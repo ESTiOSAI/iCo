@@ -17,11 +17,15 @@ final class UpBitAPIService {
 
     func fetchMarkets() async throws -> [MarketDTO] {
         let urlString = "\(endpoint)/market/all"
-        let markets: [MarketDTO] = try await network.request(url: URL(string: urlString)!)
+        let marketDTOs: [MarketDTO] = try await network.request(url: URL(string: urlString)!)
 
-        //MARK: Test
-        dump(markets)
+		return marketDTOs
+    }
 
-		return markets
+    func fetchTicks(market: String) async throws -> [TradeTickDTO] {
+        let urlString = "\(endpoint)/trades/ticks?market=\(market)"
+        let tradeTickDTOs: [TradeTickDTO] = try await network.request(url: URL(string: urlString)!)
+
+        return tradeTickDTOs
     }
 }
