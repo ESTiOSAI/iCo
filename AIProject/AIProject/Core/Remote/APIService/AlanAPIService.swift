@@ -8,11 +8,11 @@
 import Foundation
 
 final class AlanAPIService {
-    private let CLIENT_ID = "" //MARK: 아마 xcconfig를 통해서 키 관리가 필요할 거 같습니다.
+    private let CLIENT_ID = "" // MARK: 아마 xcconfig를 통해서 개인 키 관리가 필요할 거 같습니다.
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient = .init()) {
         self.network = networkClient
     }
 

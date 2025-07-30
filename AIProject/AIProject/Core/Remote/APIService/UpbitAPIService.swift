@@ -11,7 +11,7 @@ final class UpBitAPIService {
     private let network: NetworkClient
     private let endpoint: String = "https://api.upbit.com/v1"
 
-    init(networkClient: NetworkClient) {
+    init(networkClient: NetworkClient = .init()) {
         self.network = networkClient
     }
 
