@@ -10,17 +10,17 @@ import SwiftUI
 @main
 struct AIProjectApp: App {
     let persistenceController = PersistenceController.shared
-  @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
-
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-          if hasSeenOnboarding {
-            MainTabView()
-              .environment(\.managedObjectContext, persistenceController.container.viewContext)
-          } else {
-            OnboardingView()
-          }
+            if hasSeenOnboarding {
+                MainTabView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            } else {
+                OnboardingView()
+            }
         }
     }
 }
- 
+

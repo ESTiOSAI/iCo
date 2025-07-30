@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct OnboardingPageVIew: View {
-
+    
     var body: some View {
         VStack {
             Text("시작해볼까요?")
                 .font(.title)
-
+            
             
         }
     }

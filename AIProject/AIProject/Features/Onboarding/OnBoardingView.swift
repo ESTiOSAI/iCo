@@ -8,20 +8,20 @@
 import SwiftUI
 
 struct OnboardingView: View {
-  @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
-  
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    
     var body: some View {
-      TabView {
-        OnboardingPageVIew()
-        OnboardingPageVIew()
-        LastOnboardingPage {
-          withAnimation {
-            hasSeenOnboarding = true
-          }
+        TabView {
+            OnboardingPageVIew()
+            OnboardingPageVIew()
+            LastOnboardingPage {
+                withAnimation {
+                    hasSeenOnboarding = true
+                }
+            }
         }
-      }
-      .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-      .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+        .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
     }
 }
 

@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct MainTabView: View {
-  var body: some View {
-    TabView {
-      Tab("Dashboard", systemImage: "pencil") {
-        DashboardView()
-      }
-      
-      Tab("News", systemImage: "pencil") {
-        NewsView()
-      }
-      
-      Tab("ChatBot", systemImage: "pencil") {
-        ChatBotView()
-      }
-      
-      Tab("MyPage", systemImage: "pencil") {
-        MyPageView()
-      }
+    var body: some View {
+        TabView {
+            Tab("Dashboard", systemImage: "pencil") {
+                DashboardView()
+            }
+            
+            Tab("News", systemImage: "pencil") {
+                NewsView()
+            }
+            
+            Tab("ChatBot", systemImage: "pencil") {
+                ChatBotView()
+            }
+            
+            Tab("MyPage", systemImage: "pencil") {
+                MyPageView()
+            }
+        }
     }
-  }
 }
