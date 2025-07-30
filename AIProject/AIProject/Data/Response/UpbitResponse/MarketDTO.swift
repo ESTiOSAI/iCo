@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 업비트에서 거래 가능한 종목 목록 DTO
 struct MarketDTO: Codable {
     let market: String
     let koreanName: String

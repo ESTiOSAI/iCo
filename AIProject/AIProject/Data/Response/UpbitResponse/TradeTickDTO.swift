@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 가장 최근에 체결된 내역 데이터 DTO
 struct TradeTickDTO: Codable {
     let market: String
     let tradeDateUTC: String
@@ -16,8 +17,6 @@ struct TradeTickDTO: Codable {
     let tradeVolume: Double
     let prevClosingPrice: Double
     let changePrice: Double
-    let askBid: String
-    let sequentialID: Int
 
     enum CodingKeys: String, CodingKey {
         case market
@@ -28,7 +27,5 @@ struct TradeTickDTO: Codable {
         case tradeVolume = "trade_volume"
         case prevClosingPrice = "prev_closing_price"
         case changePrice = "change_price"
-        case askBid = "ask_bid"
-        case sequentialID = "sequential_id"
     }
 }

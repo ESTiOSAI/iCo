@@ -28,4 +28,11 @@ final class UpBitAPIService {
 
         return tradeTickDTOs
     }
+
+    func fetchQuotes(market: String) async throws -> [CoinQuoteDTO] {
+        let urlString = "\(endpoint)/ticker?markets=\(market)"
+        let quoteDTOs: [CoinQuoteDTO] = try await network.request(url: URL(string: urlString)!)
+
+        return quoteDTOs
+    }
 }
