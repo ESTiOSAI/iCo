@@ -7,46 +7,51 @@
 
 import Foundation
 
-/// 요청 당시 종목의 스냅샷 데이터 DTO
+/// 특정 코인의 실시간 시세, 다양한 시세 관련 정보를 포함하는 데이터 DTO
 struct CoinQuoteDTO: Codable {
+    /// 코인 마켓 코드
     let market: String
-    let tradeDate: String
-    let tradeTime: String
-    let tradeDateKst: String
-    let tradeTimeKst: String
-    let tradeTimestamp: Int64
+    /// 최근 체결 일자 및 시각
+    let tradeTimestamp: Int
 
+    /// 당일 시가
     let openingPrice: Double
+    /// 당일 고가
     let highPrice: Double
+    /// 당일 저가
     let lowPrice: Double
+    /// 현재가
     let tradePrice: Double
+    /// 전일 종가
     let prevClosingPrice: Double
 
+    /// 전일 대비 가격 변화 (RISE, FALL, EVEN)
     let change: String
+    /// 전일 대비 가격 변화
     let changePrice: Double
+    /// 전일 대비 가격 변화 비율
     let changeRate: Double
-    let signedChangePrice: Double
-    let signedChangeRate: Double
 
+    /// 최근 거래 체결량
     let tradeVolume: Double
+    /// 당일 누적 거래대금
     let accTradePrice: Double
-    let accTradePrice24h: Double
+    /// 당일 누적 거래량
     let accTradeVolume: Double
-    let accTradeVolume24h: Double
 
+    /// 52주 최고가
     let highest52WeekPrice: Double
+    /// 52주 최고가 날짜
     let highest52WeekDate: String
+    /// 52주 최저가
     let lowest52WeekPrice: Double
+    /// 52주 최저가 날짜
     let lowest52WeekDate: String
 
-    let timestamp: Int64
+    let timestamp: Int
 
     enum CodingKeys: String, CodingKey {
         case market
-        case tradeDate = "trade_date"
-        case tradeTime = "trade_time"
-        case tradeDateKst = "trade_date_kst"
-        case tradeTimeKst = "trade_time_kst"
         case tradeTimestamp = "trade_timestamp"
 
         case openingPrice = "opening_price"
@@ -58,14 +63,10 @@ struct CoinQuoteDTO: Codable {
         case change
         case changePrice = "change_price"
         case changeRate = "change_rate"
-        case signedChangePrice = "signed_change_price"
-        case signedChangeRate = "signed_change_rate"
 
         case tradeVolume = "trade_volume"
         case accTradePrice = "acc_trade_price"
-        case accTradePrice24h = "acc_trade_price_24h"
         case accTradeVolume = "acc_trade_volume"
-        case accTradeVolume24h = "acc_trade_volume_24h"
 
         case highest52WeekPrice = "highest_52_week_price"
         case highest52WeekDate = "highest_52_week_date"
@@ -76,3 +77,9 @@ struct CoinQuoteDTO: Codable {
     }
 }
 
+extension CoinQuoteDTO {
+    /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
+    var tradeDateTime: Date {
+        Date(timeIntervalSince1970: TimeInterval(tradeTimestamp) / 1000)
+    }
+}

@@ -7,6 +7,8 @@
 
 import Foundation
 
+/// Alan 응답 DTO
 struct AlanResponseDTO: Codable {
+    /// 응답 데이터
     let content: String
 }
