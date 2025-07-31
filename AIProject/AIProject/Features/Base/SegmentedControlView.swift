@@ -23,7 +23,7 @@ struct SegmentedControlView: View {
     @Binding var selection: Int
     /// 각 탭에 표시할 제목 문자열 배열
     let tabTitles: [String]
-    /// SegmentedControl 너비(기본값 150)
+    /// SegmentedControl 너비 (기본값 150)
     var width: CGFloat = 150
     
     /// 뷰 계층 구조를 정의하고, 각 탭 버튼과 배경을 구성합니다.
@@ -38,7 +38,7 @@ struct SegmentedControlView: View {
                     Text(tabTitles[idx])
                         .font(.system(size: 13, weight: .medium))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(8)
                         .foregroundColor(selection == idx ? .aiCoBackground : .aiCoAccent)
                         .background(
                             ZStack {
