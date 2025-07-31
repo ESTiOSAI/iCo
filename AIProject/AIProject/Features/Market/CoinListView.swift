@@ -26,7 +26,12 @@ struct CoinListView: View {
                     
                     Text(1333, format: .number)
                         .foregroundStyle(.red)
-                    Text(3, format: <#T##F#>)
+                    Text(3, format: .percent.precision(.fractionLength(2)))
+                        .foregroundStyle(.red)
+                    
+                    Text(162140000, format: .currency(code: "KRW"))
+                        .fontWeight(.medium)
+                        .font(.system(size: 12))
                 }
             }
         }
