@@ -10,21 +10,29 @@ import SwiftUI
 struct MainTabView: View {
     var body: some View {
         TabView {
-            Tab("Dashboard", systemImage: "pencil") {
-                DashboardView()
-            }
+            DashboardView()
+                .tabItem {
+                    Label("대쉬보드", systemImage: "square.grid.2x2")
+                }
             
-            Tab("News", systemImage: "pencil") {
-                NewsView()
-            }
+            DashboardView()
+                .tabItem {
+                    Label("마켓", systemImage: "bitcoinsign.bank.building")
+                }
             
-            Tab("ChatBot", systemImage: "pencil") {
-                ChatBotView()
-            }
+            ChatBotView()
+                .tabItem {
+                    Label("챗봇", systemImage: "bubble.left.and.text.bubble.right")
+                }
             
-            Tab("MyPage", systemImage: "pencil") {
-                MyPageView()
-            }
+            MyPageView()
+                .tabItem {
+                    Label("마이페이지", systemImage: "person.crop.circle")
+                }
         }
     }
+}
+
+#Preview {
+    MainTabView()
 }
