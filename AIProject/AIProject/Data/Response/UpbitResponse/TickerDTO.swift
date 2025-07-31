@@ -8,9 +8,9 @@
 import Foundation
 
 /// 특정 코인의 실시간 시세, 다양한 시세 관련 정보를 포함하는 데이터 DTO
-struct CoinQuoteDTO: Codable {
+struct TickerDTO: Codable {
     /// 코인 마켓 코드
-    let market: String
+    let coinID: String
     /// 최근 체결 일자 및 시각
     let tradeTimestamp: Int
 
@@ -51,7 +51,7 @@ struct CoinQuoteDTO: Codable {
     let timestamp: Int
 
     enum CodingKeys: String, CodingKey {
-        case market
+        case coinID = "market"
         case tradeTimestamp = "trade_timestamp"
 
         case openingPrice = "opening_price"
@@ -77,7 +77,7 @@ struct CoinQuoteDTO: Codable {
     }
 }
 
-extension CoinQuoteDTO {
+extension TickerDTO {
     /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(tradeTimestamp) / 1000)

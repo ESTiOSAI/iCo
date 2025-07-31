@@ -11,4 +11,6 @@ enum NetworkError: Error {
     case invalidURL
     /// 웹소켓에서 에러가 발생했습니다.
     case webSocketError
+    /// 응답이 올바르지 않습니다.
+    case invalidResponse
 }
