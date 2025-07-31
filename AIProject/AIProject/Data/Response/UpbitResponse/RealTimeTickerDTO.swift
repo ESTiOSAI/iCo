@@ -10,7 +10,7 @@ import Foundation
 /// WebSocket으로부터 오는 실시간 시세 데이터 DTO
 struct RealTimeTickerDTO: Decodable {
     /// 종목 코드
-    let code: String
+    let coinID: String
     /// 현재 체결 가격
     let tradePrice: Double
     /// 전일 대비 변화 (RISE, FALL, EVEN)
@@ -21,7 +21,7 @@ struct RealTimeTickerDTO: Decodable {
     let changeRate: Double
 
     enum CodingKeys: String, CodingKey {
-        case code
+        case coinID = "code"
         case tradePrice = "trade_price"
         case change
         case changePrice = "change_price"

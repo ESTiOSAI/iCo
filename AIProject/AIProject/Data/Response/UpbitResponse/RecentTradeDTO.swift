@@ -10,7 +10,7 @@ import Foundation
 /// 가장 최근에 체결된 내역 데이터 DTO
 struct RecentTradeDTO: Codable {
     /// 마켓 코드
-    let market: String
+    let coinID: String
     /// 체결 일자
     let tradeDate: String
     /// 체결 시간
@@ -27,7 +27,7 @@ struct RecentTradeDTO: Codable {
     let changePrice: Double
 
     enum CodingKeys: String, CodingKey {
-        case market
+        case coinID = "market"
         case tradeDate = "trade_date_utc"
         case tradeTime = "trade_time_utc"
         case timestamp

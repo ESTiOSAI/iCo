@@ -10,7 +10,7 @@ import Foundation
 /// 분 단위의 캔들 데이터 DTO
 struct MinuteCandleDTO: Codable {
     /// 종목 코드
-    let market: String
+    let coinID: String
     /// 시가
     let openingPrice: Double
     /// 캔들 기준 시각
@@ -29,7 +29,7 @@ struct MinuteCandleDTO: Codable {
     let candleAccTradeVolume: Double
 
     enum CodingKeys: String, CodingKey {
-        case market
+        case coinID = "market"
         case candleDateTime = "candle_date_time_kst"
         case openingPrice = "opening_price"
         case highPrice = "high_price"
