@@ -48,4 +48,17 @@ final class UpBitAPIService {
 
         return quoteDTOs
     }
+
+    /// 지정한 코인(마켓)의 1분봉 캔들 데이터를 가져옵니다.
+    /// - Parameters:
+    ///   - market: 조회할 마켓 코드 (ex. "RKW-BTC")
+    ///   - count: 가져올 캔들 데이터 개수, 기본값은 1입니다.
+    /// - Returns: 해당 코인(마켓)의 1분 단위의 캔들 정보
+    func fetchCandles(id market: String, count: Int = 1) async throws -> [CandleDTO] {
+        let urlString = "\(endpoint)/candles/minutes/1?market=\(market)&count=\(count)"
+        guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
+        let candleDTOs: [CandleDTO] = try await network.request(url: url)
+
+        return candleDTOs
+    }
 }
