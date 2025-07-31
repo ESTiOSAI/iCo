@@ -8,7 +8,7 @@
 import Foundation
 
 /// 가장 최근에 체결된 내역 데이터 DTO
-struct TradeTickDTO: Codable {
+struct RecentTradeDTO: Codable {
     /// 마켓 코드
     let market: String
     /// 체결 일자
@@ -38,7 +38,7 @@ struct TradeTickDTO: Codable {
     }
 }
 
-extension TradeTickDTO {
+extension RecentTradeDTO {
     /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)
