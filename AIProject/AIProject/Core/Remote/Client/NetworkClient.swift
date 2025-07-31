@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Network 통신을 담당하는 객체
 final class NetworkClient {
     func request<T: Decodable>(url: URL) async throws -> T {
         let (data, _) = try await URLSession.shared.data(from: url)

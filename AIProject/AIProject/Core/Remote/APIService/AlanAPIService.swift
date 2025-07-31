@@ -9,7 +9,7 @@ import Foundation
 
 /// 앨런 API 관련 서비스를 제공합니다.
 final class AlanAPIService {
-    private let CLIENT_ID = "" // MARK: 아마 xcconfig를 통해서 개인 키 관리가 필요할 거 같습니다.
+    private let CLIENT_ID = "" // TODO: 아마 xcconfig를 통해서 개인 키 관리가 필요할 거 같습니다.
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
 

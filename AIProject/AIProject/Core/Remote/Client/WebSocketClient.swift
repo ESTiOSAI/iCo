@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 웹소켓 통신을 담당하는 객체
 final class WebSocketClient: NSObject {
     private let endpoint = "wss://api.upbit.com/websocket/v1"
     /// URLSession 웹소켓 태스크
