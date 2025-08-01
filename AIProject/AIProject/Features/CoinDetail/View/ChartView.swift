@@ -31,11 +31,11 @@ struct ChartView: View {
 
                 // 타이틀 영역: 코인명 / 심볼
                 HStack(spacing: 8) {
-                    Text(viewModel.name)
+                    Text(viewModel.coinName)
                         .font(.title3).bold()
                         .foregroundStyle(.aiCoLabel)
 
-                    Text(viewModel.symbol)
+                    Text(viewModel.coinSymbol)
                         .font(.footnote).bold()
                         .padding(.horizontal, 10).padding(.vertical, 6)
                         .foregroundStyle(.gray)

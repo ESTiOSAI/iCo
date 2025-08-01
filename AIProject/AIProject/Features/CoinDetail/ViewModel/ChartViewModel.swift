@@ -11,9 +11,9 @@ import SwiftUI
 @MainActor
 final class ChartViewModel: ObservableObject {
     /// 코인 표시 이름 (예: "비트코인")
-    @Published var name: String = "비트코인"
+    @Published var coinName: String = "비트코인"
     /// 심볼 (예: "BTC")
-    @Published var symbol: String = "BTC"
+    @Published var coinSymbol: String = "BTC"
     /// 통화 코드 (예: "USD")
     @Published var currency: String = "USD"
     
