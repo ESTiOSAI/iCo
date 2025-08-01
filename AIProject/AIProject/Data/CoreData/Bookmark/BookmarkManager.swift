@@ -34,9 +34,11 @@ protocol BookmarkManaging {
 }
 
 final class BookmarkManager: BookmarkManaging {
+    static let shared = BookmarkManager()
+
     private let service: CoreDataService
 
-    init(service: CoreDataService = .shared) {
+    private init(service: CoreDataService = .shared) {
         self.service = service
     }
 
