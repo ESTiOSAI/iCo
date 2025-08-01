@@ -18,35 +18,35 @@ final class UpBitAPIService {
 
     /// 전체 마켓의 정보를 가져옵니다.
     /// - Returns: 마켓 정보들의 배열
-    func fetchMarkets() async throws -> [MarketDTO] {
+    func fetchMarkets() async throws -> [CoinDTO] {
         let urlString = "\(endpoint)/market/all"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
-        let marketDTOs: [MarketDTO] = try await network.request(url: url)
+        let coinDTOs: [CoinDTO] = try await network.request(url: url)
 
-		return marketDTOs
+        return coinDTOs
     }
 
     /// 지정한 마켓의 체결 이력을 가져옵니다.
     /// - Parameter market: 조회할 마켓 코드 (ex. "KRW-BTC")
     /// - Parameter count: 체결된 이력 개수, 기본값은 1입니다.
     /// - Returns: 해당 마켓의 최근 체결 정보
-    func fetchTicks(id market: String, count: Int = 1) async throws -> [TradeTickDTO] {
+    func fetchTicks(id market: String, count: Int = 1) async throws -> [RecentTradeDTO] {
         let urlString = "\(endpoint)/trades/ticks?market=\(market)&count=\(count)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
-        let tradeTickDTOs: [TradeTickDTO] = try await network.request(url: url)
+        let recentTradeDTOs: [RecentTradeDTO] = try await network.request(url: url)
 
-        return tradeTickDTOs
+        return recentTradeDTOs
     }
     
     /// 지정한 마켓의 현재 시세 정보를 가져옵니다.
     /// - Parameter market: 조회할 마켓 코드 (ex. "KRW-BTC")
     /// - Returns: 해당 마켓의 시세 정보
-    func fetchQuotes(id market: String) async throws -> [CoinQuoteDTO] {
+    func fetchQuotes(id market: String) async throws -> [TickerDTO] {
         let urlString = "\(endpoint)/ticker?markets=\(market)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
-        let quoteDTOs: [CoinQuoteDTO] = try await network.request(url: url)
+        let tickerDTOs: [TickerDTO] = try await network.request(url: url)
 
-        return quoteDTOs
+        return tickerDTOs
     }
 
     /// 지정한 코인(마켓)의 1분봉 캔들 데이터를 가져옵니다.
@@ -54,11 +54,11 @@ final class UpBitAPIService {
     ///   - market: 조회할 마켓 코드 (ex. "RKW-BTC")
     ///   - count: 가져올 캔들 데이터 개수, 기본값은 1입니다.
     /// - Returns: 해당 코인(마켓)의 1분 단위의 캔들 정보
-    func fetchCandles(id market: String, count: Int = 1) async throws -> [CandleDTO] {
+    func fetchCandles(id market: String, count: Int = 1) async throws -> [MinuteCandleDTO] {
         let urlString = "\(endpoint)/candles/minutes/1?market=\(market)&count=\(count)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
-        let candleDTOs: [CandleDTO] = try await network.request(url: url)
+        let minuteCandleDTOs: [MinuteCandleDTO] = try await network.request(url: url)
 
-        return candleDTOs
+        return minuteCandleDTOs
     }
 }

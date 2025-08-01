@@ -8,9 +8,9 @@
 import Foundation
 
 /// 분 단위의 캔들 데이터 DTO
-struct CandleDTO: Codable {
+struct MinuteCandleDTO: Codable {
     /// 종목 코드
-    let market: String
+    let coinID: String
     /// 시가
     let openingPrice: Double
     /// 캔들 기준 시각
@@ -29,7 +29,7 @@ struct CandleDTO: Codable {
     let candleAccTradeVolume: Double
 
     enum CodingKeys: String, CodingKey {
-        case market
+        case coinID = "market"
         case candleDateTime = "candle_date_time_kst"
         case openingPrice = "opening_price"
         case highPrice = "high_price"
@@ -41,7 +41,7 @@ struct CandleDTO: Codable {
     }
 }
 
-extension CandleDTO {
+extension MinuteCandleDTO {
     /// 해당 캔들에서 마지막 틱이 저장된 시각을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(timestamp) / 1000)

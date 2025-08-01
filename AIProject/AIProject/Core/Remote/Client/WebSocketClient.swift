@@ -16,7 +16,7 @@ final class WebSocketClient: NSObject {
     private var isActive = false
 
     /// 비동기 스트림 방식의 데이터 방출
-    typealias WebSocketStream = AsyncThrowingStream<CoinDTO, Error>
+    typealias WebSocketStream = AsyncThrowingStream<RealTimeTickerDTO, Error>
     private var continuation: WebSocketStream.Continuation?
 
     /// 비동기 데이터를 방출할 스트림
@@ -70,7 +70,7 @@ final class WebSocketClient: NSObject {
                 switch message {
                 case .data(let data):
                     do {
-                        let coinData = try JSONDecoder().decode(CoinDTO.self, from: data)
+                        let coinData = try JSONDecoder().decode(RealTimeTickerDTO.self, from: data)
                         continuation?.yield(coinData) // 코인 데이터 방출
                     } catch {
                         throw NetworkError.webSocketError
