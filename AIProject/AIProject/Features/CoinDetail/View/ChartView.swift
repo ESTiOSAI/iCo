@@ -47,11 +47,18 @@ struct ChartView: View {
                     Text(summary.lastPrice, format: .currency(code: viewModel.currency))
                         .font(.largeTitle).bold()
                         .foregroundStyle(.aiCoLabel)
-
-                    let sign = summary.change >= 0 ? "+" : ""
+                    
+                    let isRising = summary.change > 0
+                    let isFalling = summary.change < 0
+                    let sign = isRising ? "+" : (isFalling ? "-" : "")
+                    
                     Text("\(sign)\(summary.change, format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
                         .font(.subheadline)
-                        .foregroundStyle(summary.change >= 0 ? .aiCoNegative : .aiCoPositive)
+                        .foregroundStyle(
+                            isRising ? Color.aiCoNegative :
+                            isFalling ? Color.aiCoPositive :
+                            Color.gray
+                        )
                 }
 
                 // 라인 차트: 가격 시계열 렌더링 + 마지막 포인트 하이라이트
