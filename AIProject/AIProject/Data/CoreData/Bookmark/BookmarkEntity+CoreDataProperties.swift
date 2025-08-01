@@ -16,8 +16,8 @@ extension BookmarkEntity {
         return NSFetchRequest<BookmarkEntity>(entityName: "BookmarkEntity")
     }
 
-    @NSManaged public var coinID: String?
-    @NSManaged public var timestamp: Date?
+    @NSManaged public var coinID: String
+    @NSManaged public var timestamp: Date
 
 }
 

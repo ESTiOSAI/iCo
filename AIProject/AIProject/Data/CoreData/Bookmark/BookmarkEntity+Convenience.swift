@@ -12,7 +12,7 @@ extension BookmarkEntity {
     /// - Parameters:
     /// - context: NSManagedObjectContext
     /// - coinID: 코인(market-name)이름 문자열
-    /// - timestamp: 검색 시각 (기본값: 현재 시간)
+    /// - timestamp: 북마크 등록 시간 (기본값: 현재 시간)
     convenience init(context: NSManagedObjectContext,
                      coinID: String,
                      timestamp: Date = Date()) {

@@ -15,8 +15,8 @@ extension SearchRecordEntity {
         return NSFetchRequest<SearchRecordEntity>(entityName: "SearchRecordEntity")
     }
 
-    @NSManaged public var query: String?
-    @NSManaged public var timestamp: Date?
+    @NSManaged public var query: String
+    @NSManaged public var timestamp: Date
 
 }
 

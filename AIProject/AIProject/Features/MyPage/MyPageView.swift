@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#warning("테스트 코드입니다.")
 struct MyPageView: View {
     var body: some View {
 		CoreDataCRUDTestView()
@@ -47,9 +48,9 @@ struct CoreDataCRUDTestView: View {
 
             List(vm.bookmarks, id: \.objectID) { bookmark in
                 HStack {
-                    Text(bookmark.coinID ?? "-")
+                    Text(bookmark.coinID)
                     Spacer()
-                    Text("\(bookmark.timestamp ?? Date(), formatter: vm.dateFormatter)")
+                    Text("\(bookmark.timestamp, formatter: vm.dateFormatter)")
                         .font(.caption)
                 }
             }
@@ -103,7 +104,7 @@ final class TestViewModel: ObservableObject {
                 }
                 // update timestamp to now
                 first.timestamp = Date()
-                try manager.add(coinID: first.coinID ?? "")
+                try manager.add(coinID: first.coinID)
                 print("✏️ Updated first bookmark timestamp")
                 await MainActor.run { readTest() }
             } catch {
@@ -116,7 +117,7 @@ final class TestViewModel: ObservableObject {
         Task {
             do {
                 if let first = bookmarks.first {
-                    try manager.remove(coinID: first.coinID ?? "")
+                    try manager.remove(coinID: first.coinID)
                     print("🗑 Deleted first bookmark")
                     await MainActor.run { readTest() }
                 } else {
