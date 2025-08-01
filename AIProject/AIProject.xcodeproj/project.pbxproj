@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		26620F192E3C59D00083E177 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 26620F182E3C59D00083E177 /* Secrets.xcconfig */; };
+		A98DE7DD2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
+		A98DE7DE2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
+		A98DE7DF2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,14 +30,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		26620F182E3C59D00083E177 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B7B040032E387FCF005DE0BA /* AIProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B0401F2E387FD1005DE0BA /* AIProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		26620F1B2E3C5A5C0083E177 /* Exceptions for "AIProject" folder in "AIProject" target */ = {
+		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -48,7 +50,7 @@
 		B7B040052E387FCF005DE0BA /* AIProject */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				26620F1B2E3C5A5C0083E177 /* Exceptions for "AIProject" folder in "AIProject" target */,
+				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
 			);
 			path = AIProject;
 			sourceTree = "<group>";
@@ -93,11 +95,11 @@
 		B7B03FFA2E387FCF005DE0BA = {
 			isa = PBXGroup;
 			children = (
-				26620F182E3C59D00083E177 /* Secrets.xcconfig */,
 				B7B040052E387FCF005DE0BA /* AIProject */,
 				B7B040182E387FD1005DE0BA /* AIProjectTests */,
 				B7B040222E387FD1005DE0BA /* AIProjectUITests */,
 				B7B040042E387FCF005DE0BA /* Products */,
+				A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -231,7 +233,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				26620F192E3C59D00083E177 /* Secrets.xcconfig in Resources */,
+				A98DE7DE2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,6 +241,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98DE7DD2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98DE7DF2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +295,7 @@
 /* Begin XCBuildConfiguration section */
 		B7B040272E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26620F182E3C59D00083E177 /* Secrets.xcconfig */;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -413,7 +417,7 @@
 		};
 		B7B0402A2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26620F182E3C59D00083E177 /* Secrets.xcconfig */;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -422,7 +426,6 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -452,7 +455,6 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -474,7 +476,7 @@
 		};
 		B7B0402D2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26620F182E3C59D00083E177 /* Secrets.xcconfig */;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -513,7 +515,7 @@
 		};
 		B7B040302E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26620F182E3C59D00083E177 /* Secrets.xcconfig */;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
