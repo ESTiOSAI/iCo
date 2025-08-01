@@ -9,21 +9,21 @@ import SwiftUI
 
 struct CoinDetailView: View {
     @State private var selectedTab = 0
-    let tabs = ["차트", "보고서"]
+    private let tabs = ["차트", "AI 리포트"]
     let coin: Coin
     
     var body: some View {
         VStack {
             HeaderView(heading: coin.koreanName)
             
-            SegmentedControlView(selection: $selectedTab, tabTitles: tabs, width: 120)
+            SegmentedControlView(selection: $selectedTab, tabTitles: tabs, width: 150)
             
             // 차트, 보고서 view
             VStack {
                 Group {
                     switch selectedTab {
                     case 0: /*ChartView()*/ Text("차트") // 차트뷰 호출
-                    case 1: /*ReportView()*/ Text("보고서") // 보고서뷰 호출
+                    case 1: ReportView(coin: coin)
                     default: /*ChartView()*/ Text("차트")
                     }
                 }
