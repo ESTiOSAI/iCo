@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A98DE7DD2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
+		A98DE7DE2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
+		A98DE7DF2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B7B040162E387FD1005DE0BA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,13 +30,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B7B040032E387FCF005DE0BA /* AIProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B0401F2E387FD1005DE0BA /* AIProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A98DE7502E3C82DF003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
+		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -43,7 +50,7 @@
 		B7B040052E387FCF005DE0BA /* AIProject */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A98DE7502E3C82DF003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
+				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
 			);
 			path = AIProject;
 			sourceTree = "<group>";
@@ -92,6 +99,7 @@
 				B7B040182E387FD1005DE0BA /* AIProjectTests */,
 				B7B040222E387FD1005DE0BA /* AIProjectUITests */,
 				B7B040042E387FCF005DE0BA /* Products */,
+				A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -225,6 +233,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98DE7DE2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,6 +241,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98DE7DD2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98DE7DF2E3C8B95003F2F4F /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,6 +295,7 @@
 /* Begin XCBuildConfiguration section */
 		B7B040272E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -405,6 +417,7 @@
 		};
 		B7B0402A2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -463,6 +476,7 @@
 		};
 		B7B0402D2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -501,6 +515,7 @@
 		};
 		B7B040302E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A98DE7DC2E3C8B95003F2F4F /* Secrets.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
