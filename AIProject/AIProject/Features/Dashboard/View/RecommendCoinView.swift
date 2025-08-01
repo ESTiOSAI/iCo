@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct RecommendCoinView: View {
+    @ObservedObject var viewModel: DashboardViewModel
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(RecommendCoin.dummyDatas) { coin in
-                        RecommendCardView()
+                    ForEach(viewModel.recommendCoin) { coin in
+                        RecommendCardView(recommendCoin: coin)
                             .containerRelativeFrame(.horizontal) { value, axis in
                                 axis == .horizontal ? value * 0.7 : value
                             }
@@ -25,9 +26,12 @@ struct RecommendCoinView: View {
             }
             .scrollTargetBehavior(.viewAligned)
         }
+        .onAppear {
+            viewModel.getRecommendCoin()
+        }
     }
 }
 
 #Preview {
-    RecommendCoinView()
+    RecommendCoinView(viewModel: DashboardViewModel())
 }

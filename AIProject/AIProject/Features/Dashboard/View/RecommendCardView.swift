@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RecommendCardView: View {
+    let recommendCoin: RecommendCoin
+    
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -33,5 +35,5 @@ struct RecommendCardView: View {
 }
 
 #Preview {
-    RecommendCardView()
+    RecommendCardView(recommendCoin: RecommendCoin(comment: "좋다", coinID: "KRW-BTC"))
 }
