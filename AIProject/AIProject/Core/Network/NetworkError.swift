@@ -13,4 +13,6 @@ enum NetworkError: Error {
     case webSocketError
     /// 응답이 올바르지 않습니다.
     case invalidResponse
+	/// API Key가 올바르지 않습니다.
+    case invalidAPIKey
 }
