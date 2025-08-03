@@ -12,6 +12,7 @@ final class ReportViewModel: ObservableObject {
     let koreanName: String
     @Published var coinOverView: String = "AI가 정보를 준비하고 있어요"
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
+    @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinTodayTopNews: [Article] = [Article(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/news1")]
     
     init(coin: Coin) {
@@ -19,6 +20,7 @@ final class ReportViewModel: ObservableObject {
         self.koreanName = coin.koreanName
         fetchOverView()
         fetchTodayTopNews()
+        fetchWeeklyTrends()
     }
     
     private func fetch<T: Decodable>(
@@ -77,7 +79,7 @@ final class ReportViewModel: ObservableObject {
                     ‣ 최초발행: \(data.startDate)
                     
                     ‣ 소개: \(data.description)
-                """
+                    """
             },
             onFailure: {
                 self.coinOverView = "데이터를 불러오는 데 실패했어요"
@@ -129,6 +131,47 @@ final class ReportViewModel: ObservableObject {
             }
         )
     }
+    
+    private func fetchWeeklyTrends() {
+        let content = """
+            struct CoinWeekly: Codable {
+                /// 최근 일주일 가격 추이
+                let priceTrend: String
+                
+                /// 최근 일주일 거래량 변화
+                let volumeChange: String
+                
+                /// 지난 일주일간 가격 추이와 거래량 변화의 주요 원인
+                let reason: String
+            }
+            
+            1. 답변할 항목은 위에 제공한 Swift 구조체의 주석에 따라 내용을 구성
+            2. JSON 형식과 변수 또한 구조체와 통일
+            3. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
+            4. 출처 제외
+            5. 마크다운 문법 사용 금지
+        
+            위 다섯가지 규칙을 적용해서 "\(coin.koreanName)"의 최근 일주일 가격 추이 및 거래량 변화 그리고 그 원인을 알려줘.
+        """
+        
+        fetch(
+            content: content,
+            decodeType: CoinWeekly.self,
+            onSuccess: { data in
+                self.coinWeeklyTrends = """
+                    ‣ 가격 추이: \(data.priceTrend)
+                    
+                    ‣ 거래량 변화: \(data.volumeChange)
+                    
+                    ‣ 원인: \(data.reason)
+                    """
+            },
+            onFailure: {
+                self.coinWeeklyTrends = "데이터를 불러오는 데 실패했어요"
+            }
+        )
+    }
+}
 
 func extractJSON(from raw: String) -> String {
     guard let startRange = raw.range(of: "```json") else { return raw }
@@ -175,4 +218,15 @@ struct Article: Identifiable, Codable {
     var id: Int {
         "\(title)\(url)".hashValue
     }
+}
+
+struct CoinWeekly: Codable {
+    /// 최근 일주일 가격 추이
+    let priceTrend: String
+    
+    /// 최근 일주일 거래량 변화
+    let volumeChange: String
+    
+    /// 지난 일주일간 가격 추이와 거래량 변화의 주요 원인
+    let reason: String
 }
