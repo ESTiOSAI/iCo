@@ -10,7 +10,7 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    func recognizeText(from image: UIImage) async throws -> [String] {
+    static func recognizeText(from image: UIImage) async throws -> [String] {
         guard let cgImage = image.cgImage else {
             throw NSError(domain: "TextRecognitionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "🚨 CGImage가 유효하지 않음"])
         }
@@ -28,7 +28,7 @@ final class TextRecognitionHelper {
                 
                 let results = observations.compactMap { observation -> String? in
                     guard let topCandidate = observation.topCandidates(1).first else { return nil }
-                    return self.redactNonKoreanText(in: topCandidate.string)
+                    return Self.redactNonKoreanText(in: topCandidate.string)
                 }
                 continuation.resume(returning: results)
             }
@@ -47,7 +47,7 @@ final class TextRecognitionHelper {
         }
     }
     
-    private func redactNonKoreanText(in text: String) -> String {
+    static func redactNonKoreanText(in text: String) -> String {
         let tagger = NLTagger(tagSchemes: [.language])
         tagger.string = text
         

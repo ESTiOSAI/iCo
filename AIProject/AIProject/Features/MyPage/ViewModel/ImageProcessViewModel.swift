@@ -24,12 +24,14 @@ class ImageProcessViewModel: ObservableObject {
     
     func performOCR(from selectedImage: UIImage) async -> [String] {
         do {
-            return try await TextRecognitionHelper().recognizeText(from: selectedImage)
+            return try await TextRecognitionHelper.recognizeText(from: selectedImage)
         } catch {
             print("🚨 OCR 실패: \(error.localizedDescription)")
             return []
         }
     }
+    
+    // TODO: 인식한 텍스트 주변에 박스 그리기
     
     func convertToSymbol(with text: [String]) async {
         do {
