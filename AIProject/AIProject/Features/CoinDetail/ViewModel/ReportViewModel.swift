@@ -11,11 +11,14 @@ final class ReportViewModel: ObservableObject {
     let coin: Coin
     let koreanName: String
     @Published var coinOverView: String = "AI가 정보를 준비하고 있어요"
+    @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
+    @Published var coinTodayTopNews: [Article] = [Article(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/news1")]
     
     init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
         fetchOverView()
+        fetchTodayTopNews()
     }
     
     private func fetch<T: Decodable>(
@@ -81,6 +84,51 @@ final class ReportViewModel: ObservableObject {
             }
         )
     }
+    
+    private func fetchTodayTopNews() {
+        let content = """
+            struct CoinTodayNews: Codable { // 주석은 주어진 키워드가 '비트코인'인 경우 예상 응답
+                /// 오늘 시장 분위기
+                /// 비트코인은 최근 아마존을 제치고 세계 5위 자산으로 올라서는 성과를 달성했으나, 최근 5일 연속 가격이 하락하며 3주 만에 최저치를 기록했습니다. 8월은 비수기로 예상되며, 가격이 11만 2000달러까지 하락할 가능성이 제기되고 있습니다. JP모건 CEO는 비트코인에 대한 회의적인 입장을 밝히면서도 고객의 선택을 존중하겠다는 입장을 표명했습니다. 가상화폐 시장 전반이 하락세를 보이고 있으며, 주요 코인들이 큰 폭으로 하락하고 있습니다. 시장 분위기는 전반적으로 부정적이며, 가격 하락과 비수기 전망으로 인해 투자자들의 불안감이 커지고 있습니다.
+                let today: String
+                
+                /// 뉴스 배열, 3개
+                let articles: [Article]
+            }
+        
+            struct Article: Codable {
+                /// 뉴스 헤드라인
+                let title: String
+                
+                /// 뉴스 한 줄 요약
+                let summary: String
+                
+                /// 뉴스 원문 링크
+                let url: String
+            }
+        
+            1. 답변할 항목은 위에 제공한 Swift 구조체의 주석에 따라 내용을 구성
+            2. JSON 형식과 변수 또한 구조체와 통일
+            3. 오늘 시장 분위기(today)의 경우에는 현재 국내 시간을 기준으로 24시간 동안의 뉴스를 근거로 간단하게 요약
+            4. 뉴스 배열의 경우에는 현재 국내 시간을 기준으로 24시간 동안의 뉴스 top 3 헤드라인과 한줄 요약을 제공
+            5. 마크다운 문법 사용 금지
+        
+            위 다섯가지 규칙을 적용해서 "\(coin.koreanName)"에 대한 오늘 시장 분위기 요약본과 뉴스 배열을 제공해줘.
+        """
+        
+        fetch(
+            content: content,
+            decodeType: CoinTodayNews.self,
+            onSuccess: { data in
+                self.coinTodayTrends = data.today
+                self.coinTodayTopNews = data.articles
+            },
+            onFailure: {
+                self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
+                self.coinTodayTopNews = [Article(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
+            }
+        )
+    }
 
 func extractJSON(from raw: String) -> String {
     guard let startRange = raw.range(of: "```json") else { return raw }
@@ -104,4 +152,27 @@ struct CoinOverview: Codable {
     
     /// 디지털 자산 소개
     let description: String
+}
+
+struct CoinTodayNews: Codable {
+    /// 오늘 시장 분위기
+    let today: String
+    
+    /// 뉴스 배열, 3개
+    let articles: [Article]
+}
+
+struct Article: Identifiable, Codable {
+    /// 뉴스 제목
+    let title: String
+    
+    /// 뉴스 한 줄 요약
+    let summary: String
+    
+    /// 뉴스 원문 링크
+    let url: String
+    
+    var id: Int {
+        "\(title)\(url)".hashValue
+    }
 }
