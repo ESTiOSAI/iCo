@@ -20,9 +20,47 @@ final class ChartViewModel: ObservableObject {
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
+    /// 가격 데이터를 가져오는 서비스
+    private let priceService: CoinPriceProvider
+    /// 차트 가격 데이터를 주기적으로 갱신하기 위한 타이머
+    private var timer: Timer?
+    
     /// 초기 진입 시 1일(1D) 범위의 더미 시계열 데이터를 준비
-    init() {
-        self.prices = Self.makeDummyPrices(hours: 24, samplingInterval: 60)
+    init(priceService: CoinPriceProvider = UpbitPriceService()) {
+        self.priceService = priceService
+        startUpdating()
+    }
+    
+    /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작
+    /// - Note: 최초 1회 실행 후 60초마다 반복 호출
+    private func startUpdating() {
+        // 최초 1회
+        Task { await loadPrices() }
+
+        // 이후 1분마다 반복
+        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            Task { await self.loadPrices() }
+        }
+    }
+    
+    /// 타이머 종료 및 메모리 정리
+    deinit {
+        timer?.invalidate()
+        timer = nil
+    }
+    
+    
+    /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
+    /// - Parameter interval: 차트 간격 (기본: 1일)
+    func loadPrices(interval: CoinInterval = .d1) async {
+        do {
+            let marketCode = "KRW-\(coinSymbol)"
+            let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
+            self.prices = fetchedPrices
+        } catch {
+            print("가격 불러오기 실패: \(error.localizedDescription)")
+            self.prices = []
+        }
     }
     
     /// 현재 `prices` 기준의 간단한 요약 정보
