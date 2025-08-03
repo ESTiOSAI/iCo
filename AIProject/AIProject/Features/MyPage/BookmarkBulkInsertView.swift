@@ -11,6 +11,8 @@ import PhotosUI
 struct BookmarkBulkInsertView: View {
     @Environment(\.dismiss) var dismiss
     
+    @StateObject var vm = ImageProcessViewModel()
+    
     @State private var selectedItem: PhotosPickerItem? = nil
     @State var selectedImage: UIImage? = nil
     
@@ -71,6 +73,7 @@ struct BookmarkBulkInsertView: View {
                     if let data = try? await newValue?.loadTransferable(type: Data.self),
                        let uiImage = UIImage(data: data) {
                         selectedImage = uiImage
+                        vm.performOCR(from: selectedImage!)
                     }
                 }
             }
