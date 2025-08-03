@@ -30,7 +30,24 @@ struct BookmarkBulkInsertView: View {
                 
                 VStack {
                     if selectedImage != nil {
-                        ImagePreviewView(selectedImage: selectedImage!)
+                        ZStack {
+                            ImagePreviewView(selectedImage: selectedImage!)
+                                .opacity(vm.isLoading ? 0.2 : 1)
+                                .blur(radius: vm.isLoading ? 1 : 0)
+                            
+                            if vm.isLoading {
+                                VStack(spacing: 16) {
+                                    ProgressView()
+                                        .scaleEffect(2)
+                                    
+                                    Text("이미지 분석중...")
+                                        .font(.footnote)
+                                        .foregroundStyle(.aiCoLabel)
+                                    
+                                    //TODO: 분석 작업 취소 기능 구현하기
+                                }
+                            }
+                        }
                     } else {
                         Spacer()
                         

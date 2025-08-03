@@ -8,11 +8,17 @@
 import SwiftUI
 
 class ImageProcessViewModel: ObservableObject {
+    @Published var isLoading = false
+    
     func processImage(from selectedImage: UIImage) {
         Task {
+            await MainActor.run { self.isLoading = true }
+            
             let recognizedText = await performOCR(from: selectedImage)
             // TODO: 이미지에 글자가 없는 경우 대응하기
             await convertToSymbol(with: recognizedText)
+            
+            await MainActor.run { self.isLoading = false }
         }
     }
     
