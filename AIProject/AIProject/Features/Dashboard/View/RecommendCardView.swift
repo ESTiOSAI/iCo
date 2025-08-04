@@ -48,22 +48,3 @@ struct RecommendCardView: View {
     )
 }
 
-extension Double {
-    /// KRW(원화) 형태인 문자열로 반환합니다.
-    var formatKRW: String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.locale = Locale(identifier: "ko_KR")
-
-        guard let krw = formatter.string(from: NSNumber(value: self)) else {
-            return "잘못된 포맷입니다."
-        }
-
-        return "\(krw)원"
-    }
-
-    var formatRate: String {
-        String(format: "%.2f%%", self)
-    }
-}
-
