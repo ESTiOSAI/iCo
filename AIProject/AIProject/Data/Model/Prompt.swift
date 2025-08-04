@@ -22,9 +22,10 @@ enum Prompt {
                      -> \(bookmark)
             
                      JSON 형식으로 요청할거고, JSON 형식으로만 응답을 줘
-                     struct RecommendCoin: Codable {
+                     struct RecommendCoinDTO: Codable {
                          let name: String
                          let symbol: String
+                         let comment: String
                      }
 """
         }
