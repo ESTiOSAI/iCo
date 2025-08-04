@@ -12,7 +12,7 @@ import Charts
 /// `ChartViewModel`이 제공하는 시계열 데이터를 라인 차트로 렌더링
 struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
-    @ObservedObject var viewModel: ChartViewModel
+    @StateObject var viewModel: ChartViewModel
     /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
     @State private var selectedInterval: CoinInterval = .d1
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
@@ -23,6 +23,10 @@ struct ChartView: View {
     /// 헤더의 가격 요약 정보(마지막가 / 변화 / 등락률)
     private var summary: PriceSummary? { viewModel.summary }
 
+    init(coin: Coin) {
+        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
+    }
+    
     var body: some View {
         let lastPoint = data.last
 
@@ -123,9 +127,5 @@ struct ChartView: View {
 }
 
 #Preview {
-    ChartView(
-        viewModel: ChartViewModel(
-            coin: Coin(id: "KRW-BTC", koreanName: "비트코인")
-        )
-    )
+    ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
 }

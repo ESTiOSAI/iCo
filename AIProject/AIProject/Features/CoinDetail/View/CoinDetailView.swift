@@ -23,7 +23,7 @@ struct CoinDetailView: View {
             // 차트, 보고서 view
             VStack {
                 switch selectedTab {
-                case 0: ChartView(viewModel: ChartViewModel(coin: coin))
+                case 0: ChartView(coin: coin)
                 case 1: ReportView(coin: coin)
                 default: /*ChartView()*/ Text("차트")
                 }
