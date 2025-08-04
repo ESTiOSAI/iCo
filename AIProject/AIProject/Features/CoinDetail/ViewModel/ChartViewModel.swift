@@ -11,11 +11,11 @@ import SwiftUI
 @MainActor
 final class ChartViewModel: ObservableObject {
     /// 코인 표시 이름 (예: "비트코인")
-    @Published var coinName: String = "비트코인"
-    /// 심볼 (예: "BTC")
-    @Published var coinSymbol: String = "BTC"
+    @Published var coinName: String
+    /// 심볼 (예: "KRW-BTC")
+    @Published var coinSymbol: String
     /// 통화 코드 (예: "USD")
-    @Published var currency: String = "USD"
+    @Published var currency: String
     
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
@@ -25,8 +25,11 @@ final class ChartViewModel: ObservableObject {
     /// 차트 가격 데이터를 주기적으로 갱신하기 위한 타이머
     private var timer: Timer?
     
-    /// 초기 진입 시 1일(1D) 범위의 더미 시계열 데이터를 준비
-    init(priceService: CoinPriceProvider = UpbitPriceService()) {
+    init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
+        self.coinName = coin.koreanName
+        self.coinSymbol = coin.id
+        // id: "KRW-BTC" → currency: "KRW"
+        self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
         startUpdating()
     }
@@ -54,7 +57,7 @@ final class ChartViewModel: ObservableObject {
     /// - Parameter interval: 차트 간격 (기본: 1일)
     func loadPrices(interval: CoinInterval = .d1) async {
         do {
-            let marketCode = "KRW-\(coinSymbol)"
+            let marketCode = coinSymbol
             let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
             self.prices = fetchedPrices
         } catch {
