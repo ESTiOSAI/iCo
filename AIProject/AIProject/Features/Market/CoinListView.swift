@@ -7,6 +7,29 @@
 
 import SwiftUI
 
+@Observable
+class CoinListViewModel {
+    private let socket: WebSocketClient
+    private let upbitService: UpBitAPIService
+    
+    init(socket: WebSocketClient) {
+        self.socket = socket
+        self.upbitService = UpBitAPIService()
+    }
+    
+    func connect() {
+        socket.connect()
+    }
+    
+    func disconnect() {
+        socket.disconnect()
+    }
+    
+    func fetchTickerbyMarket() async -> [ {
+        
+    }
+}
+
 struct CoinListView: View {
     @State var coins: [CoinListModel]
     
