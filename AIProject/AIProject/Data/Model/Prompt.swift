@@ -24,13 +24,13 @@ enum Prompt {
             현재 내가 북마크한 코인은 다음과 같아.
             -> \(bookmark)
 
-            JSON 형식으로 요청할거고, JSON 형식으로만 응답을 줘
+            JSON 형식으로 요청할거고, JSON 마크다운은 제거해줘
             struct RecommendCoinDTO: Codable {
-             /// 코인 이름을 영어이름으로 줘
+             /// 코인 이름을 영어로 줘
              let name: String
              /// 내가 제공한 coinIDs에 있는 거만 줘
              let symbol: String
-             /// 이 코인을 왜 추천했고, 어떤 움직임이 있는지 최근 기사를 인용하여 간략히 작성해줘. 기사 출처는 주지마.
+             /// 이 코인을 왜 추천했고, 어떤 움직임이 있는지 최근 기사를 인용하여 한글로 간략히 작성해줘. 기사 출처는 주지마.
              let comment: String
             }
             """
