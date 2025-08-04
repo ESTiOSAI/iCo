@@ -26,11 +26,11 @@ struct RecommendCardView: View {
                 .lineLimit(3)
                 .padding(.vertical)
 
-            Text(recommendCoin.tradePrice.tradePriceFormat)
-            Text("\(recommendCoin.changeRate)%")
+            Text(recommendCoin.tradePrice.formatKRW)
+            Text(recommendCoin.changeRate.formatRate)
         }
         .padding()
-        .frame(minHeight: 180)
+        .frame(minHeight: 240)
         .background(.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
     }
 }
@@ -42,20 +42,28 @@ struct RecommendCardView: View {
             comment: "좋다!",
             coinID: "KRW-BTC",
             name: "비트코인",
-            tradePrice: 1600000000,
+            tradePrice: 1600,
             changeRate: 4.27
         )
     )
 }
 
 extension Double {
-    var tradePriceFormat: String {
-        "\(Int(self).formatted(.number))원"
+    /// KRW(원화) 형태인 문자열로 반환합니다.
+    var formatKRW: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = Locale(identifier: "ko_KR")
+
+        guard let krw = formatter.string(from: NSNumber(value: self)) else {
+            return "잘못된 포맷입니다."
+        }
+
+        return "\(krw)원"
     }
 
-    var changeRateFormat: String {
-        ""
+    var formatRate: String {
+        String(format: "%.2f%%", self)
     }
 }
-
 
