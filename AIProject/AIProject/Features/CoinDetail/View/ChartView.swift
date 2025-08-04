@@ -12,7 +12,7 @@ import Charts
 /// `ChartViewModel`이 제공하는 시계열 데이터를 라인 차트로 렌더링
 struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
-    @StateObject private var viewModel = ChartViewModel()
+    @ObservedObject var viewModel: ChartViewModel
     /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
     @State private var selectedInterval: CoinInterval = .d1
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
