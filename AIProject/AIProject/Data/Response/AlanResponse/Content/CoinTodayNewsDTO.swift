@@ -1,0 +1,16 @@
+//
+//  CoinTodayNewsDTO.swift
+//  AIProject
+//
+//  Created by 장지현 on 8/4/25.
+//
+
+import Foundation
+
+struct CoinTodayNewsDTO: Codable {
+    /// 오늘 시장 분위기
+    let today: String
+    
+    /// 뉴스 배열, 3개
+    let articles: [CoinArticleDTO]
+}

@@ -64,7 +64,7 @@ struct ReportSectionView: View {
 
 struct ReportNewsSectionView: View {
     let title: String
-    var articles: [Article]
+    var articles: [CoinArticle]
     var isNews: Bool = false
     
     var body: some View {

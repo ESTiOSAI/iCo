@@ -13,7 +13,7 @@ final class ReportViewModel: ObservableObject {
     @Published var coinOverView: String = "AI가 정보를 준비하고 있어요"
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
-    @Published var coinTodayTopNews: [Article] = [Article(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/news1")]
+    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/news1")]
     
     init(coin: Coin) {
         self.coin = coin
@@ -47,7 +47,7 @@ final class ReportViewModel: ObservableObject {
     
     private func fetchOverView() {
         let content = """
-        struct CoinOverview { // 주석은 주어진 키워드가 '이더리움'인 경우 예상 응답
+        struct CoinOverviewDTO: Codable { // 주석은 주어진 키워드가 '이더리움'인 경우 예상 응답
             /// 심볼: ETH
             let symbol: String 
             
@@ -70,7 +70,7 @@ final class ReportViewModel: ObservableObject {
         
         fetch(
             content: content,
-            decodeType: CoinOverview.self,
+            decodeType: CoinOverviewDTO.self,
             onSuccess: { data in
                 self.coinOverView = """
                     ‣ 심볼: \(data.symbol)
@@ -89,16 +89,16 @@ final class ReportViewModel: ObservableObject {
     
     private func fetchTodayTopNews() {
         let content = """
-            struct CoinTodayNews: Codable { // 주석은 주어진 키워드가 '비트코인'인 경우 예상 응답
+            struct CoinTodayNewsDTO: Codable { // 주석은 주어진 키워드가 '비트코인'인 경우 예상 응답
                 /// 오늘 시장 분위기
                 /// 비트코인은 최근 아마존을 제치고 세계 5위 자산으로 올라서는 성과를 달성했으나, 최근 5일 연속 가격이 하락하며 3주 만에 최저치를 기록했습니다. 8월은 비수기로 예상되며, 가격이 11만 2000달러까지 하락할 가능성이 제기되고 있습니다. JP모건 CEO는 비트코인에 대한 회의적인 입장을 밝히면서도 고객의 선택을 존중하겠다는 입장을 표명했습니다. 가상화폐 시장 전반이 하락세를 보이고 있으며, 주요 코인들이 큰 폭으로 하락하고 있습니다. 시장 분위기는 전반적으로 부정적이며, 가격 하락과 비수기 전망으로 인해 투자자들의 불안감이 커지고 있습니다.
                 let today: String
                 
                 /// 뉴스 배열, 3개
-                let articles: [Article]
+                let articles: [CoinArticleDTO]
             }
         
-            struct Article: Codable {
+            struct CoinArticleDTO: Codable {
                 /// 뉴스 헤드라인
                 let title: String
                 
@@ -120,21 +120,21 @@ final class ReportViewModel: ObservableObject {
         
         fetch(
             content: content,
-            decodeType: CoinTodayNews.self,
+            decodeType: CoinTodayNewsDTO.self,
             onSuccess: { data in
                 self.coinTodayTrends = data.today
-                self.coinTodayTopNews = data.articles
+                self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
             },
             onFailure: {
                 self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
-                self.coinTodayTopNews = [Article(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
+                self.coinTodayTopNews = [CoinArticle(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
             }
         )
     }
     
     private func fetchWeeklyTrends() {
         let content = """
-            struct CoinWeekly: Codable {
+            struct CoinWeeklyDTO: Codable {
                 /// 최근 일주일 가격 추이
                 let priceTrend: String
                 
@@ -156,7 +156,7 @@ final class ReportViewModel: ObservableObject {
         
         fetch(
             content: content,
-            decodeType: CoinWeekly.self,
+            decodeType: CoinWeeklyDTO.self,
             onSuccess: { data in
                 self.coinWeeklyTrends = """
                     ‣ 가격 추이: \(data.priceTrend)
@@ -181,52 +181,4 @@ func extractJSON(from raw: String) -> String {
     let jsonString = String(raw[jsonStartIndex..<endRange.lowerBound])
     
     return jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
-}
-
-struct CoinOverview: Codable {
-    /// 심볼
-    let symbol: String
-    
-    /// 웹사이트
-    let websiteURL: String?
-    
-    /// 최초발행
-    let startDate: String
-    
-    /// 디지털 자산 소개
-    let description: String
-}
-
-struct CoinTodayNews: Codable {
-    /// 오늘 시장 분위기
-    let today: String
-    
-    /// 뉴스 배열, 3개
-    let articles: [Article]
-}
-
-struct Article: Identifiable, Codable {
-    /// 뉴스 제목
-    let title: String
-    
-    /// 뉴스 한 줄 요약
-    let summary: String
-    
-    /// 뉴스 원문 링크
-    let url: String
-    
-    var id: Int {
-        "\(title)\(url)".hashValue
-    }
-}
-
-struct CoinWeekly: Codable {
-    /// 최근 일주일 가격 추이
-    let priceTrend: String
-    
-    /// 최근 일주일 거래량 변화
-    let volumeChange: String
-    
-    /// 지난 일주일간 가격 추이와 거래량 변화의 주요 원인
-    let reason: String
 }
