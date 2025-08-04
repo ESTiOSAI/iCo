@@ -32,7 +32,7 @@ final class ReportViewModel: ObservableObject {
         Task {
             do {
                 let answer = try await AlanAPIService().fetchAnswer(content: content)
-                guard let jsonData = extractJSON(from: answer.content).data(using: .utf8) else {
+                guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
                     await MainActor.run { onFailure() }
                     return
                 }
@@ -171,14 +171,4 @@ final class ReportViewModel: ObservableObject {
             }
         )
     }
-}
-
-func extractJSON(from raw: String) -> String {
-    guard let startRange = raw.range(of: "```json") else { return raw }
-    guard let endRange = raw.range(of: "```", options: .backwards) else { return raw }
-    
-    let jsonStartIndex = raw.index(after: startRange.upperBound)
-    let jsonString = String(raw[jsonStartIndex..<endRange.lowerBound])
-    
-    return jsonString.trimmingCharacters(in: .whitespacesAndNewlines)
 }
