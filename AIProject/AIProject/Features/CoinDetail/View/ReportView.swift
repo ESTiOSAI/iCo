@@ -8,19 +8,22 @@
 import SwiftUI
 
 struct ReportView: View {
-    let coin: Coin
-    private let sampleDescriptor: String = "비트코인은 2009년 사토시 나카모토님이 제안하신 최초의 분산형 디지털 암호화폐예요. \n총 발행량이 2,100만 개로 제한되어 있어 희소성이 큰 특징이에요. \n블록체인 기술을 기반으로 한 분산원장 구조를 사용해요. \n작업증명(PoW) 알고리즘으로 네트워크 보안을 유지해요."
+    @StateObject var viewModel: ReportViewModel
+    
+    init(coin: Coin) {
+        _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
+    }
     
     var body: some View {
         ScrollView() {
             VStack(spacing: 0) {
-                ReportSectionView(title: "한눈에 보는 \(coin.koreanName)", contents: [sampleDescriptor])
+                ReportSectionView(title: "한눈에 보는 \(viewModel.koreanName)", contents: [viewModel.coinOverView])
                 
-                ReportSectionView(title: "오늘 시장 분위기 살펴보기", contents: [sampleDescriptor])
+                ReportSectionView(title: "오늘 시장 분위기 살펴보기", contents: [viewModel.coinTodayTrends])
                 
-                ReportSectionView(title: "주간 동향 확인", contents: [sampleDescriptor])
+                ReportSectionView(title: "주간 동향 확인", contents: [viewModel.coinWeeklyTrends])
                 
-                ReportSectionView(title: "주요 이슈 요약", contents: [sampleDescriptor, sampleDescriptor], isNews: true)
+                ReportNewsSectionView(title: "주요 뉴스", articles: viewModel.coinTodayTopNews, isNews: true)
             }
         }
         .padding(.top, 15)
@@ -28,13 +31,13 @@ struct ReportView: View {
 }
 
 #Preview {
-    ReportView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
+    let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
+    return ReportView(coin: sampleCoin)
 }
 
 struct ReportSectionView: View {
     let title: String
-    let contents: [String]
-    var isNews: Bool = false
+    var contents: [String]
     
     var body: some View {
         VStack(spacing: 0) {
@@ -45,26 +48,10 @@ struct ReportSectionView: View {
                 
                 ForEach(contents, id: \.self) { content in
                     VStack(spacing: 0) {
-                        if isNews {
-                            HStack {
-                                Spacer()
-                                
-                                Button {
-                                    
-                                } label: {
-                                    Text("원문 보기 >")
-                                        .font(.system(size: 12))
-                                        .padding(10)
-                                }
-                                .foregroundStyle(.aiCoLabelSecondary)
-                            }
-                            .padding(.trailing)
-                        }
-                        
                         Text(content)
                             .font(.system(size: 13))
-                            .padding(isNews ? 0 : 16)
-                            .padding(.bottom, isNews ? 16 : 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(16)
                     }
                     .background {
                         RoundedRectangle(cornerRadius: 8)
@@ -77,5 +64,57 @@ struct ReportSectionView: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 20)
+    }
+}
+
+struct ReportNewsSectionView: View {
+    let title: String
+    var articles: [CoinArticle]
+    var isNews: Bool = false
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Group {
+                Text(title)
+                    .font(.system(size: 17, weight: .bold))
+                    .padding(.bottom, 8)
+                
+                ForEach(articles) { article in
+                    VStack(alignment: .leading, spacing: 0) {
+                        HStack {
+                            Spacer()
+                            
+                            Button {
+                                // FIXME: 링크 연결
+                            } label: {
+                                Text("원문 보기 >")
+                                    .font(.system(size: 12))
+                                    .padding(10)
+                            }
+                            .foregroundStyle(.aiCoLabelSecondary)
+                        }
+                        
+                        Text(article.title)
+                            .font(.system(size: 13, weight: .bold))
+                            .padding(.horizontal)
+                            .padding(.bottom, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        Text(article.summary)
+                            .font(.system(size: 13))
+                            .padding(.horizontal)
+                            .padding(.bottom, 16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .background {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.aiCoBorder)
+                    }
+                    .padding(.bottom, 10)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal)
     }
 }

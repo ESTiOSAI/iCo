@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CoinDetailView: View {
     @State private var selectedTab = 0
-    private let tabs = ["차트", "AI 리포트"]
+    
     let coin: Coin
+    
+    private let tabs = ["차트", "AI 리포트"]
     
     var body: some View {
         VStack {
@@ -20,12 +22,10 @@ struct CoinDetailView: View {
             
             // 차트, 보고서 view
             VStack {
-                Group {
-                    switch selectedTab {
-                    case 0: /*ChartView()*/ Text("차트") // 차트뷰 호출
-                    case 1: ReportView(coin: coin)
-                    default: /*ChartView()*/ Text("차트")
-                    }
+                switch selectedTab {
+                case 0: /*ChartView()*/ Text("차트") // 차트뷰 호출
+                case 1: ReportView(coin: coin)
+                default: /*ChartView()*/ Text("차트")
                 }
             }
             .frame(maxHeight: .infinity)
@@ -34,7 +34,8 @@ struct CoinDetailView: View {
 }
 
 #Preview {
-    CoinDetailView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
+    let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
+    CoinDetailView(coin: sampleCoin)
 }
 
 
