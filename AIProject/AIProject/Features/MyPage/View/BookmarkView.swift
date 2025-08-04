@@ -138,58 +138,8 @@ struct BookmarkView: View {
 
                 Divider()
 
-                LazyVStack(spacing: 8) {
-                    HStack {
-                        SortToggleButton(
-                            title: "코인명",
-                            sortCategory: .name,
-                            currentCategory: $selectedCategory,
-                            sortOrder: $nameOrder
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: selectedCategory) { _, newKey in
-                            if newKey != .name { nameOrder = .none }
-                        }
-
-                        SortToggleButton(
-                            title: "현재가/변동",
-                            sortCategory: .price,
-                            currentCategory: $selectedCategory,
-                            sortOrder: $priceOrder
-                        )
-                        .frame(width: 100, alignment: .trailing)
-                        .onChange(of: selectedCategory) { _, newKey in
-                            if newKey != .price { priceOrder = .none }
-                        }
-
-                        SortToggleButton(
-                            title: "거래대금",
-                            sortCategory: .volume,
-                            currentCategory: $selectedCategory,
-                            sortOrder: $volumeOrder
-                        )
-                        .frame(width: 100, alignment: .trailing)
-                        .onChange(of: selectedCategory) { _, newKey in
-                            if newKey != .volume { volumeOrder = .none }
-                        }
-
-                    }
-                    .padding(.leading, 16).padding(.trailing, 16)
-                    .fontWeight(.regular)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.aiCoLabel)
-
-
-                    Divider()
-
-                    ForEach(sortedCoins) { coin in
-                        NavigationLink {
-                            MockDetailView(coin: coin)
-                        } label: {
-                            CoinRowView(coin: coin)
-                        }
-                    }
-                }
+                // 코인 리스트뷰
+                CoinListSectionView(sortedCoins: sortedCoins, selectedCategory: $selectedCategory, nameOrder: $nameOrder, priceOrder: $priceOrder, volumeOrder: $volumeOrder)
             }
         }
 
