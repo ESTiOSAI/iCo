@@ -26,6 +26,12 @@ struct ChartView: View {
     var body: some View {
         let lastPoint = data.last
 
+        let isRising = summary?.change ?? 0 > 0
+        let isFalling = summary?.change ?? 0 < 0
+        let color: Color = isRising ? .aiCoNegative :
+                           isFalling ? .aiCoPositive :
+                           .gray
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
 
@@ -48,17 +54,11 @@ struct ChartView: View {
                         .font(.largeTitle).bold()
                         .foregroundStyle(.aiCoLabel)
                     
-                    let isRising = summary.change > 0
-                    let isFalling = summary.change < 0
                     let sign = isRising ? "+" : (isFalling ? "-" : "")
                     
                     Text("\(sign)\(abs(summary.change), format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
                         .font(.subheadline)
-                        .foregroundStyle(
-                            isRising ? Color.aiCoNegative :
-                            isFalling ? Color.aiCoPositive :
-                            Color.gray
-                        )
+                        .foregroundStyle(color)
                 }
                 
                 /// 값 차이가 작아도 차트가 납작하게 보이지 않도록 최소 높이와 여유 공간을 추가
@@ -82,9 +82,9 @@ struct ChartView: View {
                             y: .value("Close", point.close)
                         )
                     }
-                    .foregroundStyle(.aiCoNegative)
                     .interpolationMethod(.catmullRom)
                     .lineStyle(StrokeStyle(lineWidth: 3))
+                    .foregroundStyle(color)
 
                     if let last = lastPoint {
                         PointMark(
@@ -93,8 +93,8 @@ struct ChartView: View {
                         )
                         .symbol {
                             ZStack {
-                                Circle().fill(.aiCoNegative.opacity(0.12)).frame(width: 36, height: 36)
-                                Circle().fill(.aiCoNegative).frame(width: 10, height: 10)
+                                Circle().fill(color.opacity(0.12)).frame(width: 36, height: 36)
+                                Circle().fill(color).frame(width: 10, height: 10)
                             }
                         }
                     }
