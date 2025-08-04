@@ -22,8 +22,9 @@ final class ChartViewModel: ObservableObject {
     
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
-    /// 차트 가격 데이터를 주기적으로 갱신하기 위한 타이머
-    private var timer: Timer?
+    
+    /// 주기적 업데이트 태스크 (취소를 위해 저장)
+    private var updateTask: Task<Void, Never>?
     
     init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
         self.coinName = coin.koreanName
@@ -37,19 +38,18 @@ final class ChartViewModel: ObservableObject {
     /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작
     /// - Note: 최초 1회 실행 후 60초마다 반복 호출
     private func startUpdating() {
-        // 최초 1회
-        Task { await loadPrices() }
-
-        // 이후 1분마다 반복
-        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
-            Task { await self.loadPrices() }
+        updateTask = Task {
+            await loadPrices()
+            while true {
+                try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
+                await loadPrices()
+            }
         }
     }
     
     /// 타이머 종료 및 메모리 정리
     deinit {
-        timer?.invalidate()
-        timer = nil
+        updateTask?.cancel()
     }
     
     
