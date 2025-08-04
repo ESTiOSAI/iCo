@@ -8,17 +8,11 @@
 import SwiftUI
 
 struct CoinDetailView: View {
-    @StateObject private var reportViewModel: ReportViewModel
     @State private var selectedTab = 0
     
     let coin: Coin
     
     private let tabs = ["차트", "AI 리포트"]
-    
-    init(coin: Coin) {
-        _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
-        self.coin = coin
-    }
     
     var body: some View {
         VStack {
@@ -30,7 +24,7 @@ struct CoinDetailView: View {
             VStack {
                 switch selectedTab {
                 case 0: /*ChartView()*/ Text("차트") // 차트뷰 호출
-                case 1: ReportView(viewModel: reportViewModel)
+                case 1: ReportView(coin: coin)
                 default: /*ChartView()*/ Text("차트")
                 }
             }

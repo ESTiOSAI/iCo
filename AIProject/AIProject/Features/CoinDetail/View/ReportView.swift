@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct ReportView: View {
-    @ObservedObject var viewModel: ReportViewModel
+    @StateObject var viewModel: ReportViewModel
+    
+    init(coin: Coin) {
+        _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
+    }
     
     var body: some View {
         ScrollView() {
@@ -28,7 +32,7 @@ struct ReportView: View {
 
 #Preview {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
-    return ReportView(viewModel: ReportViewModel(coin: sampleCoin))
+    return ReportView(coin: sampleCoin)
 }
 
 struct ReportSectionView: View {
