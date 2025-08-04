@@ -8,6 +8,7 @@
 import SwiftUI
 import PhotosUI
 
+/// 이미지 등록을 통해 북마크 가져오기 기능을 실행하는 뷰
 struct BookmarkBulkInsertView: View {
     @Environment(\.dismiss) var dismiss
     
@@ -29,7 +30,16 @@ struct BookmarkBulkInsertView: View {
                 Spacer()
                 
                 VStack {
-                    if selectedImage != nil {
+                    if selectedImage == nil {
+                        // 이미지 등록 전
+                        Spacer()
+                        
+                        Text("이미지를 선택해주세요")
+                            .foregroundStyle(.aiCoLabel.opacity(0.5))
+                        
+                        Spacer()
+                    } else {
+                        // 이미지 등록 후
                         ZStack {
                             ImagePreviewView(selectedImage: selectedImage!)
                                 .opacity(vm.isLoading ? 0.2 : 1)
@@ -48,13 +58,7 @@ struct BookmarkBulkInsertView: View {
                                 }
                             }
                         }
-                    } else {
-                        Spacer()
-                        
-                        Text("이미지를 선택해주세요")
-                            .foregroundStyle(.aiCoLabel.opacity(0.5))
-                        
-                        Spacer()
+                        .frame(maxHeight: .infinity)
                     }
                 }
                 .frame(maxWidth: .infinity)

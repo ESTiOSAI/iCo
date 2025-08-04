@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// 사용자가 등록한 이미지를 표시하는 뷰
 struct ImagePreviewView: View {
     var selectedImage: UIImage
     

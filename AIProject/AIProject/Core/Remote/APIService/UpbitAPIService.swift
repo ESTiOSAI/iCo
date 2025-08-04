@@ -61,7 +61,11 @@ final class UpBitAPIService {
 
         return minuteCandleDTOs
     }
-    
+
+    /// 전달된 coinID가 실제로 존재하는지 검증하기 위해, 시세를 가져오는 endpoint에 요청을 전송합니다.
+    /// - Parameters:
+    ///   - id: 조회할 coinID (ex. "KRW-BTC")
+    /// - Returns: 해당 마켓의 시세 정보
     func verifyCoinID(id: String) async throws -> Bool {
         let urlString = "\(endpoint)/ticker?markets=\(id)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
