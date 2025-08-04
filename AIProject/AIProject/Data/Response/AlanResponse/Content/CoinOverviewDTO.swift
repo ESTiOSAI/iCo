@@ -15,7 +15,7 @@ struct CoinOverviewDTO: Codable {
     let websiteURL: String?
     
     /// 최초발행
-    let startDate: String
+    let launchDate: String
     
     /// 디지털 자산 소개
     let description: String
