@@ -21,7 +21,9 @@ final class DashboardViewModel: ObservableObject {
     
     /// 비동기로 추천 코인 목록을 가져와 `recommendCoins`에 할당합니다.
     func getRecommendCoin() async throws {
-        let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 리트코인")
+        let markets = try await upbitService.fetchMarkets()
+        let coinIDs = markets.map { $0.coinID }
+        let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움", coinIDs: coinIDs.joined(separator: " "))
         let jsonString = try await alanService.fetchAnswer(content: prompt.content).content
 
         if let jsonData = jsonString.data(using: .utf8) {
