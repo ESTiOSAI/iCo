@@ -19,4 +19,14 @@ final class NetworkClient {
         let modelData = try JSONDecoder().decode(T.self, from: data)
         return modelData
     }
+    
+    func requestWithBool(_ request: URLRequest) async throws -> Bool {
+        let (_, response) = try await URLSession.shared.data(from: request.url!)
+        
+        if let httpResponse = response as? HTTPURLResponse, (200..<300) ~= httpResponse.statusCode {
+            return true
+        } else {
+            return false
+        }
+    }
 }

@@ -61,4 +61,11 @@ final class UpBitAPIService {
 
         return minuteCandleDTOs
     }
+    
+    func verifyCoinID(id: String) async throws -> Bool {
+        let urlString = "\(endpoint)/ticker?markets=\(id)"
+        guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
+        
+        return try await network.requestWithBool(URLRequest(url: url))
+    }
 }
