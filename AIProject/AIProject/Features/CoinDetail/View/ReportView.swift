@@ -46,6 +46,7 @@ struct ReportSectionView: View {
                     VStack(spacing: 0) {
                         Text(content)
                             .font(.system(size: 13))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(16)
                     }
                     .background {
@@ -80,26 +81,26 @@ struct ReportNewsSectionView: View {
                             Spacer()
                             
                             Button {
-                                
-                            } label: {
                                 // FIXME: 링크 연결
+                            } label: {
                                 Text("원문 보기 >")
                                     .font(.system(size: 12))
                                     .padding(10)
                             }
                             .foregroundStyle(.aiCoLabelSecondary)
                         }
-                        .padding(.trailing)
                         
                         Text(article.title)
                             .font(.system(size: 13, weight: .bold))
                             .padding(.horizontal)
                             .padding(.bottom, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Text(article.summary)
                             .font(.system(size: 13))
                             .padding(.horizontal)
                             .padding(.bottom, 16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .background {
                         RoundedRectangle(cornerRadius: 8)
@@ -111,6 +112,5 @@ struct ReportNewsSectionView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal)
-        .padding(.bottom, 20)
     }
 }
