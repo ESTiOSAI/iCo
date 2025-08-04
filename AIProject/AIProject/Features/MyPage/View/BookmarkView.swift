@@ -10,7 +10,7 @@ import SwiftUI
 struct BookmarkView: View {
     //@StateObject var vm = BookmarkViewModel()
 
-    @State private var selectedKey: SortCategory? = nil
+    @State private var selectedCategory: SortCategory? = nil
     @State private var nameOrder: SortOrder = .none
     @State private var priceOrder: SortOrder = .none
     @State private var volumeOrder: SortOrder = .none
@@ -25,7 +25,7 @@ struct BookmarkView: View {
 
     // 정렬 데이터
     var sortedCoins: [CoinListModel] {
-        switch selectedKey {
+        switch selectedCategory{
         case .name:
             switch nameOrder {
             case .ascending:
@@ -142,34 +142,34 @@ struct BookmarkView: View {
                     HStack {
                         SortToggleButton(
                             title: "코인명",
-                            sortKey: .name,
-                            currentKey: $selectedKey,
+                            sortCategory: .name,
+                            currentCategory: $selectedCategory,
                             sortOrder: $nameOrder
                         )
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .onChange(of: selectedKey) { _, newKey in
+                        .onChange(of: selectedCategory) { _, newKey in
                             if newKey != .name { nameOrder = .none }
                         }
 
                         SortToggleButton(
                             title: "현재가/변동",
-                            sortKey: .price,
-                            currentKey: $selectedKey,
+                            sortCategory: .price,
+                            currentCategory: $selectedCategory,
                             sortOrder: $priceOrder
                         )
                         .frame(width: 100, alignment: .trailing)
-                        .onChange(of: selectedKey) { _, newKey in
+                        .onChange(of: selectedCategory) { _, newKey in
                             if newKey != .price { priceOrder = .none }
                         }
 
                         SortToggleButton(
                             title: "거래대금",
-                            sortKey: .volume,
-                            currentKey: $selectedKey,
+                            sortCategory: .volume,
+                            currentCategory: $selectedCategory,
                             sortOrder: $volumeOrder
                         )
                         .frame(width: 100, alignment: .trailing)
-                        .onChange(of: selectedKey) { _, newKey in
+                        .onChange(of: selectedCategory) { _, newKey in
                             if newKey != .volume { volumeOrder = .none }
                         }
 
