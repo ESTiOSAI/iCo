@@ -31,3 +31,70 @@ final class AlanAPIService {
         return alanResponseDTO
     }
 }
+
+extension AlanAPIService {
+    /// "\(coin.koreanName)" 개요를 JSON 형식으로 가져옵니다.
+    func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
+        let content = """
+        struct CoinOverviewDTO: Codable {
+            let symbol: String 
+            let websiteURL: String?
+            let launchDate: String
+            let description: String
+        }
+
+        \"\(coin.koreanName)\" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
+        """
+        let answer = try await fetchAnswer(content: content)
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw NetworkError.invalidData
+        }
+        return try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
+    }
+
+    /// 최근 24시간 뉴스 기반 시장 분위기와 기사 목록을 JSON 형식으로 가져옵니다.
+    func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO {
+        let content = """
+        struct CoinTodayNewsDTO: Codable {
+            let todaySentiment: String
+            let articles: [CoinArticleDTO]
+        }
+
+        struct CoinArticleDTO: Codable {
+            let title: String
+            let summary: String
+            let url: String
+        }
+
+        1. 현재 국내 시간을 기준으로 최근 24시간 뉴스 기반
+        2. 뉴스 전반을 분석해 시장 분위기를 요약
+
+        위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+        """
+        let answer = try await fetchAnswer(content: content)
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw NetworkError.invalidData
+        }
+        return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
+    }
+
+    /// 일주일간의 가격 추이 및 거래량 변화 정보를 JSON 형식으로 가져옵니다.
+    func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO {
+        let content = """
+        struct CoinWeeklyDTO: Codable {
+            let priceTrend: String
+            let volumeChange: String
+            let reason: String
+        }
+
+        1. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
+
+        위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+        """
+        let answer = try await fetchAnswer(content: content)
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw NetworkError.invalidData
+        }
+        return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
+    }
+}
