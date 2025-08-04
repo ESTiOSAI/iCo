@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct CoinListView: View {
-    
     let viewModel = CoinListViewModel(socket: .init())
+    @State private var visibleCoins: Set<CoinListModel.ID> = []
     
     var body: some View {
-        VStack {
-            
+        NavigationStack {
             List {
                 CoinListHeaderView()
                     .fontWeight(.regular)
@@ -21,9 +20,30 @@ struct CoinListView: View {
                     .foregroundStyle(.aiCoLabel)
                 
                 ForEach(viewModel.coins) { coin in
-                    CoinCell(coin: coin)
+                    GeometryReader { geometry in
+                        ZStack {
+                            CoinCell(coin: coin)
+                            NavigationLink {
+                                CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
+                            } label: {
+                                EmptyView()
+                            }
+                        }
+                        .onAppear {
+                            let frame = geometry.frame(in: .global)
+                            cellOnAppear(frame, id: coin.id)
+                        }
+                        .onDisappear {
+                            visibleCoins.remove(coin.id)
+                            viewModel.unsubscribe(visibleCoins)
+                        }
+                    }
                 }
             }
+            .onChange(of: visibleCoins, { oldValue, newValue in
+                print("add: \(newValue.subtracting(oldValue))\nremove:\(oldValue.subtracting(newValue))")
+                print("count: \(newValue.count)")
+            })
             .task {
                 await viewModel.connect()
                 await viewModel.fetchInitial()
@@ -31,6 +51,21 @@ struct CoinListView: View {
             .onDisappear {
                 viewModel.disconnect()
             }
+        }
+    }
+}
+
+extension CoinListView {
+    private func cellOnAppear(_ frame: CGRect, id: CoinListModel.ID) {
+        let threshold: CGFloat = 80
+        
+        // cell의 상단 좌표가 프레임 + 임계값 보다 작고
+        // cell 하단 좌표가 프레임 - 임계값보다 크면
+        // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
+        if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
+            
+            visibleCoins.insert(id)
+            viewModel.subscribe(visibleCoins)
         }
     }
 }
@@ -84,9 +119,7 @@ fileprivate struct CoinCell: View {
                     .frame(maxWidth: 40, alignment: .trailing)
                 
                 HStack(spacing: 0) {
-                    Text(coin.tradeAmount, format: .number
-                        .font(.system(size: 12))
-                    Text("원")
+                    Text(coin.tradeAmount.formattedCurrency())
                         .font(.system(size: 12))
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)

@@ -31,6 +31,14 @@ class CoinListViewModel {
         self.coins = await fetchMarketCoinData()
     }
     
+    func subscribe(_ coins: Set<CoinListModel.ID>) {
+        
+    }
+    
+    func unsubscribe(_ coins: Set<CoinListModel.ID>) {
+        
+    }
+    
     private func fetchMarketCoinData() async -> [CoinListModel] {
         async let coins = (try? await upbitService.fetchMarkets()) ?? []
         async let tickers = (try? await upbitService.fetchTicker(by: "KRW")) ?? []
