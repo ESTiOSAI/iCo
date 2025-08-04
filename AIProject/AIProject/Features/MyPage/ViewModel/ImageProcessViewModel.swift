@@ -59,19 +59,26 @@ class ImageProcessViewModel: ObservableObject {
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
     func convertToSymbol(with text: [String]) async -> [String]? {
-        do {
-            let answer = try await AlanAPIService().fetchAnswer(content: """
+        if !text.isEmpty {
+            
+            do {
+                let answer = try await AlanAPIService().fetchAnswer(content: """
             아래의 문자열 배열에서 가상화폐의 이름을 찾아서 해당 코인의 영문 심볼들을 반환해. 오타가 있다면 고쳐주고 "," 로 구분해서 JSON으로 반환해.
             \(text)
             """)
-            
-            let convertedSymbols = answer.content.extractedJSON
-                .replacingOccurrences(of: "\"", with:"") // "\" 문자 제거하기
-                .components(separatedBy: ",") // "," 기준으로 나누기
-            
-            return convertedSymbols
-        } catch {
-            print(error)
+                
+                let convertedSymbols = answer.content.extractedJSON
+                    .replacingOccurrences(of: "\"", with:"") // "\" 문자 제거하기
+                    .components(separatedBy: ",") // "," 기준으로 나누기
+                
+                return convertedSymbols
+            } catch {
+                print(error)
+                return nil
+            }
+        } else {
+            print("전달 받은 텍스트가 없습니다!!")
+            await MainActor.run { self.isLoading = false }
             return nil
         }
     }
