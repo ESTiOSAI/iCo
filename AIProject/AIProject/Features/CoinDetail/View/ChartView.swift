@@ -52,7 +52,7 @@ struct ChartView: View {
                     let isFalling = summary.change < 0
                     let sign = isRising ? "+" : (isFalling ? "-" : "")
                     
-                    Text("\(sign)\(summary.change, format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
+                    Text("\(sign)\(abs(summary.change), format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
                         .font(.subheadline)
                         .foregroundStyle(
                             isRising ? Color.aiCoNegative :
