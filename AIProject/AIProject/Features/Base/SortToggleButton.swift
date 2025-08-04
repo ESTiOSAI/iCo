@@ -40,19 +40,19 @@ enum SortOrder {
 
 struct SortToggleButton: View {
     let title: String
-    let sortKey: SortCategory
-    @Binding var currentKey: SortCategory?
+    let sortCategory: SortCategory
+    @Binding var currentCategory: SortCategory?
     @Binding var sortOrder: SortOrder
 
     var body: some View {
         Button {
-            if currentKey == sortKey {
+            if currentCategory == sortCategory {
                 sortOrder.toggle()
             } else {
                 sortOrder = .ascending
             }
 
-            currentKey = sortKey
+            currentCategory = sortCategory
         } label: {
             HStack(spacing: 4) {
                 Text(title)
