@@ -13,27 +13,49 @@ struct RecommendCardView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Image(systemName: "swift")
-                Text("Hyperliquid")
+                Image(uiImage: recommendCoin.coinImage ?? UIImage())
+                Text(recommendCoin.name)
 
                 Spacer()
 
-                Text("HYPE")
+                Text(recommendCoin.coinID)
                     .foregroundStyle(.gray)
             }
 
-            Text("2025년 상반기 동안 높은 성과를 보여주셔서 감사합니다. 오늘도 화이팅!!")
+            Text(recommendCoin.comment)
                 .lineLimit(3)
                 .padding(.vertical)
 
-            Text("현재가 1,333")
-            Text("전일대비 3.00%")
+            Text(recommendCoin.tradePrice.tradePriceFormat)
+            Text("\(recommendCoin.changeRate)%")
         }
         .padding()
+        .frame(minHeight: 180)
         .background(.gray.opacity(0.1), in: RoundedRectangle(cornerRadius: 10))
     }
 }
 
 #Preview {
-    RecommendCardView(recommendCoin: RecommendCoin(comment: "좋다", coinID: "KRW-BTC"))
+    RecommendCardView(
+        recommendCoin: RecommendCoin(
+            coinImage: UIImage(systemName: "swift"),
+            comment: "좋다!",
+            coinID: "KRW-BTC",
+            name: "비트코인",
+            tradePrice: 1600000000,
+            changeRate: 4.27
+        )
+    )
 }
+
+extension Double {
+    var tradePriceFormat: String {
+        "\(Int(self).formatted(.number))원"
+    }
+
+    var changeRateFormat: String {
+        ""
+    }
+}
+
+

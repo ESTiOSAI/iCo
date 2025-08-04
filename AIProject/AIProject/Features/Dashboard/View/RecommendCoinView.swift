@@ -11,10 +11,10 @@ struct RecommendCoinView: View {
     @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
-        ScrollViewReader { proxy in
+        ScrollViewReader { _ in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    ForEach(viewModel.recommendCoin) { coin in
+                    ForEach(viewModel.recommendCoins) { coin in
                         RecommendCardView(recommendCoin: coin)
                             .containerRelativeFrame(.horizontal) { value, axis in
                                 axis == .horizontal ? value * 0.7 : value
@@ -27,7 +27,13 @@ struct RecommendCoinView: View {
             .scrollTargetBehavior(.viewAligned)
         }
         .onAppear {
-            viewModel.getRecommendCoin()
+            Task {
+                do {
+                    try await viewModel.getRecommendCoin()
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
         }
     }
 }
