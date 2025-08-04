@@ -11,21 +11,19 @@ struct RecommendCoinView: View {
     @ObservedObject var viewModel: DashboardViewModel
 
     var body: some View {
-        ScrollViewReader { _ in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(viewModel.recommendCoins) { coin in
-                        RecommendCardView(recommendCoin: coin)
-                            .containerRelativeFrame(.horizontal) { value, axis in
-                                axis == .horizontal ? value * 0.7 : value
-                            }
-                    }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack {
+                ForEach(viewModel.recommendCoins) { coin in
+                    RecommendCardView(recommendCoin: coin)
+                        .containerRelativeFrame(.horizontal) { value, axis in
+                            axis == .horizontal ? value * 0.7 : value
+                        }
                 }
-                .padding(.horizontal)
-                .scrollTargetLayout()
             }
-            .scrollTargetBehavior(.viewAligned)
+            .padding(.horizontal)
+            .scrollTargetLayout()
         }
+        .scrollTargetBehavior(.viewAligned)
         .onAppear {
             Task {
                 do {
