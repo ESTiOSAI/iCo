@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ThemeView: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            HeaderView(heading: "차트 색상 변경")
+            Spacer()
+        }
     }
 }
 
