@@ -60,7 +60,20 @@ struct ChartView: View {
                             Color.gray
                         )
                 }
+                
+                /// 값 차이가 작아도 차트가 납작하게 보이지 않도록 최소 높이와 여유 공간을 추가
+                let minY = data.map(\.close).min() ?? 0
+                let maxY = data.map(\.close).max() ?? 0
+                let range = maxY - minY
+                let minRange: Double = 10
+                let safeRange = max(range, minRange)
+                let padding = safeRange * 0.05
+                let center = (minY + maxY) / 2
 
+                /// 실제 적용할 차트 Y축 최소/최대값
+                let chartMin = center - safeRange / 2 - padding
+                let chartMax = center + safeRange / 2 + padding
+                
                 // 라인 차트: 가격 시계열 렌더링 + 마지막 포인트 하이라이트
                 Chart {
                     ForEach(data) { point in
@@ -69,9 +82,9 @@ struct ChartView: View {
                             y: .value("Close", point.close)
                         )
                     }
-                    .interpolationMethod(.linear)
-                    .lineStyle(.init(lineWidth: 3))
                     .foregroundStyle(.aiCoNegative)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 3))
 
                     if let last = lastPoint {
                         PointMark(
@@ -87,6 +100,7 @@ struct ChartView: View {
                     }
                 }
                 .frame(height: 380)
+                .chartYScale(domain: chartMin...chartMax)
                 .chartXAxis(.hidden)
                 .chartYAxis(.hidden)
 
