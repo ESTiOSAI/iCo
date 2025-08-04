@@ -123,5 +123,9 @@ struct ChartView: View {
 }
 
 #Preview {
-    ChartView()
+    ChartView(
+        viewModel: ChartViewModel(
+            coin: Coin(id: "KRW-BTC", koreanName: "비트코인")
+        )
+    )
 }
