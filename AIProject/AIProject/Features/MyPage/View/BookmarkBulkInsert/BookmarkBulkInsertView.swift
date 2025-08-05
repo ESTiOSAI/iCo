@@ -19,12 +19,19 @@ struct BookmarkBulkInsertView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading) {
-                SubheaderView(subheading: "보유 코인이나 관심 코인을 한번에 등록하시려면 스크린샷을 업로드하세요.")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("보유 코인이나 관심 코인을 한번에 등록하시려면 스크린샷을 업로드하세요.")
+                    .font(.system(size: 16))
+                    .fontWeight(.medium)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text("아이코가 자동으로 북마크를 등록해드려요.")
-                    .padding(.horizontal, 16)
+                    .font(.system(size: 14))
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .padding(.horizontal, 16)
+            .frame(maxWidth: .infinity)
             
             VStack(spacing: 18) {
                 Spacer()
@@ -97,6 +104,29 @@ struct BookmarkBulkInsertView: View {
                         vm.processImage(from: selectedImage!)
                     }
                 }
+            }
+            .alert("북마크 분석 결과", isPresented: $vm.showAnalysisResultAlert) {
+                Button {
+                    vm.addToBookmark()
+                } label: {
+                    Text("추가하기")
+                }
+                
+                Button(role: .cancel) {
+                    vm.showAnalysisResultAlert = false
+                } label: {
+                    Text("취소하기")
+                }
+            } message: {
+                let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
+                Text("\(formattedCoinIDs) 코인을 찾았어요.")
+            }
+        }
+        .onAppear {
+            do {
+                print(try BookmarkManager.shared.fetchAll().count)
+            } catch {
+                print("🚨 CoreData 에러", error)
             }
         }
     }
