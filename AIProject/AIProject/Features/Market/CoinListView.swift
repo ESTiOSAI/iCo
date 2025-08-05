@@ -29,7 +29,7 @@ struct CoinListView: View {
                                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
                             } label: {
                                 EmptyView()
-                            }
+                            }.opacity(0)
                         }
                         .onAppear {
                             guard !visibleCoins.contains(coin.id) else { return }
