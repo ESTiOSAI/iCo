@@ -20,9 +20,11 @@ struct CoinListView: View {
                     .foregroundStyle(.aiCoLabel)
                 
                 ForEach(viewModel.coins) { coin in
+                    
+                    // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
                     GeometryReader { geometry in
+                        CoinCell(coin: coin)
                         ZStack {
-                            CoinCell(coin: coin)
                             NavigationLink {
                                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
                             } label: {
@@ -30,6 +32,7 @@ struct CoinListView: View {
                             }
                         }
                         .onAppear {
+                            guard !visibleCoins.contains(coin.id) else { return }
                             let frame = geometry.frame(in: .global)
                             cellOnAppear(frame, id: coin.id)
                         }
@@ -40,17 +43,22 @@ struct CoinListView: View {
                     }
                 }
             }
-            .onChange(of: visibleCoins, { oldValue, newValue in
-                print("add: \(newValue.subtracting(oldValue))\nremove:\(oldValue.subtracting(newValue))")
-                print("count: \(newValue.count)")
-            })
-            .task {
+        }
+        .task {
+            await viewModel.fetchInitial()
+        }
+        .onChange(of: visibleCoins, { oldValue, newValue in
+            print("add: \(newValue.subtracting(oldValue))\nremove:\(oldValue.subtracting(newValue))")
+            print("count: \(newValue.count)")
+        })
+        
+        .onAppear {
+            Task {
                 await viewModel.connect()
-                await viewModel.fetchInitial()
             }
-            .onDisappear {
-                viewModel.disconnect()
-            }
+        }
+        .onDisappear {
+            viewModel.disconnect()
         }
     }
 }

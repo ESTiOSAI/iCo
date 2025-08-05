@@ -43,8 +43,7 @@ class CoinListViewModel {
         async let coins = (try? await upbitService.fetchMarkets()) ?? []
         async let tickers = (try? await upbitService.fetchTicker(by: "KRW")) ?? []
         
-        let result = await coins.reduce(into: [String: (korean: String, english: String)]()){ acc, coins in
-                    
+        let result = await coins.reduce(into: [String: (korean: String, english: String)]()) { acc, coins in
             acc[coins.coinID] = (coins.koreanName, coins.englishName)
         }
         

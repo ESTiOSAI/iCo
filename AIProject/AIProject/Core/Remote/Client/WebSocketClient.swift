@@ -59,6 +59,9 @@ final class WebSocketClient: NSObject {
     private func receiveMessageByStream() async throws {
         isActive = true // 스트림 활성화
 
+        stream = nil
+        continuation?.finish()
+        
         stream = WebSocketStream { continuation in
             self.continuation = continuation
         }
