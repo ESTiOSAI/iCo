@@ -90,14 +90,17 @@ class ImageProcessViewModel: ObservableObject {
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
     func convertToSymbol(with text: [String]) async throws -> [String] {
+        let textString = text.description
+        
         do {
-            let answer = try await AlanAPIService().fetchAnswer(content: """
-            아래의 문자열 배열에서 가상화폐의 이름을 찾아. 응답에는 다른 설명 없이 빈 배열에 해당 코인의 영문 심볼들만 담아서 반환해. 오타가 있다면 고쳐주고 "," 로 구분해.
-            \(text)
-            """, action: .coinIDExtraction)
+            let answer = try await AlanAPIService().fetchAnswer(
+                content: Prompt.extractCoinID(text: textString).content,
+                action: .coinIDExtraction
+            )
             
-            let convertedSymbols = answer.content.extractedJSON
-                .replacingOccurrences(of: "\"", with: "") // "\" 문자 제거하기
+            let convertedSymbols = answer.content
+                .replacingOccurrences(of: "[", with: "") // 여는 대괄호 제거하기
+                .replacingOccurrences(of: "]", with: "") // 닫는 대괄호 제거하기
                 .components(separatedBy: ",") // "," 기준으로 나누기
             
             return convertedSymbols

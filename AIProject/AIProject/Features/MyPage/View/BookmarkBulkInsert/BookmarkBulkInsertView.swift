@@ -119,7 +119,7 @@ struct BookmarkBulkInsertView: View {
                 }
             } message: {
                 let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
-                Text("\(formattedCoinIDs) 코인을 찾았어요.")
+                Text("사진에서 \(formattedCoinIDs) 코인을 발견했어요.")
             }
             .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
                 Button(role: .cancel) {

@@ -11,6 +11,7 @@ enum Prompt {
     case generateOverView(coinKName: String)
     case generateTodayNews(coinKName: String)
     case generateWeeklyTrends(coinKName: String)
+    case extractCoinID(text: String)
 
     var content: String {
         switch self {
@@ -77,6 +78,11 @@ enum Prompt {
             1. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
 
             위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            """
+        case .extractCoinID(let text):
+            """
+            아래의 문자열 배열에서 가상화폐의 이름을 찾아. 응답에는 다른 설명 없이 `[]` 이런 빈 배열에 영문 심볼들만 담아서 반환해. 오타가 있다면 고쳐주고 "," 로 구분해.
+            \(text)
             """
         }
     }
