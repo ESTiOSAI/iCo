@@ -27,7 +27,6 @@ struct SubheaderView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.top, 16)
     }
 }
 

@@ -67,5 +67,6 @@ struct HeaderView: View {
 
 #Preview {
     HeaderView(heading: "북마크 관리", isBookmarkView: true)
+        .padding(.bottom, 16)
     SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
 }
