@@ -23,8 +23,8 @@ struct CoinListView: View {
                     
                     // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
                     GeometryReader { geometry in
-                        CoinCell(coin: coin)
                         ZStack {
+                            CoinCell(coin: coin)
                             NavigationLink {
                                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
                             } label: {
