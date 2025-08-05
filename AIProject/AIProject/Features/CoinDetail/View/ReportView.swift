@@ -21,9 +21,9 @@ struct ReportView: View {
                 
                 ReportSectionView(title: "오늘 시장 분위기 살펴보기", contents: [viewModel.coinTodayTrends])
                 
-                ReportSectionView(title: "주간 동향 확인", contents: [viewModel.coinWeeklyTrends])
-                
                 ReportNewsSectionView(title: "주요 뉴스", articles: viewModel.coinTodayTopNews, isNews: true)
+                
+                ReportSectionView(title: "주간 동향 확인", contents: [viewModel.coinWeeklyTrends])
             }
         }
         .padding(.top, 15)
