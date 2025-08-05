@@ -23,4 +23,15 @@ enum CoinInterval: String, CaseIterable, Identifiable {
     
     /// UI 및 리스트 바인딩을 위한 고유 식별자
     var id: String { rawValue }
+    
+    /// 각 기간별로 차트에 필요한 캔들(데이터 포인트) 수를 반환
+    var candleCount: Int {
+        switch self {
+        case .d1: return 60 * 24
+        case .w1: return 60 * 24 * 7
+        case .m3: return 60 * 24 * 30 * 3
+        case .m6: return 60 * 24 * 30 * 6
+        case .y1: return 60 * 24 * 365
+        }
+    }
 }

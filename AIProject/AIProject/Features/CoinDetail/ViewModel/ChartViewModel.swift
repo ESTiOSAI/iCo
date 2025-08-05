@@ -11,18 +11,59 @@ import SwiftUI
 @MainActor
 final class ChartViewModel: ObservableObject {
     /// 코인 표시 이름 (예: "비트코인")
-    @Published var coinName: String = "비트코인"
-    /// 심볼 (예: "BTC")
-    @Published var coinSymbol: String = "BTC"
+    @Published var coinName: String
+    /// 심볼 (예: "KRW-BTC")
+    @Published var coinSymbol: String
     /// 통화 코드 (예: "USD")
-    @Published var currency: String = "USD"
+    @Published var currency: String
     
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
-    /// 초기 진입 시 1일(1D) 범위의 더미 시계열 데이터를 준비
-    init() {
-        self.prices = Self.makeDummyPrices(hours: 24, samplingInterval: 60)
+    /// 가격 데이터를 가져오는 서비스
+    private let priceService: CoinPriceProvider
+    
+    /// 주기적 업데이트 태스크 (취소를 위해 저장)
+    private var updateTask: Task<Void, Never>?
+    
+    init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
+        self.coinName = coin.koreanName
+        self.coinSymbol = coin.id
+        // id: "KRW-BTC" → currency: "KRW"
+        self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
+        self.priceService = priceService
+        startUpdating()
+    }
+    
+    /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작
+    /// - Note: 최초 1회 실행 후 60초마다 반복 호출
+    private func startUpdating() {
+        updateTask = Task {
+            await loadPrices()
+            while true {
+                try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
+                await loadPrices()
+            }
+        }
+    }
+    
+    /// 타이머 종료 및 메모리 정리
+    deinit {
+        updateTask?.cancel()
+    }
+    
+    
+    /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
+    /// - Parameter interval: 차트 간격 (기본: 1일)
+    func loadPrices(interval: CoinInterval = .d1) async {
+        do {
+            let marketCode = coinSymbol
+            let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
+            self.prices = fetchedPrices
+        } catch {
+            print("가격 불러오기 실패: \(error.localizedDescription)")
+            self.prices = []
+        }
     }
     
     /// 현재 `prices` 기준의 간단한 요약 정보
