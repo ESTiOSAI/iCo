@@ -127,7 +127,7 @@ fileprivate struct CoinCell: View {
                     .frame(maxWidth: 40, alignment: .trailing)
                 
                 HStack(spacing: 0) {
-                    Text(coin.tradeAmount.formattedCurrency())
+                    Text(coin.tradeAmount.formatMillion)
                         .font(.system(size: 12))
                 }
                 .frame(maxWidth: .infinity, alignment: .trailing)

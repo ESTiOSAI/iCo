@@ -25,4 +25,21 @@ extension Double {
     var formatRate: String {
         String(format: "%.2f%%", self)
     }
+    
+    /// 백만 단위의 원화 포맷팅
+    var formatMillion: String {
+        let millionValue = self / 1_000_000
+        
+        // NumberFormatter를 사용하여 로컬라이즈된 숫자 포맷을 적용
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = ","
+        formatter.maximumFractionDigits = 0
+        
+        guard let result = formatter.string(from: NSNumber(value: millionValue)) else {
+            return "\(millionValue)백만"  // 포맷 실패 시 기본값 반환
+        }
+        
+        return "\(result)백만"
+    }
 }
