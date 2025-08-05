@@ -16,27 +16,26 @@ final class BookmarkViewModel: ObservableObject {
     private let manager: BookmarkManaging = BookmarkManager.shared
 
     func loadBookmarks() async {
-            do {
-                let bookmarkedEntities = try manager.fetchAll()
-                let bookmarkedIDs = Set(bookmarkedEntities.map(\.coinID))
-                // UI 스레드에서 coins 업데이트
-                coins = allCoins.filter { bookmarkedIDs.contains($0.coinID) }
-            } catch {
-                print("북마크 조회 실패:", error)
-            }
+        do {
+            let bookmarkedEntities = try manager.fetchAll()
+            let bookmarkedIDs = Set(bookmarkedEntities.map(\.coinID))
+            // UI 스레드에서 coins 업데이트
+            coins = allCoins.filter { bookmarkedIDs.contains($0.coinID) }
+        } catch {
+            print("북마크 조회 실패:", error)
         }
+    }
 
     func toggleBookmark(_ coin: CoinListModel) async {
-            do {
-                let isNowBookmarked = try manager.toggle(coinID: coin.coinID)
-                if !isNowBookmarked {
-                    coins.removeAll { $0.coinID == coin.coinID }
-                }
-            } catch {
-                print("북마크 토글 실패:", error)
+        do {
+            let isNowBookmarked = try manager.toggle(coinID: coin.coinID)
+            if !isNowBookmarked {
+                coins.removeAll { $0.coinID == coin.coinID }
             }
+        } catch {
+            print("북마크 토글 실패:", error)
         }
-
+    }
 }
 
 
