@@ -36,30 +36,24 @@ struct CoinRowView: View {
             VStack(alignment: .trailing, spacing: 2) {
                 HStack(spacing: 2) {
                     Text(coin.currentPrice, format: .number)
-                        .foregroundColor(Color.aiCoLabel)
-                        .font(.subheadline)
-
                     Text("원")
-                        .foregroundColor(Color.aiCoLabel)
-                        .font(.system(size: 12))
                 }
+                .foregroundColor(Color.aiCoLabel)
+                .font(.system(size: 12))
 
                 HStack(spacing: 2) {
                     Text(coin.changePrice, format: .number)
-                        .font(.caption)
-                        .foregroundColor(Color.aiCoPositive)
-                    
                     Text("%")
-                        .foregroundColor(Color.aiCoPositive)
-                        .font(.system(size: 10))
                 }
+                .font(.caption)
+                .foregroundColor(Color.aiCoPositive)
             }
             .frame(width: 100, alignment: .trailing)
 
             // 거래 대금
             VStack(alignment: .trailing, spacing: 2) {
                 HStack(spacing: 2) {
-                    Text(coin.tradeAmount.formattedVolumePrice)
+                    Text(coin.tradeAmount, format: .number)
                 }
                 .font(.system(size: 15))
                 .foregroundColor(.aiCoLabel)
@@ -68,17 +62,5 @@ struct CoinRowView: View {
         }
         .padding(.vertical, 8)
         .padding(.horizontal)
-    }
-}
-
-extension Double {
-    /// 백만 단위 거래 대금 포맷 + 천 단위 쉼표
-    var formattedVolumePrice: String {
-        let millionUnit = Int(self / 1_000_000)
-        let numberFormatter = NumberFormatter()
-        numberFormatter.numberStyle = .decimal
-
-        let formatted = numberFormatter.string(from: NSNumber(value: millionUnit)) ?? "\(millionUnit)"
-        return "\(formatted)백만"
     }
 }
