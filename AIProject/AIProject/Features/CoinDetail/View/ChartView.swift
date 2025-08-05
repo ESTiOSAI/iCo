@@ -12,7 +12,7 @@ import Charts
 /// `ChartViewModel`이 제공하는 시계열 데이터를 라인 차트로 렌더링
 struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
-    @StateObject private var viewModel = ChartViewModel()
+    @StateObject var viewModel: ChartViewModel
     /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
     @State private var selectedInterval: CoinInterval = .d1
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
@@ -23,9 +23,19 @@ struct ChartView: View {
     /// 헤더의 가격 요약 정보(마지막가 / 변화 / 등락률)
     private var summary: PriceSummary? { viewModel.summary }
 
+    init(coin: Coin) {
+        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
+    }
+    
     var body: some View {
         let lastPoint = data.last
 
+        let isRising = summary?.change ?? 0 > 0
+        let isFalling = summary?.change ?? 0 < 0
+        let color: Color = isRising ? .aiCoNegative :
+                           isFalling ? .aiCoPositive :
+                           .gray
+        
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
 
@@ -35,11 +45,7 @@ struct ChartView: View {
                         .font(.title3).bold()
                         .foregroundStyle(.aiCoLabel)
 
-                    Text(viewModel.coinSymbol)
-                        .font(.footnote).bold()
-                        .padding(.horizontal, 10).padding(.vertical, 6)
-                        .foregroundStyle(.gray)
-                        .background(Capsule().fill(Color(.systemGray5)))
+                    BadgeLabelView(text: viewModel.coinSymbol)
                 }
 
                 // 상단 요약: 현재가 및 등락
@@ -48,19 +54,26 @@ struct ChartView: View {
                         .font(.largeTitle).bold()
                         .foregroundStyle(.aiCoLabel)
                     
-                    let isRising = summary.change > 0
-                    let isFalling = summary.change < 0
                     let sign = isRising ? "+" : (isFalling ? "-" : "")
                     
-                    Text("\(sign)\(summary.change, format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
+                    Text("\(sign)\(abs(summary.change), format: .currency(code: viewModel.currency)) (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
                         .font(.subheadline)
-                        .foregroundStyle(
-                            isRising ? Color.aiCoNegative :
-                            isFalling ? Color.aiCoPositive :
-                            Color.gray
-                        )
+                        .foregroundStyle(color)
                 }
+                
+                /// 값 차이가 작아도 차트가 납작하게 보이지 않도록 최소 높이와 여유 공간을 추가
+                let minY = data.map(\.close).min() ?? 0
+                let maxY = data.map(\.close).max() ?? 0
+                let range = maxY - minY
+                let minRange: Double = 10
+                let safeRange = max(range, minRange)
+                let padding = safeRange * 0.05
+                let center = (minY + maxY) / 2
 
+                /// 실제 적용할 차트 Y축 최소/최대값
+                let chartMin = center - safeRange / 2 - padding
+                let chartMax = center + safeRange / 2 + padding
+                
                 // 라인 차트: 가격 시계열 렌더링 + 마지막 포인트 하이라이트
                 Chart {
                     ForEach(data) { point in
@@ -69,9 +82,9 @@ struct ChartView: View {
                             y: .value("Close", point.close)
                         )
                     }
-                    .interpolationMethod(.linear)
-                    .lineStyle(.init(lineWidth: 3))
-                    .foregroundStyle(.aiCoNegative)
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(StrokeStyle(lineWidth: 3))
+                    .foregroundStyle(color)
 
                     if let last = lastPoint {
                         PointMark(
@@ -80,13 +93,14 @@ struct ChartView: View {
                         )
                         .symbol {
                             ZStack {
-                                Circle().fill(.aiCoNegative.opacity(0.12)).frame(width: 36, height: 36)
-                                Circle().fill(.aiCoNegative).frame(width: 10, height: 10)
+                                Circle().fill(color.opacity(0.12)).frame(width: 36, height: 36)
+                                Circle().fill(color).frame(width: 10, height: 10)
                             }
                         }
                     }
                 }
                 .frame(height: 380)
+                .chartYScale(domain: chartMin...chartMax)
                 .chartXAxis(.hidden)
                 .chartYAxis(.hidden)
 
@@ -109,5 +123,5 @@ struct ChartView: View {
 }
 
 #Preview {
-    ChartView()
+    ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
 }
