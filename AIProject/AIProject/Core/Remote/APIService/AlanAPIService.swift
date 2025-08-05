@@ -47,8 +47,14 @@ extension AlanAPIService {
         """
         let answer = try await fetchAnswer(content: content)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw NetworkError.invalidData
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
         }
+        
         return try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
     }
 
@@ -73,8 +79,14 @@ extension AlanAPIService {
         """
         let answer = try await fetchAnswer(content: content)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw NetworkError.invalidData
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
         }
+        
         return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
     }
 
@@ -93,8 +105,14 @@ extension AlanAPIService {
         """
         let answer = try await fetchAnswer(content: content)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw NetworkError.invalidData
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
         }
+        
         return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
     }
 }

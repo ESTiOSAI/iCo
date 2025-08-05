@@ -15,6 +15,4 @@ enum NetworkError: Error {
     case invalidResponse
 	/// API Key가 올바르지 않습니다.
     case invalidAPIKey
-    /// data가 올바르지 않습니다.
-    case invalidData
 }
