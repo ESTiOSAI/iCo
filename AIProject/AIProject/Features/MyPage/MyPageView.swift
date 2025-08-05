@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct MyPageView: View {
     @State private var showBulkInsertSheet = false
     
