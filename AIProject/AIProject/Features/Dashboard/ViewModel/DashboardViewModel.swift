@@ -25,7 +25,7 @@ final class DashboardViewModel: ObservableObject {
             let markets = try await upbitService.fetchMarkets()
             let coinIDs = markets.map { $0.coinID }.filter { $0.contains("KRW") }
             let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움", coinIDs: coinIDs.joined(separator: " "))
-            let jsonString = try await alanService.fetchAnswer(content: prompt.content).content.extractedJSON
+            let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
             if let jsonData = jsonString.data(using: .utf8) {
                 let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonData)
