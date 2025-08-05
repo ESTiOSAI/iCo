@@ -62,7 +62,7 @@ extension AlanAPIService {
 
         \"\(coin.koreanName)\" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
+        let answer = try await fetchAnswer(content: content, action: .coinReportGeneration)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -103,7 +103,7 @@ extension AlanAPIService {
 
         위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
+        let answer = try await fetchAnswer(content: content, action: .coinReportGeneration)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -129,7 +129,7 @@ extension AlanAPIService {
 
         위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
+        let answer = try await fetchAnswer(content: content, action: .coinReportGeneration)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
