@@ -26,11 +26,7 @@ struct RecommendCoinView: View {
         .scrollTargetBehavior(.viewAligned)
         .onAppear {
             Task {
-                do {
-                    try await viewModel.getRecommendCoin()
-                } catch {
-                    print(error.localizedDescription)
-                }
+                await viewModel.getRecommendCoin()
             }
         }
     }
