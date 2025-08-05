@@ -54,7 +54,7 @@ final class ReportViewModel: ObservableObject {
         do {
             let data = try await alanAPIService.fetchTodayNews(for: coin)
             await MainActor.run {
-                self.coinTodayTrends = data.todaySentiment
+                self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
                 self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
             }
         } catch {

@@ -62,7 +62,7 @@ extension AlanAPIService {
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO {
         let content = """
         struct CoinTodayNewsDTO: Codable {
-            let todaySentiment: String
+            let summaryOfTodaysMarketSentiment: String
             let articles: [CoinArticleDTO]
         }
 

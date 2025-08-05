@@ -116,5 +116,6 @@ struct ReportNewsSectionView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal)
+        .padding(.bottom, 20)
     }
 }
