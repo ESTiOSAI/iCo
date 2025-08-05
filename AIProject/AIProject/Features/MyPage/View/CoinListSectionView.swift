@@ -59,7 +59,7 @@ struct CoinListSectionView: View {
 
             ForEach(sortedCoins) { coin in
                 NavigationLink {
-                    MockDetailView(coin: coin)
+                    CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
                 } label: {
                     CoinRowView(coin: coin)
                 }
