@@ -65,7 +65,7 @@ class ImageProcessViewModel: ObservableObject {
                 let answer = try await AlanAPIService().fetchAnswer(content: """
             아래의 문자열 배열에서 가상화폐의 이름을 찾아서 해당 코인의 영문 심볼들을 반환해. 오타가 있다면 고쳐주고 "," 로 구분해서 JSON으로 반환해.
             \(text)
-            """)
+            """, action: .coinIDExtraction)
                 
                 let convertedSymbols = answer.content.extractedJSON
                     .replacingOccurrences(of: "\"", with:"") // "\" 문자 제거하기

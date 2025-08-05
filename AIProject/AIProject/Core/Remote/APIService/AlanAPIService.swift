@@ -19,12 +19,10 @@ final class AlanAPIService {
     /// 입력한 질문 또는 문장에 대한 응답을 가져옵니다.
     /// - Parameter content: 질문 또는 분석할 문장
     /// - Returns: 수신한 응답 데이터
-    func fetchAnswer(content: String) async throws -> AlanResponseDTO {
-        guard let clientKey = Bundle.main.infoDictionary?["ALAN_API_KEY"] as? String else {
-            throw NetworkError.invalidAPIKey
-        }
+    func fetchAnswer(content: String, action: AlanAction) async throws -> AlanResponseDTO {
+        guard let clientID = switchClientID(for: action) else { throw NetworkError.invalidAPIKey }
 
-        let urlString = "\(endpoint)?content=\(content)&client_id=\(clientKey)"
+        let urlString = "\(endpoint)?content=\(content)&client_id=\(clientID)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
         let alanResponseDTO: AlanResponseDTO = try await network.request(url: url)
 
@@ -33,6 +31,18 @@ final class AlanAPIService {
 }
 
 extension AlanAPIService {
+    /// Alan이 수행할 작업에 따라 ClientID를 전환합니다.
+    private func switchClientID(for action: AlanAction) -> String? {
+        switch action {
+        case .coinRecomendation:
+            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
+        case .coinReportGeneration:
+            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
+        case .coinIDExtraction:
+            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
+        }
+    }
+    
     /// "\(coin.koreanName)" 개요를 JSON 형식으로 가져옵니다.
     func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
         // 캐시된 응답이 있으면 바로 반환
@@ -52,7 +62,7 @@ extension AlanAPIService {
 
         \"\(coin.koreanName)\" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content)
+        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -93,7 +103,7 @@ extension AlanAPIService {
 
         위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content)
+        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -119,7 +129,7 @@ extension AlanAPIService {
 
         위 조건에 따라 \"\(coin.koreanName)\"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
         """
-        let answer = try await fetchAnswer(content: content)
+        let answer = try await fetchAnswer(content: content, action: .coinRecomendation)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
