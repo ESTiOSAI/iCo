@@ -11,7 +11,7 @@ struct MarketView: View {
     @State var coins: [CoinListModel] = CoinListModel.preview
     var body: some View {
         NavigationStack {
-            CoinListView(coins: coins)
+            CoinListView()
         }
     }
 }
