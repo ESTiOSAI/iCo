@@ -59,23 +59,31 @@ class ImageProcessViewModel: ObservableObject {
                 }
                 
                 print(verifiedCoinIDs)
-                await MainActor.run {
-                    self.isLoading = false
-                    self.showAnalysisResultAlert = true
-                }
+                
+                await showAnalysisResult()
+                
             } catch let error as ImageProcessError {
-                await MainActor.run {
-                    self.isLoading = false
-                    self.errorMessage = error.message
-                    self.showErrorMessage = true
-                }
-                print("🚨 이미지 처리 중 에러 발생:", error)
+                await showError(error)
             }
         }
     }
     
+    @MainActor
+    private func showAnalysisResult() {
+        self.isLoading = false
+        self.showAnalysisResultAlert = true
+    }
+    
+    @MainActor
+    private func showError(_ error: ImageProcessError) {
+        self.isLoading = false
+        self.errorMessage = error.message
+        self.showErrorMessage = true
+        print("🚨 이미지 처리 중 에러 발생:", error)
+    }
+    
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
-    func performOCR(from selectedImage: UIImage) async throws -> [String] {
+    private func performOCR(from selectedImage: UIImage) async throws -> [String] {
         do {
             let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
             
@@ -89,7 +97,7 @@ class ImageProcessViewModel: ObservableObject {
     // TODO: 인식한 텍스트 주변에 박스 그리기
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
-    func convertToSymbol(with text: [String]) async throws -> [String] {
+    private func convertToSymbol(with text: [String]) async throws -> [String] {
         let textString = text.description
         
         do {
