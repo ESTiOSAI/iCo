@@ -59,8 +59,8 @@ extension AlanAPIService {
             let launchDate: String
             let description: String
         }
-
-        \"\(coin.koreanName)\" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
+        
+        \"\(coin.koreanName)\" 개요를 위 JSON 형식으로 작성 (마크다운 금지, 실제 뉴스 링크 전달)
         """
         let answer = try await fetchAnswer(content: content, action: .coinReportGeneration)
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
@@ -72,16 +72,20 @@ extension AlanAPIService {
             )
         }
         
-        let dto = try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
-        let response = URLResponse(
-            url: cacheURL,
-            mimeType: "application/json",
-            expectedContentLength: jsonData.count,
-            textEncodingName: "utf-8"
-        )
-        let cacheEntry = CachedURLResponse(response: response, data: jsonData)
-        URLCache.shared.storeCachedResponse(cacheEntry, for: request)
-        return dto
+        do {
+            let dto = try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
+            let response = URLResponse(
+                url: cacheURL,
+                mimeType: "application/json",
+                expectedContentLength: jsonData.count,
+                textEncodingName: "utf-8"
+            )
+            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+            return dto
+        } catch {
+            throw error
+        }
     }
 
     /// 최근 24시간 뉴스 기반 시장 분위기와 기사 목록을 JSON 형식으로 가져옵니다.
@@ -113,7 +117,11 @@ extension AlanAPIService {
             )
         }
         
-        return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
+        do {
+            return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
+        } catch {
+            throw error
+        }
     }
 
     /// 일주일간의 가격 추이 및 거래량 변화 정보를 JSON 형식으로 가져옵니다.
@@ -138,7 +146,10 @@ extension AlanAPIService {
                 )
             )
         }
-        
-        return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
+        do {
+            return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
+        } catch {
+            throw error
+        }
     }
 }
