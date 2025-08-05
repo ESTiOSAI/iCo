@@ -10,7 +10,7 @@ import SwiftUI
 struct MyPageView: View {
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 HeaderView(heading: "마이페이지")
                     .padding(.bottom)
@@ -19,7 +19,7 @@ struct MyPageView: View {
                     NavigationLink("북마크 관리", destination: BookmarkView())
                     NavigationLink("알림 설정", destination: AlarmView())
                     NavigationLink("차트 색상 변경", destination: ThemeView())
-                    NavigationLink("문의하기", destination: BookmarkView())
+                    NavigationLink("문의하기", destination: EmptyView())
                     NavigationLink("개인정보처리방침", destination: PrivacyPolicyView())
                 }
                 .listStyle(.plain)
