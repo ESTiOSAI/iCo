@@ -18,6 +18,7 @@ struct ReportView: View {
         ScrollView() {
             VStack(spacing: 0) {
                 ReportSectionView(title: "한눈에 보는 \(viewModel.koreanName)", contents: [viewModel.coinOverView])
+                // FIXME: 웹사이트 정보를 지우거나, 웹사이트로 이동할 수 있는 버튼 만들기
                 
                 ReportSectionView(title: "오늘 시장 분위기 살펴보기", contents: [viewModel.coinTodayTrends])
                 
@@ -68,6 +69,8 @@ struct ReportSectionView: View {
 }
 
 struct ReportNewsSectionView: View {
+    @State private var safariItem: IdentifiableURL?
+    
     let title: String
     var articles: [CoinArticle]
     var isNews: Bool = false
@@ -85,7 +88,10 @@ struct ReportNewsSectionView: View {
                             Spacer()
                             
                             Button {
-                                // FIXME: 링크 연결
+                                // FIXME: 앨런이 뉴스 원문 기사를 제대로 제공하지 않음
+//                                if let url = URL(string: article.url) {
+                                safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/956560")!)
+//                                }
                             } label: {
                                 Text("원문 보기 >")
                                     .font(.system(size: 12))
@@ -117,5 +123,8 @@ struct ReportNewsSectionView: View {
         }
         .padding(.horizontal)
         .padding(.bottom, 20)
+        .sheet(item: $safariItem) { item in
+            SafariView(url: item.url)
+        }
     }
 }

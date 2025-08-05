@@ -8,6 +8,9 @@
 /// 정형화된 프롬프트 객체
 enum Prompt {
     case recommendCoin(preference: String, bookmark: String, coinIDs: String)
+    case generateOverView(coinKName: String)
+    case generateTodayNews(coinKName: String)
+    case generateWeeklyTrends(coinKName: String)
 
     var content: String {
         switch self {
@@ -33,6 +36,47 @@ enum Prompt {
              /// 이 코인을 왜 추천했고, 어떤 움직임이 있는지 최근 기사를 인용하여 한글로 간략히 작성해줘. 기사 출처는 주지마.
              let comment: String
             }
+            """
+        case .generateOverView(let coinKName):
+            """
+            struct CoinOverviewDTO: Codable {
+                let symbol: String 
+                let websiteURL: String?
+                let launchDate: String
+                let description: String
+            }
+            
+            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지, 실제 뉴스 링크 전달)
+            """
+        case .generateTodayNews(let coinKName):
+            """
+            struct CoinTodayNewsDTO: Codable {
+                let summaryOfTodaysMarketSentiment: String
+                let articles: [CoinArticleDTO]
+            }
+
+            struct CoinArticleDTO: Codable {
+                let title: String
+                let summary: String
+                let url: String
+            }
+
+            1. 현재 국내 시간을 기준으로 최근 24시간 뉴스 기반
+            2. 뉴스 전반을 분석해 시장 분위기를 요약
+
+            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            """
+        case .generateWeeklyTrends(let coinKName):
+            """
+            struct CoinWeeklyDTO: Codable {
+                let priceTrend: String
+                let volumeChange: String
+                let reason: String
+            }
+
+            1. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
+
+            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
             """
         }
     }
