@@ -35,6 +35,13 @@ final class AlanAPIService {
 extension AlanAPIService {
     /// "\(coin.koreanName)" 개요를 JSON 형식으로 가져옵니다.
     func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
+        // 캐시된 응답이 있으면 바로 반환
+        let cacheURL = URL(string: "https://api.example.com/coins/\(coin.id)/overview")!
+        let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
+        if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
+            return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
+        }
+
         let content = """
         struct CoinOverviewDTO: Codable {
             let symbol: String 
@@ -55,7 +62,16 @@ extension AlanAPIService {
             )
         }
         
-        return try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
+        let dto = try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
+        let response = URLResponse(
+            url: cacheURL,
+            mimeType: "application/json",
+            expectedContentLength: jsonData.count,
+            textEncodingName: "utf-8"
+        )
+        let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+        URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+        return dto
     }
 
     /// 최근 24시간 뉴스 기반 시장 분위기와 기사 목록을 JSON 형식으로 가져옵니다.
