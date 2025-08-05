@@ -121,6 +121,15 @@ struct BookmarkBulkInsertView: View {
                 let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
                 Text("\(formattedCoinIDs) 코인을 찾았어요.")
             }
+            .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
+                Button(role: .cancel) {
+                    vm.showErrorMessage = false
+                } label: {
+                    Text("확인")
+                }
+            } message: {
+                Text(vm.errorMessage)
+            }
         }
         .onAppear {
             do {
@@ -128,6 +137,9 @@ struct BookmarkBulkInsertView: View {
             } catch {
                 print("🚨 CoreData 에러", error)
             }
+        }
+        .onDisappear {
+            vm.verifiedCoinIDs = []
         }
     }
 }
