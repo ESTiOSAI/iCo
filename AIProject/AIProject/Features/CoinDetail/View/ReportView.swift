@@ -43,14 +43,14 @@ struct ReportSectionView: View {
     var body: some View {
         VStack(spacing: 0) {
             Group {
-                Text(title)
-                    .font(.system(size: 17, weight: .bold))
+                SubheaderView(subheading: title)
                     .padding(.bottom, 8)
                 
                 ForEach(contents, id: \.self) { content in
                     VStack(spacing: 0) {
                         Text(content)
                             .font(.system(size: 13))
+                            .foregroundStyle(.aiCoLabel)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(16)
                     }
@@ -60,10 +60,10 @@ struct ReportSectionView: View {
                     }
                     .padding(.bottom, 10)
                 }
+                .padding(.horizontal, 16)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.horizontal)
         .padding(.bottom, 20)
     }
 }
@@ -78,8 +78,7 @@ struct ReportNewsSectionView: View {
     var body: some View {
         VStack(spacing: 0) {
             Group {
-                Text(title)
-                    .font(.system(size: 17, weight: .bold))
+                SubheaderView(subheading: title)
                     .padding(.bottom, 8)
                 
                 ForEach(articles) { article in
@@ -102,12 +101,14 @@ struct ReportNewsSectionView: View {
                         
                         Text(article.title)
                             .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(.aiCoLabel)
                             .padding(.horizontal)
                             .padding(.bottom, 8)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         Text(article.summary)
                             .font(.system(size: 13))
+                            .foregroundStyle(.aiCoLabel)
                             .padding(.horizontal)
                             .padding(.bottom, 16)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -118,10 +119,10 @@ struct ReportNewsSectionView: View {
                     }
                     .padding(.bottom, 10)
                 }
+                .padding(.horizontal, 16)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.horizontal)
         .padding(.bottom, 20)
         .sheet(item: $safariItem) { item in
             SafariView(url: item.url)
