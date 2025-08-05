@@ -45,11 +45,7 @@ struct ChartView: View {
                         .font(.title3).bold()
                         .foregroundStyle(.aiCoLabel)
 
-                    Text(viewModel.coinSymbol)
-                        .font(.footnote).bold()
-                        .padding(.horizontal, 10).padding(.vertical, 6)
-                        .foregroundStyle(.gray)
-                        .background(Capsule().fill(Color(.systemGray5)))
+                    BadgeLabelView(text: viewModel.coinSymbol)
                 }
 
                 // 상단 요약: 현재가 및 등락
