@@ -25,6 +25,18 @@ final class UpBitAPIService {
 
         return coinDTOs
     }
+    
+    
+    /// 지정한 인용 화폐 마켓의 모든 코인을 현재 시세를 가져옵니다.
+    /// - Parameter currency: 마켓 화폐 (ex. "KRW", "BTC")
+    /// - Returns: 해당 카멧의 모든 코인 시세 정보
+    func fetchTicker(by currency: String) async throws -> [TickerDTO] {
+        let urlString = "\(endpoint)/ticker/all?quote_currencies=\(currency)"
+        guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
+        let tickerDTOs: [TickerDTO] = try await network.request(url: url)
+
+        return tickerDTOs
+    }
 
     /// 지정한 마켓의 체결 이력을 가져옵니다.
     /// - Parameter market: 조회할 마켓 코드 (ex. "KRW-BTC")
