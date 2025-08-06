@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RecentSearchView: View {
     @ObservedObject var viewModel: SearchViewModel
+    @State private var selectedCoin: Coin? = nil
 
     var body: some View {
         ScrollView {
@@ -44,8 +45,15 @@ struct RecentSearchView: View {
                                 .foregroundStyle(.aiCoPositive)
                         }
                     }
+                    .onTapGesture {
+                        viewModel.addRecentSearchKeyword(coin)
+                        selectedCoin = coin
+                    }
                 }
                 .padding(.vertical, 5)
+                .navigationDestination(item: $selectedCoin) { coin in
+                    CoinDetailView(coin: coin)
+                }
             }
         }
         .padding()
