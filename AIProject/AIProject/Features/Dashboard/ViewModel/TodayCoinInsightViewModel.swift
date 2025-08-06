@@ -25,32 +25,20 @@ final class TodayCoinInsightViewModel: ObservableObject {
     private func fetchOverallAsync() async {
         do {
             let data = try await alanAPIService.fetchTodayInsight()
+            
             await MainActor.run {
-                switch data.todaysSentiment {
-                case "호재":
-                    sentiment = .positive
-                case "중립":
-                    sentiment = .neutral
-                case "악재":
-                    sentiment = .negative
-                default:
-                    sentiment = .neutral
-                    // TODO: 새로고침
-                }
+                sentiment = Sentiment.from(data.todaysSentiment)
                 
-                self.summary = ""
-                
-                for (key, values) in data.summary {
+                self.summary = data.summary.map { key, values in
+                    var content = ""
                     if data.summary.count > 1 {
-                        self.summary.append("‣ \(key) 소식\n")
+                        content += "‣ \(key) 소식\n"
                     }
-                    for value in values {
-                        self.summary.append("\(value)\n")
-                    }
+                    content += values.joined(separator: "\n")
+                    return content
                 }
-                
-                self.summary = self.summary.trimmingCharacters(in: .whitespacesAndNewlines)
-                print(self.summary)
+                .joined(separator: "\n\n")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
             print("오류 발생: \(error.localizedDescription)")

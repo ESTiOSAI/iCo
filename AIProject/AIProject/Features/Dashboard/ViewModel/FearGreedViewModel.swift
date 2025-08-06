@@ -34,20 +34,7 @@ final class FearGreedViewModel: ObservableObject {
             
             await MainActor.run {
                 self.indexValue = CGFloat(doubleIndex)
-                switch fearGreedIndex.valueClassification {
-                case "Extreme Fear":
-                    fearGreed = .extremeFear
-                case "Fear":
-                    fearGreed = .fear
-                case "Neutral":
-                    fearGreed = .neutral
-                case "Greed":
-                    fearGreed = .greed
-                case "Extreme Greed":
-                    fearGreed = .extremeGreed
-                default:
-                    print("Fear And Greed Index: Invalid valueClassification")
-                }
+                fearGreed = FearGreed.from(fearGreedIndex.valueClassification)
                 self.classification = fearGreed.description
             }
         } catch {

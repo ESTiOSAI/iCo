@@ -44,3 +44,22 @@ enum FearGreed: String {
         }
     }
 }
+
+extension FearGreed {
+    static func from(_ classification: String) -> FearGreed {
+        switch classification {
+        case "Extreme Fear":
+            return .extremeFear
+        case "Fear":
+            return .fear
+        case "Neutral":
+            return .neutral
+        case "Greed":
+            return .greed
+        case "Extreme Greed":
+            return .extremeGreed
+        default:
+            return .neutral
+        }
+    }
+}
