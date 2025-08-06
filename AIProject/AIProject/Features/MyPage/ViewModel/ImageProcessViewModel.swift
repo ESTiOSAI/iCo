@@ -27,15 +27,14 @@ class ImageProcessViewModel: ObservableObject {
                 // 이미지에서 텍스트 읽어오기
                 let recognizedText = try await performOCR(from: selectedImage)
                 guard !recognizedText.isEmpty else {
-                    print("ℹ️ OCR 처리 결과 : \(recognizedText)")
                     throw ImageProcessError.noRecognizedText
                 }
                 
                 // 읽어온 텍스트에서 코인 이름을 추출하기
                 let convertedSymbols = try await convertToSymbol(with: recognizedText)
                 guard !convertedSymbols.isEmpty else {
-                    print("ℹ️ OCR 처리 결과 : \(recognizedText)")
-                    print("ℹ️ Alan 응답 : \(convertedSymbols)")
+                    print("ℹ️ OCR 처리 결과 :", recognizedText)
+                    print("ℹ️ Alan 응답 :", convertedSymbols)
                     throw ImageProcessError.noExtractedCoinID
                 }
                 
@@ -48,9 +47,8 @@ class ImageProcessViewModel: ObservableObject {
                         throw ImageProcessError.noMatchingCoinIDAtAPI
                     }
                 }
-                
-                print(verifiedCoinIDs)
-                
+
+                print("🚀 최종 코인 목록 :", verifiedCoinIDs)
                 await showAnalysisResult()
                 
             } catch let error as ImageProcessError {

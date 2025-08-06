@@ -108,14 +108,16 @@ struct BookmarkBulkInsertView: View {
             .alert("북마크 분석 결과", isPresented: $vm.showAnalysisResultAlert) {
                 Button {
                     vm.addToBookmark()
+                    clearCoinIDArray()
                 } label: {
-                    Text("추가하기")
+                    Text("가져오기")
                 }
                 
                 Button(role: .cancel) {
                     vm.showAnalysisResultAlert = false
+                    clearCoinIDArray()
                 } label: {
-                    Text("취소하기")
+                    Text("취소")
                 }
             } message: {
                 let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
@@ -138,9 +140,12 @@ struct BookmarkBulkInsertView: View {
                 print("🚨 CoreData 에러", error)
             }
         }
-        .onDisappear {
-            vm.verifiedCoinIDs = []
-        }
+    }
+}
+
+extension BookmarkBulkInsertView {
+    private func clearCoinIDArray() {
+        vm.verifiedCoinIDs = []
     }
 }
 
