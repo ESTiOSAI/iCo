@@ -8,14 +8,11 @@
 import Foundation
 
 final class TodayCoinInsightViewModel: ObservableObject {
-    @Published var sentiment: Sentiment = .positive
-    @Published var summary: String = """
-    비트코인은 약 $114,900~115,000 수준에서 반등하며 강세 흐름을 이어가고 있고, 이더리움 역시 최근 상승세를 보이며 투자자 심리를 지지하고 있습니다.
-    연준의 금리 인하 기대가 커지면서 달러 약세 및 위험자산 선호로 전체적으로 긍정적인 투자 분위기가 조성되고 있습니다.
-    다만, 이더리움에 대한 기관 자금 유입이 활발한 상황에서 스테이킹 관련 규제와 시장 변동성은 여전히 주의 요인입니다.
-    """
+    @Published var sentiment: Sentiment = .neutral
+    @Published var summary: String = "AI가 정보를 준비하고 있어요"
     
     let isCommunity: Bool
+    let alanAPIService = AlanAPIService()
     
     init(isCommunity: Bool = false) {
         self.isCommunity = isCommunity
@@ -25,7 +22,41 @@ final class TodayCoinInsightViewModel: ObservableObject {
     }
     
     private func fetchOverallAsync() async {
-        
+        do {
+            let data = try await alanAPIService.fetchTodayInsight()
+            await MainActor.run {
+                switch data.todaysSentiment {
+                case "호재":
+                    sentiment = .positive
+                case "중립":
+                    sentiment = .neutral
+                case "악재":
+                    sentiment = .negative
+                default:
+                    sentiment = .neutral
+                    // TODO: 새로고침
+                }
+                
+                self.summary = ""
+                
+                for (key, values) in data.summary {
+                    if data.summary.count > 1 {
+                        self.summary.append("‣ \(key) 소식\n")
+                    }
+                    for value in values {
+                        self.summary.append("\(value)\n")
+                    }
+                }
+                
+                self.summary = self.summary.trimmingCharacters(in: .whitespacesAndNewlines)
+                print(self.summary)
+            }
+        } catch {
+            print("오류 발생: \(error.localizedDescription)")
+            await MainActor.run {
+                self.summary = "데이터를 불러오는 데 실패했어요"
+            }
+        }
     }
     
     private func fetchCommunityAsync() async {

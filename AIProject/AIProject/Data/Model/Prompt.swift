@@ -12,6 +12,7 @@ enum Prompt {
     case generateTodayNews(coinKName: String)
     case generateWeeklyTrends(coinKName: String)
     case extractCoinID(text: String)
+    case generateTodayInsight
 
     var content: String {
         switch self {
@@ -83,6 +84,23 @@ enum Prompt {
             """
             아래의 문자열 배열에서 가상화폐의 이름을 찾아. 응답에는 다른 설명 없이 `[]` 이런 빈 배열에 영문 심볼들만 담아서 반환해. 오타가 있다면 고쳐주고 "," 로 구분해.
             \(text)
+            """
+        case.generateTodayInsight:
+            """
+            struct TodayInsightDTO: Codable {
+                /// 주어진 시간 동안의 암호화폐 전체 시장 분위기 (호재 / 악재 / 중립)
+                let todaysSentiment: String
+                
+                /// 내용 요약
+                /// 호재의 경우 긍정요인만 or 악재라면 부정 요인만 제공
+                /// 중립이라면 긍정요인, 부정요인을 같이 담은 [String]을 제공
+                let summary: [String: [String]]
+            }
+
+            1. 현재 국내 시간을 기준으로 최근 2시간 뉴스 기반
+            2. 뉴스 전반을 분석해 시장 분위기를 요약 
+
+            위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
             """
         }
     }

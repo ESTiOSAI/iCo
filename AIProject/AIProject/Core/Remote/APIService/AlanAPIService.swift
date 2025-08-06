@@ -123,4 +123,25 @@ extension AlanAPIService {
             throw error
         }
     }
+    
+    /// 2시간 동안의 전체 시장 정보를 JSON 형식으로 가져옵니다.
+    func fetchTodayInsight() async throws -> TodayInsightDTO {
+        let prompt = Prompt.generateTodayInsight
+        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
+        print(answer.content)
+        
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
+        }
+        do {
+            return try JSONDecoder().decode(TodayInsightDTO.self, from: jsonData)
+        } catch {
+            throw error
+        }
+    }
 }

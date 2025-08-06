@@ -17,8 +17,7 @@ struct DashboardSectionView<Content: View>: View {
             SubheaderView(subheading: subheading, description: description)
             content()
         }
-        .padding(.bottom, 40
-        )
+        .padding(.bottom, 40)
     }
 }
 
