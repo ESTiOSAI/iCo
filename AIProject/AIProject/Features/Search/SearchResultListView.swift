@@ -1,15 +1,15 @@
 //
-//  RelatedKeywordView.swift
+//  SearchResultListView.swift
 //  AIProject
 //
-//  Created by 강대훈 on 8/5/25.
+//  Created by 강대훈 on 8/6/25.
 //
 
 import SwiftUI
 
-struct RelatedKeywordView: View {
+struct SearchResultListView: View {
     @ObservedObject var viewModel: SearchViewModel
-    @State private var selectedCoin: Coin? = nil
+    @Binding var selectedCoin: Coin?
 
     var body: some View {
         List {
@@ -36,5 +36,8 @@ struct RelatedKeywordView: View {
 }
 
 #Preview {
-    RelatedKeywordView(viewModel: SearchViewModel())
+    SearchResultListView(
+        viewModel: SearchViewModel(),
+        selectedCoin: .constant(Coin(id: "KRW-BTC", koreanName: "비트코인"))
+    )
 }

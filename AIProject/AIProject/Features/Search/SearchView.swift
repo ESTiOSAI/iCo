@@ -16,7 +16,7 @@ struct SearchView: View {
             if searchText.isEmpty {
                 RecentSearchView(viewModel: viewModel)
             } else {
-            	RelatedKeywordView(viewModel: viewModel)
+                SearchResultView(viewModel: viewModel, searchText: searchText)
             }
         }
         .searchable(text: $searchText, prompt: "코인 이름으로 검색하세요")
