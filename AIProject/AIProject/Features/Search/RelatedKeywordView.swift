@@ -9,7 +9,8 @@ import SwiftUI
 
 struct RelatedKeywordView: View {
     @ObservedObject var viewModel: SearchViewModel
-    
+    @State private var selectedCoin: Coin? = nil
+
     var body: some View {
         List {
             ForEach(viewModel.relatedCoins) { coin in
@@ -21,10 +22,15 @@ struct RelatedKeywordView: View {
                         .foregroundStyle(.gray)
                     Spacer()
                 }
+                .contentShape(Rectangle())
                 .onTapGesture {
                     viewModel.addRecentSearchKeyword(coin)
+                    selectedCoin = coin
                 }
             }
+        }
+        .navigationDestination(item: $selectedCoin) { coin in
+            CoinDetailView(coin: coin)
         }
     }
 }
