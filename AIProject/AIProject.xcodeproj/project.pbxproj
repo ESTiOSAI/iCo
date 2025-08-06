@@ -10,6 +10,7 @@
 		A9C265DA2E40B11D00C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
 		A9C265DB2E40B12500C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
 		A9C265DC2E40B12500C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
+		26621BE42E423BE70083E177 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 26621BE32E423BE70083E177 /* AsyncAlgorithms */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26621BE42E423BE70083E177 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +135,7 @@
 			);
 			name = AIProject;
 			packageProductDependencies = (
+				26621BE32E423BE70083E177 /* AsyncAlgorithms */,
 			);
 			productName = AIProject;
 			productReference = B7B040032E387FCF005DE0BA /* AIProject.app */;
@@ -216,6 +219,9 @@
 			);
 			mainGroup = B7B03FFA2E387FCF005DE0BA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				26621BE22E423BE70083E177 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B7B040042E387FCF005DE0BA /* Products */;
 			projectDirPath = "";
@@ -594,6 +600,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		26621BE22E423BE70083E177 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		26621BE32E423BE70083E177 /* AsyncAlgorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 26621BE22E423BE70083E177 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			productName = AsyncAlgorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B7B03FFB2E387FCF005DE0BA /* Project object */;
 }
