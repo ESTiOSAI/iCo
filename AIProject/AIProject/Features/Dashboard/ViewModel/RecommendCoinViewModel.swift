@@ -9,7 +9,7 @@ import SwiftUI
 
 final class RecommendCoinViewModel: ObservableObject {
     /// 추천 코인 배열
-    @Published var recommendCoins: [RecommendCoin] = []
+    @Published var state: RecommendCoinViewState = .loading
 
     private var alanService: AlanAPIService
     private var upbitService: UpBitAPIService
@@ -20,8 +20,9 @@ final class RecommendCoinViewModel: ObservableObject {
     }
     
     /// 비동기로 추천 코인 목록을 가져와 `recommendCoins`에 할당합니다.
-    func getRecommendCoin() async {
+    func loadRecommendCoin() async {
         do {
+            state = .loading
             let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움")
             let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
@@ -30,11 +31,11 @@ final class RecommendCoinViewModel: ObservableObject {
                 let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 Task { @MainActor in
-                    recommendCoins = results
+                    state = .success(results)
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            state = .failure(error)
         }
     }
 

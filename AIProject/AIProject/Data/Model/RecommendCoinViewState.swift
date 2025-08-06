@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum RecommendCoinViewState<View> {
+enum RecommendCoinViewState {
     case loading
     case success([RecommendCoin])
     case failure(Error)
