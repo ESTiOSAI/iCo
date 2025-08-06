@@ -16,14 +16,14 @@ final class UpBitAPIService {
         self.network = networkClient
     }
 
-    /// 전체 마켓의 정보를 가져옵니다.
+    /// 전체 마켓의 KRW(원화) 정보를 가져옵니다.
     /// - Returns: 마켓 정보들의 배열
     func fetchMarkets() async throws -> [CoinDTO] {
         let urlString = "\(endpoint)/market/all"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
         let coinDTOs: [CoinDTO] = try await network.request(url: url)
 
-        return coinDTOs
+        return coinDTOs.filter { $0.coinID.contains("KRW") }
     }
     
     
