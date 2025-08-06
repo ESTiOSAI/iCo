@@ -35,6 +35,27 @@ final class SearchViewModel: ObservableObject {
         self.recentSearchCoins = recentSearchCoins.compactMap { $0.toCoin }
     }
     
+    /// 최근 검색 기록에 추가합니다.
+    /// - Parameter coin: 추가할 코인 데이터입니다.
+    func addRecentSearchKeyword(_ coin: Coin) {
+        if recentSearchCoins.contains(where: { $0.id == coin.id }) {
+            removeRecentSearchKeyword(coin)
+        }
+
+        recentSearchCoins.insert(coin, at: 0)
+        UserDefaults.standard.set(recentSearchCoins.compactMap { $0.toData }, forKey: "recentSearchCoins")
+    }
+
+    
+    /// 최근 검색 기록을 삭제합니다.
+    /// - Parameter coin: 삭제할 코인 데이터입니다.
+    func removeRecentSearchKeyword(_ coin: Coin) {
+        if let index = recentSearchCoins.firstIndex(where: { $0.id == coin.id }) {
+            recentSearchCoins.remove(at: index)
+            UserDefaults.standard.set(recentSearchCoins.compactMap { $0.toData }, forKey: "recentSearchCoins")
+        }
+    }
+
     /// 검색 키워드를 스트림에 전달합니다.
     /// - Parameter keyword: 사용자가 입력한 검색어 문자열입니다.
     func sendKeyword(with keyword: String) async {

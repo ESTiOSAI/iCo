@@ -36,6 +36,13 @@ struct RecentSearchView: View {
                             .foregroundStyle(.gray)
 
                         Spacer()
+
+                        Button {
+                            viewModel.removeRecentSearchKeyword(coin)
+                        } label: {
+                            Image(systemName: "multiply")
+                                .foregroundStyle(.aiCoPositive)
+                        }
                     }
                 }
                 .padding(.vertical, 5)

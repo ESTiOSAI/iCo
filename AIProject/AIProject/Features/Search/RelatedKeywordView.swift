@@ -19,6 +19,10 @@ struct RelatedKeywordView: View {
                     Text(coin.id)
                         .font(.footnote)
                         .foregroundStyle(.gray)
+                    Spacer()
+                }
+                .onTapGesture {
+                    viewModel.addRecentSearchKeyword(coin)
                 }
             }
         }
