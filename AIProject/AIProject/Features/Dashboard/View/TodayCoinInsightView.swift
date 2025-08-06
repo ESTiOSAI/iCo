@@ -21,8 +21,8 @@ struct TodayCoinInsightView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 0) {
                 Text(!isCommunity ? "전체적인 시장은 " : "현재 커뮤니티 분위기는 ")
-                Text("중립")
-                    .foregroundStyle(.red)
+                Text(viewModel.sentiment.description)
+                    .foregroundStyle(viewModel.sentiment.color)
                 Text("예요")
             }
             .foregroundStyle(.aiCoLabel)

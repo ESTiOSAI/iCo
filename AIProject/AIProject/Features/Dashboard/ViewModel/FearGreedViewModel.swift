@@ -8,6 +8,7 @@
 import Foundation
 
 final class FearGreedViewModel: ObservableObject {
+    @Published var fearGreed: FearGreed = .neutral
     @Published var indexValue: CGFloat = 0
     @Published var classification: String = "중립"
     

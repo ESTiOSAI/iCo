@@ -26,7 +26,7 @@ struct FearGreedView: View {
                 
                 Circle()
                     .trim(from: 0.0, to: 0.75 * viewModel.indexValue / 100)
-                    .stroke(.red, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    .stroke(viewModel.fearGreed.color, style: StrokeStyle(lineWidth: 20, lineCap: .round))
                     .rotationEffect(.degrees(135))
                 
                 VStack(spacing: size.height * 0.15) {
@@ -36,7 +36,7 @@ struct FearGreedView: View {
                     
                     Text(viewModel.classification)
                         .font(.system(size: size.width * 0.15, weight: .semibold))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(viewModel.fearGreed.color)
                         .padding(.top, size.height * 0.01)
                 }
                 .offset(y: size.height * 0.15)
