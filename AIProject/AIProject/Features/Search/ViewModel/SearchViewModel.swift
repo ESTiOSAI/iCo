@@ -9,7 +9,7 @@ import SwiftUI
 import AsyncAlgorithms
 
 final class SearchViewModel: ObservableObject {
-    @Published var bookMarkCoins: [Coin] = []
+    @Published var recentSearchCoins: [Coin] = []
     @Published var relatedCoins: [Coin] = []
 
     private var upbitService: UpBitAPIService
@@ -25,13 +25,14 @@ final class SearchViewModel: ObservableObject {
         observeStream()
     }
     
-    /// 북마크에 저장된 코인을 받아옵니다.
-    func loadBookMarkCoins() {
-        bookMarkCoins = [
-            Coin(id: "KRW-BTC", koreanName: "비트코인"),
-            Coin(id: "KRW-ETC", koreanName: "이더리움"),
-            Coin(id: "KRW-LTC", koreanName: "리트코인"),
-        ]
+    /// 최근 검색 기록을 받아옵니다.
+    func loadRecentSearchKeyword() {
+        guard let recentSearchCoins = UserDefaults.standard.array(forKey: "recentSearchCoins") as? [Data] else {
+            recentSearchCoins = []
+			return
+        }
+
+        self.recentSearchCoins = recentSearchCoins.compactMap { $0.toCoin }
     }
     
     /// 검색 키워드를 스트림에 전달합니다.

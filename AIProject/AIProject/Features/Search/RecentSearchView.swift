@@ -18,7 +18,7 @@ struct RecentSearchView: View {
                 Spacer()
             }
 
-            if viewModel.bookMarkCoins.isEmpty {
+            if viewModel.recentSearchCoins.isEmpty {
                 HStack {
                     Text("검색 내역이 없어요.")
                         .font(.callout)
@@ -26,7 +26,7 @@ struct RecentSearchView: View {
                     Spacer()
                 }
             } else {
-                ForEach(viewModel.bookMarkCoins) { coin in
+                ForEach(viewModel.recentSearchCoins) { coin in
                     HStack {
                         Image(systemName: "swift")
                         Text(coin.koreanName)
@@ -43,7 +43,7 @@ struct RecentSearchView: View {
         }
         .padding()
         .onAppear {
-            viewModel.loadBookMarkCoins()
+            viewModel.loadRecentSearchKeyword()
         }
     }
 }
