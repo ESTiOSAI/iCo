@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-final class DashboardViewModel: ObservableObject {
+final class RecommendCoinViewModel: ObservableObject {
     /// 추천 코인 배열
     @Published var recommendCoins: [RecommendCoin] = []
 

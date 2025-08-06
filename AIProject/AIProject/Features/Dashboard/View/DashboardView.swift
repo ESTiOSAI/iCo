@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @StateObject private var viewModel = DashboardViewModel()
     
     var body: some View {
         ScrollView {
@@ -16,7 +15,7 @@ struct DashboardView: View {
                 .padding(.bottom, 16)
             
             DashboardSectionView(subheading: "이런 코인은 어떠세요?", description: "회원님의 관심 코인을 기반으로 새로운 코인을 추천해드려요") {
-                RecommendCoinView(viewModel: viewModel)
+                RecommendCoinView()
             }
             
             DashboardSectionView(subheading: "새로운 소식들이 있어요") {

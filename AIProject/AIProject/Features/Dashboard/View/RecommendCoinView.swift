@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecommendCoinView: View {
-    @ObservedObject var viewModel: DashboardViewModel
+    @StateObject private var viewModel = RecommendCoinViewModel()
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -33,5 +33,5 @@ struct RecommendCoinView: View {
 }
 
 #Preview {
-    RecommendCoinView(viewModel: DashboardViewModel())
+    RecommendCoinView()
 }
