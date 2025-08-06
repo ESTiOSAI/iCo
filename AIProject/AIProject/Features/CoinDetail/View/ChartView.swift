@@ -46,6 +46,26 @@ struct ChartView: View {
                         .foregroundStyle(.aiCoLabel)
 
                     BadgeLabelView(text: viewModel.coinSymbol)
+                    
+                    Spacer()
+                    
+                    /// 코인 북마크 버튼
+                    /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
+                    /// - 탭 시 북마크 추가/제거 로직 호출
+                    Button(action: {
+                        viewModel.toggleBookmark()
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(Color(.systemGray5))
+                                .frame(width: 32, height: 32)
+                            Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.aiCoLabel)
+                        }
+                    }
                 }
 
                 // 상단 요약: 현재가 및 등락
@@ -117,6 +137,19 @@ struct ChartView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 16)
+            /// 뷰가 나타날 때 현재 코인의 북마크 여부 확인 (PR 테스트용으로 남겨둠, 추후 삭제 예정)
+            .onAppear {
+                viewModel.checkBookmark()
+                do {
+                    let bookmarks = try BookmarkManager.shared.fetchAll()
+                    print("현재 북마크된 코인 ID 목록:")
+                    for bookmark in bookmarks {
+                        print(" - \(bookmark.coinID)")
+                    }
+                } catch {
+                    print("북마크 목록 가져오기 실패: \(error)")
+                }
+            }
         }
         .background(.aiCoBackground)
     }
