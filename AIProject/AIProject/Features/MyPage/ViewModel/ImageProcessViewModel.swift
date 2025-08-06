@@ -11,75 +11,139 @@ import SwiftUI
 class ImageProcessViewModel: ObservableObject {
     @Published var isLoading = false
     
+    @Published var showAnalysisResultAlert = false
+    
+    @Published var showErrorMessage = false
+    @Published var errorMessage = ""
+    
+    @Published var verifiedCoinIDs = [String]()
+    
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: UIImage) {
         Task {
             await MainActor.run { self.isLoading = true }
             
-            let recognizedText = await performOCR(from: selectedImage)
-            // TODO: 이미지에 글자가 없는 경우 대응하기
-            if let convertedSymbols = await convertToSymbol(with: recognizedText) {
-                
-                // 검증된 coinID만 배열에 담기
-                var verifiedCoinIDs = [String]()
-                for symbol in convertedSymbols {
-                    do {
-                        // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
-                        let krwSymbolName = "KRW-\(symbol)"
-                        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-                        
-                        if verified {
-                            verifiedCoinIDs.append(krwSymbolName)
-                        } else {
-                            continue
-                        }
-                        
-                    } catch {
-                        print(error)
-                    }
+            do {
+                // 이미지에서 텍스트 읽어오기
+                let recognizedText = try await performOCR(from: selectedImage)
+                guard !recognizedText.isEmpty else {
+                    throw ImageProcessError.noRecognizedText
                 }
                 
-                print(verifiedCoinIDs)
-                await MainActor.run { self.isLoading = false }
+                // 읽어온 텍스트에서 코인 이름을 추출하기
+                let convertedSymbols = try await convertToSymbol(with: recognizedText)
+                guard !convertedSymbols.isEmpty else {
+                    print("ℹ️ OCR 처리 결과 :", recognizedText)
+                    print("ℹ️ Alan 응답 :", convertedSymbols)
+                    throw ImageProcessError.noExtractedCoinID
+                }
+                
+                // 업비트 API 호출 테스트로 검증된 coinID만 배열에 담기
+                for symbol in convertedSymbols {
+                    do {
+                        try await verifyAndAppend(symbol: symbol)
+                    } catch {
+                        print("ℹ️ 업비트 API 호출 테스트 :", symbol)
+                        throw ImageProcessError.noMatchingCoinIDAtAPI
+                    }
+                }
+
+                print("🚀 최종 코인 목록 :", verifiedCoinIDs)
+                await showAnalysisResult()
+                
+            } catch let error as ImageProcessError {
+                await showError(error)
             }
         }
     }
     
+    @MainActor
+    private func showAnalysisResult() {
+        self.isLoading = false
+        self.showAnalysisResultAlert = true
+    }
+    
+    @MainActor
+    private func showError(_ error: ImageProcessError) {
+        self.isLoading = false
+        self.errorMessage = error.message
+        self.showErrorMessage = true
+        print("🚨 이미지 처리 중 에러 발생:", error)
+    }
+    
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
-    func performOCR(from selectedImage: UIImage) async -> [String] {
+    private func performOCR(from selectedImage: UIImage) async throws -> [String] {
         do {
-            return try await TextRecognitionHelper.recognizeText(from: selectedImage)
+            let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
+            
+            return recognizedText
         } catch {
-            print("🚨 OCR 실패: \(error.localizedDescription)")
-            return []
+            print(#function)
+            throw ImageProcessError.unknownVisionError
         }
     }
     
     // TODO: 인식한 텍스트 주변에 박스 그리기
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
-    func convertToSymbol(with text: [String]) async -> [String]? {
-        if !text.isEmpty {
+    private func convertToSymbol(with text: [String]) async throws -> [String] {
+        let textString = text.description
+        let prompt = Prompt.extractCoinID(text: textString).content
+        
+        do {
+            let answer = try await AlanAPIService().fetchAnswer(
+                content: prompt,
+                action: .coinIDExtraction
+            )
             
-            do {
-                let answer = try await AlanAPIService().fetchAnswer(content: """
-            아래의 문자열 배열에서 가상화폐의 이름을 찾아서 해당 코인의 영문 심볼들을 반환해. 오타가 있다면 고쳐주고 "," 로 구분해서 JSON으로 반환해.
-            \(text)
-            """, action: .coinIDExtraction)
-                
-                let convertedSymbols = answer.content.extractedJSON
-                    .replacingOccurrences(of: "\"", with:"") // "\" 문자 제거하기
-                    .components(separatedBy: ",") // "," 기준으로 나누기
-                
-                return convertedSymbols
-            } catch {
-                print(error)
-                return nil
+            var answerContent = answer.content
+            
+//#if DEBUG
+//            print("ℹ️ 앨런 프롬프트 :", prompt)
+//            print("ℹ️ 앨런 응답 :", answerContent)
+//#endif
+            
+            // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
+            if answerContent.starts(with: "```json") {
+                answerContent = answerContent.extractedJSON
             }
-        } else {
-            print("전달 받은 텍스트가 없습니다!!")
-            await MainActor.run { self.isLoading = false }
-            return nil
+            
+            let convertedSymbols = answerContent.convertIntoArray
+
+//#if DEBUG
+//            print("ℹ️ 파싱 후 :", convertedSymbols)
+//#endif
+            
+            return convertedSymbols
+        } catch {
+            print(#function)
+            print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
+            throw ImageProcessError.unknownAlanError
+        }
+    }
+    
+    /// 업비트 API를 호출해 coinID가 실제로 존재하는지 검증, 검증된 coinID를 배열에 저장하는 함수
+    private func verifyAndAppend(symbol: String) async throws {
+        // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
+        let krwSymbolName = "KRW-\(symbol)"
+        
+        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
+        
+        if verified {
+            await MainActor.run {
+                self.verifiedCoinIDs.append(krwSymbolName)
+            }
+        }
+    }
+    
+    // CoreData에 coinID를 일괄 삽입하는 함수
+    func addToBookmark() {
+        do {
+            for coinId in verifiedCoinIDs {
+                try BookmarkManager.shared.add(coinID: coinId)
+            }
+        } catch {
+            print(error)
         }
     }
 }

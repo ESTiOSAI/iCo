@@ -10,6 +10,8 @@ import SwiftUI
 /// 헤더에 표시할 제목을 필수로 전달해주세요.
 /// 마켓이나 북마크 메뉴일 경우 각 파라메터에 true 값을 넣어주세요.
 struct HeaderView: View {
+    @State private var showBulkInsertSheet = false
+    
     let heading: String
     
     var showSearchButton = false
@@ -39,7 +41,7 @@ struct HeaderView: View {
                 HStack(spacing: 8) {
                     Group {
                         Button {
-                            // 가져오기 기능 구현하기
+                            showBulkInsertSheet = true
                         } label: {
                             Text("가져오기")
                         }
@@ -58,6 +60,9 @@ struct HeaderView: View {
                     .clipShape(
                         RoundedRectangle(cornerRadius: 8)
                     )
+                }
+                .sheet(isPresented: $showBulkInsertSheet) {
+                    BookmarkBulkInsertView()
                 }
             }
         }
