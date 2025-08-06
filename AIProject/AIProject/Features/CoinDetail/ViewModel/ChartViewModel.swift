@@ -48,6 +48,7 @@ final class ChartViewModel: ObservableObject {
         Task {
             if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol) {
                 self.isBookmarked = result
+                print("[북마크 상태] \(result ? "추가됨" : "제거됨")")
             }
         }
     }
