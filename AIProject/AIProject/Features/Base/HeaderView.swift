@@ -41,13 +41,13 @@ struct HeaderView: View {
                 HStack(spacing: 8) {
                     Group {
                         Button {
-                            // 가져오기 기능 구현하기
+                            showBulkInsertSheet = true
                         } label: {
                             Text("가져오기")
                         }
                         
                         Button {
-                            showBulkInsertSheet = true
+                            // 내보내기 기능 구현하기
                         } label: {
                             Text("내보내기")
                         }
