@@ -32,24 +32,33 @@ struct CoinListView: View {
                             }.opacity(0)
                         }
                         .onAppear {
+                            print(#function, coin.id)
                             guard !visibleCoins.contains(coin.id) else { return }
                             let frame = geometry.frame(in: .global)
-                            cellOnAppear(frame, id: coin.id)
+                            let threshold: CGFloat = 80
+                            
+                            // cell의 상단 좌표가 프레임 + 임계값 보다 작고
+                            // cell 하단 좌표가 프레임 - 임계값보다 크면
+                            // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
+                            if frame.minY < UIScreen.main.bounds.height && frame.maxY > -threshold {
+                                print("통과", coin.id )
+                                visibleCoins.insert(coin.id)
+                            }
                         }
                         .onDisappear {
                             visibleCoins.remove(coin.id)
-                            viewModel.unsubscribe(visibleCoins)
                         }
                     }
                 }
             }
         }
-        .task {
-            await viewModel.fetchInitial()
-        }
         .onChange(of: visibleCoins, { oldValue, newValue in
-            print("add: \(newValue.subtracting(oldValue))\nremove:\(oldValue.subtracting(newValue))")
-            print("count: \(newValue.count)")
+            guard visibleCoins.count > 16 else { return }
+            
+            Task {
+                print("add: \(newValue.subtracting(oldValue))")
+                await viewModel.sendTIcket(newValue)
+            }
         })
         
         .onAppear {
@@ -65,16 +74,7 @@ struct CoinListView: View {
 
 extension CoinListView {
     private func cellOnAppear(_ frame: CGRect, id: CoinListModel.ID) {
-        let threshold: CGFloat = 80
         
-        // cell의 상단 좌표가 프레임 + 임계값 보다 작고
-        // cell 하단 좌표가 프레임 - 임계값보다 크면
-        // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
-        if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
-            
-            visibleCoins.insert(id)
-            viewModel.subscribe(visibleCoins)
-        }
     }
 }
 
@@ -118,12 +118,12 @@ fileprivate struct CoinCell: View {
                 
                 Text(coin.currentPrice, format: .number)
                     .font(.system(size: 12))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(coin.change == .rise ? .red : .blue)
                     .frame(maxWidth: 75, alignment: .trailing)
                 
                 Text(coin.changePrice, format: .percent.precision(.fractionLength(2)))
                     .font(.system(size: 12))
-                    .foregroundStyle(.red)
+                    .foregroundStyle(coin.change == .rise ? .red : .blue)
                     .frame(maxWidth: 40, alignment: .trailing)
                 
                 HStack(spacing: 0) {
