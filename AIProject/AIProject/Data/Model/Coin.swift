@@ -7,7 +7,13 @@
 
 import Foundation
 
-struct Coin: Identifiable {
+struct Coin: Identifiable, Codable {
     let id: String
     let koreanName: String
+}
+
+extension Coin {
+    var toData: Data? {
+        try? JSONEncoder().encode(self)
+    }
 }
