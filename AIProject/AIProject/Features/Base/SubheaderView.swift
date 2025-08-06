@@ -8,22 +8,28 @@
 import SwiftUI
 
 /// 서브헤더에 표시할 제목을 필수로 전달해주세요.
+/// 제목 아래에 추가할 설명이 있다면 전달해주세요.
 struct SubheaderView: View {
-    @State var subheading: String
+    let subheading: String
+    var description: String? = nil
     
     var body: some View {
-        HStack {
+        VStack(alignment: .leading, spacing: 8) {
             Text(subheading)
-                .font(.system(size: 18, weight: .medium))
+                .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(.aiCoLabel)
             
-            Spacer()
+            if let description {
+                Text(description)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.aiCoLabel)
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.vertical, 4)
     }
 }
 
 #Preview {
-    SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
+    SubheaderView(subheading: "이런 코인은 어떠세요?", description: "회원님의 관심 코인을 기반으로 새로운 코인을 추천해드려요")
 }
