@@ -27,33 +27,7 @@ struct RecentSearchView: View {
                     Spacer()
                 }
             } else {
-                ForEach(viewModel.recentSearchCoins) { coin in
-                    HStack {
-                        Image(systemName: "swift")
-                        Text(coin.koreanName)
-                            .bold()
-                        Text(coin.id)
-                            .font(.system(size: 13))
-                            .foregroundStyle(.gray)
-
-                        Spacer()
-
-                        Button {
-                            viewModel.removeRecentSearchKeyword(coin)
-                        } label: {
-                            Image(systemName: "multiply")
-                                .foregroundStyle(.aiCoPositive)
-                        }
-                    }
-                    .onTapGesture {
-                        viewModel.updateRecentSearchKeyword(coin)
-                        selectedCoin = coin
-                    }
-                }
-                .padding(.vertical, 5)
-                .navigationDestination(item: $selectedCoin) { coin in
-                    CoinDetailView(coin: coin)
-                }
+                RecentSearchListView(viewModel: viewModel, selectedCoin: $selectedCoin)
             }
         }
         .padding()
