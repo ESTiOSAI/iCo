@@ -8,7 +8,9 @@
 import SwiftUI
 
 final class RecommendCoinViewModel: ObservableObject {
-    /// 추천 코인 배열
+    /// 현재 추천 코인 뷰의 UI 상태를 나타냅니다.
+    ///
+    /// `state`는 로딩, 성공, 실패 등의 화면 표현을 의미합니다.
     @Published var state: RecommendCoinViewState = .loading
 
     private var alanService: AlanAPIService
@@ -19,7 +21,7 @@ final class RecommendCoinViewModel: ObservableObject {
         upbitService = UpBitAPIService()
     }
     
-    /// 비동기로 추천 코인 목록을 가져와 `recommendCoins`에 할당합니다.
+    /// 비동기로 추천 코인 목록을 가져옵니다.
     func loadRecommendCoin() async {
         do {
             state = .loading
