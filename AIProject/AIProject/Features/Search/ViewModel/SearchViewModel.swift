@@ -66,7 +66,7 @@ final class SearchViewModel: ObservableObject {
     private func setupCoinData() {
         Task {
             do {
-                let coinDTOs = try await upbitService.fetchMarkets()
+                let coinDTOs = try await upbitService.fetchMarkets().filter { $0.coinID.contains("KRW") }
                 coins = coinDTOs.map { Coin(id: $0.coinID, koreanName: $0.koreanName) }
             } catch {
                 print(error.localizedDescription)
