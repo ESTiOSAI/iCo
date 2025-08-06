@@ -16,7 +16,8 @@ final class ChartViewModel: ObservableObject {
     @Published var coinSymbol: String
     /// 통화 코드 (예: "USD")
     @Published var currency: String
-    
+    /// 현재 코인이 북마크된 상태인지 나타냄
+    @Published var isBookmarked: Bool = false
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
@@ -33,6 +34,19 @@ final class ChartViewModel: ObservableObject {
         self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
         startUpdating()
+    }
+    
+    /// 현재 코인이 북마크되어 있는지 확인하여 isBookmarked 상태를 갱신
+    func checkBookmark() {
+        self.isBookmarked = (try? BookmarkManager.shared.isBookmarked(coinSymbol)) ?? false
+    }
+    
+    /// 현재 코인의 북마크 상태를 토글하고, 결과를 isBookmarked에 반영
+    func toggleBookmark() {
+        if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol) {
+            self.isBookmarked = result
+            print("[북마크 상태] \(result ? "추가됨" : "제거됨")")
+        }
     }
     
     /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작
