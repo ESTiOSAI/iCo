@@ -144,4 +144,25 @@ extension AlanAPIService {
             throw error
         }
     }
+    
+    /// 하루 동안의 커뮤니티 동향을 JSON 형식으로 가져옵니다.
+    func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
+        let prompt = Prompt.generateCommunityInsight(redditPost: post)
+        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
+        print(answer.content)
+        
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
+        }
+        do {
+            return try JSONDecoder().decode(CommunityInsightDTO.self, from: jsonData)
+        } catch {
+            throw error
+        }
+    }
 }

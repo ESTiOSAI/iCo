@@ -13,6 +13,7 @@ enum Prompt {
     case generateWeeklyTrends(coinKName: String)
     case extractCoinID(text: String)
     case generateTodayInsight
+    case generateCommunityInsight(redditPost: String)
 
     var content: String {
         switch self {
@@ -101,6 +102,18 @@ enum Prompt {
             2. 뉴스 전반을 분석해 시장 분위기를 요약 
 
             위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            """
+        case.generateCommunityInsight(let redditPost):
+            """
+            \(redditPost)
+            지금 보낸 건, reddit의 r/CryptoCurrecy community에서, 하루동안 좋아요를 가장 많이 받은 게시물 5개의 제목과 내용이야.
+            이 게시물들을 TodayInsightDTO를 기반으로 JSON으로 응답해줘.
+            struct CommunityInsightDTO: Codable {
+                /// 게시물을 기반으로 평가한 커뮤니티 분위기 (호재 / 악재 / 중립)
+                let todaysSentiment: String
+                /// 커뮤니티 분위기를 그렇게 평가한 이유 요약
+                let summary: String
+            }
             """
         }
     }
