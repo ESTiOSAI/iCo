@@ -39,22 +39,13 @@ class ImageProcessViewModel: ObservableObject {
                     throw ImageProcessError.noExtractedCoinID
                 }
                 
-                // 검증된 coinID만 배열에 담기
+                // 업비트 API 호출 테스트로 검증된 coinID만 배열에 담기
                 for symbol in convertedSymbols {
                     do {
-                        // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
-                        let krwSymbolName = "KRW-\(symbol)"
-                        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-                        
-                        if verified {
-                            await MainActor.run {
-                                self.verifiedCoinIDs.append(krwSymbolName)
-                            }
-                        } else {
-                            continue
-                        }
+                        try await verifyAndAppend(symbol: symbol)
                     } catch {
-                        print(error)
+                        print("ℹ️ 업비트 API 호출 테스트 :", symbol)
+                        throw ImageProcessError.noMatchingCoinIDAtAPI
                     }
                 }
                 
@@ -119,6 +110,21 @@ class ImageProcessViewModel: ObservableObject {
         }
     }
     
+    /// 업비트 API를 호출해 coinID가 실제로 존재하는지 검증, 검증된 coinID를 배열에 저장하는 함수
+    private func verifyAndAppend(symbol: String) async throws {
+        // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
+        let krwSymbolName = "KRW-\(symbol)"
+        
+        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
+        
+        if verified {
+            await MainActor.run {
+                self.verifiedCoinIDs.append(krwSymbolName)
+            }
+        }
+    }
+    
+    // CoreData에 coinID를 일괄 삽입하는 함수
     func addToBookmark() {
         do {
             for coinId in verifiedCoinIDs {
