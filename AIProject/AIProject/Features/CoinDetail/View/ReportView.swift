@@ -18,13 +18,13 @@ struct ReportView: View {
         ScrollView() {
             VStack(spacing: 0) {
                 ReportSectionView(title: "한눈에 보는 \(viewModel.koreanName)", contents: [viewModel.coinOverView])
-                // FIXME: 웹사이트 정보를 지우거나, 웹사이트로 이동할 수 있는 버튼 만들기
+                // TODO: 웹사이트 정보를 지우거나, 웹사이트로 이동할 수 있는 버튼 만들기
+                
+                ReportSectionView(title: "주간 동향 확인", contents: [viewModel.coinWeeklyTrends])
                 
                 ReportSectionView(title: "오늘 시장 분위기 살펴보기", contents: [viewModel.coinTodayTrends])
                 
                 ReportNewsSectionView(title: "주요 뉴스", articles: viewModel.coinTodayTopNews, isNews: true)
-                
-                ReportSectionView(title: "주간 동향 확인", contents: [viewModel.coinWeeklyTrends])
             }
         }
         .padding(.top, 15)

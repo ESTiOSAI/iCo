@@ -80,6 +80,27 @@ extension AlanAPIService {
             throw error
         }
     }
+    
+    /// 일주일간의 가격 추이 및 거래량 변화 정보를 JSON 형식으로 가져옵니다.
+    func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO {
+        let prompt = Prompt.generateWeeklyTrends(coinKName: coin.koreanName)
+        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
+        print(answer.content)
+        
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
+                )
+            )
+        }
+        do {
+            return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
+        } catch {
+            throw error
+        }
+    }
 
     /// 최근 24시간 뉴스 기반 시장 분위기와 기사 목록을 JSON 형식으로 가져옵니다.
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO {
@@ -98,27 +119,6 @@ extension AlanAPIService {
         
         do {
             return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
-        } catch {
-            throw error
-        }
-    }
-
-    /// 일주일간의 가격 추이 및 거래량 변화 정보를 JSON 형식으로 가져옵니다.
-    func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO {
-        let prompt = Prompt.generateWeeklyTrends(coinKName: coin.koreanName)
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
-        
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
-        do {
-            return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
         } catch {
             throw error
         }

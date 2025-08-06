@@ -24,8 +24,8 @@ final class ReportViewModel: ObservableObject {
         
         Task.detached(priority: .background) {
             await self.fetchOverViewAsync()
-            await self.fetchTodayTopNewsAsync()
             await self.fetchWeeklyTrendsAsync()
+            await self.fetchTodayTopNewsAsync()
         }
     }
     
@@ -50,22 +50,6 @@ final class ReportViewModel: ObservableObject {
         }
     }
     
-    private func fetchTodayTopNewsAsync() async {
-        do {
-            let data = try await alanAPIService.fetchTodayNews(for: coin)
-            await MainActor.run {
-                self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
-                self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
-            }
-        } catch {
-            print("오류 발생: \(error.localizedDescription)")
-            await MainActor.run {
-                self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
-                self.coinTodayTopNews = [CoinArticle(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
-            }
-        }
-    }
-    
     private func fetchWeeklyTrendsAsync() async {
         do {
             let data = try await alanAPIService.fetchWeeklyTrends(for: coin)
@@ -82,6 +66,22 @@ final class ReportViewModel: ObservableObject {
             print("오류 발생: \(error.localizedDescription)")
             await MainActor.run {
                 self.coinWeeklyTrends = "데이터를 불러오는 데 실패했어요"
+            }
+        }
+    }
+    
+    private func fetchTodayTopNewsAsync() async {
+        do {
+            let data = try await alanAPIService.fetchTodayNews(for: coin)
+            await MainActor.run {
+                self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
+                self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
+            }
+        } catch {
+            print("오류 발생: \(error.localizedDescription)")
+            await MainActor.run {
+                self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
+                self.coinTodayTopNews = [CoinArticle(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
             }
         }
     }
