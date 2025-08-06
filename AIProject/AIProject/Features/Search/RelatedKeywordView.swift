@@ -18,7 +18,7 @@ struct RelatedKeywordView: View {
                     Image(systemName: "swift")
                     Text(coin.koreanName)
                     Text(coin.id)
-                        .font(.footnote)
+                        .font(.system(size: 13))
                         .foregroundStyle(.gray)
                     Spacer()
                 }

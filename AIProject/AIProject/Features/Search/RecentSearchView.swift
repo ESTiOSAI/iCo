@@ -22,7 +22,7 @@ struct RecentSearchView: View {
             if viewModel.recentSearchCoins.isEmpty {
                 HStack {
                     Text("검색 내역이 없어요.")
-                        .font(.callout)
+                        .font(.system(size: 15))
                         .foregroundStyle(.gray)
                     Spacer()
                 }
@@ -33,7 +33,7 @@ struct RecentSearchView: View {
                         Text(coin.koreanName)
                             .bold()
                         Text(coin.id)
-                            .font(.footnote)
+                            .font(.system(size: 13))
                             .foregroundStyle(.gray)
 
                         Spacer()
