@@ -96,7 +96,7 @@ final class SearchViewModel: ObservableObject {
     private func performSearch(with keyword: String) {
         guard !keyword.isEmpty else { return }
 
-        relatedCoins = coins.filter { $0.koreanName.contains(keyword) }
+        relatedCoins = coins.filter { $0.koreanName.contains(keyword) || $0.id.lowercased().contains(keyword.lowercased()) }
     }
 
     deinit {
