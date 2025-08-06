@@ -35,9 +35,9 @@ final class SearchViewModel: ObservableObject {
         self.recentSearchCoins = recentSearchCoins.compactMap { $0.toCoin }
     }
     
-    /// 최근 검색 기록에 추가합니다.
+    /// 최근 검색 기록에 업데이트합니다.
     /// - Parameter coin: 추가할 코인 데이터입니다.
-    func addRecentSearchKeyword(_ coin: Coin) {
+    func updateRecentSearchKeyword(_ coin: Coin) {
         if recentSearchCoins.contains(where: { $0.id == coin.id }) {
             removeRecentSearchKeyword(coin)
         }
@@ -66,7 +66,7 @@ final class SearchViewModel: ObservableObject {
     private func setupCoinData() {
         Task {
             do {
-                let coinDTOs = try await upbitService.fetchMarkets().filter { $0.coinID.contains("KRW") }
+                let coinDTOs = try await upbitService.fetchMarkets()
                 coins = coinDTOs.map { Coin(id: $0.coinID, koreanName: $0.koreanName) }
             } catch {
                 print(error.localizedDescription)

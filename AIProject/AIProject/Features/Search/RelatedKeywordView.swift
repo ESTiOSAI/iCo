@@ -24,7 +24,7 @@ struct RelatedKeywordView: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    viewModel.addRecentSearchKeyword(coin)
+                    viewModel.updateRecentSearchKeyword(coin)
                     selectedCoin = coin
                 }
             }

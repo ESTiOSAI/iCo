@@ -46,7 +46,7 @@ struct RecentSearchView: View {
                         }
                     }
                     .onTapGesture {
-                        viewModel.addRecentSearchKeyword(coin)
+                        viewModel.updateRecentSearchKeyword(coin)
                         selectedCoin = coin
                     }
                 }
