@@ -27,6 +27,12 @@ final class WebSocketClient: NSObject {
     /// 지속적으로 서버에 핑을 보내기 위한 타이머
     private var timer: Timer?
     
+    override init() {
+        super.init()
+        
+        print(#function, #file)
+    }
+    
     /// 웹소켓 연결을 시작합니다.
     func connect() async throws {
         disconnect()
@@ -38,9 +44,7 @@ final class WebSocketClient: NSObject {
         self.webSocketTask?.resume()
         
         checkingAlive()
-        await sendPing()
-        
-        print("connect 종료")
+        await sendPing2()
     }
     
     /// 웹소켓 연결을 종료합니다.
@@ -58,11 +62,8 @@ final class WebSocketClient: NSObject {
     
     /// 데이터를 방출하는 스트림을 반환합니다.
     func subscribe() -> WebSocketStream? {
-//        guard isActive else { return nil }
-//        guard let stream else { return nil }
         return stream
     }
-    
     
     /// 코인 시세 요청 전송
     /// - Parameters:
@@ -111,16 +112,13 @@ final class WebSocketClient: NSObject {
                             let result = String(data: data, encoding: .utf8) ?? error.localizedDescription
                             print(#line, result)
                         }
-                        throw NetworkError.webSocketError
                     }
-                default:
-                    throw NetworkError.webSocketError
+                default: print("text")
+                    
                 }
             } catch {
                 print(error)
                 continuation?.yield(with: .failure(NetworkError.webSocketError))
-                
-                try await connect()
             }
         }
     }
@@ -131,7 +129,7 @@ final class WebSocketClient: NSObject {
         timer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true, block: { [weak self] _ in
             guard let self else { return }
             Task {
-                await self.sendPing()
+                await self.sendPing2()
             }
         })
     }
@@ -155,12 +153,17 @@ final class WebSocketClient: NSObject {
         }
     }
     
-    private func sendPing2() async {
-        let requestFormat = "[{ticket:test},{type:ticker,codes:[KRW-BTC]}]"
+    private func sendPing2(coins: [String] = ["KRW-NEWT", "KRW-ONDO", "KRW-PENGU", "KRW-STRIKE", "KRW-XLM", "KRW-GAS", "KRW-MNT", "KRW-ENA", "KRW-SOL", "KRW-USDT", "KRW-ETH", "KRW-ERA", "KRW-PROVE", "KRW-XRP", "KRW-DOGE", "KRW-BTC", "KRW-SUI"], ticket: String = "test") async {
 
         do {
-            /// 기존에는 콜백방식의 API
-            try await webSocketTask?.send(URLSessionWebSocketTask.Message.string(requestFormat))
+            let jsonData: [[String: Any]] = [
+                ["ticket": ticket],
+                ["type": "ticker", "codes": coins]
+            ]
+            
+            if let requestData = try? JSONSerialization.data(withJSONObject: jsonData) {
+                try await self.webSocketTask?.send(.data(requestData))
+            }
             print("핑 성공!")
         } catch {
             print("핑 관련 에러 발생: \(error.localizedDescription)")
@@ -183,6 +186,11 @@ extension WebSocketClient: URLSessionWebSocketDelegate {
     
     /// 웹 소켓 연결 종료
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        var r = ""
+        if let reason, let string = String(data: reason, encoding: .utf8) {
+            r = string
+        }
+        print("DidClose reason: \(r) code: \(closeCode)")
         disconnect()
     }
 }

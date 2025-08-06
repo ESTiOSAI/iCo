@@ -48,11 +48,9 @@ class CoinListViewModel {
     func consume() async {
 //        guard let stream = socket.subscribe() else { return }
         guard let stream = socket.subscribe() else {
-            print("stream 생성되지 않음")
             return
         }
         do {
-            print("stream 생성됨")
             for try await ticker in stream {
                 guard let index = coins.firstIndex(where: {
                     $0.coinID == ticker.coinID
@@ -60,13 +58,10 @@ class CoinListViewModel {
                     return
                 }
                 
-                coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].coinName, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
-                
-                print(coins[index])
+                coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
             }
         } catch {
-            print(error)
-            print("에러 발생")
+            socket.disconnect()
         }
     }
     
