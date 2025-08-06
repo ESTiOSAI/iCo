@@ -61,6 +61,8 @@ extension AlanAPIService {
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
         case .coinIDExtraction:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
+        case .bookmarkSuggestion:
+            return Bundle.main.infoDictionary?["ALAN_API_KEY_BOOKMARK_SUGGESTION"] as? String
         }
     }
     
@@ -127,5 +129,48 @@ extension AlanAPIService {
     func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
         let prompt = Prompt.generateCommunityInsight(redditPost: post)
         return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
+    }
+
+    /// 북마크된 코인 전체에 대한 투자 브리핑과 전략 제안을 JSON 형식으로 가져옵니다.
+    func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: InvestmentCharacter) async throws -> PortfolioBriefingDTO {
+        let coinNames = coins.map { $0.coinID }.joined(separator: ", ")
+        print("coinNames: \(coinNames)")
+
+        let importance: String
+        switch character {
+        case .shortTerm:
+            importance = "최근 가격 흐름과 거래량 변화를 최우선으로 고려하며, 테마는 보조적으로 참고."
+        case .longTerm:
+            importance = "테마, 시가 총액의 안정성과 성장성을 최우선으로 고려하며, 최근 가격 흐름과 거래량은 보조적으로 참고."
+        }
+
+        let content = """
+        struct PortfolioBriefingDTO: Codable {
+            let briefing: String
+            let strategy: String
+        }
+
+        1. 분석 대상 코인: \(coinNames)
+        2. 코인별 개별 분석이 아니라, 전체적으로 공통점과 분포(테마, 시가 총액, 최근 7일 가격 흐름, 최근 7일 거래량)를 간결하게 2줄로 요약
+        3. 중요도 반영: \(importance)
+        4. 요약문에는 반드시 업계 평균이나 상위/하위 10% 대비 특징을 1개 이상 포함 (예: 거래량이 상위 15% 수준)
+        5. 투자자가 지금 바로 주목해야 할 '기회' 또는 '위험'을 한 문장으로 명확히 제시
+        6. 이 공통점의 강점과 현재 시장 상황을 바탕으로, 단기/중기/장기 중 하나의 전략을 선택해 이유와 함께 구체적으로 제안
+        7. 모든 설명은 숫자, 비교, 구체적 시간 프레임을 포함하고, 포괄적 표현(‘좋다’, ‘나쁘다’ 등) 대신 행동 유도형 문장 사용
+        8. 마크다운 금지
+        """
+
+        let answer = try await fetchAnswer(content: content, action: .bookmarkSuggestion)
+
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환 실패"
+                )
+            )
+        }
+
+        return try JSONDecoder().decode(PortfolioBriefingDTO.self, from: jsonData)
     }
 }

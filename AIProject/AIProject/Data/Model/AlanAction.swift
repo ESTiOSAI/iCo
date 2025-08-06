@@ -14,4 +14,6 @@ enum AlanAction {
     case coinReportGeneration
     /// 코인 ID 추출
     case coinIDExtraction
+	/// 북마크 코인 요약 및 제안
+    case bookmarkSuggestion
 }

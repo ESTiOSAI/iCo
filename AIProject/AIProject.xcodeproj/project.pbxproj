@@ -38,6 +38,22 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A94846402E42E91C00538FC4 /* Exceptions for "AIProject" folder in "AIProjectTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Features/Base/DefaultProgressView.swift,
+				Features/Base/RoundedButton.swift,
+			);
+			target = B7B040142E387FD1005DE0BA /* AIProjectTests */;
+		};
+		A94846412E42E91C00538FC4 /* Exceptions for "AIProject" folder in "AIProjectUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Features/Base/DefaultProgressView.swift,
+				Features/Base/RoundedButton.swift,
+			);
+			target = B7B0401E2E387FD1005DE0BA /* AIProjectUITests */;
+		};
 		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -52,6 +68,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
+				A94846402E42E91C00538FC4 /* Exceptions for "AIProject" folder in "AIProjectTests" target */,
+				A94846412E42E91C00538FC4 /* Exceptions for "AIProject" folder in "AIProjectUITests" target */,
 			);
 			path = AIProject;
 			sourceTree = "<group>";
