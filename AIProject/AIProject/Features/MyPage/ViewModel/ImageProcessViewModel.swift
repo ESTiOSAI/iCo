@@ -90,17 +90,31 @@ class ImageProcessViewModel: ObservableObject {
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
     private func convertToSymbol(with text: [String]) async throws -> [String] {
         let textString = text.description
+        let prompt = Prompt.extractCoinID(text: textString).content
         
         do {
             let answer = try await AlanAPIService().fetchAnswer(
-                content: Prompt.extractCoinID(text: textString).content,
+                content: prompt,
                 action: .coinIDExtraction
             )
             
-            let convertedSymbols = answer.content
-                .replacingOccurrences(of: "[", with: "") // 여는 대괄호 제거하기
-                .replacingOccurrences(of: "]", with: "") // 닫는 대괄호 제거하기
-                .components(separatedBy: ",") // "," 기준으로 나누기
+            var answerContent = answer.content
+            
+//#if DEBUG
+//            print("ℹ️ 앨런 프롬프트 :", prompt)
+//            print("ℹ️ 앨런 응답 :", answerContent)
+//#endif
+            
+            // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
+            if answerContent.starts(with: "```json") {
+                answerContent = answerContent.extractedJSON
+            }
+            
+            let convertedSymbols = answerContent.convertIntoArray
+
+//#if DEBUG
+//            print("ℹ️ 파싱 후 :", convertedSymbols)
+//#endif
             
             return convertedSymbols
         } catch {
