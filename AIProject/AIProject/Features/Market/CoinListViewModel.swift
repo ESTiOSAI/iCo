@@ -11,16 +11,26 @@ import Foundation
 class CoinListViewModel {
     private let socket: WebSocketClient
     private let upbitService: UpBitAPIService
+    private let ticket = UUID().uuidString
     
     var coins: [CoinListModel] = []
     
     init(socket: WebSocketClient) {
         self.socket = socket
         self.upbitService = UpBitAPIService()
+        
+        Task {
+            await fetchInitial()
+        }
     }
     
     func connect() async {
-        try? await socket.connect()
+        do {
+            try await socket.connect()
+            await consume()
+        } catch {
+            print(error)
+        }
     }
     
     func disconnect() {
@@ -31,12 +41,38 @@ class CoinListViewModel {
         self.coins = await fetchMarketCoinData()
     }
     
-    func subscribe(_ coins: Set<CoinListModel.ID>) {
-        
+    func sendTIcket(_ coins: Set<CoinListModel.ID>) async {
+        await socket.subscribe(ticket: ticket, coins: Array(coins))
     }
     
-    func unsubscribe(_ coins: Set<CoinListModel.ID>) {
-        
+    func consume() async {
+//        guard let stream = socket.subscribe() else { return }
+        guard let stream = socket.subscribe() else {
+            print("stream 생성되지 않음")
+            return
+        }
+        do {
+            print("stream 생성됨")
+            for try await ticker in stream {
+                guard let index = coins.firstIndex(where: {
+                    $0.coinID == ticker.coinID
+                }) else {
+                    return
+                }
+                
+                coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].coinName, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
+                
+                print(coins[index])
+            }
+        } catch {
+            print(error)
+            print("에러 발생")
+        }
+    }
+    
+    func unsubscribe(_ coins: Set<CoinListModel.ID>) async {
+        await socket.subscribe(ticket: ticket, coins: Array(coins))
+        await consume()
     }
     
     private func fetchMarketCoinData() async -> [CoinListModel] {
