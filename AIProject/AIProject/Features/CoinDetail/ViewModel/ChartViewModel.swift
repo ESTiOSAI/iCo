@@ -38,18 +38,14 @@ final class ChartViewModel: ObservableObject {
     
     /// 현재 코인이 북마크되어 있는지 확인하여 isBookmarked 상태를 갱신
     func checkBookmark() {
-        Task {
-            self.isBookmarked = (try? BookmarkManager.shared.isBookmarked(coinSymbol)) ?? false
-        }
+        self.isBookmarked = (try? BookmarkManager.shared.isBookmarked(coinSymbol)) ?? false
     }
-
+    
     /// 현재 코인의 북마크 상태를 토글하고, 결과를 isBookmarked에 반영
     func toggleBookmark() {
-        Task {
-            if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol) {
-                self.isBookmarked = result
-                print("[북마크 상태] \(result ? "추가됨" : "제거됨")")
-            }
+        if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol) {
+            self.isBookmarked = result
+            print("[북마크 상태] \(result ? "추가됨" : "제거됨")")
         }
     }
     
