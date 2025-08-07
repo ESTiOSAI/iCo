@@ -28,6 +28,27 @@ final class AlanAPIService {
         
         return alanResponseDTO
     }
+    
+    /// 지정된 프롬프트와 작업 타입에 따라 응답을 받아 디코딩된 DTO를 반환합니다.
+    ///
+    /// - Parameters:
+    ///   - prompt: 요청을 생성하는 프롬프트
+    ///   - action: 요청 목적에 따른 작업 타입
+    /// - Returns: 디코딩된 DTO 객체
+    private func fetchDTO<T: Decodable>(prompt: Prompt, action: AlanAction) async throws -> T {
+        let answer = try await fetchAnswer(content: prompt.content, action: action)
+        
+        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: [],
+                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환 실패"
+                )
+            )
+        }
+        
+        return try JSONDecoder().decode(T.self, from: jsonData)
+    }
 }
 
 extension AlanAPIService {
@@ -55,34 +76,21 @@ extension AlanAPIService {
         if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
             return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
         }
-
+        
         let prompt = Prompt.generateOverView(coinKName: coin.koreanName)
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
+        let dto: CoinOverviewDTO = try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
+        let jsonData = try JSONEncoder().encode(dto)
         
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
+        let response = URLResponse(
+            url: cacheURL,
+            mimeType: "application/json",
+            expectedContentLength: jsonData.count,
+            textEncodingName: "utf-8"
+        )
+        let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+        URLCache.shared.storeCachedResponse(cacheEntry, for: request)
         
-        do {
-            let dto = try JSONDecoder().decode(CoinOverviewDTO.self, from: jsonData)
-            let response = URLResponse(
-                url: cacheURL,
-                mimeType: "application/json",
-                expectedContentLength: jsonData.count,
-                textEncodingName: "utf-8"
-            )
-            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
-            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
-            return dto
-        } catch {
-            throw error
-        }
+        return dto
     }
     
     /// 주어진 코인에 대해 주간 트렌드 데이터를 가져옵니다.
@@ -91,22 +99,7 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO {
         let prompt = Prompt.generateWeeklyTrends(coinKName: coin.koreanName)
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
-        
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
-        do {
-            return try JSONDecoder().decode(CoinWeeklyDTO.self, from: jsonData)
-        } catch {
-            throw error
-        }
+        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
     
     /// 주어진 코인에 대해 24시간 뉴스 및 시장 분위기 데이터를 가져옵니다.
@@ -115,23 +108,7 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO {
         let prompt = Prompt.generateTodayNews(coinKName: coin.koreanName)
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
-        
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
-        
-        do {
-            return try JSONDecoder().decode(CoinTodayNewsDTO.self, from: jsonData)
-        } catch {
-            throw error
-        }
+        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
     
     /// 주어진 코인에 대해 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
@@ -140,22 +117,7 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchTodayInsight() async throws -> TodayInsightDTO {
         let prompt = Prompt.generateTodayInsight
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
-        
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
-        do {
-            return try JSONDecoder().decode(TodayInsightDTO.self, from: jsonData)
-        } catch {
-            throw error
-        }
+        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
     
     /// 주어진 코인에 대해 커뮤니티 기반 인사이트 데이터를 가져옵니다.
@@ -164,21 +126,6 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
         let prompt = Prompt.generateCommunityInsight(redditPost: post)
-        let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
-        print(answer.content)
-        
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환하는 데 실패했습니다."
-                )
-            )
-        }
-        do {
-            return try JSONDecoder().decode(CommunityInsightDTO.self, from: jsonData)
-        } catch {
-            throw error
-        }
+        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
 }
