@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// 버튼 터치 시 실행할 메서드
 struct RoundedButton: View {
     let buttonHeight: CGFloat = 32
     
@@ -14,6 +15,11 @@ struct RoundedButton: View {
     var image: Image? = Image(systemName: "chevron.right")
     var foregroundColor: Color = .aiCoLabel
     var backgroundColor: Color = .aiCoBackground
+    
+    /// 버튼이 눌렸을 때 실행될 액션
+    ///
+    /// 외부에서 이 버튼을 사용할 때 실행하고자 하는 동작을 이 클로저로 전달
+    /// 예: 버튼 클릭 시 네비게이션 이동, 토글, API 호출 등.
     var action: () -> Void
     
     var body: some View {
