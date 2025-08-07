@@ -67,19 +67,24 @@ struct PersistenceController {
         guard count == 0 else { return }
 
         // 2) 초기 북마크로 넣고 싶은 coinID 목록
-        let initialCoinIDs = ["KRW-STRIKE", "KRW-SOL", "KRW-AHT"]
+        let initialBookmarks: [String: String] = [
+            "KRW-BTC": "비트코인",
+            "KRW-ETH": "이더리움",
+            "KRW-BONK": "봉크"
+        ]
 
         // 3) 각각 BookmarkEntity 생성
-        initialCoinIDs.forEach { id in
+        initialBookmarks.forEach { id, name in
             let bookmark = BookmarkEntity(context: context)
             bookmark.coinID = id
+            bookmark.coinKoreanName = name
             bookmark.timestamp = Date()
         }
 
         // 4) 저장
         do {
             try context.save()
-            print("✅ Seeded \(initialCoinIDs.count) bookmarks")
+            print("✅ Seeded \(initialBookmarks.count) bookmarks")
         } catch {
             print("❌ Seed failed:", error)
         }

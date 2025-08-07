@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct CoinListSectionView: View {
-    let sortedCoins: [CoinListModel]
+    let sortedCoins: [BookmarkEntity]
     @Binding var selectedCategory: SortCategory?
     @Binding var nameOrder: SortOrder
     @Binding var priceOrder: SortOrder
     @Binding var volumeOrder: SortOrder
 
     var body: some View {
-        LazyVStack(spacing: 8) {
+        List {
             HStack {
                 SortToggleButton(
                     title: "코인명",
@@ -55,15 +55,16 @@ struct CoinListSectionView: View {
             .font(.system(size: 12))
             .foregroundStyle(.aiCoLabel)
 
-            Divider()
 
-            ForEach(sortedCoins) { coin in
+            ForEach(sortedCoins, id: \.coinID) { coin in
                 NavigationLink {
-                    CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
+                    CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
                     CoinRowView(coin: coin)
                 }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
         }
     }
 }
