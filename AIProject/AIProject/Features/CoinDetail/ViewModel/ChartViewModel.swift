@@ -66,15 +66,26 @@ final class ChartViewModel: ObservableObject {
         updateTask?.cancel()
     }
     
-    
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
-    func loadPrices(interval: CoinInterval = .d1) async {
+    func loadPrices(interval: CoinInterval = .all.first!) async {
         do {
             let marketCode = coinSymbol
             let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
-            self.prices = fetchedPrices
-            self.prices = fetchedPrices.enumerated().map { idx, price in
+            
+            /// KST 기준으로 오늘의 시작 시간과 현재 시각 계산
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+
+            let nowKST = Date()
+            let todayStartKST = calendar.startOfDay(for: nowKST)
+
+            /// 당일 범위에 해당하는 가격만 필터링
+            let filteredPrices = fetchedPrices.filter { price in
+                return price.date >= todayStartKST && price.date <= nowKST
+            }
+                        
+            self.prices = filteredPrices.enumerated().map { idx, price in
                 CoinPrice(
                     date: price.date,
                     open: price.open,
@@ -116,9 +127,25 @@ extension ChartViewModel {
         var currentTimestamp = startDate
         var value = 100.0
         
-        for _ in 0..<sampleCount {
-            priceSeries.append(.init(date: currentTimestamp, close: value))
+        for i in 0..<sampleCount {
+            let open = value
+            let close = value + Double.random(in: -2...2)
+            let high = max(open, close) + Double.random(in: 0...1)
+            let low = min(open, close) - Double.random(in: 0...1)
+            
+            priceSeries.append(
+                CoinPrice(
+                    date: currentTimestamp,
+                    open: open,
+                    high: high,
+                    low: low,
+                    close: close,
+                    index: i
+                )
+            )
+            
             currentTimestamp = currentTimestamp.addingTimeInterval(samplingInterval)
+            value = close
         }
         return priceSeries
     }
