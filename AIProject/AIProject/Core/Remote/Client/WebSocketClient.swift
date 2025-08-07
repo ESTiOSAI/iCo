@@ -134,25 +134,7 @@ final class WebSocketClient: NSObject {
         })
     }
     
-    /// 요청 포맷
-    private func sendPing() async {
-        do {
-            try await withCheckedThrowingContinuation { continuation in
-                webSocketTask?.sendPing { error in
-                    guard let error else {
-                        print("핑 성공")
-                        continuation.resume()
-                        return
-                    }
-                    continuation.resume(throwing: error)
-                }
-            }
-        } catch {
-            print("ping error: \(error)")
-            self.checkingAlive()
-        }
-    }
-    
+    // TODO: Ping 보내는 걸 고려해보기
     private func sendPing2(coins: [String] = ["KRW-NEWT", "KRW-ONDO", "KRW-PENGU", "KRW-STRIKE", "KRW-XLM", "KRW-GAS", "KRW-MNT", "KRW-ENA", "KRW-SOL", "KRW-USDT", "KRW-ETH", "KRW-ERA", "KRW-PROVE", "KRW-XRP", "KRW-DOGE", "KRW-BTC", "KRW-SUI"], ticket: String = "test") async {
 
         do {
