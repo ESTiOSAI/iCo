@@ -7,16 +7,23 @@
 
 import Foundation
 
+/// AI를 활용한 코인 리포트를 생성하는 뷰 모델입니다.
+///
+/// 코인 개요, 주간 동향, 오늘의 시장 요약, 주요 뉴스 목록을 비동기적으로 가져옵니다.
+/// `AlanAPIService`를 통해 데이터를 요청하고, UI에 표시할 형식으로 가공합니다.
+///
+/// - Parameters:
+///   - coin: 보고서 생성의 대상이 되는 코인입니다.
 final class ReportViewModel: ObservableObject {
-    let coin: Coin
-    let koreanName: String
-    
-    private let alanAPIService = AlanAPIService()
-    
     @Published var coinOverView: String = "AI가 정보를 준비하고 있어요"
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/")]
+    
+    let coin: Coin
+    let koreanName: String
+    
+    private let alanAPIService = AlanAPIService()
     
     init(coin: Coin) {
         self.coin = coin

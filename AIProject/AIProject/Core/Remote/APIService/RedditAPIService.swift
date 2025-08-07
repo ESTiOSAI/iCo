@@ -7,12 +7,11 @@
 
 import Foundation
 
-// TODO: 2차 스프린트에 fetchData(), DTO 수정 예정
 /// 레딧 API 관련 서비스를 제공합니다.
 final class RedditAPIService {
     private let network: NetworkClient
     private let endpoint: String = "https://oauth.reddit.com/r/cryptocurrency/top.json?t=day&limit=5"
-
+    
     init(networkClient: NetworkClient = .init()) {
         self.network = networkClient
     }
@@ -23,7 +22,7 @@ final class RedditAPIService {
         let urlString = "\(endpoint)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
         let redditDTO: RedditDTO = try await network.request(url: url)
-
+        
         return redditDTO.data.children
     }
 }

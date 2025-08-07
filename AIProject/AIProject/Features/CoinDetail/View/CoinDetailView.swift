@@ -20,7 +20,6 @@ struct CoinDetailView: View {
             
             SegmentedControlView(selection: $selectedTab, tabTitles: tabs, width: 150)
             
-            // 차트, 보고서 view
             VStack {
                 switch selectedTab {
                 case 1: ReportView(coin: coin)
@@ -36,5 +35,3 @@ struct CoinDetailView: View {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
     CoinDetailView(coin: sampleCoin)
 }
-
-

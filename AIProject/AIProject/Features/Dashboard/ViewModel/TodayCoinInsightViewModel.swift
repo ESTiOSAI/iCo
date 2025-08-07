@@ -36,16 +36,19 @@ final class TodayCoinInsightViewModel: ObservableObject {
             
             await MainActor.run {
                 sentiment = Sentiment.from(data.todaysSentiment)
-                
-                self.summary = data.summary.map { key, values in
-                    var content = ""
+
+                self.summary = data.summary.reduce("") { partialResult, element in
+                    let (key, values) = element
+                    var segment = ""
+                    
                     if data.summary.count > 1 {
-                        content += "‣ \(key) 소식\n"
+                        segment += "‣ \(key) 소식\n"
                     }
-                    content += values.joined(separator: "\n")
-                    return content
+                    segment += values.joined(separator: "\n")
+                    
+                    // 두 개 이상의 섹션이 있을 경우 섹션 별로 빈 줄 추가
+                    return partialResult.isEmpty ? segment : partialResult + "\n\n" + segment
                 }
-                .joined(separator: "\n\n")
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
@@ -63,15 +66,16 @@ final class TodayCoinInsightViewModel: ObservableObject {
         do {
             let communityData = try await redditAPIService.fetchData()
             
-            let communitySummary = communityData.enumerated().map { index, item in
-                var entry = "제목\(index): \(item.data.title)"
+            let communitySummary = communityData.enumerated().reduce(into: "") { result, element in
+                let (index, item) = element
+                
+                result += "제목\(index): \(item.data.title)"
                 if !item.data.content.isEmpty {
-                    entry += "\n내용\(index): \(item.data.content)"
+                    result += "\n내용\(index): \(item.data.content)"
                 }
-                return entry
+                result += "\n"
             }
-            .joined(separator: "\n\n")
-            print(communitySummary)
+            .trimmingCharacters(in: .newlines)
             
             let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
             
