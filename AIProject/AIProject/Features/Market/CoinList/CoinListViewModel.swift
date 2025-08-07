@@ -11,7 +11,7 @@ import AsyncAlgorithms
 @Observable
 class CoinListViewModel {
     private let socket: WebSocketClient
-    private let upbitService: UpBitAPIService
+    
     private let ticket = UUID().uuidString
     
     @ObservationIgnored
@@ -19,21 +19,15 @@ class CoinListViewModel {
     
     private(set) var coins: [CoinListModel] = []
     
-    init(socket: WebSocketClient, upbitService: UpBitAPIService = UpBitAPIService()) {
+    init(socket: WebSocketClient) {
         self.socket = socket
-        self.upbitService = upbitService
         
         Task {
-            await fetchInitial()
             await ticketStream()
         }
     }
     
     // MARK: - Private
-    
-    private func fetchInitial() async {
-        self.coins = await fetchMarketCoinData()
-    }
     
     private func ticketStream() async {
         let stream = visibleCoinsChannel
@@ -67,24 +61,8 @@ class CoinListViewModel {
         }
     }
     
-    private func fetchMarketCoinData() async -> [CoinListModel] {
-        async let coins = (try? await upbitService.fetchMarkets()) ?? []
-        async let tickers = (try? await upbitService.fetchTicker(by: "KRW")) ?? []
-        
-        let result = await coins.reduce(into: [String: (korean: String, english: String)]()) { acc, coins in
-            acc[coins.coinID] = (coins.koreanName, coins.englishName)
-        }
-        
-        return await tickers.compactMap { ticker in
-            CoinListModel(
-                coinID: ticker.coinID,
-                image: "",
-                name: result[ticker.coinID]?.korean ?? "없음",
-                currentPrice: ticker.tradePrice,
-                changePrice: ticker.changeRate,
-                tradeAmount: ticker.accTradePrice
-            )
-        }
+    func change(_ coins: [CoinListModel]) {
+        self.coins = coins
     }
     
     // TODO: error handling
