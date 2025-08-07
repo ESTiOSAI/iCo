@@ -74,6 +74,16 @@ final class ChartViewModel: ObservableObject {
             let marketCode = coinSymbol
             let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
             self.prices = fetchedPrices
+            self.prices = fetchedPrices.enumerated().map { idx, price in
+                CoinPrice(
+                    date: price.date,
+                    open: price.open,
+                    high: price.high,
+                    low: price.low,
+                    close: price.close,
+                    index: idx
+                )
+            }
         } catch {
             print("가격 불러오기 실패: \(error.localizedDescription)")
             self.prices = []
