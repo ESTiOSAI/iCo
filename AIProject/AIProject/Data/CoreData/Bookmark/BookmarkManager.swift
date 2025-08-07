@@ -10,7 +10,7 @@ import CoreData
 
 protocol BookmarkManaging {
     /// 북마크 추가 (저장)
-    func add(coinID: String) throws
+    func add(coinID: String, coinKoreanName: String) throws
 
     /// 북마크 삭제 (해제)
     func remove(coinID: String) throws
@@ -27,7 +27,7 @@ protocol BookmarkManaging {
     /// 현재 상태를 반전시키는 토글 메서드
     /// - Returns: 토글 후 북마크 설정 상태 (true: 설정됨, false: 해제됨)
     @discardableResult
-    func toggle(coinID: String) throws -> Bool
+    func toggle(coinID: String, coinKoreanName: String) throws -> Bool
 
     /// 특정 코인이 현재 북마크 상태인지 확인
     func isBookmarked(_ coinID: String) throws -> Bool
@@ -42,7 +42,7 @@ final class BookmarkManager: BookmarkManaging {
         self.service = service
     }
 
-    func add(coinID: String) throws {
+    func add(coinID: String, coinKoreanName: String) throws {
         let context = service.viewContext
         // 중복 방지
         let request: NSFetchRequest<BookmarkEntity> = BookmarkEntity.fetchRequest()
@@ -53,6 +53,7 @@ final class BookmarkManager: BookmarkManaging {
         if existing.first == nil {
             let bookmark = BookmarkEntity(context: context)
             bookmark.coinID = coinID
+            bookmark.coinKoreanName = coinKoreanName
             bookmark.timestamp = Date()
             service.insert(bookmark)
         }
@@ -88,14 +89,21 @@ final class BookmarkManager: BookmarkManaging {
     @discardableResult
     /// 주어진 coinID가 이미 북마크되어 있는지 확인 후,
     /// 저장 ↔ 삭제를 수행하고, 최종 상태를 반환.
-    func toggle(coinID: String) throws -> Bool {
+    func toggle(coinID: String, coinKoreanName: String) throws -> Bool {
         if try isBookmarked(coinID) {
             try remove(coinID: coinID)
             return false
         } else {
-            try add(coinID: coinID)
+            try add(coinID: coinID, coinKoreanName: coinKoreanName)
             return true
         }
+    }
+
+    @available(*, deprecated, message: "Use toggle(coinID:coinKoreanName:) instead")
+    func toggle(coinID: String) throws -> Bool {
+        throw NSError(domain: "BookmarkManager", code: 999, userInfo: [
+            NSLocalizedDescriptionKey: "이 메서드는 더 이상 사용되지 않습니다. 한글 이름을 함께 전달해야 합니다."
+        ])
     }
 
     // 이미 북마크에 존재하는지 체크
