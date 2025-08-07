@@ -11,6 +11,7 @@ struct MarketView: View {
     @State var coins: [CoinListModel] = CoinListModel.preview
     var body: some View {
         NavigationStack {
+            HeaderView(heading: "마켓", showSearchButton: true, isBookmarkView: true)
             CoinListView()
         }
     }
