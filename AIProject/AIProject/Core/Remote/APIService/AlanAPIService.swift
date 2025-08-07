@@ -136,12 +136,24 @@ extension AlanAPIService {
         let coinNames = coins.map { $0.coinID }.joined(separator: ", ")
         print("coinNames: \(coinNames)")
 
+        // 온보딩 때 받을 투자 성향
         let importance: String
         switch character {
         case .shortTerm:
             importance = "최근 가격 흐름과 거래량 변화를 최우선으로 고려하며, 테마는 보조적으로 참고."
         case .longTerm:
             importance = "테마, 시가 총액의 안정성과 성장성을 최우선으로 고려하며, 최근 가격 흐름과 거래량은 보조적으로 참고."
+        }
+
+        // 북마크 배열로 해시를 캐시 URL 키로 사용
+        let bookmarkHash = coins.map { $0.coinID }.sorted().joined(separator: ",").hashValue
+        let cacheURL = URL(string: "https://cache.local/bookmarkBriefing/\(bookmarkHash)")!
+        let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
+
+        // 캐시가 있으면 즉시 리턴
+        if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
+            print("캐시 사용")
+            return try JSONDecoder().decode(PortfolioBriefingDTO.self, from: cachedResponse.data)
         }
 
         let content = """
@@ -160,8 +172,8 @@ extension AlanAPIService {
         8. 마크다운 금지
         """
 
+        // API 호출
         let answer = try await fetchAnswer(content: content, action: .bookmarkSuggestion)
-
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -171,6 +183,18 @@ extension AlanAPIService {
             )
         }
 
-        return try JSONDecoder().decode(PortfolioBriefingDTO.self, from: jsonData)
+        let dto = try JSONDecoder().decode(PortfolioBriefingDTO.self, from: jsonData)
+
+        // 응답 캐싱
+        let response = URLResponse(
+            url: cacheURL,
+            mimeType: "application/json",
+            expectedContentLength: jsonData.count,
+            textEncodingName: "utf-8"
+        )
+        let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+        URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+
+        return dto
     }
 }

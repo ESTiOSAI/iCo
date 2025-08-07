@@ -53,7 +53,7 @@ struct CoinRowView: View {
             // 거래 대금
             VStack(alignment: .trailing, spacing: 2) {
                 HStack(spacing: 2) {
-                    Text(coin.tradeAmount, format: .number)
+                    Text(coin.tradeAmount.formatMillion)
                 }
                 .font(.system(size: 15))
                 .foregroundColor(.aiCoLabel)

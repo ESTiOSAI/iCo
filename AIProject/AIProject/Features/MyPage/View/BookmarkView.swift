@@ -8,17 +8,12 @@
 import SwiftUI
 
 struct BookmarkView: View {
-    //@StateObject var vm = BookmarkViewModel()
+    @StateObject var vm = BookmarkViewModel()
 
     @State private var selectedCategory: SortCategory? = nil
     @State private var nameOrder: SortOrder = .none
     @State private var priceOrder: SortOrder = .none
     @State private var volumeOrder: SortOrder = .none
-
-    @State var investmentBrief: String = "요약문 이어서~"
-    @State var strategySuggestion: String = "전략 제안 이어서~"
-
-    @State private var didCopy = false
 
     // 더미 데이터
     var allCoins = CoinListModel.preview
@@ -64,56 +59,12 @@ struct BookmarkView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
-
                 HeaderView(heading: "북마크 관리", isBookmarkView: true)
                     .padding(.bottom, 16)
                 SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
 
                 // 북마크 AI 한줄평
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("📝투자 브리핑 요약")
-                        .font(.system(size: 15))
-                        .foregroundColor(.primary)
-
-                    Text(investmentBrief)
-                        .font(.system(size: 12))
-                        .foregroundColor(.primary)
-
-                    Spacer()
-
-                    Text("✅전략 제안")
-                        .font(.system(size: 15))
-                        .foregroundColor(.primary)
-
-                    Text(strategySuggestion)
-                        .font(.system(size: 12))
-                        .foregroundColor(.primary)
-                }
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.gray.opacity(0.1))
-                .cornerRadius(12)
-                .padding(.leading, 16).padding(.trailing, 16).padding(.bottom, 24)
-                .overlay(alignment: .topTrailing) {
-                    Button {
-                        didCopy = true
-
-                        // 클립 보드에 복사
-                        UIPasteboard.general.string = investmentBrief + "\n\n" + strategySuggestion
-
-                        Task {
-                            try? await Task.sleep(nanoseconds: 2_000_000_000)
-                            didCopy = false
-                        }
-                    } label: {
-                        Image(systemName: didCopy ? "checkmark.circle" : "doc.on.doc")
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                            .foregroundColor(.secondary)
-                            .padding(24)
-                            .padding(.top, -16)
-                    }
-                }
+                briefingSection
 
                 HStack {
                     Image(systemName: "bookmark.fill")
@@ -123,14 +74,8 @@ struct BookmarkView: View {
 
                     Spacer()
 
-                    Button {
-
-                    } label: {
-                        Text("전체 삭제")
-                            .font(.system(size: 12)).bold()
-                            .padding(.horizontal, 10).padding(.vertical, 6)
-                            .foregroundStyle(.gray)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(Color(.systemGray5)))
+                    RoundedButton(title: "전체 삭제") {
+                        print("전체 삭제")
                     }
                 }
                 .padding(.leading, 16)
@@ -142,9 +87,44 @@ struct BookmarkView: View {
                 CoinListSectionView(sortedCoins: sortedCoins, selectedCategory: $selectedCategory, nameOrder: $nameOrder, priceOrder: $priceOrder, volumeOrder: $volumeOrder)
             }
         }
-
+        .task {
+            await vm.loadBriefing(character: .longTerm)
+        }
     }
 
+    private var briefingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if vm.bookmarks.isEmpty {
+                Text("코인을 북마크 해보세요!")
+            } else if vm.isLoading {
+                DefaultProgressView(
+                    message: "분석중...",
+                    font: .caption2,
+                    spacing: 8
+                )
+            } else if let briefing = vm.briefing {
+                BadgeLabelView(text: "📝 투자 브리핑 요약")
+                Text(briefing.briefing)
+                    .font(.system(size: 12))
+
+                Spacer()
+
+                BadgeLabelView(text: "✅ 전략 제안")
+                Text(briefing.strategy)
+                    .font(.system(size: 12))
+            } else if let errorMessage = vm.errorMessage {
+                Text("예상치 못한 에러 발생: \(errorMessage)")
+                    .foregroundColor(.red)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundColor(.primary)
+        .background(.gray.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 24)
+    }
 }
 
 #Preview {

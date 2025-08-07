@@ -10,33 +10,53 @@ import SwiftUI
 
 @MainActor
 final class BookmarkViewModel: ObservableObject {
-    @Published var coins: [CoinListModel] = []
-
-    private let allCoins = CoinListModel.preview
     private let manager: BookmarkManaging = BookmarkManager.shared
+    private let service: AlanAPIService
 
-    func loadBookmarks() async {
+    @Published var bookmarks: [BookmarkEntity] = []
+    @Published var briefing: PortfolioBriefingDTO?
+    @Published var errorMessage: String?
+    @Published var isLoading: Bool = false
+    var isBookmarkEmpty: Bool {
+        bookmarks.isEmpty
+    }
+
+    init(service: AlanAPIService = AlanAPIService()) {
+        self.service = service
+        fetchBookmarks()
+    }
+
+    func loadBriefing(character: InvestmentCharacter) async {
+        guard !bookmarks.isEmpty else {
+            print("북마크 is empty!")
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
         do {
-            let bookmarkedEntities = try manager.fetchAll()
-            let bookmarkedIDs = Set(bookmarkedEntities.map(\.coinID))
-            // UI 스레드에서 coins 업데이트
-            coins = allCoins.filter { bookmarkedIDs.contains($0.coinID) }
+            let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+            briefing = dto
+
+        } catch let error as NetworkError {
+            errorMessage = "네트워크 에러: \(error.localizedDescription)"
         } catch {
-            print("북마크 조회 실패:", error)
+            errorMessage = "기타 에러: \(error.localizedDescription)"
         }
     }
 
-    func toggleBookmark(_ coin: CoinListModel) async {
+    func fetchBookmarks() {
         do {
-            let isNowBookmarked = try manager.toggle(coinID: coin.coinID)
-            if !isNowBookmarked {
-                coins.removeAll { $0.coinID == coin.coinID }
-            }
+            bookmarks = try manager.fetchAll()
         } catch {
-            print("북마크 토글 실패:", error)
+            bookmarks = []
         }
     }
 }
 
-
-
+// 온보딩에서 받는 유저 투자 성격
+enum InvestmentCharacter {
+    case shortTerm
+    case longTerm
+}
