@@ -17,6 +17,16 @@ struct HeaderView: View {
     var showSearchButton = false
     var isBookmarkView = false
     
+    let onSearchTap: () -> Void
+    
+    init(showBulkInsertSheet: Bool = false, heading: String, showSearchButton: Bool = false, isBookmarkView: Bool = false, onSearchTap: @escaping () -> Void = { }) {
+        self.showBulkInsertSheet = showBulkInsertSheet
+        self.heading = heading
+        self.showSearchButton = showSearchButton
+        self.isBookmarkView = isBookmarkView
+        self.onSearchTap = onSearchTap
+    }
+    
     var body: some View {
         HStack {
             Text(heading)
@@ -27,7 +37,7 @@ struct HeaderView: View {
             
             if showSearchButton {
                 Button {
-                    print("Hi")
+                    onSearchTap()
                 } label: {
                     Image(systemName: "magnifyingglass")
                         .resizable()
@@ -71,7 +81,9 @@ struct HeaderView: View {
 }
 
 #Preview {
-    HeaderView(heading: "북마크 관리", isBookmarkView: true)
+    HeaderView(heading: "북마크 관리", isBookmarkView: true) {
+                
+    }
         .padding(.bottom, 16)
     SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
 }
