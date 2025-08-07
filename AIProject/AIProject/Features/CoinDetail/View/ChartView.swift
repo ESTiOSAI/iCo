@@ -34,13 +34,13 @@ struct ChartView: View {
         let isRising = summary?.change ?? 0 > 0
         let isFalling = summary?.change ?? 0 < 0
         let color: Color = isRising ? .aiCoNegative :
-                           isFalling ? .aiCoPositive :
-                           .gray
+        isFalling ? .aiCoPositive :
+            .gray
         
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-
-                // 타이틀 영역: 코인명 / 심볼
+                
+                /// 타이틀 영역: 코인명 / 심볼
                 HStack(spacing: 8) {
                     Text(viewModel.coinName)
                         .font(.title3).bold()
@@ -184,6 +184,8 @@ struct ChartView: View {
                     plotArea
                         .padding(.trailing, 10)
                 }
+                
+                /// 기간 선택 탭 (UI용)
                 GeometryReader { proxy in
                     SegmentedControlView(
                         selection: $selectedTab,
