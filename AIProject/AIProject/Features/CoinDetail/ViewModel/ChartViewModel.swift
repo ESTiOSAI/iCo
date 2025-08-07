@@ -111,6 +111,53 @@ final class ChartViewModel: ObservableObject {
     }
 }
 
+extension ChartViewModel {
+    /// Y축 범위 설정
+    /// - Parameters:
+    ///   - data: 표시할 가격 데이터 배열
+    /// - Returns: Y축의 최소/최대값을 포함한 범위 (패딩 포함)
+    /// - Note: 최소 범위는 10 이상이며, 여유 공간을 위해 ±20% 패딩을 추가
+    func yAxisRange(from data: [CoinPrice]) -> ClosedRange<Double> {
+        let minY = data.map(\.low).min() ?? 0
+        let maxY = data.map(\.high).max() ?? 0
+        let range = maxY - minY
+        let safeRange = max(range, 10)
+        let padding = range * 0.2
+        let center = (minY + maxY) / 2
+        return (center - safeRange / 2 - padding)...(center + safeRange / 2 + padding)
+    }
+    
+    /// X축의 시간 범위(Domain)를 계산
+    /// - Parameters:
+    ///   - data: 시각화할 가격 데이터 배열
+    /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
+    func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
+        let now = Date()
+        let calendar = Calendar(identifier: .gregorian)
+        let lastDate = data.last?.date ?? now
+        let xStart = calendar.startOfDay(for: now)
+        let xEnd = lastDate.addingTimeInterval(60 * 5)
+        return xStart...xEnd
+    }
+    
+    /// 초기 차트 스크롤 위치를 지정할 시각을 반환
+    /// - Parameters:
+    ///   - data: 시각화할 가격 데이터 배열
+    /// - Returns: 마지막 데이터 시점 +5분
+    func scrollToTime(for data: [CoinPrice]) -> Date {
+        data.last?.date.addingTimeInterval(60 * 5) ?? Date()
+    }
+    
+    /// 차트 X축 라벨에 사용할 시간 포맷터 (24시간제 HH:mm 형식)
+    /// - Returns: "HH:mm" 포맷을 사용하는 DateFormatter (ko_KR 로케일)
+    var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }
+}
+
 // MARK: - Dummy Data Generator
 extension ChartViewModel {
     /// 지정한 시간 범위와 샘플링 간격으로 더미 시계열 가격을 생성

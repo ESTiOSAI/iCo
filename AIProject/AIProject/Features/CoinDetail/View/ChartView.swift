@@ -82,45 +82,9 @@ struct ChartView: View {
                         .foregroundStyle(color)
                 }
                 
-                /// 시계열 데이터의 고가/저가를 기준으로 차트의 Y축 범위를 동적으로 계산
-                let minY = data.map(\.low).min() ?? 0
-                let maxY = data.map(\.high).max() ?? 0
-                
-                /// 값 차이가 너무 작을 경우 대비한 최소 범위 설정
-                let range = maxY - minY
-                let minRange: Double = 10
-                
-                /// 실제 시각화에 사용할 안전 범위 및 여유 공간 설정
-                let safeRange = max(range, minRange)
-                let padding = safeRange * 0.2
-                let center = (minY + maxY) / 2
-                
-                /// Y축 범위 설정 (중앙 기준 양방향 + 여유 padding)
-                let chartMin = center - safeRange / 2 - padding
-                let chartMax = center + safeRange / 2 + padding
-                
-                /// X축 도메인 설정을 위한 기준 시간 계산
-                let now = Date()
-                let calendar = Calendar(identifier: .gregorian)
-                
-                /// 차트 우측 여백 확보용 시간 (5분 후)
-                let futurePadding = TimeInterval(60 * 5)
-                
-                /// X축 시작은 오늘 00:00, 끝은 마지막 데이터 시점 + 5분
-                let lastDate = data.last?.date ?? now
-                let xStart = calendar.startOfDay(for: now)
-                let xEnd = lastDate.addingTimeInterval(futurePadding)
-                
-                /// 초기 스크롤 위치: 데이터의 가장 마지막 시간 이후로 약간 이동
-                let scrollTo = lastDate.addingTimeInterval(futurePadding)
-                
-                /// X축 시간 표시 포맷 (HH:mm / 24시간제)
-                let timeFormatter: DateFormatter = {
-                    let formatter = DateFormatter()
-                    formatter.dateFormat = "HH:mm"
-                    formatter.locale = Locale(identifier: "ko_KR")
-                    return formatter
-                }()
+                let yRange = viewModel.yAxisRange(from: data)
+                let xDomain = viewModel.xAxisDomain(for: data)
+                let scrollTo = viewModel.scrollToTime(for: data)
                 
                 /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
                 Chart(data) { point in
@@ -143,11 +107,11 @@ struct ChartView: View {
                 }
                 .frame(height: 380)
                 /// X축 도메인 설정 및 스크롤 위치 초기화
-                .chartXScale(domain: xStart...xEnd)
+                .chartXScale(domain: xDomain)
                 .chartScrollPosition(initialX: scrollTo)
                 .chartScrollableAxes(.horizontal)
                 /// Y축 도메인 설정 (동적 범위)
-                .chartYScale(domain: chartMin...chartMax)
+                .chartYScale(domain: yRange)
                 /// 한 화면에서 보이는 X축 범위 (2880초 = 48분)
                 .chartXVisibleDomain(length: 2880)
                 /// X축 눈금 (15분 간격) + 1시간마다 세로선 표시
@@ -156,7 +120,7 @@ struct ChartView: View {
                         AxisTick()
                         AxisValueLabel {
                             if let date = value.as(Date.self) {
-                                Text(timeFormatter.string(from: date))
+                                Text(viewModel.timeFormatter.string(from: date))
                             }
                         }
                         
