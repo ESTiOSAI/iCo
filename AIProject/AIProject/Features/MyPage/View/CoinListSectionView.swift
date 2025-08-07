@@ -27,28 +27,6 @@ struct CoinListSectionView: View {
                 .onChange(of: selectedCategory) { _, newKey in
                     if newKey != .name { nameOrder = .none }
                 }
-
-                SortToggleButton(
-                    title: "현재가/변동",
-                    sortCategory: .price,
-                    currentCategory: $selectedCategory,
-                    sortOrder: $priceOrder
-                )
-                .frame(width: 100, alignment: .trailing)
-                .onChange(of: selectedCategory) { _, newKey in
-                    if newKey != .price { priceOrder = .none }
-                }
-
-                SortToggleButton(
-                    title: "거래대금",
-                    sortCategory: .volume,
-                    currentCategory: $selectedCategory,
-                    sortOrder: $volumeOrder
-                )
-                .frame(width: 100, alignment: .trailing)
-                .onChange(of: selectedCategory) { _, newKey in
-                    if newKey != .volume { volumeOrder = .none }
-                }
             }
             .padding(.horizontal, 16)
             .fontWeight(.regular)

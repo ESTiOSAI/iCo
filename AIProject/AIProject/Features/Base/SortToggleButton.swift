@@ -9,8 +9,8 @@ import SwiftUI
 
 enum SortCategory {
     case name
-    case price
-    case volume
+//    case price
+//    case volume
 }
 
 enum SortOrder {
