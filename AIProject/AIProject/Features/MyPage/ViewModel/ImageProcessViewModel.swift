@@ -118,10 +118,10 @@ class ImageProcessViewModel: ObservableObject {
             
             var answerContent = answer.content
             
-//#if DEBUG
-//            print("ℹ️ 앨런 프롬프트 :", prompt)
-//            print("ℹ️ 앨런 응답 :", answerContent)
-//#endif
+#if DEBUG
+            print("ℹ️ 앨런 프롬프트 :", prompt)
+            print("ℹ️ 앨런 응답 :", answerContent)
+#endif
             
             // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
             if answerContent.starts(with: "```json") {
@@ -130,9 +130,9 @@ class ImageProcessViewModel: ObservableObject {
             
             let convertedSymbols = answerContent.convertIntoArray
 
-//#if DEBUG
-//            print("ℹ️ 파싱 후 :", convertedSymbols)
-//#endif
+#if DEBUG
+            print("ℹ️ 파싱 후 :", convertedSymbols)
+#endif
             
             return convertedSymbols
         } catch let error as URLError {
