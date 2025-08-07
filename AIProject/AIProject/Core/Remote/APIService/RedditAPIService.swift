@@ -11,7 +11,7 @@ import Foundation
 /// 레딧 API 관련 서비스를 제공합니다.
 final class RedditAPIService {
     private let network: NetworkClient
-    private let endpoint: String = "https://oauth.reddit.com/r/cryptocurrency/top.json?t=day&limit=20"
+    private let endpoint: String = "https://oauth.reddit.com/r/cryptocurrency/top.json?t=day&limit=5"
 
     init(networkClient: NetworkClient = .init()) {
         self.network = networkClient

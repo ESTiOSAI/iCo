@@ -7,9 +7,15 @@
 
 import Foundation
 
+/// 공포-탐욕 지수를 관리하는 뷰 모델입니다.
+///
+/// API에서 데이터를 받아 공포 탐욕 지수 수치와 설명을 업데이트합니다.
 final class FearGreedViewModel: ObservableObject {
+    /// 공포-탐욕 상태입니다.
     @Published var fearGreed: FearGreed = .neutral
+    /// 공포-탐욕 지수 값입니다.
     @Published var indexValue: CGFloat = 0
+    /// 한글로 표시된 공포-탐욕 분류입니다.
     @Published var classification: String = "중립"
     
     init() {
@@ -18,6 +24,7 @@ final class FearGreedViewModel: ObservableObject {
         }
     }
     
+    /// 공포-탐욕 지수 데이터를 불러와 상태를 업데이트합니다.
     private func fetchFearGreedAsync() async {
         do {
             let data = try await FearGreedAPIService().fetchData()
@@ -34,20 +41,7 @@ final class FearGreedViewModel: ObservableObject {
             
             await MainActor.run {
                 self.indexValue = CGFloat(doubleIndex)
-                switch fearGreedIndex.valueClassification {
-                case "Extreme Fear":
-                    fearGreed = .extremeFear
-                case "Fear":
-                    fearGreed = .fear
-                case "Neutral":
-                    fearGreed = .neutral
-                case "Greed":
-                    fearGreed = .greed
-                case "Extreme Greed":
-                    fearGreed = .extremeGreed
-                default:
-                    print("Fear And Greed Index: Invalid valueClassification")
-                }
+                fearGreed = FearGreed.from(fearGreedIndex.valueClassification)
                 self.classification = fearGreed.description
             }
         } catch {

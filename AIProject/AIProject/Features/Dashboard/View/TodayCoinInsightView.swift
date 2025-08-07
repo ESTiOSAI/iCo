@@ -31,6 +31,7 @@ struct TodayCoinInsightView: View {
         }
         .font(.system(size: 13))
         .padding(.horizontal)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
