@@ -44,14 +44,14 @@ struct CoinListView: View {
             }
         }
         .onChange(of: scenePhase, { _, newValue in
-            handleConnection(by: newValue)
+            Task {
+                await handleConnection(by: newValue)
+            }
         })
         .onChange(of: visibleCoins, { oldValue, newValue in
-            guard visibleCoins.count > 16 else { return }
+            guard visibleCoins.count > 5 else { return }
             
             Task {
-                print("add: \(newValue.subtracting(oldValue))")
-                
                 await viewModel.sendTIcket(newValue)
             }
         })
@@ -68,7 +68,7 @@ struct CoinListView: View {
 
 extension CoinListView {
     private func insertCoin(id: CoinListModel.ID, proxy: GeometryProxy) {
-        guard !visibleCoins.contains(coin.id) else { return }
+        guard !visibleCoins.contains(id) else { return }
         let frame = proxy.frame(in: .global)
         let threshold: CGFloat = 80
         
@@ -76,72 +76,20 @@ extension CoinListView {
         // cell 하단 좌표가 프레임 - 임계값보다 크면
         // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
         if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
-            visibleCoins.insert(coin.id)
+            visibleCoins.insert(id)
         }
     }
-    private func handleConnection(by phase: ScenePhase) {
-        
-    }
-}
-
-fileprivate struct CoinListHeaderView: View {
-    var body: some View {
-        HStack(spacing: 60) {
-            HStack {
-                Text("한글명")
-                Image(systemName: "arrow.up.arrow.down")
-            }
-            
-            HStack {
-                Text("현재가")
-                    .frame(maxWidth: 80, alignment: .trailing)
-                
-                Text("전일대비")
-                    .frame(maxWidth: 55, alignment: .trailing)
-            }
-            
-            Text("거래대금")
-        }
-    }
-}
-
-fileprivate struct CoinCell: View {
-    let coin: CoinListModel
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            HStack(spacing: 4) {
-                VStack(alignment: .leading) {
-                    Text(coin.name)
-                        .lineLimit(2)
-                        .font(.system(size: 14))
-                    
-                    Text(coin.coinName)
-                        .font(.system(size: 12))
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: 100, alignment: .leading)
-                
-                Text(coin.currentPrice, format: .number)
-                    .font(.system(size: 12))
-                    .foregroundStyle(coin.change == .rise ? .red : .blue)
-                    .frame(maxWidth: 75, alignment: .trailing)
-                
-                Text(coin.changePrice, format: .percent.precision(.fractionLength(2)))
-                    .font(.system(size: 12))
-                    .foregroundStyle(coin.change == .rise ? .red : .blue)
-                    .frame(maxWidth: 55, alignment: .trailing)
-                
-                HStack(spacing: 0) {
-                    Text(coin.tradeAmount.formatMillion)
-                        .font(.system(size: 12))
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .fontWeight(.medium)
-            .foregroundStyle(.aiCoLabel)
-            .frame(maxWidth: .infinity, alignment: .leading)
+    private func handleConnection(by phase: ScenePhase) async {
+        print(#function, phase)
+        switch phase {
+        case .background:
+            viewModel.disconnect()
+        case .inactive:
+            break
+        case .active:
+            await viewModel.connect()
+        @unknown default:
+            break
         }
     }
 }
