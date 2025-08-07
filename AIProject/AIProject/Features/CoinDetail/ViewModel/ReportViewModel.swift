@@ -50,9 +50,10 @@ final class ReportViewModel: ObservableObject {
                     """
             }
         } catch {
-            print("오류 발생: \(error.localizedDescription)")
+            print("🚨 [CoinDetail-OverView] \(error)")
+            
             await MainActor.run {
-                self.coinOverView = "데이터를 불러오는 데 실패했어요"
+                self.coinOverView = "정보를 불러오는 데 실패했어요"
             }
         }
     }
@@ -70,9 +71,10 @@ final class ReportViewModel: ObservableObject {
                     """
             }
         } catch {
-            print("오류 발생: \(error.localizedDescription)")
+            print("🚨 [CoinDetail-Weekly] \(error)")
+            
             await MainActor.run {
-                self.coinWeeklyTrends = "데이터를 불러오는 데 실패했어요"
+                self.coinOverView = "정보를 불러오는 데 실패했어요"
             }
         }
     }
@@ -85,7 +87,8 @@ final class ReportViewModel: ObservableObject {
                 self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
             }
         } catch {
-            print("오류 발생: \(error.localizedDescription)")
+            print("🚨 [CoinDetail-TodaysAndNews] \(error)")
+            
             await MainActor.run {
                 self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
                 self.coinTodayTopNews = [CoinArticle(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]

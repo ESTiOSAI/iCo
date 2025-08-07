@@ -39,12 +39,7 @@ final class AlanAPIService {
         let answer = try await fetchAnswer(content: prompt.content, action: action)
         
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: [],
-                    debugDescription: "extractedJSON 문자열을 UTF-8 데이터로 변환 실패"
-                )
-            )
+            throw DecodingError.custom(message: "응답 JSON 문자열을 Data로 변환할 수 없습니다.")
         }
         
         return try JSONDecoder().decode(T.self, from: jsonData)
@@ -81,16 +76,21 @@ extension AlanAPIService {
         
         let prompt = Prompt.generateOverView(coinKName: coin.koreanName)
         let dto: CoinOverviewDTO = try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
-        let jsonData = try JSONEncoder().encode(dto)
         
-        let response = URLResponse(
-            url: cacheURL,
-            mimeType: "application/json",
-            expectedContentLength: jsonData.count,
-            textEncodingName: "utf-8"
-        )
-        let cacheEntry = CachedURLResponse(response: response, data: jsonData)
-        URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+        do {
+            let jsonData = try JSONEncoder().encode(dto)
+            
+            let response = URLResponse(
+                url: cacheURL,
+                mimeType: "application/json",
+                expectedContentLength: jsonData.count,
+                textEncodingName: "utf-8"
+            )
+            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+        } catch {
+            throw DecodingError.custom(message: "DTO를 JSON 형식으로 인코딩하는 데 실패했습니다.")
+        }
         
         return dto
     }
