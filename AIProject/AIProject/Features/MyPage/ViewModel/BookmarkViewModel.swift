@@ -54,6 +54,15 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
+    func deleteAllBookmarks() {
+        do {
+            try manager.deleteAll()
+            self.bookmarks = []
+        } catch {
+            print(error)
+        }
+    }
+
     func exportBriefingImage() {
         let view = BriefingSectionView(
             briefing: briefing,
