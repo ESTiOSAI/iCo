@@ -18,19 +18,23 @@ class ImageProcessViewModel: ObservableObject {
     
     @Published var verifiedCoinIDs = [String]()
     
+    @Published var processImageTask: Task<Void, Error>?
+    
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: UIImage) {
-        Task {
+        processImageTask = Task {
             await MainActor.run { self.isLoading = true }
             
             do {
                 // 이미지에서 텍스트 읽어오기
+                try Task.checkCancellation()
                 let recognizedText = try await performOCR(from: selectedImage)
                 guard !recognizedText.isEmpty else {
                     throw ImageProcessError.noRecognizedText
                 }
                 
                 // 읽어온 텍스트에서 코인 이름을 추출하기
+                try Task.checkCancellation()
                 let convertedSymbols = try await convertToSymbol(with: recognizedText)
                 guard !convertedSymbols.isEmpty else {
                     print("ℹ️ OCR 처리 결과 :", recognizedText)
@@ -39,9 +43,12 @@ class ImageProcessViewModel: ObservableObject {
                 }
                 
                 // 업비트 API 호출 테스트로 검증된 coinID만 배열에 담기
+                try Task.checkCancellation()
                 for symbol in convertedSymbols {
                     do {
                         try await verifyAndAppend(symbol: symbol)
+                    } catch is CancellationError {
+                        throw CancellationError()
                     } catch {
                         print("ℹ️ 업비트 API 호출 테스트 :", symbol)
                         throw ImageProcessError.noMatchingCoinIDAtAPI
@@ -51,10 +58,17 @@ class ImageProcessViewModel: ObservableObject {
                 print("🚀 최종 코인 목록 :", verifiedCoinIDs)
                 await showAnalysisResult()
                 
+            } catch is CancellationError {
+                await showError(.canceled)
             } catch let error as ImageProcessError {
                 await showError(error)
             }
         }
+    }
+    
+    @MainActor
+    func cancelTask() {
+        self.processImageTask?.cancel()
     }
     
     @MainActor
@@ -73,10 +87,14 @@ class ImageProcessViewModel: ObservableObject {
     
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
     private func performOCR(from selectedImage: UIImage) async throws -> [String] {
+        try Task.checkCancellation()
+        
         do {
             let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
             
             return recognizedText
+        } catch is CancellationError {
+            throw CancellationError()
         } catch {
             print(#function)
             throw ImageProcessError.unknownVisionError
@@ -91,6 +109,8 @@ class ImageProcessViewModel: ObservableObject {
         let prompt = Prompt.extractCoinID(text: textString).content
         
         do {
+            try Task.checkCancellation()
+            
             let answer = try await AlanAPIService().fetchAnswer(
                 content: prompt,
                 action: .coinIDExtraction
@@ -115,8 +135,13 @@ class ImageProcessViewModel: ObservableObject {
 //#endif
             
             return convertedSymbols
-        } catch {
-            print(#function)
+        } catch let error as URLError {
+            // 네트워크 작업에서 사용자가 작업을 취소하는 경우 CancellationError가 아닌 URLError로 넘어오기 때문에
+            // URLError로 타입 캐스팅하고 code 값으로 분기해서 에러를 상위 제어로 던짐
+            if error.code == .cancelled {
+                throw CancellationError()
+            }
+            
             print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
             throw ImageProcessError.unknownAlanError
         }
@@ -124,15 +149,24 @@ class ImageProcessViewModel: ObservableObject {
     
     /// 업비트 API를 호출해 coinID가 실제로 존재하는지 검증, 검증된 coinID를 배열에 저장하는 함수
     private func verifyAndAppend(symbol: String) async throws {
+        try Task.checkCancellation()
+        
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
         let krwSymbolName = "KRW-\(symbol)"
         
-        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-        
-        if verified {
-            await MainActor.run {
-                self.verifiedCoinIDs.append(krwSymbolName)
+        do {
+            let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
+            
+            if verified {
+                await MainActor.run {
+                    self.verifiedCoinIDs.append(krwSymbolName)
+                }
             }
+        } catch let error as URLError {
+            if error.code == .cancelled {
+                throw CancellationError()
+            }
+            print(error)
         }
     }
     

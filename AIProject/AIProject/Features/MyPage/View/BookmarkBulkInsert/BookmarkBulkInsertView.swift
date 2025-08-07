@@ -49,14 +49,10 @@ struct BookmarkBulkInsertView: View {
                         // 이미지 등록 후
                         ZStack {
                             ImagePreviewView(selectedImage: selectedImage!)
-                                .opacity(vm.isLoading ? 0.2 : 1)
-                                .blur(radius: vm.isLoading ? 1 : 0)
                             
                             if vm.isLoading {
                                 VStack(spacing: 16) {
-                                    DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요")
-                                    
-                                    //TODO: 분석 작업 취소 기능 구현하기
+                                    DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요", buttonAction: vm.cancelTask)
                                 }
                             }
                         }
