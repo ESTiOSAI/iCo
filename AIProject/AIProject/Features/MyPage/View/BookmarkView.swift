@@ -70,15 +70,13 @@ struct BookmarkView: View {
                 Divider()
 
                 // 코인 리스트뷰
-                NavigationStack {
-                    CoinListSectionView(
-                        sortedCoins: sortedCoins,
-                        selectedCategory: $selectedCategory,
-                        nameOrder: $nameOrder,
-                        priceOrder: $priceOrder,
-                        volumeOrder: $volumeOrder
-                    )
-                }
+                CoinListSectionView(
+                    sortedCoins: sortedCoins,
+                    selectedCategory: $selectedCategory,
+                    nameOrder: $nameOrder,
+                    priceOrder: $priceOrder,
+                    volumeOrder: $volumeOrder
+                )
             }
         .task {
             await vm.loadBriefing(character: .longTerm)
