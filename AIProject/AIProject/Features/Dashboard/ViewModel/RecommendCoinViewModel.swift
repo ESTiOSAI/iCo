@@ -7,9 +7,11 @@
 
 import SwiftUI
 
-final class DashboardViewModel: ObservableObject {
-    /// 추천 코인 배열
-    @Published var recommendCoins: [RecommendCoin] = []
+final class RecommendCoinViewModel: ObservableObject {
+    /// 현재 추천 코인 뷰의 UI 상태를 나타냅니다.
+    ///
+    /// `state`는 로딩, 성공, 실패 등의 화면 표현을 의미합니다.
+    @Published var state: RecommendCoinViewState = .loading
 
     private var alanService: AlanAPIService
     private var upbitService: UpBitAPIService
@@ -19,12 +21,11 @@ final class DashboardViewModel: ObservableObject {
         upbitService = UpBitAPIService()
     }
     
-    /// 비동기로 추천 코인 목록을 가져와 `recommendCoins`에 할당합니다.
-    func getRecommendCoin() async {
+    /// 비동기로 추천 코인 목록을 가져옵니다.
+    func loadRecommendCoin() async {
         do {
-            let markets = try await upbitService.fetchMarkets()
-            let coinIDs = markets.map { $0.coinID }.filter { $0.contains("KRW") }
-            let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움", coinIDs: coinIDs.joined(separator: " "))
+            state = .loading
+            let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움")
             let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
             if let jsonData = jsonString.data(using: .utf8) {
@@ -32,11 +33,11 @@ final class DashboardViewModel: ObservableObject {
                 let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 Task { @MainActor in
-                    recommendCoins = results
+                    state = .success(results)
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            state = .failure(error)
         }
     }
 

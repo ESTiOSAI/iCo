@@ -7,7 +7,7 @@
 
 /// 정형화된 프롬프트 객체
 enum Prompt {
-    case recommendCoin(preference: String, bookmark: String, coinIDs: String)
+    case recommendCoin(preference: String, bookmark: String)
     case generateOverView(coinKName: String)
     case generateTodayNews(coinKName: String)
     case generateWeeklyTrends(coinKName: String)
@@ -15,12 +15,11 @@ enum Prompt {
 
     var content: String {
         switch self {
-        case .recommendCoin(let preference, let bookmark, let coinIDs):
+        case .recommendCoin(let preference, let bookmark):
             """
             코인 5개를 추천해줘.
 
-            너가 추천해줘야 하는 코인 리스트는 다음과 같아.
-            -> \(coinIDs)
+            너가 추천해줘야 하는 코인은 "KRW"만 추천해줘야 해.
 
             현재 나의 코인 투자 선호도는 다음과 같아.
             -> \(preference)
@@ -28,11 +27,11 @@ enum Prompt {
             현재 내가 북마크한 코인은 다음과 같아.
             -> \(bookmark)
 
-            JSON 형식으로 요청할거고, JSON 마크다운은 제거해줘
+            JSON 형식으로 요청할거고, JSON 마크다운은 제거해줘, JSON 외에 어떤 응답도 주지마.
             struct RecommendCoinDTO: Codable {
-             /// 코인 이름을 영어로 줘
+             /// 코인 이름을 한글로 전달해 줘
              let name: String
-             /// 내가 제공한 coinIDs에 있는 거만 줘
+             /// 원화 코인만 주고 형식은 "KRW-XXX" 으로 전달해 줘 
              let symbol: String
              /// 이 코인을 왜 추천했고, 어떤 움직임이 있는지 최근 기사를 인용하여 한글로 간략히 작성해줘. 기사 출처는 주지마.
              let comment: String

@@ -8,30 +8,48 @@
 import SwiftUI
 
 struct RecommendCoinView: View {
-    @ObservedObject var viewModel: DashboardViewModel
+    @StateObject private var viewModel = RecommendCoinViewModel()
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(viewModel.recommendCoins) { coin in
-                    RecommendCardView(recommendCoin: coin)
-                        .containerRelativeFrame(.horizontal) { value, axis in
-                            axis == .horizontal ? value * 0.7 : value
+        Group {
+            switch viewModel.state {
+            case .loading:
+                Text("코인을 추천중입니다..")
+            case .success(let recommendCoins):
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(recommendCoins) { coin in
+                            RecommendCardView(recommendCoin: coin)
+                                .containerRelativeFrame(.horizontal) { value, axis in
+                                    axis == .horizontal ? value * 0.7 : value
+                                }
                         }
+                    }
+                    .padding(.horizontal)
+                    .scrollTargetLayout()
+                }
+                .scrollTargetBehavior(.viewAligned)
+            case .failure(let error):
+                VStack {
+                    Text("코인 추천을 받지 못했어요.")
+                    Button {
+                        Task {
+                            await viewModel.loadRecommendCoin()
+                        }
+                    } label: {
+                        Text("다시 시도하기")
+                    }
                 }
             }
-            .padding(.horizontal)
-            .scrollTargetLayout()
         }
-        .scrollTargetBehavior(.viewAligned)
         .onAppear {
             Task {
-                await viewModel.getRecommendCoin()
+                await viewModel.loadRecommendCoin()
             }
         }
     }
 }
 
 #Preview {
-    RecommendCoinView(viewModel: DashboardViewModel())
+    RecommendCoinView()
 }
