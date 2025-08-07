@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ALAN_API_KEY_BOOKMARK_SUGGESTION</key>
+	<string>${ALAN_API_KEY_BOOKMARK_SUGGESTION}</string>
 	<key>ALAN_API_KEY_COIN_ID_EXTRACTION</key>
 	<string>$(ALAN_API_KEY_COIN_ID_EXTRACTION)</string>
 	<key>ALAN_API_KEY_COIN_RECOMENDATION</key>

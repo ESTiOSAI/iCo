@@ -140,7 +140,7 @@ class ImageProcessViewModel: ObservableObject {
     func addToBookmark() {
         do {
             for coinId in verifiedCoinIDs {
-                try BookmarkManager.shared.add(coinID: coinId)
+                //try BookmarkManager.shared.add(coinID: coinId)
             }
         } catch {
             print(error)

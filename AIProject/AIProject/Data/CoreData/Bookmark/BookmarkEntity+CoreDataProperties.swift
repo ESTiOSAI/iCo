@@ -17,6 +17,7 @@ extension BookmarkEntity {
     }
 
     @NSManaged public var coinID: String
+    @NSManaged public var coinKoreanName: String
     @NSManaged public var timestamp: Date
 
 }
