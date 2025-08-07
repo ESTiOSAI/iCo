@@ -15,6 +15,9 @@ struct BookmarkView: View {
     @State private var priceOrder: SortOrder = .none
     @State private var volumeOrder: SortOrder = .none
 
+    @State private var isShowingShareSheet = false
+    @State private var sharingImage: UIImage?
+
     // 더미 데이터
     var allCoins = CoinListModel.preview
 
@@ -61,10 +64,17 @@ struct BookmarkView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HeaderView(heading: "북마크 관리", isBookmarkView: true)
                     .padding(.bottom, 16)
-                SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
 
+                HStack {
+                    SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
+
+                }
                 // 북마크 AI 한줄평
-                briefingSection
+                BriefingSectionView(briefing: vm.briefing, isLoading: vm.isLoading, bookmarksEmpty: vm.isBookmarkEmpty, errorMessage: vm.errorMessage)
+
+                Button("내보내기") {
+                    vm.exportBriefingImage()
+                }
 
                 HStack {
                     Image(systemName: "bookmark.fill")
@@ -92,7 +102,7 @@ struct BookmarkView: View {
         }
     }
 
-    private var briefingSection: some View {
+    /*private var briefingSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             if vm.bookmarks.isEmpty {
                 Text("코인을 북마크 해보세요!")
@@ -124,9 +134,65 @@ struct BookmarkView: View {
         .cornerRadius(12)
         .padding(.horizontal, 16)
         .padding(.bottom, 24)
+    }*/
+}
+
+struct BriefingSectionView: View {
+    let briefing: PortfolioBriefingDTO?
+    let isLoading: Bool
+    let bookmarksEmpty: Bool
+    let errorMessage: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if bookmarksEmpty {
+                Text("코인을 북마크 해보세요!")
+            } else if isLoading {
+                DefaultProgressView(
+                    message: "분석중...",
+                    font: .caption2,
+                    spacing: 8
+                )
+            } else if let briefing {
+                BadgeLabelView(text: "📝 투자 브리핑 요약")
+                Text(briefing.briefing)
+                    .font(.system(size: 12))
+
+                Spacer(minLength: 0)
+
+                BadgeLabelView(text: "✅ 전략 제안")
+                Text(briefing.strategy)
+                    .font(.system(size: 12))
+            } else if let errorMessage {
+                Text("예상치 못한 에러 발생: \(errorMessage)")
+                    .foregroundColor(.red)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundColor(.primary)
+        .background(.gray.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 24)
     }
 }
 
+
 #Preview {
     BookmarkView()
+}
+
+struct ActivityView: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        return UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
