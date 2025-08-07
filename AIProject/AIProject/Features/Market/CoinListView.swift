@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AsyncAlgorithms
 
 struct CoinListView: View {
     let viewModel = CoinListViewModel(socket: .init())
@@ -55,10 +56,10 @@ struct CoinListView: View {
             
             Task {
                 print("add: \(newValue.subtracting(oldValue))")
+                
                 await viewModel.sendTIcket(newValue)
             }
         })
-        
         .onAppear {
             Task {
                 await viewModel.connect()
