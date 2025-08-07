@@ -71,7 +71,6 @@ final class TodayCoinInsightViewModel: ObservableObject {
                 return entry
             }
             .joined(separator: "\n\n")
-            print(communitySummary)
             
             let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
             

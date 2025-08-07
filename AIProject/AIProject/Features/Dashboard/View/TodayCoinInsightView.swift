@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+/// 오늘의 코인 시장 또는 커뮤니티 인사이트를 보여주는 뷰입니다.
+///
+/// `TodayCoinInsightViewModel`을 사용해 감정 분석 결과와 요약 정보를 표시합니다.
+/// `isCommunity` 값에 따라 전체 시장 또는 커뮤니티 기반 인사이트를 구분하여 출력합니다.
+///
+/// - Parameters:
+///   - isCommunity: 커뮤니티 기반 인사이트 여부를 나타내는 불리언 값입니다.
 struct TodayCoinInsightView: View {
     @StateObject var viewModel: TodayCoinInsightViewModel
     

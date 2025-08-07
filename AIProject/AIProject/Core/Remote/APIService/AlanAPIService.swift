@@ -11,21 +11,21 @@ import Foundation
 final class AlanAPIService {
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
-
+    
     init(networkClient: NetworkClient = .init()) {
         self.network = networkClient
     }
-
+    
     /// 입력한 질문 또는 문장에 대한 응답을 가져옵니다.
     /// - Parameter content: 질문 또는 분석할 문장
     /// - Returns: 수신한 응답 데이터
     func fetchAnswer(content: String, action: AlanAction) async throws -> AlanResponseDTO {
         guard let clientID = switchClientID(for: action) else { throw NetworkError.invalidAPIKey }
-
+        
         let urlString = "\(endpoint)?content=\(content)&client_id=\(clientID)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
         let alanResponseDTO: AlanResponseDTO = try await network.request(url: url)
-
+        
         return alanResponseDTO
     }
 }
@@ -43,7 +43,11 @@ extension AlanAPIService {
         }
     }
     
-    /// "\(coin.koreanName)" 개요를 JSON 형식으로 가져옵니다.
+    /// 지정된 코인에 대한 개요 정보를 JSON으로 가져옵니다.
+    ///
+    /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
+    /// - Parameter coin: 개요 정보를 요청할 코인
+    /// - Returns: 디코딩된 개요 DTO
     func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
         // 캐시된 응답이 있으면 바로 반환
         let cacheURL = URL(string: "https://api.example.com/coins/\(coin.id)/overview")!
@@ -81,7 +85,10 @@ extension AlanAPIService {
         }
     }
     
-    /// 일주일간의 가격 추이 및 거래량 변화 정보를 JSON 형식으로 가져옵니다.
+    /// 주어진 코인에 대해 주간 트렌드 데이터를 가져옵니다.
+    ///
+    /// - Parameter coin: 대상 코인
+    /// - Returns: 디코딩된 DTO
     func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO {
         let prompt = Prompt.generateWeeklyTrends(coinKName: coin.koreanName)
         let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
@@ -101,8 +108,11 @@ extension AlanAPIService {
             throw error
         }
     }
-
-    /// 최근 24시간 뉴스 기반 시장 분위기와 기사 목록을 JSON 형식으로 가져옵니다.
+    
+    /// 주어진 코인에 대해 24시간 뉴스 및 시장 분위기 데이터를 가져옵니다.
+    ///
+    /// - Parameter coin: 대상 코인
+    /// - Returns: 디코딩된 DTO
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO {
         let prompt = Prompt.generateTodayNews(coinKName: coin.koreanName)
         let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
@@ -124,7 +134,10 @@ extension AlanAPIService {
         }
     }
     
-    /// 2시간 동안의 전체 시장 정보를 JSON 형식으로 가져옵니다.
+    /// 주어진 코인에 대해 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
+    ///
+    /// - Parameter coin: 대상 코인
+    /// - Returns: 디코딩된 DTO
     func fetchTodayInsight() async throws -> TodayInsightDTO {
         let prompt = Prompt.generateTodayInsight
         let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)
@@ -145,7 +158,10 @@ extension AlanAPIService {
         }
     }
     
-    /// 하루 동안의 커뮤니티 동향을 JSON 형식으로 가져옵니다.
+    /// 주어진 코인에 대해 커뮤니티 기반 인사이트 데이터를 가져옵니다.
+    ///
+    /// - Parameter coin: 대상 코인
+    /// - Returns: 디코딩된 DTO
     func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
         let prompt = Prompt.generateCommunityInsight(redditPost: post)
         let answer = try await fetchAnswer(content: prompt.content, action: .coinReportGeneration)

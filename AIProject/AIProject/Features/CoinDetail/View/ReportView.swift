@@ -5,6 +5,13 @@
 //  Created by 장지현 on 7/31/25.
 //
 
+
+/// 코인에 대한 AI 분석 리포트를 보여주는 뷰입니다.
+///
+/// `ReportViewModel`을 통해 받아온 개요, 주간 동향, 오늘의 시장 분위기, 주요 뉴스를 섹션별로 표시합니다.
+///
+/// - Parameters:
+///   - coin: 리포트를 보여줄 대상 코인
 import SwiftUI
 
 struct ReportView: View {
@@ -88,9 +95,9 @@ struct ReportNewsSectionView: View {
                             
                             Button {
                                 // FIXME: 앨런이 뉴스 원문 기사를 제대로 제공하지 않음
-//                                if let url = URL(string: article.url) {
+                                //                                if let url = URL(string: article.url) {
                                 safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/956560")!)
-//                                }
+                                //                                }
                             } label: {
                                 Text("원문 보기 >")
                                     .font(.system(size: 12))

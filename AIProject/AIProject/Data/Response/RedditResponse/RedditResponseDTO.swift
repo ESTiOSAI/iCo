@@ -8,7 +8,6 @@
 import Foundation
 
 /// Reddit 응답 DTO
-// TODO: 수정 가능성이 높습니다. (2차 스프린트)
 struct RedditDTO: Codable {
     let data: RedditResponseDTO
 
