@@ -8,29 +8,43 @@
 import SwiftUI
 
 struct RoundedButton: View {
+    let buttonHeight: CGFloat = 32
+    
     let title: String
-    let image: Image? = nil
-    var foregroundColor: Color = .gray
-    var backgroundColor: Color = Color(.systemGray5)
+    var image: Image? = Image(systemName: "chevron.right")
+    var foregroundColor: Color = .aiCoLabel
+    var backgroundColor: Color = .aiCoBackground
     var action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text(title)
-                if let image = image {
+                    .font(.system(size: 12)).bold()
+                    .foregroundStyle(foregroundColor)
+                
+                if let image {
                     image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 10)
+                        .foregroundStyle(.aiCoLabelSecondary)
                 }
             }
-            .font(.system(size: 12)).bold()
             .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .foregroundStyle(foregroundColor)
+            .padding(.vertical, 7)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(backgroundColor)
+                RoundedRectangle(cornerRadius: buttonHeight / 2)
+                    .fill(.aiCoBackground.opacity(0.1))
             )
+            .overlay {
+                RoundedRectangle(cornerRadius: buttonHeight / 2)
+                    .stroke(.default, lineWidth: 0.5)
+            }
         }
-        .buttonStyle(.plain)
     }
+}
+
+#Preview {
+    RoundedButton(title: "Hi", action: { print("Hi") })
 }
