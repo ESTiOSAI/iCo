@@ -14,6 +14,13 @@ protocol CoinPriceProvider {
     /// - Parameters:
     ///   - market: 마켓 식별자 (예: "KRW-BTC")
     ///   - interval: 가격 차트의 기간 옵션 (예: .d1 = 1일)
+    ///   - to: 종료 기준 시각 (기본: nil)
     /// - Returns: 시계열 가격 데이터 배열
-    func fetchPrices(market: String, interval: CoinInterval) async throws -> [CoinPrice]
+    func fetchPrices(market: String, interval: CoinInterval, to: Date?) async throws -> [CoinPrice]
+}
+
+extension CoinPriceProvider {
+    func fetchPrices(market: String, interval: CoinInterval) async throws -> [CoinPrice] {
+        try await fetchPrices(market: market, interval: interval, to: nil)
+    }
 }

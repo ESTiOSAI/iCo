@@ -66,14 +66,35 @@ final class ChartViewModel: ObservableObject {
         updateTask?.cancel()
     }
     
-    
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
-    func loadPrices(interval: CoinInterval = .d1) async {
+    func loadPrices(interval: CoinInterval = .all.first!) async {
         do {
             let marketCode = coinSymbol
             let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
-            self.prices = fetchedPrices
+            
+            /// KST 기준으로 오늘의 시작 시간과 현재 시각 계산
+            var calendar = Calendar.current
+            calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
+
+            let nowKST = Date()
+            let todayStartKST = calendar.startOfDay(for: nowKST)
+
+            /// 당일 범위에 해당하는 가격만 필터링
+            let filteredPrices = fetchedPrices.filter { price in
+                return price.date >= todayStartKST && price.date <= nowKST
+            }
+                        
+            self.prices = filteredPrices.enumerated().map { idx, price in
+                CoinPrice(
+                    date: price.date,
+                    open: price.open,
+                    high: price.high,
+                    low: price.low,
+                    close: price.close,
+                    index: idx
+                )
+            }
         } catch {
             print("가격 불러오기 실패: \(error.localizedDescription)")
             self.prices = []
@@ -90,26 +111,49 @@ final class ChartViewModel: ObservableObject {
     }
 }
 
-// MARK: - Dummy Data Generator
 extension ChartViewModel {
-    /// 지정한 시간 범위와 샘플링 간격으로 더미 시계열 가격을 생성
+    /// Y축 범위 설정
     /// - Parameters:
-    ///   - hours: 과거로부터 생성할 시간 범위 (시간 단위, 예: 24)
-    ///   - samplingInterval: 샘플 간격 (초, 예: 60 → 1분)
-    /// - Returns: 생성된 `CoinPrice` 시계열 배열
-    static func makeDummyPrices(hours: Double, samplingInterval: TimeInterval) -> [CoinPrice] {
+    ///   - data: 표시할 가격 데이터 배열
+    /// - Returns: Y축의 최소/최대값을 포함한 범위 (패딩 포함)
+    /// - Note: 최소 범위는 10 이상이며, 여유 공간을 위해 ±20% 패딩을 추가
+    func yAxisRange(from data: [CoinPrice]) -> ClosedRange<Double> {
+        let minY = data.map(\.low).min() ?? 0
+        let maxY = data.map(\.high).max() ?? 0
+        let range = maxY - minY
+        let safeRange = max(range, 10)
+        let padding = range * 0.2
+        let center = (minY + maxY) / 2
+        return (center - safeRange / 2 - padding)...(center + safeRange / 2 + padding)
+    }
+    
+    /// X축의 시간 범위(Domain)를 계산
+    /// - Parameters:
+    ///   - data: 시각화할 가격 데이터 배열
+    /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
+    func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
-        let startDate = now.addingTimeInterval(-hours * 3600)
-        let sampleCount = Int((hours * 3600) / samplingInterval)
-        
-        var priceSeries: [CoinPrice] = []
-        var currentTimestamp = startDate
-        var value = 100.0
-        
-        for _ in 0..<sampleCount {
-            priceSeries.append(.init(date: currentTimestamp, close: value))
-            currentTimestamp = currentTimestamp.addingTimeInterval(samplingInterval)
-        }
-        return priceSeries
+        let calendar = Calendar(identifier: .gregorian)
+        let lastDate = data.last?.date ?? now
+        let xStart = calendar.startOfDay(for: now)
+        let xEnd = lastDate.addingTimeInterval(60 * 5)
+        return xStart...xEnd
+    }
+    
+    /// 초기 차트 스크롤 위치를 지정할 시각을 반환
+    /// - Parameters:
+    ///   - data: 시각화할 가격 데이터 배열
+    /// - Returns: 마지막 데이터 시점 +5분
+    func scrollToTime(for data: [CoinPrice]) -> Date {
+        data.last?.date.addingTimeInterval(60 * 5) ?? Date()
+    }
+    
+    /// 차트 X축 라벨에 사용할 시간 포맷터 (24시간제 HH:mm 형식)
+    /// - Returns: "HH:mm" 포맷을 사용하는 DateFormatter (ko_KR 로케일)
+    var timeFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
     }
 }

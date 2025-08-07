@@ -7,31 +7,28 @@
 
 import Foundation
 
-/// 코인 차트의 기간 선택 옵션
-/// `rawValue`는 UI 표시용 문자열 (예: "1D") 이며, `Identifiable`의 `id`로도 재사용
-enum CoinInterval: String, CaseIterable, Identifiable {
-    /// 1일
-    case d1 = "1D"
-    /// 1주
-    case w1 = "1W"
-    /// 3개월
-    case m3 = "3M"
-    /// 6개월
-    case m6 = "6M"
-    /// 1년
-    case y1 = "1Y"
-    
-    /// UI 및 리스트 바인딩을 위한 고유 식별자
-    var id: String { rawValue }
-    
-    /// 각 기간별로 차트에 필요한 캔들(데이터 포인트) 수를 반환
-    var candleCount: Int {
-        switch self {
-        case .d1: return 60 * 24
-        case .w1: return 60 * 24 * 7
-        case .m3: return 60 * 24 * 30 * 3
-        case .m6: return 60 * 24 * 30 * 6
-        case .y1: return 60 * 24 * 365
-        }
+/// 코인 차트에서 기간을 나타내는 구조체 모델
+/// API 요청 시 필요한 시작 날짜 계산 및 구간 식별에 사용
+struct CoinInterval: Identifiable, Hashable {
+    /// 기간 ID (예: "1D", "1W" 등)
+    let id: String
+    /// 현재 시점을 기준으로 몇 분 전부터 데이터를 조회할지 나타내는 분 단위 값
+    let minutes: Int
+    /// 시작일 계산: 현재 시점에서 `minutes` 만큼 이전 시각
+    var startDate: Date {
+        Calendar.current.date(byAdding: .minute, value: -minutes, to: Date())!
     }
+    /// 종료일: 항상 현재 시각 기준
+    var endDate: Date {
+        Date()
+    }
+
+    /// 사용 가능한 전체 기간 옵션 목록
+    static let all: [CoinInterval] = [
+        CoinInterval(id: "1D", minutes: 1440), // 1일 == 1440분
+        CoinInterval(id: "1W", minutes: 1440 * 7),
+        CoinInterval(id: "3M", minutes: 1440 * 30 * 3),
+        CoinInterval(id: "6M", minutes: 1440 * 30 * 6),
+        CoinInterval(id: "1Y", minutes: 1440 * 365)
+    ]
 }
