@@ -9,8 +9,9 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    let viewModel = CoinListViewModel(socket: .init())
+    private let viewModel = CoinListViewModel(socket: .init())
     @State private var visibleCoins: Set<CoinListModel.ID> = []
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         NavigationStack {
@@ -33,16 +34,7 @@ struct CoinListView: View {
                             }.opacity(0)
                         }
                         .onAppear {
-                            guard !visibleCoins.contains(coin.id) else { return }
-                            let frame = geometry.frame(in: .global)
-                            let threshold: CGFloat = 80
-                            
-                            // cell의 상단 좌표가 프레임 + 임계값 보다 작고
-                            // cell 하단 좌표가 프레임 - 임계값보다 크면
-                            // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
-                            if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
-                                visibleCoins.insert(coin.id)
-                            }
+                            insertCoin(id: coin.id, proxy: geometry)
                         }
                         .onDisappear {
                             visibleCoins.remove(coin.id)
@@ -51,6 +43,9 @@ struct CoinListView: View {
                 }
             }
         }
+        .onChange(of: scenePhase, { _, newValue in
+            handleConnection(by: newValue)
+        })
         .onChange(of: visibleCoins, { oldValue, newValue in
             guard visibleCoins.count > 16 else { return }
             
@@ -72,7 +67,19 @@ struct CoinListView: View {
 }
 
 extension CoinListView {
-    private func cellOnAppear(_ frame: CGRect, id: CoinListModel.ID) {
+    private func insertCoin(id: CoinListModel.ID, proxy: GeometryProxy) {
+        guard !visibleCoins.contains(coin.id) else { return }
+        let frame = proxy.frame(in: .global)
+        let threshold: CGFloat = 80
+        
+        // cell의 상단 좌표가 프레임 + 임계값 보다 작고
+        // cell 하단 좌표가 프레임 - 임계값보다 크면
+        // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
+        if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
+            visibleCoins.insert(coin.id)
+        }
+    }
+    private func handleConnection(by phase: ScenePhase) {
         
     }
 }
