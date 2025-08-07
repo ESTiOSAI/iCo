@@ -14,7 +14,7 @@ struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
     @StateObject var viewModel: ChartViewModel
     /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
-    @State private var selectedInterval: CoinInterval = .d1
+    @State private var selectedInterval: CoinInterval = CoinInterval.all.first!
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
     @State private var selectedTab = 0
 
@@ -187,7 +187,7 @@ struct ChartView: View {
                 GeometryReader { proxy in
                     SegmentedControlView(
                         selection: $selectedTab,
-                        tabTitles: CoinInterval.allCases.map(\.rawValue),
+                        tabTitles: CoinInterval.all.map(\.id),
                         width: proxy.size.width
                     )
                     .frame(width: proxy.size.width, height: 44)
