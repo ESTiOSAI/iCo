@@ -9,12 +9,16 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    private let viewModel = CoinListViewModel(socket: .init())
+    @Bindable var viewModel: CoinListViewModel
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
     
+    init(viewModel: CoinListViewModel) {
+        self.viewModel = viewModel
+    }
+    
     var body: some View {
-        NavigationStack {
+        VStack(spacing: 0) {
             List {
                 CoinListHeaderView()
                     .fontWeight(.regular)
@@ -95,5 +99,5 @@ extension CoinListView {
 }
 
 #Preview {
-    CoinListView()
+    CoinListView(viewModel: .init(socket: .init()))
 }
