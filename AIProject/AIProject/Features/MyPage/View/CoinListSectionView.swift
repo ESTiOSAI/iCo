@@ -15,7 +15,7 @@ struct CoinListSectionView: View {
     @Binding var volumeOrder: SortOrder
 
     var body: some View {
-        List {
+        VStack {
             HStack {
                 SortToggleButton(
                     title: "코인명",
@@ -33,6 +33,7 @@ struct CoinListSectionView: View {
             .font(.system(size: 12))
             .foregroundStyle(.aiCoLabel)
 
+            Divider()
 
             ForEach(sortedCoins, id: \.coinID) { coin in
                 NavigationLink {
@@ -41,8 +42,10 @@ struct CoinListSectionView: View {
                     CoinRowView(coin: coin)
                 }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         }
+        .padding(.top, 16)
+        .padding(.bottom, 16)
+        .background(.aiCoBackground.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
