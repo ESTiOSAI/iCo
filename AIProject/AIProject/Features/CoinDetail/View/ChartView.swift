@@ -71,13 +71,13 @@ struct ChartView: View {
 
                 // 상단 요약: 현재가 및 등락
                 if let summary {
-                    Text("\(summary.lastPrice.formatted(.number.grouping(.automatic)))원")
+                    Text(summary.lastPrice.formatKRW)
                         .font(.largeTitle).bold()
                         .foregroundStyle(.aiCoLabel)
                     
                     let sign = isRising ? "+" : (isFalling ? "-" : "")
                     
-                    Text("\(sign)\(abs(summary.change).formatted(.number.grouping(.automatic)))원 (\(summary.changeRate, format: .number.precision(.fractionLength(1)))%)")
+                    Text("\(sign)\(abs(summary.change).formatKRW) (\(summary.changeRate.formatRate))")
                         .font(.subheadline)
                         .foregroundStyle(color)
                 }
