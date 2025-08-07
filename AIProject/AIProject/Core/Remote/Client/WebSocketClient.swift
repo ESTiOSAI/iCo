@@ -44,7 +44,7 @@ final class WebSocketClient: NSObject {
         self.webSocketTask?.resume()
         
         checkingAlive()
-        await sendPing2()
+        try await sendPing()
     }
     
     /// 웹소켓 연결을 종료합니다.
@@ -91,8 +91,8 @@ final class WebSocketClient: NSObject {
         }
         print("stream 체결 됨")
         defer {
-            stream = nil
             continuation?.finish()
+            stream = nil
             print("continuation 초기화")
         }
         
@@ -129,9 +129,26 @@ final class WebSocketClient: NSObject {
         timer = Timer.scheduledTimer(withTimeInterval: 120, repeats: true, block: { [weak self] _ in
             guard let self else { return }
             Task {
-                await self.sendPing2()
+                try? await self.sendPing()
             }
         })
+    }
+    
+    private func sendPing() async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            if let socket = webSocketTask {
+                socket.sendPing { error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                    continuation.resume()
+                }
+            } else {
+                continuation.resume(throwing: NetworkError.webSocketError)
+            }
+            
+        }
     }
     
     // TODO: Ping 보내는 걸 고려해보기
