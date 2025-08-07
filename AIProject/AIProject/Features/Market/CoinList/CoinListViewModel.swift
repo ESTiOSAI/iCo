@@ -38,10 +38,20 @@ class CoinListViewModel {
     private func ticketStream() async {
         let stream = visibleCoinsChannel
             .removeDuplicates()
-            .debounce(for: .milliseconds(500))
+            ._throttle(for: .milliseconds(500), latest: true)
         for await visibleCoin in stream {
             await socket.subscribe(ticket: ticket, coins: Array(visibleCoin))
         }
+    }
+    
+    private func performUpdate(_ ticker: RealTimeTickerDTO) async {
+        guard let index = coins.firstIndex(where: {
+            $0.coinID == ticker.coinID
+        }) else {
+            return
+        }
+        
+        coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
     }
     
     private func consume() async {
@@ -50,13 +60,7 @@ class CoinListViewModel {
         }
         do {
             for try await ticker in stream {
-                guard let index = coins.firstIndex(where: {
-                    $0.coinID == ticker.coinID
-                }) else {
-                    return
-                }
-                
-                coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
+                await performUpdate(ticker)
             }
         } catch {
             socket.disconnect()
