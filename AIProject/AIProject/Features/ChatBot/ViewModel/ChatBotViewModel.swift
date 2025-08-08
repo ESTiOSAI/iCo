@@ -7,13 +7,6 @@
 
 import Foundation
 
-struct ChatMessage: Identifiable {
-    let content: String
-    let isUser: Bool
-
-    var id: Int { content.hashValue }
-}
-
 final class ChatBotViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = []
     private let chatBotClient: ChatBotClient
