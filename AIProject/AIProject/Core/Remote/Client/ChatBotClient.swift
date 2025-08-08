@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 챗봇에 활용할 OpenRouter API와 통신하고 SSE 방식으로 데이터를 내려주는 객체
 final class ChatBotClient: NSObject {
     private var task: URLSessionDataTask?
     private var session: URLSession?
@@ -16,7 +17,9 @@ final class ChatBotClient: NSObject {
     typealias ChatBotStream = AsyncThrowingStream<String, Error>
     private(set) var continuation: ChatBotStream.Continuation?
     var stream: ChatBotStream?
-
+    
+    /// OpenRouter SSE 서버에 연결을 생성하고 응답 스트림을 시작합니다.
+    /// - Parameter content: 서버에 전송할 유저 메세지 입니다.
     func connect(content: String) async throws {
         stream = ChatBotStream { continuation in
             self.continuation = continuation
@@ -27,7 +30,8 @@ final class ChatBotClient: NSObject {
         task = session?.dataTask(with: request)
         task?.resume()
     }
-
+    
+    /// 현재 SSE 연결과 스트림을 종료합니다.
     func disconnect() {
         continuation?.finish()
         continuation = nil
@@ -37,6 +41,10 @@ final class ChatBotClient: NSObject {
         session?.invalidateAndCancel()
     }
 
+    
+    /// OpenRouter SSE 요청을 구성합니다.
+    /// - Parameter content: 요청을 보낼 유저의 메세지입니다.
+    /// - Returns: SSE 연결에 사용할 준비된 `URLRequest`를 반환합니다.
     private func configureRequest(content: String) throws -> URLRequest {
         guard let token = Bundle.main.infoDictionary?["CHATBOT_API_KEY"] as? String else {
             throw NetworkError.invalidAPIKey
@@ -90,7 +98,6 @@ extension ChatBotClient: URLSessionDataDelegate {
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         if let error { continuation?.finish(throwing: error) }
-
         disconnect()
     }
 }
