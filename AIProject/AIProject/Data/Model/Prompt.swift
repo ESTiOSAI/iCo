@@ -14,6 +14,7 @@ enum Prompt {
     case extractCoinID(text: String)
     case generateTodayInsight
     case generateCommunityInsight(redditPost: String)
+    case generateBookmarkBriefing(importance: String, bookmarks: String)
 
     var content: String {
         switch self {
@@ -96,10 +97,10 @@ enum Prompt {
                 /// 중립이라면 긍정요인, 부정요인을 같이 담은 [String]을 제공
                 let summary: [String: [String]]
             }
-
+            
             1. 현재 국내 시간을 기준으로 최근 2시간 뉴스 기반
             2. 뉴스 전반을 분석해 시장 분위기를 요약 
-
+            
             위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
             """
         case.generateCommunityInsight(let redditPost):
@@ -113,6 +114,21 @@ enum Prompt {
                 /// 커뮤니티 분위기를 그렇게 평가한 이유 요약
                 let summary: String
             }
+            """
+        case .generateBookmarkBriefing(let importance, let bookmarks):
+            """
+            struct PortfolioBriefingDTO: Codable {
+                let briefing: String
+                let strategy: String
+            }
+            
+            1. 분석 대상 코인: \(bookmarks)
+            2. 코인별 개별 분석이 아니라, 전체적으로 공통점과 분포(테마, 시가 총액, 최근 7일 가격 흐름, 최근 7일 거래량)를 2줄로 요약
+            3. 중요도 반영: \(importance)
+            4. 요약문에는 반드시 업계 평균이나 상위/하위 10% 대비 특징을 1개 이상 포함 (예: 거래량이 상위 15% 수준)
+            5. 공통점의 강점과 현재 시장 상황을 바탕으로, 단기/중기/장기 중 선택해 이유와 함께 구체적으로 제안
+            6. 모든 설명은 숫자, 비교, 구체적 시간을 포함하고, 포괄적 표현(‘좋다’, ‘나쁘다’ 등) 대신 행동 유도형 문장 사용
+            7. 마크다운 금지
             """
         }
     }
