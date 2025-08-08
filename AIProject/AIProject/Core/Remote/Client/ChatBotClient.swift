@@ -59,6 +59,10 @@ final class ChatBotClient: NSObject {
             "model": "openai/gpt-3.5-turbo",
             "messages": [
                 [
+                    "role": "system",
+                    "content": "너는 코인 투자 도우미야, 모든 가상 화폐는 KRW로 보여줘"
+                ],
+                [
                     "role": "user",
                     "content": "\(content)"
                 ]
