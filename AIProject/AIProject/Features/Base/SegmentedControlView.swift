@@ -36,10 +36,11 @@ struct SegmentedControlView: View {
                     }
                 } label: {
                     Text(tabTitles[idx])
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: 15, weight: selection == idx ? .bold : .regular))
                         .frame(maxWidth: .infinity)
-                        .padding(8)
-                        .foregroundColor(selection == idx ? .aiCoBackground : .aiCoAccent)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .foregroundColor(selection == idx ? .aiCoBackgroundWhite : .aiCoLabelSecondary)
                         .background(
                             ZStack {
                                 if selection == idx {
@@ -52,12 +53,15 @@ struct SegmentedControlView: View {
                 }
             }
         }
-        .padding(4)
-        .background(Color(.aiCoBorder).clipShape(Capsule()))
+        .padding(8)
+        .background(.aiCoBackgroundAccent)
         .frame(width: width)
+        .clipShape(Capsule())
+        .overlay { Capsule().stroke(.default, lineWidth: 0.5) }
     }
 }
 
 #Preview {
-    SegmentedControlView(selection: .constant(0), tabTitles: ["1", "2"])
+    SegmentedControlView(selection: .constant(0), tabTitles: ["1D", "1D", "1D", "1D", "1D"], width: 320)
+        .padding()
 }
