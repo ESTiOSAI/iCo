@@ -7,12 +7,9 @@
 
 import SwiftUI
 
-/// 버튼 터치 시 실행할 메서드
 struct RoundedButton: View {
-    let buttonHeight: CGFloat = 32
-    
     let title: String
-    var image: Image? = Image(systemName: "chevron.right")
+    var imageName: String? = "chevron.right"
     var foregroundColor: Color = .aiCoLabel
     var backgroundColor: Color = .aiCoBackground
     
@@ -25,26 +22,24 @@ struct RoundedButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
-                Text(title)
-                    .font(.system(size: 12)).bold()
-                    .foregroundStyle(foregroundColor)
+                    Text(title)
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(foregroundColor)
                 
-                if let image {
-                    image
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 10)
+                if let imageName {
+                    Image(systemName: imageName)
+                        .font(.system(size: 10))
                         .foregroundStyle(.aiCoLabelSecondary)
                 }
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
             .background(
-                RoundedRectangle(cornerRadius: buttonHeight / 2)
-                    .fill(.aiCoBackground.opacity(0.1))
+                Capsule()
+                    .fill(.aiCoBackgroundWhite)
             )
             .overlay {
-                RoundedRectangle(cornerRadius: buttonHeight / 2)
+                Capsule()
                     .stroke(.default, lineWidth: 0.5)
             }
         }
@@ -52,5 +47,10 @@ struct RoundedButton: View {
 }
 
 #Preview {
-    RoundedButton(title: "Hi", action: { print("Hi") })
+    VStack {
+        RoundedButton(title: "With Image", action: { dummyAction() })
+        RoundedButton(title: "Text Only", imageName: nil, action: { dummyAction() })
+    }
+    .padding()
+    .background(.aiCoBackground)
 }
