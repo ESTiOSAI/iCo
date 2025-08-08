@@ -19,15 +19,15 @@ struct BookmarkBulkInsertView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("보유 코인이나 관심 코인을 한번에 등록하시려면 스크린샷을 업로드하세요.")
-                    .font(.system(size: 16))
+            VStack(alignment: .leading, spacing: 6) {
+                Text("코인 목록이 캡쳐된 스크린샷을 업로드하세요.")
+                    .font(.system(size: 18))
                     .fontWeight(.medium)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text("아이코가 자동으로 북마크를 등록해드려요.")
-                    .font(.system(size: 14))
+                    .font(.system(size: 16))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.horizontal, 16)
@@ -49,19 +49,10 @@ struct BookmarkBulkInsertView: View {
                         // 이미지 등록 후
                         ZStack {
                             ImagePreviewView(selectedImage: selectedImage!)
-                                .opacity(vm.isLoading ? 0.2 : 1)
-                                .blur(radius: vm.isLoading ? 1 : 0)
                             
                             if vm.isLoading {
                                 VStack(spacing: 16) {
-                                    ProgressView()
-                                        .scaleEffect(2)
-                                    
-                                    Text("이미지 분석중...")
-                                        .font(.footnote)
-                                        .foregroundStyle(.aiCoLabel)
-                                    
-                                    //TODO: 분석 작업 취소 기능 구현하기
+                                    DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요", buttonAction: vm.cancelTask)
                                 }
                             }
                         }
@@ -69,7 +60,7 @@ struct BookmarkBulkInsertView: View {
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .background(.aiCoBackground)
+                .background(.aiCoBackground.opacity(0.5))
                 
                 PhotosPicker(
                     selection: $selectedItem,
@@ -121,7 +112,7 @@ struct BookmarkBulkInsertView: View {
                 }
             } message: {
                 let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
-                Text("사진에서 \(formattedCoinIDs) 코인을 발견했어요.")
+                Text("이미지에서 \(formattedCoinIDs) 코인을 발견했어요.")
             }
             .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
                 Button(role: .cancel) {
