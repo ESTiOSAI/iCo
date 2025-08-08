@@ -52,10 +52,11 @@ final class TodayCoinInsightViewModel: ObservableObject {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             }
         } catch {
-            print("🚨 [Dashboard - Insight] \(error)")
+            guard let ne = error as? NetworkError else { return print(error) }
             
+            print(ne.log())
             await MainActor.run {
-                self.summary = "데이터를 불러오는 데 실패했어요"
+                self.summary = ne.localizedDescription
             }
         }
     }
@@ -76,28 +77,21 @@ final class TodayCoinInsightViewModel: ObservableObject {
                 }
                 result += "\n"
             }
-            .trimmingCharacters(in: .newlines)
+                .trimmingCharacters(in: .newlines)
             
-            do {
-                let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
-                
-                await MainActor.run {
-                    sentiment = Sentiment.from(alanData.todaysSentiment)
-                    
-                    self.summary = alanData.summary
-                }
-            } catch {
-                print("🚨 [Dashboard - Community] \(error)")
-                
-                await MainActor.run {
-                    self.summary = "데이터를 불러오는 데 실패했어요"
-                }
-            }
-        } catch {
-            print("🚨 [Reddit] \(error)")
+            let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
             
             await MainActor.run {
-                self.summary = "데이터를 불러오는 데 실패했어요"
+                sentiment = Sentiment.from(alanData.todaysSentiment)
+                
+                self.summary = alanData.summary
+            }
+        } catch {
+            guard let ne = error as? NetworkError else { return print(error) }
+            
+            print(ne.log())
+            await MainActor.run {
+                self.summary = ne.localizedDescription
             }
         }
     }

@@ -50,8 +50,10 @@ final class FearGreedViewModel: ObservableObject {
                 fearGreed = FearGreed.from(fearGreedIndex.valueClassification)
                 self.classification = fearGreed.description
             }
-        }  catch {
-            print("🚨 [FearAndGreed] \(error)")
+        } catch {
+            guard let ne = error as? NetworkError else { return print(error) }
+            
+            print(ne.log())
             await MainActor.run {
                 // FIXME: 데이터를 불러오지 못했을 경우 새로고침 버튼
             }

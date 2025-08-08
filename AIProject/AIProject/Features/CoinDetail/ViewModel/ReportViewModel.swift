@@ -50,10 +50,11 @@ final class ReportViewModel: ObservableObject {
                     """
             }
         } catch {
-            print("🚨 [CoinDetail-OverView] \(error)")
+            guard let ne = error as? NetworkError else { return print(error) }
             
+            print(ne.log())
             await MainActor.run {
-                self.coinOverView = "정보를 불러오는 데 실패했어요"
+                self.coinOverView = ne.localizedDescription
             }
         }
     }
@@ -71,10 +72,11 @@ final class ReportViewModel: ObservableObject {
                     """
             }
         } catch {
-            print("🚨 [CoinDetail-Weekly] \(error)")
+            guard let ne = error as? NetworkError else { return print(error) }
             
+            print(ne.log())
             await MainActor.run {
-                self.coinOverView = "정보를 불러오는 데 실패했어요"
+                self.coinWeeklyTrends = ne.localizedDescription
             }
         }
     }
@@ -87,11 +89,12 @@ final class ReportViewModel: ObservableObject {
                 self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
             }
         } catch {
-            print("🚨 [CoinDetail-TodaysAndNews] \(error)")
+            guard let ne = error as? NetworkError else { return print(error) }
             
+            print(ne.log())
             await MainActor.run {
-                self.coinTodayTrends = "데이터를 불러오는 데 실패했어요"
-                self.coinTodayTopNews = [CoinArticle(title: "데이터를 불러오는데 실패했어요", summary: "", url: "")]
+                self.coinTodayTrends = ne.localizedDescription
+                self.coinTodayTopNews = [CoinArticle(title: ne.localizedDescription, summary: "", url: "")]
             }
         }
     }

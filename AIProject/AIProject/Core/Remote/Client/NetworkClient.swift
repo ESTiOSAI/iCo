@@ -24,9 +24,11 @@ final class NetworkClient {
             } catch let decodingError as DecodingError {
                 throw NetworkError.decodingError(decodingError)
             }
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            throw NetworkError.taskCancelled
         } catch let urlError as URLError {
             throw NetworkError.networkError(urlError)
-        } catch {
+        }  catch {
             throw error
         }
     }
@@ -37,8 +39,8 @@ final class NetworkClient {
             return
         case 401:
             throw NetworkError.quotaExceeded(statusCode)
-        case 404: // FIXME: 404도 추가할까요?
-            throw NetworkError.unknown(statusCode)
+        case 404:
+            throw NetworkError.notFound(statusCode)
         case 414:
             throw NetworkError.uriTooLong(statusCode)
         case 503:
