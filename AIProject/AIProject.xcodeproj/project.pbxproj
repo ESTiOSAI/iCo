@@ -41,7 +41,7 @@
 		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				App/Resource/Info.plist,
 			);
 			target = B7B040022E387FCF005DE0BA /* AIProject */;
 		};
