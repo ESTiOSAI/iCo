@@ -59,9 +59,9 @@ class ImageProcessViewModel: ObservableObject {
                 await showAnalysisResult()
                 
             } catch is CancellationError {
-                await showError(.canceled)
+                await terminateProcess()
             } catch let error as ImageProcessError {
-                await showError(error)
+                await terminateProcess(with: error)
             }
         }
     }
@@ -78,11 +78,14 @@ class ImageProcessViewModel: ObservableObject {
     }
     
     @MainActor
-    private func showError(_ error: ImageProcessError) {
+    private func terminateProcess(with error: ImageProcessError? = nil) {
         self.isLoading = false
-        self.errorMessage = error.description
-        self.showErrorMessage = true
-        print("🚨 이미지 처리 중 에러 발생:", error)
+        
+        if let error {
+            self.errorMessage = error.description
+            self.showErrorMessage = true
+            print("🚨 이미지 처리 중 에러 발생:", error)
+        }
     }
     
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수

@@ -24,9 +24,6 @@ enum ImageProcessError: Error, CustomStringConvertible {
     /// 기타 Alan API에서 발생한 에러
     case unknownAlanError
     
-    /// 사용자가 취소 요청
-    case canceled
-    
     var description: String {
         switch self {
         case .noRecognizedText:
@@ -35,8 +32,6 @@ enum ImageProcessError: Error, CustomStringConvertible {
             return "이미지에서 코인을 찾지 못했어요"
         case .noMatchingCoinIDAtAPI:
             return "아이코에 등록되지 않은 코인이에요"
-        case .canceled:
-            return "이미지 분석을 취소했어요"
         default:
             return "이미지 처리 중 예상치 못한 문제가 발생했어요"
         }
