@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+class ThemeManager: ObservableObject {
+    @Published var selectedTheme: Theme = .basic
+}
+
 enum Theme: String, CaseIterable {
     case basic
     case pop

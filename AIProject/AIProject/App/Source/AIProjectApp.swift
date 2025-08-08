@@ -28,6 +28,7 @@ struct AIProjectApp: App {
             if hasSeenOnboarding {
                 MainTabView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .environmentObject(themeManager)
             } else {
                 OnboardingView()
             }

@@ -17,6 +17,8 @@ struct ChartView: View {
     @State private var selectedInterval: CoinInterval = CoinInterval.all.first!
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
     @State private var selectedTab = 0
+    
+    @EnvironmentObject var themeManager: ThemeManager
 
     /// 차트 데이터 (시계열 포인트)
     private var data: [CoinPrice] { viewModel.prices }
