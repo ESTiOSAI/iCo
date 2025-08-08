@@ -56,7 +56,7 @@ struct CoinListView: View {
             guard visibleCoins.count > 5 else { return }
             
             Task {
-                await viewModel.sendTIcket(newValue)
+                await viewModel.sendTicket(newValue)
             }
         })
         .onAppear {
