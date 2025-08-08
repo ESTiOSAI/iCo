@@ -21,8 +21,8 @@ final class NetworkClient {
             
             do {
                 return try JSONDecoder().decode(T.self, from: data)
-            } catch let decodingError as Swift.DecodingError {
-                throw DecodingError.fromResponse(decodingError)
+            } catch let decodingError as DecodingError {
+                throw NetworkError.decodingError(decodingError)
             }
         } catch let urlError as URLError {
             throw NetworkError.networkError(urlError)
@@ -53,7 +53,9 @@ final class NetworkClient {
             }
         }
     }
-    
+}
+
+extension NetworkClient {
     /// 서버에서 반환하는 상태 코드가 유효한지를 검증하고 Bool 타입으로 반환합니다.
     func requestWithBool(_ request: URLRequest) async throws -> Bool {
         let (_, response) = try await URLSession.shared.data(from: request.url!)

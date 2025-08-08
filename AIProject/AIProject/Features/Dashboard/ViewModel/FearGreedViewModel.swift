@@ -31,11 +31,17 @@ final class FearGreedViewModel: ObservableObject {
             
             guard let fearGreedIndex = data.first else {
                 print("Fear And Greed Index: No Data")
+                await MainActor.run {
+                    // FIXME: 데이터를 잘못되었을 경우 새로고침 버튼
+                }
                 return
             }
             
             guard let doubleIndex = Double(fearGreedIndex.value) else {
                 print("Fear And Greed Index: Failed to convert String to CGFloat")
+                await MainActor.run {
+                    // FIXME: 데이터를 잘못되었을 경우 새로고침 버튼
+                }
                 return
             }
             

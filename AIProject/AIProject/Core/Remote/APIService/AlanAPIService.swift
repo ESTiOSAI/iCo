@@ -29,7 +29,7 @@ final class AlanAPIService {
         return alanResponseDTO
     }
     
-    /// 지정된 프롬프트와 작업 타입에 따라 응답을 받아 디코딩된 DTO를 반환합니다.
+    /// 지정된 프롬프트와 작업 타입에 따라 JSON String 응답을 받아 디코딩된 DTO를 반환합니다.
     ///
     /// - Parameters:
     ///   - prompt: 요청을 생성하는 프롬프트
@@ -39,10 +39,14 @@ final class AlanAPIService {
         let answer = try await fetchAnswer(content: prompt.content, action: action)
         
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
-            throw DecodingError.custom(message: "응답 JSON 문자열을 Data로 변환할 수 없습니다.")
+            throw NetworkError.encodingError
         }
         
-        return try JSONDecoder().decode(T.self, from: jsonData)
+        do {
+            return try JSONDecoder().decode(T.self, from: jsonData)
+        } catch let decodingError as DecodingError {
+            throw NetworkError.decodingError(decodingError)
+        }
     }
 }
 
@@ -71,12 +75,16 @@ extension AlanAPIService {
         let cacheURL = URL(string: "https://api.example.com/coins/\(coin.id)/overview")!
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
         if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
-            return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
+            do {
+                return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
+            } catch let decodingError as DecodingError {
+                throw NetworkError.decodingError(decodingError)
+            }
         }
         
         let prompt = Prompt.generateOverView(coinKName: coin.koreanName)
         let dto: CoinOverviewDTO = try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
-        
+            
         do {
             let jsonData = try JSONEncoder().encode(dto)
             
@@ -89,7 +97,7 @@ extension AlanAPIService {
             let cacheEntry = CachedURLResponse(response: response, data: jsonData)
             URLCache.shared.storeCachedResponse(cacheEntry, for: request)
         } catch {
-            throw DecodingError.custom(message: "DTO를 JSON 형식으로 인코딩하는 데 실패했습니다.")
+            throw NetworkError.encodingError
         }
         
         return dto
