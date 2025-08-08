@@ -37,12 +37,11 @@ enum NetworkError: Error {
     case serverError(_ statusCode: Int)
     /// 서버로부터 전달된 상태 코드와 오류 메시지를 포함한 오류입니다.
     case remoteError(_ statusCode: Int, _ errorData: String)
+    /// 알 수 없는 상태 코드 기반의 오류입니다.
+    case unknown(_ statusCode: Int)
     
     /// 웹소켓 통신 중 발생한 오류입니다.
     case webSocketError
-    
-    /// 알 수 없는 상태 코드 기반의 오류입니다.
-    case unknown(_ statusCode: Int)
 }
 
 extension NetworkError: LocalizedError {
