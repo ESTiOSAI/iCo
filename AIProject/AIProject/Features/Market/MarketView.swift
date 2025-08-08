@@ -28,6 +28,12 @@ struct MarketView: View {
                 
                     CoinListView(viewModel: viewModel.coinListViewModel)
                 }
+                .refreshable {
+                    Task {
+                        await viewModel.refresh()
+                        viewModel.change(tab: MarketCoinTab(rawValue: selectedTabIndex) ?? .bookmark)
+                    }
+                }
             }
             .onChange(of: selectedTabIndex, { _, newValue in
                 if let tab = MarketCoinTab(rawValue: newValue) {

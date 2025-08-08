@@ -53,8 +53,6 @@ struct CoinListView: View {
             }
         })
         .onChange(of: visibleCoins, { oldValue, newValue in
-            guard visibleCoins.count > 5 else { return }
-            
             Task {
                 await viewModel.sendTicket(newValue)
             }

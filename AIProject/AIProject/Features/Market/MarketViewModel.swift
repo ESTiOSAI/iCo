@@ -24,7 +24,9 @@ class MarketViewModel {
         self.upbitService = upbitService
         self.coinListViewModel = coinListViewModel
         
-        setup()
+        Task {
+            await setup()
+        }
     }
     
     func change(tab: MarketCoinTab) {
@@ -36,15 +38,17 @@ class MarketViewModel {
         }
     }
     
+    func refresh() async {
+        await setup()
+    }
+    
     // TODO: Bookmark가 변경된 걸 notify 받고, 변경 해주어야 함
-    private func setup() {
-        Task {
-            let coins = await fetchMarketCoinData()
-            let bookmaredCoinID = await fetchBookmarkCoin()
-            
-            self.bookmaredCoins = coins.filter { bookmaredCoinID.contains($0.coinID) }
-            self.totalCoins = coins
-        }
+    private func setup() async {
+        let coins = await fetchMarketCoinData()
+        let bookmaredCoinID = await fetchBookmarkCoin()
+        
+        self.bookmaredCoins = coins.filter { bookmaredCoinID.contains($0.coinID) }
+        self.totalCoins = coins
     }
     
     // TODO: 실제 BookMark Coin 가져오기
@@ -53,22 +57,26 @@ class MarketViewModel {
     }
     
     private func fetchMarketCoinData() async -> [CoinListModel] {
-        async let coins = (try? await upbitService.fetchMarkets()) ?? []
-        async let tickers = (try? await upbitService.fetchTicker(by: "KRW")) ?? []
-        
-        let result = await coins.reduce(into: [String: (korean: String, english: String)]()) { acc, coins in
-            acc[coins.coinID] = (coins.koreanName, coins.englishName)
-        }
-        
-        return await tickers.compactMap { ticker in
-            CoinListModel(
-                coinID: ticker.coinID,
-                image: "",
-                name: result[ticker.coinID]?.korean ?? "없음",
-                currentPrice: ticker.tradePrice,
-                changePrice: ticker.changeRate,
-                tradeAmount: ticker.accTradePrice
-            )
+        do {
+            async let coins = try await upbitService.fetchMarkets()
+            async let tickers = try await upbitService.fetchTicker(by: "KRW")
+            
+            let result = try await coins.reduce(into: [String: (korean: String, english: String)]()) { acc, coins in
+                acc[coins.coinID] = (coins.koreanName, coins.englishName)
+            }
+            return try await tickers.compactMap { ticker in
+                CoinListModel(
+                    coinID: ticker.coinID,
+                    image: "",
+                    name: result[ticker.coinID]?.korean ?? "없음",
+                    currentPrice: ticker.tradePrice,
+                    changePrice: ticker.changeRate,
+                    tradeAmount: ticker.accTradePrice
+                )
+            }
+        } catch {
+            print(error)
+            return []
         }
     }
 }

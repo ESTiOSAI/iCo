@@ -38,6 +38,7 @@ class CoinListViewModel {
         }
     }
     
+    @MainActor
     private func performUpdate(_ ticker: RealTimeTickerDTO) async {
         guard let index = coins.firstIndex(where: {
             $0.coinID == ticker.coinID
