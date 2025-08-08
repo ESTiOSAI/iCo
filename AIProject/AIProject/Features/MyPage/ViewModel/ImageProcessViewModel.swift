@@ -80,7 +80,7 @@ class ImageProcessViewModel: ObservableObject {
     @MainActor
     private func showError(_ error: ImageProcessError) {
         self.isLoading = false
-        self.errorMessage = error.message
+        self.errorMessage = error.description
         self.showErrorMessage = true
         print("🚨 이미지 처리 중 에러 발생:", error)
     }
@@ -172,12 +172,13 @@ class ImageProcessViewModel: ObservableObject {
     
     // CoreData에 coinID를 일괄 삽입하는 함수
     func addToBookmark() {
-        do {
-            for coinId in verifiedCoinIDs {
+        print("To Be Handled in the following PR")
+        //do {
+            //for coinId in verifiedCoinIDs {
                 //try BookmarkManager.shared.add(coinID: coinId)
-            }
-        } catch {
-            print(error)
-        }
+            //}
+        //} catch {
+            //print(error)
+        //}
     }
 }

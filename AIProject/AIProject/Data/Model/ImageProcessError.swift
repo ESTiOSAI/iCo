@@ -8,7 +8,7 @@
 import Foundation
 
 /// 이미지 처리 뷰 모델 내 각 함수를 실행하는 과정에서 발생 가능한 에러의 목록들을 담는 Enum
-enum ImageProcessError: Error {
+enum ImageProcessError: Error, CustomStringConvertible {
     /// OCR을 정상 실행했지만 감지된 텍스트가 없을 때
     case noRecognizedText
     
@@ -27,7 +27,7 @@ enum ImageProcessError: Error {
     /// 사용자가 취소 요청
     case canceled
     
-    var message: String {
+    var description: String {
         switch self {
         case .noRecognizedText:
             return "이미지에서 문자를 찾지 못했어요"
