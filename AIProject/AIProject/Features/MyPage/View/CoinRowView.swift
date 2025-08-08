@@ -9,20 +9,28 @@ import SwiftUI
 
 struct CoinRowView: View {
     let coin: BookmarkEntity
+    let imageURL: URL?
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "bitcoinsign.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 28, height: 28)
-                .padding(4)
-                .background(Color.orange)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(Color.purple, lineWidth: 2)
-                )
+            Group {
+                if let url = imageURL {
+                    AsyncImage(url: url) { img in
+                        img.resizable()
+                            .aspectRatio(contentMode: .fit)
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
+                    Text(String(coin.coinSymbol.prefix(1)))
+                        .font(.caption.bold())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+            .frame(width: 28, height: 28)
+            .padding(4)
+            .background(Color.orange)
+            .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(coin.coinKoreanName)

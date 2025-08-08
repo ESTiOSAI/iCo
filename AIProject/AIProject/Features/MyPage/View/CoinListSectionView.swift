@@ -14,6 +14,8 @@ struct CoinListSectionView: View {
     @Binding var priceOrder: SortOrder
     @Binding var volumeOrder: SortOrder
 
+    let imageURLProvider: (String) -> URL?
+
     var body: some View {
         VStack {
             HStack {
@@ -39,13 +41,13 @@ struct CoinListSectionView: View {
                 NavigationLink {
                     CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
-                    CoinRowView(coin: coin)
+                    CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol))
                 }
             }
         }
         .padding(.top, 16)
         .padding(.bottom, 16)
-        .background(.aiCoBackground.opacity(0.5))
+        .background(.aiCoBackground.opacity(0.7))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }

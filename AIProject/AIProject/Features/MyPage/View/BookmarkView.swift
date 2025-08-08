@@ -62,7 +62,7 @@ struct BookmarkView: View {
 
                 HStack {
                     SubheaderView(subheading: "북마크한 코인")
-
+ 
                     Spacer()
 
                     RoundedButton(title: "전체 삭제") {
@@ -86,14 +86,25 @@ struct BookmarkView: View {
                         selectedCategory: $selectedCategory,
                         nameOrder: $nameOrder,
                         priceOrder: $priceOrder,
-                        volumeOrder: $volumeOrder
+                        volumeOrder: $volumeOrder,
+                        imageURLProvider: { vm.imageURL(for: $0) }
                     )
                     .padding()
                 }
 
             }
             .task {
-                await vm.loadBriefing(character: .longTerm)
+                async let imagesTask: () = vm.loadCoinImages()
+                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                await imagesTask
+                await briefingTask
+                print("🏁 [.task] finished: images=\(vm.imageMap.count), bookmarks=\(vm.bookmarks.count)")
+            }
+            // 북마크 "심볼 세트"가 바뀔 때만 이미지 갱신
+            .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
+                Task { @MainActor in
+                    await vm.loadCoinImages()
+                }
             }
         }
     }
