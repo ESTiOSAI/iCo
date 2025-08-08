@@ -11,6 +11,10 @@
 		A9C265DB2E40B12500C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
 		A9C265DC2E40B12500C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
 		A9F6C9F22E4465FE005D88E2 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A9F6C9F12E4465FE005D88E2 /* AsyncAlgorithms */; };
+		B75CFBAD2E45D42C0055632C /* AdServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75CFBAC2E45D42C0055632C /* AdServices.framework */; };
+		B75D1B1E2E4597FC006839B5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */; };
+		B75D1B202E459806006839B5 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */; };
+		B75D1B222E459ADB006839B5 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75D1B212E459ADB006839B5 /* AdSupport.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,6 +36,8 @@
 
 /* Begin PBXFileReference section */
 		A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		B75CFBAC2E45D42C0055632C /* AdServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdServices.framework; path = System/Library/Frameworks/AdServices.framework; sourceTree = SDKROOT; };
+		B75D1B212E459ADB006839B5 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		B7B040032E387FCF005DE0BA /* AIProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B0401F2E387FD1005DE0BA /* AIProjectUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,7 +47,7 @@
 		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				App/Resource/Info.plist,
 			);
 			target = B7B040022E387FCF005DE0BA /* AIProject */;
 		};
@@ -73,6 +79,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B75CFBAD2E45D42C0055632C /* AdServices.framework in Frameworks */,
+				B75D1B202E459806006839B5 /* FirebaseCrashlytics in Frameworks */,
+				B75D1B222E459ADB006839B5 /* AdSupport.framework in Frameworks */,
+				B75D1B1E2E4597FC006839B5 /* FirebaseAnalytics in Frameworks */,
 				A9F6C9F22E4465FE005D88E2 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,6 +104,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B75D1B1C2E4597FC006839B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B75CFBAC2E45D42C0055632C /* AdServices.framework */,
+				B75D1B212E459ADB006839B5 /* AdSupport.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		B7B03FFA2E387FCF005DE0BA = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +120,7 @@
 				B7B040052E387FCF005DE0BA /* AIProject */,
 				B7B040182E387FD1005DE0BA /* AIProjectTests */,
 				B7B040222E387FD1005DE0BA /* AIProjectUITests */,
+				B75D1B1C2E4597FC006839B5 /* Frameworks */,
 				B7B040042E387FCF005DE0BA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,6 +145,7 @@
 				B7B03FFF2E387FCF005DE0BA /* Sources */,
 				B7B040002E387FCF005DE0BA /* Frameworks */,
 				B7B040012E387FCF005DE0BA /* Resources */,
+				B75D1FD22E45C153006839B5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -136,6 +157,8 @@
 			name = AIProject;
 			packageProductDependencies = (
 				A9F6C9F12E4465FE005D88E2 /* AsyncAlgorithms */,
+				B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */,
+				B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */,
 			);
 			productName = AIProject;
 			productReference = B7B040032E387FCF005DE0BA /* AIProject.app */;
@@ -221,6 +244,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				A9F6C9F02E4465FE005D88E2 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B7B040042E387FCF005DE0BA /* Products */;
@@ -260,6 +284,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B75D1FD22E45C153006839B5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}.debug.dylib",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B7B03FFF2E387FCF005DE0BA /* Sources */ = {
@@ -336,6 +386,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = SJDR485DTV;
+				ENABLE_DEBUG_DYLIB = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -401,6 +452,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = SJDR485DTV;
+				ENABLE_DEBUG_DYLIB = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -430,10 +482,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/Info.plist;
+				INFOPLIST_FILE = AIProject/App/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -445,6 +498,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.AIProject;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -464,7 +518,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/Info.plist;
+				INFOPLIST_FILE = AIProject/App/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -476,6 +530,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.AIProject;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -610,6 +665,14 @@
 				minimumVersion = 1.0.4;
 			};
 		};
+		B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -617,6 +680,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A9F6C9F02E4465FE005D88E2 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
+		};
+		B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
