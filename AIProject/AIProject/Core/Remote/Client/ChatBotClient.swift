@@ -7,30 +7,44 @@
 
 import Foundation
 
-final class SSEClient: NSObject {
+final class ChatBotClient: NSObject {
     private var task: URLSessionDataTask?
     private var session: URLSession?
 
-    typealias SSEStream = AsyncThrowingStream<String, Error>
-    private(set) var continuation: SSEStream.Continuation?
-    var stream: SSEStream?
+    private let url: String = "https://openrouter.ai/api/v1/chat/completions"
 
-    func connect(to url: URL, token: String) {
-        let request = configureRequest(to: url, token: token)
+    typealias ChatBotStream = AsyncThrowingStream<String, Error>
+    private(set) var continuation: ChatBotStream.Continuation?
+    var stream: ChatBotStream?
+
+    func connect(content: String) async throws {
+        stream = ChatBotStream { continuation in
+            self.continuation = continuation
+        }
+
+        let request = try configureRequest(content: content)
         session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         task = session?.dataTask(with: request)
         task?.resume()
     }
 
     func disconnect() {
+        continuation?.finish()
+        continuation = nil
+        stream = nil
+
         task?.cancel()
         session?.invalidateAndCancel()
     }
 
-    private func configureRequest(to url: URL, token: String) -> URLRequest {
-        var request = URLRequest(url: url)
+    private func configureRequest(content: String) throws -> URLRequest {
+        guard let token = Bundle.main.infoDictionary?["CHATBOT_API_KEY"] as? String else {
+            throw NetworkError.invalidAPIKey
+        }
+
+        var request = URLRequest(url: URL(string: url)!)
         request.httpMethod = "POST"
-        request.setValue(token, forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("text/event-stream", forHTTPHeaderField: "Content-Type")
 
         let jsonBody: [String: Any] = [
@@ -38,19 +52,19 @@ final class SSEClient: NSObject {
             "messages": [
                 [
                     "role": "user",
-                    "content": "안녕? 오늘 한국 날씨는 어때?"
+                    "content": "\(content)"
                 ]
             ],
             "stream": true
         ]
 
-        request.httpBody = try? JSONSerialization.data(withJSONObject: jsonBody)
+        request.httpBody = try JSONSerialization.data(withJSONObject: jsonBody)
 
         return request
     }
 }
 
-extension SSEClient: URLSessionDataDelegate {
+extension ChatBotClient: URLSessionDataDelegate {
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard let text = String(data: data, encoding: .utf8) else { return }
 
@@ -66,7 +80,7 @@ extension SSEClient: URLSessionDataDelegate {
                     Task { @MainActor in
                         if let jsonObject = try? JSONDecoder().decode(ChatDTO.self, from: jsonData) {
                             let value = jsonObject.choices.first?.delta.content ?? ""
-                            print(value)
+                            continuation?.yield(value)
                         }
                     }
                 }
@@ -75,10 +89,8 @@ extension SSEClient: URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-        if let error {
-            print("에러 발생: \(error.localizedDescription)")
-        } else {
-            print("성공!")
-        }
+        if let error { continuation?.finish(throwing: error) }
+
+        disconnect()
     }
 }
