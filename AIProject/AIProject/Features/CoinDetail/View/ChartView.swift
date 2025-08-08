@@ -46,7 +46,7 @@ struct ChartView: View {
                         .font(.title3).bold()
                         .foregroundStyle(.aiCoLabel)
 
-                    BadgeLabelView(text: viewModel.coinSymbol)
+                    CoinLabelView(text: viewModel.coinSymbol)
                     
                     Spacer()
                     
