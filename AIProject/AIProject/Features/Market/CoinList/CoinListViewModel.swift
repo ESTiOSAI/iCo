@@ -79,7 +79,7 @@ class CoinListViewModel {
         socket.disconnect()
     }
     
-    func sendTIcket(_ coins: Set<CoinListModel.ID>) async {
+    func sendTicket(_ coins: Set<CoinListModel.ID>) async {
         await visibleCoinsChannel.send(coins)
     }
 }
