@@ -13,11 +13,13 @@ import Charts
 struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
     @StateObject var viewModel: ChartViewModel
+    
     /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
     @State private var selectedInterval: CoinInterval = CoinInterval.all.first!
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
     @State private var selectedTab = 0
     
+    /// 현재 선택된 테마 정보를 가져오기 위한 전역 상태 객체
     @EnvironmentObject var themeManager: ThemeManager
 
     /// 차트 데이터 (시계열 포인트)
