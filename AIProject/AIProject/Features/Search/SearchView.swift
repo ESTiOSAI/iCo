@@ -12,14 +12,14 @@ struct SearchView: View {
     @StateObject private var viewModel = SearchViewModel()
 
     var body: some View {
-        VStack {
+        NavigationStack {
             if searchText.isEmpty {
                 RecentSearchView(viewModel: viewModel)
             } else {
                 SearchResultView(viewModel: viewModel, searchText: searchText)
             }
         }
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "코인 이름으로 검색하세요")
+        .searchable(text: $searchText, prompt: "코인 이름으로 검색하세요")
         .onChange(of: searchText) {
             Task {
                 await viewModel.sendKeyword(with: searchText)
