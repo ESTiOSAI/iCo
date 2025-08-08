@@ -24,7 +24,10 @@ final class RecommendCoinViewModel: ObservableObject {
     /// 비동기로 추천 코인 목록을 가져옵니다.
     func loadRecommendCoin() async {
         do {
-            state = .loading
+            Task { @MainActor in
+                state = .loading
+            }
+
             let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움")
             let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
@@ -37,7 +40,9 @@ final class RecommendCoinViewModel: ObservableObject {
                 }
             }
         } catch {
-            state = .failure(error)
+            Task { @MainActor in
+                state = .failure(error)
+            }
         }
     }
 
