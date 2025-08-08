@@ -32,6 +32,16 @@ enum Theme: String, CaseIterable {
     }
 }
 
+extension Theme {
+    var displayName: String {
+        switch self {
+        case .basic: return "기본"
+        case .pop: return "팝"
+        case .classic: return "고전"
+        }
+    }
+}
+
 /// 테마 설정을 관리하는 전역 상태 객체
 class ThemeManager: ObservableObject {
     /// 현재 선택된 테마

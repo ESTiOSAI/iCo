@@ -19,28 +19,14 @@ struct ThemeView: View {
             SubheaderView(subheading: "차트 색상 변경")
                 .padding(.bottom, 20)
             
-            ThemeRow(
-                title: "기본",
-                theme: .basic,
-                isSelected: themeManager.selectedTheme == .basic
-            ) {
-                themeManager.selectedTheme = .basic
-            }
-
-            ThemeRow(
-                title: "팝",
-                theme: .pop,
-                isSelected: themeManager.selectedTheme == .pop
-            ) {
-                themeManager.selectedTheme = .pop
-            }
-            
-            ThemeRow(
-                title: "고전",
-                theme: .classic,
-                isSelected: themeManager.selectedTheme == .classic
-            ) {
-                themeManager.selectedTheme = .classic
+            ForEach(Theme.allCases, id: \.self) { theme in
+                ThemeRow(
+                    title: theme.displayName,
+                    theme: theme,
+                    isSelected: themeManager.selectedTheme == theme
+                ) {
+                    themeManager.selectedTheme = theme
+                }
             }
             
             Spacer()
