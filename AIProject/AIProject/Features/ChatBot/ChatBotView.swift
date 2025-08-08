@@ -9,7 +9,9 @@ import SwiftUI
 
 struct ChatBotView: View {
     @StateObject private var viewModel = ChatBotViewModel()
+
     @State private var searchText: String = ""
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         NavigationStack {
@@ -48,12 +50,16 @@ struct ChatBotView: View {
             .padding(.horizontal)
             .navigationTitle("챗봇")
             .navigationBarTitleDisplayMode(.large)
+            .onTapGesture {
+                isFocused = false
+            }
 
             HStack {
                 TextField("무엇이든 물어보세요.", text: $searchText)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
                     .cornerRadius(20)
+                    .focused($isFocused)
 
                 Button {
                     Task {
