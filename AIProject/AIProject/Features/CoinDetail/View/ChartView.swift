@@ -35,8 +35,8 @@ struct ChartView: View {
 
         let isRising = summary?.change ?? 0 > 0
         let isFalling = summary?.change ?? 0 < 0
-        let color: Color = isRising ? .aiCoNegative :
-        isFalling ? .aiCoPositive :
+        let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
+        isFalling ? themeManager.selectedTheme.negativeColor :
             .gray
         
         ScrollView {
@@ -96,7 +96,9 @@ struct ChartView: View {
                         yStart: .value("Low", point.low),
                         yEnd: .value("High", point.high)
                     )
-                    .foregroundStyle(point.close >= point.open ? .aiCoPositive : .aiCoNegative)
+                    .foregroundStyle(
+                        point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
+                    )
                     
                     /// 시가/종가 직사각형 (실체 바)
                     RectangleMark(
@@ -105,7 +107,9 @@ struct ChartView: View {
                         yEnd: .value("Close", point.close),
                         width: 6
                     )
-                    .foregroundStyle(point.close >= point.open ? .aiCoPositive : .aiCoNegative)
+                    .foregroundStyle(
+                        point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
+                    )
                 }
                 .frame(height: 380)
                 /// X축 도메인 설정 및 스크롤 위치 초기화

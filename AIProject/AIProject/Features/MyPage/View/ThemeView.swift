@@ -15,10 +15,26 @@ enum Theme: String, CaseIterable {
     case basic
     case pop
     case classic
+    
+    var positiveColor: Color {
+        switch self {
+        case .basic: return .aiCoPositive
+        case .pop: return .red
+        case .classic: return Color(UIColor.systemPink)
+        }
+    }
+    
+    var negativeColor: Color {
+        switch self {
+        case .basic: return .aiCoNegative
+        case .pop: return Color(UIColor.systemMint)
+        case .classic: return .green
+        }
+    }
 }
 
 struct ThemeView: View {
-    @State private var selectedTheme: Theme = .basic
+    @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
         VStack {
@@ -30,29 +46,26 @@ struct ThemeView: View {
             
             ThemeRow(
                 title: "기본",
-                positiveColor: .aiCoPositive,
-                negativecColor: .aiCoNegative,
-                isSelected: selectedTheme == .basic
+                theme: .basic,
+                isSelected: themeManager.selectedTheme == .basic
             ) {
-                selectedTheme = .basic
+                themeManager.selectedTheme = .basic
             }
 
             ThemeRow(
                 title: "팝",
-                positiveColor: .red,
-                negativecColor: Color(UIColor.systemMint),
-                isSelected: selectedTheme == .pop
+                theme: .pop,
+                isSelected: themeManager.selectedTheme == .pop
             ) {
-                selectedTheme = .pop
+                themeManager.selectedTheme = .pop
             }
             
             ThemeRow(
                 title: "고전",
-                positiveColor: Color(UIColor.systemPink),
-                negativecColor: .green,
-                isSelected: selectedTheme == .classic
+                theme: .classic,
+                isSelected: themeManager.selectedTheme == .classic
             ) {
-                selectedTheme = .classic
+                themeManager.selectedTheme = .classic
             }
             
             Spacer()
@@ -66,8 +79,7 @@ struct ThemeView: View {
 
 struct ThemeRow: View {
     let title: String
-    let positiveColor: Color
-    let negativecColor: Color
+    let theme: Theme
     let isSelected: Bool
     let onTap: () -> Void
     
@@ -79,8 +91,8 @@ struct ThemeRow: View {
             Spacer()
             
             HStack(spacing: 0) {
-                positiveColor
-                negativecColor
+                theme.positiveColor
+                theme.negativeColor
             }
             .frame(width: 40, height: 20)
             .clipShape(RoundedRectangle(cornerRadius: 4))
