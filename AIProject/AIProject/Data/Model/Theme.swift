@@ -41,28 +41,3 @@ extension Theme {
         }
     }
 }
-
-/// 테마 설정을 관리하는 전역 상태 객체
-class ThemeManager: ObservableObject {
-    /// 현재 선택된 테마
-    @Published var selectedTheme: Theme {
-        didSet {
-            saveTheme()
-        }
-    }
-    
-    private let themeKey = "selectedTheme"
-    
-    init() {
-        if let saved = UserDefaults.standard.string(forKey: themeKey),
-           let theme = Theme(rawValue: saved) {
-            self.selectedTheme = theme
-        } else {
-            self.selectedTheme = .basic
-        }
-    }
-    
-    private func saveTheme() {
-        UserDefaults.standard.set(selectedTheme.rawValue, forKey: themeKey)
-    }
-}
