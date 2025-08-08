@@ -8,19 +8,58 @@
 import Foundation
 
 struct CoinListModel: Identifiable {
+    enum TickerChangeType: String {
+        case rise = "RISE"
+        case even = "EVEN"
+        case fall = "FALL"
+        
+        init(rawValue: String) {
+            switch rawValue {
+            case "RISE": self = .rise
+            case "EVEN": self = .even
+                case "FALL": self = .fall
+            default:
+                self = .rise
+            }
+        }
+    }
+    
+    /// id 예시: KRW-BTC
     let coinID: String
+    
     var id: String {
         coinID
     }
     
     let image: String
+    
+    /// koreanName 예시: 비트코인
     let name: String
+    
+    /// 현재시세
     let currentPrice: Double
+    
+    /// 전일대비 변동률
     let changePrice: Double
+    
+    /// 거래대금
     let tradeAmount: Double
     
+    /// coin code: BTC, XRP
     var coinName: String {
         coinID.components(separatedBy: "-").last ?? ""
+    }
+    
+    var change: TickerChangeType
+    
+    init(coinID: String, image: String, name: String, currentPrice: Double, changePrice: Double, tradeAmount: Double, change: TickerChangeType = .rise) {
+        self.coinID = coinID
+        self.image = image
+        self.name = name
+        self.currentPrice = currentPrice
+        self.changePrice = changePrice
+        self.tradeAmount = tradeAmount
+        self.change = change
     }
 }
 

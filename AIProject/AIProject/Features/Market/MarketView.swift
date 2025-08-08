@@ -8,28 +8,39 @@
 import SwiftUI
 
 struct MarketView: View {
-    @State var coins: [CoinListModel] = CoinListModel.preview
+    @State var isShowSearchView = false
+    @State var selectedTabIndex: Int = 0
+    @State var viewModel: MarketViewModel = MarketViewModel(upbitService: .init(), coinListViewModel: CoinListViewModel(socket: .init()))
+    
     var body: some View {
         NavigationStack {
-            CoinListView()
+            VStack {
+                HeaderView(heading: "마켓", showSearchButton: true) {
+                    isShowSearchView = true
+                }
+                
+                VStack(spacing: 8) {
+                                    
+                SegmentedControlView(selection: $selectedTabIndex,
+                                     tabTitles: ["북마크한 코인", "전체 코인"],
+                                     width: 200)
+                .frame(height: 44)
+                
+                    CoinListView(viewModel: viewModel.coinListViewModel)
+                }
+            }
+            .onChange(of: selectedTabIndex, { _, newValue in
+                if let tab = MarketCoinTab(rawValue: newValue) {
+                    viewModel.change(tab: tab)
+                }
+            })
+            .navigationDestination(isPresented: $isShowSearchView) {
+                SearchView()
+            }
         }
     }
 }
 
-struct MockDetailView: View {
-    var coin: CoinListModel
-    
-    var body: some View {
-        VStack {
-            Text(coin.name)
-                .font(.largeTitle)
-            
-            Text("Coin Name: \(coin.coinName)")
-                .font(.title2)
-            
-            Text("Current Price: \(coin.currentPrice, format: .number) 원")
-                .font(.title3)
-        }
-        .padding()
-    }
+#Preview {
+    MarketView()
 }
