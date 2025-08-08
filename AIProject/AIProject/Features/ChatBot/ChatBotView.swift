@@ -25,6 +25,7 @@ struct ChatBotView: View {
                                     .font(.system(size: 13))
                                     .padding(15)
                                     .background(Color.blue.opacity(0.2))
+                                    .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight]))
                                     .frame(maxWidth: 300, alignment: .trailing)
                             }
                         } else {
@@ -40,6 +41,7 @@ struct ChatBotView: View {
                                     .font(.system(size: 13))
                                     .padding()
                                     .background(Color.red.opacity(0.2))
+                                    .clipShape(RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight]))
                                     .frame(maxWidth: 300, alignment: .leading)
                                 Spacer()
                             }
@@ -62,9 +64,9 @@ struct ChatBotView: View {
                     .focused($isFocused)
 
                 Button {
-                    Task {
-                        await viewModel.sendMessage(with: searchText)
-                    }
+                    let tempText = searchText
+                    searchText = ""
+                    Task { await viewModel.sendMessage(with: tempText) }
                 } label: {
                     Image(systemName: "arrow.up")
                         .padding(10)
