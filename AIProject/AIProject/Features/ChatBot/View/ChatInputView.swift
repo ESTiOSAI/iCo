@@ -21,6 +21,7 @@ struct ChatInputView: View {
                 .padding(.vertical, 10)
                 .cornerRadius(20)
                 .focused(isFocused)
+                .disabled(!viewModel.isEditable)
 
             Button {
                 let tempText = searchText

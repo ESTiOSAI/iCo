@@ -10,6 +10,8 @@ import Foundation
 final class ChatBotViewModel: ObservableObject {
     /// 사용자와 챗봇의 메세지를 담은 배열입니다.
     @Published var messages: [ChatMessage] = []
+    @Published var isEditable: Bool = true
+
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
 
@@ -21,26 +23,35 @@ final class ChatBotViewModel: ObservableObject {
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
     func sendMessage(with content: String) async {
         do {
+            await MainActor.run { isEditable = false }
             await addMessage(with: content)
             try await chatBotClient.connect(content: content)
-            try await observeStream()
+            await observeStream()
+            await MainActor.run { isEditable = true }
         } catch {
             print(error.localizedDescription)
+            await MainActor.run { isEditable = true }
         }
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
-    private func observeStream() async throws {
+    private func observeStream() async {
         guard let stream = chatBotClient.stream else { return }
 
-        for try await content in stream {
-            await MainActor.run {
-                if let message = messages.last(where: { !$0.isUser }) {
-                    if let index = messages.lastIndex(where: { !$0.isUser }) {
-                        messages[index] = ChatMessage(content: message.content + content, isUser: false)
+        do {
+            for try await content in stream {
+                await MainActor.run {
+                    if let message = messages.last(where: { !$0.isUser }) {
+                        if let index = messages.lastIndex(where: { !$0.isUser }) {
+                            messages[index] = ChatMessage(content: message.content + content, isUser: false)
+                        }
                     }
                 }
             }
+
+            print("작업 완료!")
+        } catch {
+            print("스트림 과정에서 에러가 발생했습니다.")
         }
     }
 
