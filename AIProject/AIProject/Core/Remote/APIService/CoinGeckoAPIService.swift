@@ -35,31 +35,81 @@ final class CoinGeckoAPIService {
         ]
 
         guard let url = comps?.url else { throw NetworkError.invalidURL }
-        print("🧭 [GECKO] symbols=\(trimmed)")
-            print("🔗 [GECKO] URL=\(url.absoluteString)")
 
         let dtos: [CoinGeckoImageDTO] = try await network.request(url: url)
-		print("dtos: \(dtos)")
+        print("dtos: \(dtos)")
         return dtos
     }
 
-    /// 심볼 → 이미지 URL 매핑을 조회합니다.
-    /// - Parameters:
-    ///   - symbols: 코인 심볼 배열 (대소문자 무관)
-    ///   - vsCurrency: 표기 통화 (기본: "krw")
-    /// - Returns: ["BTC": URL, "ETH": URL, ...]
-    func fetchImageMap(symbols: [String], vsCurrency: String = "krw") async throws -> [String: URL] {
-        let dtos = try await fetchCoinImages(symbols: symbols, vsCurrency: vsCurrency)
-        return Dictionary(uniqueKeysWithValues: dtos.map { ($0.symbol.uppercased(), $0.imageURL) })
-            .compactMapValues { $0 }
+    func fetchCoinImagesBatched(
+        symbols: [String],
+        vsCurrency: String = "krw",
+        batchSize: Int = 50,
+        maxConcurrentBatches: Int = 3
+    ) async -> [CoinGeckoImageDTO] {
+
+        let uniq = Array(Set(
+            symbols
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+                .map { $0.lowercased() }
+        ))
+
+        guard !uniq.isEmpty else { return [] }
+
+        let chunks = uniq.chunked(into: batchSize)
+        var results: [CoinGeckoImageDTO] = []
+
+        // 병럴 처리
+        var start = 0
+        while start < chunks.count {
+            let end = min(start + maxConcurrentBatches, chunks.count)
+            let window = Array(chunks[start..<end])
+            start = end
+
+            await withTaskGroup(of: [CoinGeckoImageDTO].self) { group in
+                for chunk in window {
+                    group.addTask { [vsCurrency] in
+                        do {
+                            return try await self.fetchCoinImages(symbols: chunk, vsCurrency: vsCurrency)
+                        } catch {
+                            print("네트워크 에러처리", error.localizedDescription)
+                            return []
+                        }
+                    }
+                }
+
+                for await part in group {
+                    results.append(contentsOf: part)
+                }
+            }
+        }
+
+        return results
     }
 
+    /// symbols가 50개를 초과해도 배치로 모두 조회해 ["BTC": URL] 형태로 리턴합니다.
+    func fetchImageMapBatched(
+        symbols: [String],
+        vsCurrency: String = "krw",
+        batchSize: Int = 50,
+        maxConcurrentBatches: Int = 3
+    ) async -> [String: URL] {
 
-    /// 북마크 엔티티 목록으로 이미지를 조회합니다. (coinSymbol 계산속성 사용 가정)
-    /// - Returns: ["BTC": URL, ...]
-    func fetchImageMapForBookmarks(_ bookmarks: [BookmarkEntity], vsCurrency: String = "krw") async throws -> [String: URL] {
-        let symbols = bookmarks.map { ($0.coinID.split(separator: "-").last.map(String.init) ?? $0.coinID) }
-        return try await fetchImageMap(symbols: symbols, vsCurrency: vsCurrency)
+        let dtos = await fetchCoinImagesBatched(
+            symbols: symbols,
+            vsCurrency: vsCurrency,
+            batchSize: batchSize,
+            maxConcurrentBatches: maxConcurrentBatches
+        )
+
+        // 키는 대문자 심볼로 통일
+        return Dictionary(uniqueKeysWithValues:
+            dtos.compactMap { dto in
+                guard let url = dto.imageURL else { return nil }
+                return (dto.symbol.uppercased(), url)
+            }
+        )
     }
 }
 

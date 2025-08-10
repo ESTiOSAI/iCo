@@ -37,7 +37,7 @@ final class BookmarkViewModel: ObservableObject {
         }
 
         isLoading = true
-        defer { isLoading = false }   // @MainActor 컨텍스트이므로 안전
+        defer { isLoading = false }
 
         do {
             let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
@@ -45,7 +45,7 @@ final class BookmarkViewModel: ObservableObject {
             errorMessage = nil
         } catch let error as NetworkError {
             errorMessage = "네트워크 에러: \(error.localizedDescription)"
-            print("❌ loadBriefing NetworkError:", error)   // 어떤 NetworkError인지 확인
+            print("❌ loadBriefing NetworkError:", error)
         } catch {
             errorMessage = "기타 에러: \(error.localizedDescription)"
             print("❌ loadBriefing error:", error)
@@ -73,26 +73,51 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
+    func deleteBookmark(_ bookmark: BookmarkEntity) {
+        do {
+            try manager.remove(coinID: bookmark.coinID)
+
+            withAnimation {
+                // 리스트에서 제거
+                bookmarks.removeAll { $0.objectID == bookmark.objectID }
+            }
+
+            Task { await loadCoinImages() }
+        } catch {
+            print(error)
+        }
+    }
+
 // MARK: - CoinGecko관련
     func loadCoinImages() async {
         guard !bookmarks.isEmpty else {
             await MainActor.run { imageMap = [:] }
             return
         }
-        do {
-            let map = try await geckoService.fetchImageMapForBookmarks(bookmarks)
-            await MainActor.run { imageMap = map }
-        } catch {
-            await MainActor.run { imageMap = [:] }
-            print("코인 이미지 로드 에러\(error.localizedDescription)")
-        }
+
+        let symbols = Array(
+            Set(
+                bookmarks.compactMap {
+                    $0.coinID.split(separator: "-").last.map { String($0).uppercased() }
+                }
+            )
+        )
+
+        let map = await geckoService.fetchImageMapBatched(
+            symbols: symbols,
+            vsCurrency: "krw",
+            batchSize: 50,
+            maxConcurrentBatches: 3
+        )
+
+        await MainActor.run { imageMap = map }
     }
 
     func imageURL(for symbol: String) -> URL? {
         let key = symbol
             .trimmingCharacters(in: .whitespacesAndNewlines)
-            .uppercased()
-        return imageMap[key]
+            .split(separator: "-").last.map(String.init) ?? symbol
+        return imageMap[key.uppercased()]
     }
 
 // MARK: - 북마크 내보내기 관련
