@@ -26,9 +26,7 @@ struct RoundedRectangleFillButton: View {
     
     var body: some View {
         Button {
-            if let action {
-                action()
-            }
+            action?()
         } label: {
             HStack(spacing: 8) {
                 if let imageName {

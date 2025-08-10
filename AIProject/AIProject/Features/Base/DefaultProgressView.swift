@@ -43,10 +43,8 @@ struct DefaultProgressView: View {
             Text(message)
                 .font(.system(size: 16))
                 .foregroundColor(.aiCoLabel)
-            
-            if let buttonAction {
-                RoundedButton(title: "작업취소", action: buttonAction)
-            }
+             
+            RoundedButton(title: "작업취소", action: buttonAction ?? {})
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding()
