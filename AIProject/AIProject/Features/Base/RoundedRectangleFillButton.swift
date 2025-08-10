@@ -13,59 +13,66 @@ import SwiftUI
 /// - Parameters:
 ///   - title: 버튼에 표시될 텍스트
 ///   - imageName: (옵션) `SF Symbols` 이름. 아이콘이 텍스트 왼쪽에 표시됨
-///   - action: 버튼이 탭되었을 때 실행될 클로저
+///   - isSelected: 버튼이 탭되었을 때 버튼을 파란 스타일로 변경하기 위해 사용하는 Binding 변수
+///   - action: (옵션)  버튼이 탭되었을 때 실행될 클로저
 struct RoundedRectangleFillButton: View {
     let cornerRadius: CGFloat = 10
     
     var title: String
     var imageName: String?
+    @Binding var isSelected: Bool
     
-    var action: (() -> Void)
+    var action: (() -> Void)?
     
     var body: some View {
-        Button(action: action) {
+        Button {
+            action?()
+        } label: {
             HStack(spacing: 8) {
                 if let imageName {
                     Image(systemName: "\(imageName)")
                         .resizable()
                         .scaledToFit()
                         .frame(height: 16)
-                        .foregroundStyle(.aiCoLabelSecondary)
-                        .fontWeight(.light)
-                        .offset(y: -1)
+                        .foregroundStyle(!isSelected ? .aiCoLabelSecondary : .aiCoAccent)
+                        .fontWeight(!isSelected ? .light : .regular)
+                        .offset(y: -1) // 아이콘 위치 조정하기
                 }
                 
                 Text(title)
                     .frame(height: 36)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundStyle(.aiCoLabel)
+                    .font(.system(size: 14, weight: !isSelected ? .regular : .medium))
+                    .foregroundStyle(!isSelected ? .aiCoLabel : .aiCoAccent)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
-            .background(.aiCoBackground)
+            .background(!isSelected ? .aiCoBackground : .aiCoBackgroundAccent)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(.default, lineWidth: 0.5)
+                    .stroke(!isSelected ? .default : .accent, lineWidth: 0.5)
             )
         }
     }
 }
 
+#if DEBUG
 func dummyAction() {
     print("sayHi")
 }
+#endif
 
 #Preview {
     VStack(spacing: 16) {
         HStack(spacing: 16) {
-            RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down") { dummyAction() }
-            RoundedRectangleFillButton(title: "내보내기") { dummyAction() }
+            RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isSelected: .constant(false)) { dummyAction() }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isSelected: .constant(false)) { dummyAction() }
         }
         
         VStack(spacing: 16) {
-            RoundedRectangleFillButton(title: "내보내기") { dummyAction() }
+            RoundedRectangleFillButton(title: "내보내기", isSelected: .constant(false)) { dummyAction() }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isSelected: .constant(true))
         }
     }
     .padding(16)
