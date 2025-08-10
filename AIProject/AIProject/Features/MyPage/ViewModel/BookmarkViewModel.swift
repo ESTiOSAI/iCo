@@ -63,10 +63,10 @@ final class BookmarkViewModel: ObservableObject {
     func deleteAllBookmarks() {
         do {
             try manager.deleteAll()
-                bookmarks = []
-                imageMap = [:]       
-                briefing = nil
-                errorMessage = nil
+            bookmarks = []
+            imageMap = [:]
+            briefing = nil
+            errorMessage = nil
 
         } catch {
             print(error)
@@ -77,18 +77,28 @@ final class BookmarkViewModel: ObservableObject {
         do {
             try manager.remove(coinID: bookmark.coinID)
 
+            let removedSymbol = bookmark.coinID
+                .split(separator: "-").last.map { String($0).uppercased() }
+            ?? bookmark.coinID.uppercased()
+
             withAnimation {
                 // 리스트에서 제거
                 bookmarks.removeAll { $0.objectID == bookmark.objectID }
             }
 
-            Task { await loadCoinImages() }
+            let remainingSymbols = Set(bookmarks.compactMap {
+                $0.coinID.split(separator: "-").last.map { String($0).uppercased() }
+            })
+            if !remainingSymbols.contains(removedSymbol) {
+                imageMap.removeValue(forKey: removedSymbol)
+            }
+
         } catch {
             print(error)
         }
     }
 
-// MARK: - CoinGecko관련
+    // MARK: - CoinGecko관련
     func loadCoinImages() async {
         guard !bookmarks.isEmpty else {
             await MainActor.run { imageMap = [:] }
@@ -120,7 +130,7 @@ final class BookmarkViewModel: ObservableObject {
         return imageMap[key.uppercased()]
     }
 
-// MARK: - 북마크 내보내기 관련
+    // MARK: - 북마크 내보내기 관련
     func exportBriefingImage() {
         let view = BriefingSectionView(
             briefing: briefing,
