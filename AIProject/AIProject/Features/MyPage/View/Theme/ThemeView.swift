@@ -41,4 +41,5 @@ struct ThemeView: View {
 
 #Preview {
     ThemeView()
+        .environmentObject(ThemeManager())
 }
