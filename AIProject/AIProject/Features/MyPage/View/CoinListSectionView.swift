@@ -15,6 +15,7 @@ struct CoinListSectionView: View {
     @Binding var volumeOrder: SortOrder
 
     let imageURLProvider: (String) -> URL?
+    let onDelete: (BookmarkEntity) -> Void
 
     var body: some View {
         VStack {
@@ -41,8 +42,9 @@ struct CoinListSectionView: View {
                 NavigationLink {
                     CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
-                    CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol))
+                    CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol), onDelete: onDelete)
                 }
+                Divider().padding(.leading, 16)
             }
         }
         .padding(.top, 16)

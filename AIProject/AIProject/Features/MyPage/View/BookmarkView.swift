@@ -87,7 +87,8 @@ struct BookmarkView: View {
                         nameOrder: $nameOrder,
                         priceOrder: $priceOrder,
                         volumeOrder: $volumeOrder,
-                        imageURLProvider: { vm.imageURL(for: $0) }
+                        imageURLProvider: { vm.imageURL(for: $0) },
+                        onDelete: { vm.deleteBookmark($0) }
                     )
                     .padding()
                 }
@@ -96,11 +97,10 @@ struct BookmarkView: View {
             .task {
                 async let imagesTask: () = vm.loadCoinImages()
                 async let briefingTask: () = vm.loadBriefing(character: .longTerm)
-                await imagesTask
                 await briefingTask
-                print("🏁 [.task] finished: images=\(vm.imageMap.count), bookmarks=\(vm.bookmarks.count)")
+                await imagesTask
             }
-            // 북마크 "심볼 세트"가 바뀔 때만 이미지 갱신
+            // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
                 Task { @MainActor in
                     await vm.loadCoinImages()
