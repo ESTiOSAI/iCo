@@ -59,9 +59,11 @@ struct RoundedRectangleFillButton: View {
     }
 }
 
+#if DEBUG
 func dummyAction() {
     print("sayHi")
 }
+#endif
 
 #Preview {
     VStack(spacing: 16) {
