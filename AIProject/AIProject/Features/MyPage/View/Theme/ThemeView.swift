@@ -19,17 +19,22 @@ struct ThemeView: View {
             SubheaderView(subheading: "차트 색상 변경")
                 .padding(.bottom, 20)
             
-            ForEach(Theme.allCases, id: \.self) { theme in
-                ThemeRow(
-                    title: theme.displayName,
-                    theme: theme,
-                    isSelected: themeManager.selectedTheme == theme
-                ) {
-                    themeManager.selectedTheme = theme
+            VStack(spacing: 16) {
+                ForEach(Theme.allCases, id: \.self) { theme in
+                    ThemeRow(
+                        title: theme.displayName,
+                        theme: theme,
+                        isSelected: themeManager.selectedTheme == theme
+                    ) {
+                        themeManager.selectedTheme = theme
+                    }
                 }
             }
+            .padding(.horizontal, 16)
+            .animation(.snappy, value: themeManager.selectedTheme)
+            .buttonStyle(.plain)
             
-            Spacer()
+            Spacer(minLength: 0)
         }
     }
 }
