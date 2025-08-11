@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BotMessageView: View {
+    @State private var bounce = false
+
     let content: String
 
     var body: some View {
@@ -24,19 +26,28 @@ struct BotMessageView: View {
                 Spacer()
             }
 
-            Text(content.isEmpty ? "..." : content)
-                .foregroundStyle(.aiCoLabel)
-                .font(.system(size: 13))
-                .padding()
-                .background {
-                    RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
-                        .fill(.aiCoBackgroundAccent)
+            Group {
+                if content.isEmpty {
+                    Image(systemName: "ellipsis")
+                        .symbolEffect(.bounce, value: bounce)
+                        .onAppear { bounce = true }
+                        .onDisappear { bounce = false }
+                } else {
+                    Text(content)
                 }
-                .overlay {
-                    RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
-                        .stroke(Gradient.aiCoGradientStyle(.accent), lineWidth: 0.5)
-                }
-                .frame(maxWidth: 300, alignment: .leading)
+            }
+            .foregroundStyle(.aiCoLabel)
+            .font(.system(size: 13))
+            .padding()
+            .background {
+                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
+                    .fill(.aiCoBackgroundAccent)
+            }
+            .overlay {
+                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
+                    .stroke(Gradient.aiCoGradientStyle(.accent), lineWidth: 0.5)
+            }
+            .frame(maxWidth: 300, alignment: .leading)
 
             Spacer()
         }
