@@ -36,7 +36,7 @@ struct ChatBotView: View {
                     }
                 }
                 .onChange(of: viewModel.messages) {
-                    proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
+                    proxy.scrollTo(viewModel.messages.last?.id)
                 }
             }
             .padding(.horizontal)

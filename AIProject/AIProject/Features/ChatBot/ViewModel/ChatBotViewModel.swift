@@ -60,6 +60,7 @@ final class ChatBotViewModel: ObservableObject {
         guard let stream = chatBotClient.stream else { return }
 
         for try await content in stream {
+            try await Task.sleep(for: .seconds(0.05))
             await MainActor.run {
                 if let message = messages.last(where: { !$0.isUser }) {
                     if let index = messages.lastIndex(where: { !$0.isUser }) {
