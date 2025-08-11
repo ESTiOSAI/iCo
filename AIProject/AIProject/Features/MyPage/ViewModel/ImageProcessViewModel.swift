@@ -139,15 +139,14 @@ class ImageProcessViewModel: ObservableObject {
 #endif
             
             return convertedSymbols
-        } catch let error as URLError {
-            // 네트워크 작업에서 사용자가 작업을 취소하는 경우 CancellationError가 아닌 URLError로 넘어오기 때문에
-            // URLError로 타입 캐스팅하고 code 값으로 분기해서 에러를 상위 제어로 던짐
-            if error.code == .cancelled {
+        } catch let error as NetworkError {
+            switch error {
+            case .taskCancelled:
                 throw CancellationError()
+            default:
+                print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
+                throw ImageProcessError.unknownAlanError
             }
-            
-            print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
-            throw ImageProcessError.unknownAlanError
         }
     }
     
@@ -158,19 +157,12 @@ class ImageProcessViewModel: ObservableObject {
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
         let krwSymbolName = "KRW-\(symbol)"
         
-        do {
-            let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-            
-            if verified {
-                await MainActor.run {
-                    self.verifiedCoinIDs.append(krwSymbolName)
-                }
+        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
+        
+        if verified {
+            await MainActor.run {
+                self.verifiedCoinIDs.append(krwSymbolName)
             }
-        } catch let error as URLError {
-            if error.code == .cancelled {
-                throw CancellationError()
-            }
-            print(error)
         }
     }
     
