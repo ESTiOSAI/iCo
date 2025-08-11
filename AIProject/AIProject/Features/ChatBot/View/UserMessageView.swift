@@ -12,24 +12,20 @@ struct UserMessageView: View {
 
     var body: some View {
         HStack {
-            VStack {
-                Image(systemName: "swift")
-                    .foregroundStyle(.blue)
-                    .padding(8)
-                    .background(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
-                Spacer()
-            }
-
-            Group {
-                Text(content.isEmpty ? "..." : content)
-            }
-            .font(.system(size: 13))
-            .padding()
-            .background(.aiCoBackground)
-            .clipShape(RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight]))
-            .frame(maxWidth: 300, alignment: .leading)
-
             Spacer()
+            Text(content)
+                .font(.system(size: 13))
+                .foregroundStyle(.aiCoLabel)
+                .padding(15)
+                .background {
+                    RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight])
+                        .fill(Color.aiCoBackgroundWhite)
+                }
+                .overlay {
+                    RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight])
+                        .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+                }
+                .frame(maxWidth: 300, alignment: .trailing)
         }
     }
 }

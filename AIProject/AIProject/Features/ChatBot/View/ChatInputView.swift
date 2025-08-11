@@ -15,9 +15,8 @@ struct ChatInputView: View {
     var body: some View {
         HStack {
             TextField("무엇이든 물어보세요.", text: $viewModel.searchText)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .cornerRadius(20)
+                .font(.system(size: 14))
+                .foregroundStyle(.aiCoLabelSecondary)
                 .focused(isFocused)
 
             Button {
@@ -25,17 +24,24 @@ struct ChatInputView: View {
             } label: {
                 Image(systemName: "arrow.up")
                     .padding(10)
-                    .background(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+            }
+            .background {
+                Circle()
+                    .fill(viewModel.isEditable ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
+            }
+            .overlay {
+                Circle()
+                    .stroke(Gradient.aiCoGradientStyle(viewModel.isEditable ? .accent : .default), lineWidth: 0.5)
             }
             .disabled(!viewModel.isEditable)
-            .opacity(viewModel.isEditable ? 0.5 : 1.0)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(
+        .padding(.leading, 17)
+        .padding(.trailing, 14)
+        .padding(.vertical, 10)
+        .overlay {
             RoundedRectangle(cornerRadius: 30)
-                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-        )
+                .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+        }
         .padding(.horizontal)
         .padding(.bottom, 10)
     }
