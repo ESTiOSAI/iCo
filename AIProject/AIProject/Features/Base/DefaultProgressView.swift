@@ -48,7 +48,7 @@ struct DefaultProgressView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding()
-        .background(.ultraThinMaterial)
+        .background(.aiCoBackgroundWhite)
     }
 }
 
