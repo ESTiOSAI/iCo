@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct LastOnboardingPage: View {
+    @AppStorage(AppStorageKey.investmentType) private var storedInvestmentType: String = ""
+    
     @State private var selectedType: RiskTolerance?
-    @State var isSelected = false
+    
     var onFinish: () -> Void
     
     var body: some View {
@@ -27,7 +29,6 @@ struct LastOnboardingPage: View {
                     title: type.rawValue,
                     isSelected: Binding(get: { selectedType == type }, set: { _ in })) {
                         selectedType = type
-                        isSelected = true
                     }
                     .animation(.easeInOut(duration: 0.15), value: selectedType)
             }
@@ -35,12 +36,14 @@ struct LastOnboardingPage: View {
             
             Spacer()
             
-            RoundedRectangleFillButton(title: "시작하기", isSelected: $isSelected) {
+            RoundedRectangleFillButton(
+                title: "시작하기",
+                isSelected: .init(get: { selectedType != nil }, set: { _ in })
+            ) {
                 if let selected = selectedType {
-                    UserDefaults.standard.set(selected.rawValue, forKey: UserDefaults.Keys.investmentType)
+                    storedInvestmentType = selected.rawValue
                     
-                    let savedValue = UserDefaults.standard.string(forKey: UserDefaults.Keys.investmentType)
-                    print("저장된 투자 성향: \(savedValue ?? "없음")")
+                    print("저장된 투자 성향: \(storedInvestmentType.isEmpty ? "없음" : storedInvestmentType)")
                 }
                 onFinish()
             }
