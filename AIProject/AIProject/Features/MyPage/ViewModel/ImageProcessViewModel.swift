@@ -80,6 +80,7 @@ class ImageProcessViewModel: ObservableObject {
     @MainActor
     private func terminateProcess(with error: ImageProcessError? = nil) {
         self.isLoading = false
+        print("취소 완료")
         
         if let error {
             self.errorMessage = error.description
