@@ -37,49 +37,75 @@ struct BookmarkView: View {
     }
 
     var body: some View {
-            VStack(alignment: .leading, spacing: 8) {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 8) {
                 HeaderView(heading: "북마크 관리", isBookmarkView: true)
                     .padding(.bottom, 16)
 
                 HStack {
                     SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
-
                 }
+
                 // 북마크 AI 한줄평
                 BriefingSectionView(briefing: vm.briefing, isLoading: vm.isLoading, bookmarksEmpty: vm.isBookmarkEmpty, errorMessage: vm.errorMessage)
 
-//                Button("내보내기") {
-//                    vm.exportBriefingImage()
-//                }
+                HStack(spacing: 2) {
+                    Image(systemName: "info.circle")
+                    Text("해당 컨텐츠는 생성형 AI의 응답으로 오류가 있을 수 있습니다.")
+                }
+                .font(.system(size: 8))
+                .foregroundColor(.gray)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding(.trailing, 16)
+
+                Spacer()
 
                 HStack {
-                    Image(systemName: "bookmark.fill")
-
-                    Text("북마크 코인")
-                        .font(.system(size: 15))
-
+                    SubheaderView(subheading: "북마크한 코인")
+ 
                     Spacer()
 
                     RoundedButton(title: "전체 삭제") {
-                        print("전체 삭제")
+                        vm.deleteAllBookmarks()
                     }
                 }
-                .padding(.leading, 16)
                 .padding(.trailing, 16)
 
                 Divider()
 
-                // 코인 리스트뷰
-                CoinListSectionView(
-                    sortedCoins: sortedCoins,
-                    selectedCategory: $selectedCategory,
-                    nameOrder: $nameOrder,
-                    priceOrder: $priceOrder,
-                    volumeOrder: $volumeOrder
-                )
+                if sortedCoins.isEmpty {
+                    Text("북마크한 코인이 없습니다 🥵")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, minHeight: 100)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                } else {
+                    CoinListSectionView(
+                        sortedCoins: sortedCoins,
+                        selectedCategory: $selectedCategory,
+                        nameOrder: $nameOrder,
+                        priceOrder: $priceOrder,
+                        volumeOrder: $volumeOrder,
+                        imageURLProvider: { vm.imageURL(for: $0) },
+                        onDelete: { vm.deleteBookmark($0) }
+                    )
+                    .padding()
+                }
+
             }
-        .task {
-            await vm.loadBriefing(character: .longTerm)
+            .task {
+                async let imagesTask: () = vm.loadCoinImages()
+                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                await briefingTask
+                await imagesTask
+            }
+            // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
+            .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
+                Task { @MainActor in
+                    await vm.loadCoinImages()
+                }
+            }
         }
     }
 }
@@ -117,7 +143,6 @@ struct BriefingSectionView: View {
         .background(.gray.opacity(0.1))
         .cornerRadius(12)
         .padding(.horizontal, 16)
-        .padding(.bottom, 24)
     }
 }
 

@@ -12,17 +12,21 @@ import SwiftUI
 final class BookmarkViewModel: ObservableObject {
     private let manager: BookmarkManaging = BookmarkManager.shared
     private let service: AlanAPIService
+    private let geckoService: CoinGeckoAPIService
 
     @Published var bookmarks: [BookmarkEntity] = []
     @Published var briefing: PortfolioBriefingDTO?
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
+    @Published var imageMap: [String: URL] = [:]
+
     var isBookmarkEmpty: Bool {
         bookmarks.isEmpty
     }
 
-    init(service: AlanAPIService = AlanAPIService()) {
+    init(service: AlanAPIService = AlanAPIService(), geckoService: CoinGeckoAPIService = CoinGeckoAPIService()) {
         self.service = service
+        self.geckoService = geckoService
         fetchBookmarks()
     }
 
@@ -38,11 +42,13 @@ final class BookmarkViewModel: ObservableObject {
         do {
             let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
             briefing = dto
-
+            errorMessage = nil
         } catch let error as NetworkError {
             errorMessage = "네트워크 에러: \(error.localizedDescription)"
+            print("❌ loadBriefing NetworkError:", error)
         } catch {
             errorMessage = "기타 에러: \(error.localizedDescription)"
+            print("❌ loadBriefing error:", error)
         }
     }
 
@@ -54,6 +60,67 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
+    func deleteAllBookmarks() {
+        do {
+            try manager.deleteAll()
+                bookmarks = []
+                imageMap = [:]       
+                briefing = nil
+                errorMessage = nil
+
+        } catch {
+            print(error)
+        }
+    }
+
+    func deleteBookmark(_ bookmark: BookmarkEntity) {
+        do {
+            try manager.remove(coinID: bookmark.coinID)
+
+            withAnimation {
+                // 리스트에서 제거
+                bookmarks.removeAll { $0.objectID == bookmark.objectID }
+            }
+
+            Task { await loadCoinImages() }
+        } catch {
+            print(error)
+        }
+    }
+
+// MARK: - CoinGecko관련
+    func loadCoinImages() async {
+        guard !bookmarks.isEmpty else {
+            await MainActor.run { imageMap = [:] }
+            return
+        }
+
+        let symbols = Array(
+            Set(
+                bookmarks.compactMap {
+                    $0.coinID.split(separator: "-").last.map { String($0).uppercased() }
+                }
+            )
+        )
+
+        let map = await geckoService.fetchImageMapBatched(
+            symbols: symbols,
+            vsCurrency: "krw",
+            batchSize: 50,
+            maxConcurrentBatches: 3
+        )
+
+        await MainActor.run { imageMap = map }
+    }
+
+    func imageURL(for symbol: String) -> URL? {
+        let key = symbol
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: "-").last.map(String.init) ?? symbol
+        return imageMap[key.uppercased()]
+    }
+
+// MARK: - 북마크 내보내기 관련
     func exportBriefingImage() {
         let view = BriefingSectionView(
             briefing: briefing,

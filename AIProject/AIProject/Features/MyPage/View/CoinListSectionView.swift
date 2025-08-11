@@ -14,8 +14,11 @@ struct CoinListSectionView: View {
     @Binding var priceOrder: SortOrder
     @Binding var volumeOrder: SortOrder
 
+    let imageURLProvider: (String) -> URL?
+    let onDelete: (BookmarkEntity) -> Void
+
     var body: some View {
-        List {
+        VStack {
             HStack {
                 SortToggleButton(
                     title: "코인명",
@@ -33,16 +36,20 @@ struct CoinListSectionView: View {
             .font(.system(size: 12))
             .foregroundStyle(.aiCoLabel)
 
+            Divider()
 
             ForEach(sortedCoins, id: \.coinID) { coin in
                 NavigationLink {
                     CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
-                    CoinRowView(coin: coin)
+                    CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol), onDelete: onDelete)
                 }
+                Divider().padding(.leading, 16)
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
         }
+        .padding(.top, 16)
+        .padding(.bottom, 16)
+        .background(.aiCoBackground.opacity(0.7))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 }
