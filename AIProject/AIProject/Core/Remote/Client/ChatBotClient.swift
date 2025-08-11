@@ -50,7 +50,11 @@ final class ChatBotClient: NSObject {
             throw NetworkError.invalidAPIKey
         }
 
-        var request = URLRequest(url: URL(string: url)!)
+        guard let url = URL(string: url) else {
+            throw NetworkError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("text/event-stream", forHTTPHeaderField: "Content-Type")
@@ -92,7 +96,6 @@ extension ChatBotClient: URLSessionDataDelegate {
                     Task { @MainActor in
                         if let jsonObject = try? JSONDecoder().decode(ChatDTO.self, from: jsonData) {
                             let value = jsonObject.choices.first?.delta.content ?? ""
-                            print(value)
                             continuation?.yield(value)
                         } else {
                             if subString == "[DONE]" { disconnect() }
