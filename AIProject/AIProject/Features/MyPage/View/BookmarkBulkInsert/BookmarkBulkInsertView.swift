@@ -45,8 +45,8 @@ struct BookmarkBulkInsertView: View {
                     Text("취소")
                 }
             } message: {
-                let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
-                Text("이미지에서 \(formattedCoinIDs) 코인을 발견했어요.")
+                let formattedCoinNames = vm.verifiedCoinList.map { $0.koreanName }.joined(separator: ", ")
+                Text("이미지에서 아래의 코인을 발견했어요\n\n\(formattedCoinNames)")
             }
             .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
                 Button(role: .cancel) {
@@ -71,7 +71,7 @@ struct BookmarkBulkInsertView: View {
 
 extension BookmarkBulkInsertView {
     func clearCoinIDArray() {
-        vm.verifiedCoinIDs = []
+        vm.verifiedCoinList = []
     }
 }
 

@@ -17,7 +17,7 @@ class ImageProcessViewModel: ObservableObject {
     @Published var errorMessage = ""
     
     @Published var coinList: [CoinDTO]?
-    @Published var verifiedCoinIDs = [String]()
+    @Published var verifiedCoinList = [CoinDTO]()
     
     @Published var processImageTask: Task<Void, Error>?
     
@@ -44,7 +44,7 @@ class ImageProcessViewModel: ObservableObject {
                 guard !recognizedText.isEmpty else {
                     throw ImageProcessError.noRecognizedText
                 }
-                /*
+                
                 // 읽어온 텍스트에서 코인 이름을 추출하기
                 try Task.checkCancellation()
                 let convertedSymbols = try await convertToSymbol(with: recognizedText)
@@ -66,8 +66,8 @@ class ImageProcessViewModel: ObservableObject {
                         throw ImageProcessError.noMatchingCoinIDAtAPI
                     }
                 }
-                */
-                print("🚀 최종 코인 목록 :", verifiedCoinIDs)
+                
+                print("🚀 최종 코인 목록 :", verifiedCoinList)
                 await showAnalysisResult()
             } catch is CancellationError {
                 await terminateProcess()
@@ -151,7 +151,6 @@ class ImageProcessViewModel: ObservableObject {
 #if DEBUG
             print("ℹ️ 파싱 후 :", convertedSymbols)
 #endif
-            
             return convertedSymbols
         } catch let error as NetworkError {
             switch error {
@@ -171,11 +170,9 @@ class ImageProcessViewModel: ObservableObject {
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
         let krwSymbolName = "KRW-\(symbol)"
         
-        let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-        
-        if verified {
+        if let coinList {
             await MainActor.run {
-                self.verifiedCoinIDs.append(krwSymbolName)
+                self.verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
             }
         }
     }
