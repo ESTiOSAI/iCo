@@ -17,13 +17,10 @@ class ThemeManager: ObservableObject {
         }
     }
     
-    /// UserDefaults에 저장할 키 값
-    private let themeKey = "selectedTheme"
-    
     /// 초기화 시 저장된 테마 값을 UserDefaults에서 불러와 설정
     /// 저장된 값이 없거나 변환에 실패할 경우 기본 테마인 `.basic`을 사용
     init() {
-        if let saved = UserDefaults.standard.string(forKey: themeKey),
+        if let saved = UserDefaults.standard.string(forKey: AppStorageKey.theme),
            let theme = Theme(rawValue: saved) {
             self.selectedTheme = theme
         } else {
@@ -33,6 +30,6 @@ class ThemeManager: ObservableObject {
     
     /// 선택된 테마를 UserDefaults에 저장
     private func saveTheme() {
-        UserDefaults.standard.set(selectedTheme.rawValue, forKey: themeKey)
+        UserDefaults.standard.set(selectedTheme.rawValue, forKey: AppStorageKey.theme)
     }
 }
