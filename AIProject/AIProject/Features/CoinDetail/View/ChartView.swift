@@ -175,9 +175,9 @@ struct ChartView: View {
                 viewModel.checkBookmark()
                 do {
                     let bookmarks = try BookmarkManager.shared.fetchAll()
-                    print("현재 북마크된 코인 ID 목록:")
-                    for bookmark in bookmarks {
-                        print(" - \(bookmark.coinID)")
+                    print("현재 북마크된 코인 목록:")
+                    for (idx, bookmark) in bookmarks.enumerated() {
+                        print("[\(idx)] \(bookmark.coinID ?? "<nil>") / \(bookmark.coinKoreanName ?? "<nil>")")
                     }
                 } catch {
                     print("북마크 목록 가져오기 실패: \(error)")

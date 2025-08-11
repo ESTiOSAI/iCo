@@ -43,9 +43,8 @@ final class ChartViewModel: ObservableObject {
     
     /// 현재 코인의 북마크 상태를 토글하고, 결과를 isBookmarked에 반영
     func toggleBookmark() {
-        if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol) {
+        if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol, coinKoreanName: coinName) {
             self.isBookmarked = result
-            print("[북마크 상태] \(result ? "추가됨" : "제거됨")")
         }
     }
     
