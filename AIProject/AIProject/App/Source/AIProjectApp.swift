@@ -23,11 +23,14 @@ struct AIProjectApp: App {
     // register app delegate for Firebase setup
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    @StateObject private var themeManager = ThemeManager()
+    
     var body: some Scene {
         WindowGroup {
             if hasSeenOnboarding {
                 MainTabView()
                     .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                    .environmentObject(themeManager)
             } else {
                 OnboardingView()
             }
