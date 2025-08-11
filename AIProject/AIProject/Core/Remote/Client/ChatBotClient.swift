@@ -86,13 +86,16 @@ extension ChatBotClient: URLSessionDataDelegate {
         for comp in comps {
             if let index = comp.firstIndex(of: ":") {
                 let afterIndex = comp.index(after: index)
-                let subString = comp.suffix(from: afterIndex)
+                let subString = comp.suffix(from: afterIndex).trimmingCharacters(in: .whitespaces)
 
                 if let jsonData = subString.data(using: .utf8) {
                     Task { @MainActor in
                         if let jsonObject = try? JSONDecoder().decode(ChatDTO.self, from: jsonData) {
                             let value = jsonObject.choices.first?.delta.content ?? ""
+                            print(value)
                             continuation?.yield(value)
+                        } else {
+                            if subString == "[DONE]" { disconnect() }
                         }
                     }
                 }
@@ -101,7 +104,9 @@ extension ChatBotClient: URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-        if let error { continuation?.finish(throwing: error) }
-        disconnect()
+        if let error {
+            continuation?.finish(throwing: error)
+            disconnect()
+        }
     }
 }
