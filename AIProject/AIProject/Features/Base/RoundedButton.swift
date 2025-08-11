@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct RoundedButton: View {
-    let title: String
-    var imageName: String? = "chevron.right"
-    var foregroundColor: Color = .aiCoLabel
-    var backgroundColor: Color = .aiCoBackground
+    var title: String?
+    var imageName: String?
+    var foregroundColor: Color?
     
     /// 버튼이 눌렸을 때 실행될 액션
     ///
@@ -22,9 +21,11 @@ struct RoundedButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
+                if let title {
                     Text(title)
                         .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(foregroundColor)
+                        .foregroundStyle(foregroundColor ?? .aiCoLabel)
+                }
                 
                 if let imageName {
                     Image(systemName: imageName)
@@ -34,6 +35,7 @@ struct RoundedButton: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
+            .frame(width: title != nil ? nil : 24, height: title != nil ? nil : 24)
             .background(
                 Capsule()
                     .fill(.aiCoBackgroundWhite)
@@ -50,6 +52,7 @@ struct RoundedButton: View {
     VStack {
         RoundedButton(title: "With Image", action: { dummyAction() })
         RoundedButton(title: "Text Only", imageName: nil, action: { dummyAction() })
+        RoundedButton(title: nil, imageName: "xmark", action: { dummyAction() })
     }
     .padding()
     .background(.aiCoBackground)
