@@ -16,7 +16,8 @@ struct BookmarkView: View {
     @State private var volumeOrder: SortOrder = .none
 
     @State private var isShowingShareSheet = false
-    @State private var sharingImage: UIImage?
+    @State private var sharingItems: [Any] = []
+    @State private var showingExportOptions = false
 
     // 정렬 데이터
     var sortedCoins: [BookmarkEntity] {
@@ -39,8 +40,12 @@ struct BookmarkView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 8) {
-                HeaderView(heading: "북마크 관리", isBookmarkView: true)
-                    .padding(.bottom, 16)
+                HeaderView(heading: "북마크 관리", isBookmarkView: true, onExportTap: {
+                    guard !(vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading) else { return }
+                    showingExportOptions = true
+                }
+                )
+                .padding(.bottom, 16)
 
                 HStack {
                     SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
@@ -92,7 +97,6 @@ struct BookmarkView: View {
                     )
                     .padding()
                 }
-
             }
             .task {
                 async let imagesTask: () = vm.loadCoinImages()
@@ -106,6 +110,26 @@ struct BookmarkView: View {
                     await vm.loadCoinImages()
                 }
             }
+        }
+        .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
+            Button("이미지로 내보내기") {
+                if let url = vm.makeFullReportPNGURL(scale: 2.0) {
+                    sharingItems = [url]
+                    isShowingShareSheet = true
+                }
+            }
+
+            Button("PDF 내보내기") {
+                if let url = vm.makeFullReportPDF(scale: 2.0) {
+                    sharingItems = [url]
+                    isShowingShareSheet = true
+                }
+            }
+
+            Button("취소", role: .cancel) {}
+        }
+        .sheet(isPresented: $isShowingShareSheet) {
+            ActivityView(activityItems: sharingItems)
         }
     }
 }
@@ -163,4 +187,49 @@ struct ActivityView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+/// 내보내기 전용 뷰
+struct ExportReportView: View {
+    let dto: PortfolioBriefingDTO
+    let coins: [BookmarkEntity]
+    let imageURLProvider: (String) -> URL?
+
+    @State private var selectedCategory: SortCategory? = .name
+    @State private var nameOrder: SortOrder = .none
+    @State private var priceOrder: SortOrder = .none
+    @State private var volumeOrder: SortOrder = .none
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // 브리핑
+            BriefingSectionView(
+                briefing: dto,
+                isLoading: false,
+                bookmarksEmpty: false,
+                errorMessage: nil
+            )
+
+            HStack {
+                SubheaderView(subheading: "북마크한 코인")
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+
+            Divider().padding(.horizontal, 16)
+
+            CoinListSectionView(
+                sortedCoins: coins,
+                selectedCategory: $selectedCategory,
+                nameOrder: $nameOrder,
+                priceOrder: $priceOrder,
+                volumeOrder: $volumeOrder,
+                imageURLProvider: { _ in nil },
+                onDelete: { _ in }
+            )
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+        .padding(.top, 16)
+    }
 }
