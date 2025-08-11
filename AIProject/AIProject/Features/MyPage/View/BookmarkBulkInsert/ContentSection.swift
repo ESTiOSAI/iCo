@@ -28,11 +28,11 @@ struct ContentSection: View {
                                 .frame(width: 100)
                                 .frame(width: 150, height: 150)
                                 .opacity(0.8)
-                                .background(.aiCoBackgroundAccent)
+                                .background(.aiCoBackground)
                                 .clipShape(.circle)
                                 .overlay {
                                     Circle()
-                                        .stroke(.accent, lineWidth: 0.5)
+                                        .stroke(.default, lineWidth: 0.5)
                                 }
                                 .padding(.bottom, 16)
                         
