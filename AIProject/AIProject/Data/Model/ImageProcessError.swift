@@ -9,6 +9,9 @@ import Foundation
 
 /// 이미지 처리 뷰 모델 내 각 함수를 실행하는 과정에서 발생 가능한 에러의 목록들을 담는 Enum
 enum ImageProcessError: Error, CustomStringConvertible {
+    /// 업비트에서 코인 목록을 불러오지 못했을 때
+    case noCoinFetched
+    
     /// OCR을 정상 실행했지만 감지된 텍스트가 없을 때
     case noRecognizedText
     

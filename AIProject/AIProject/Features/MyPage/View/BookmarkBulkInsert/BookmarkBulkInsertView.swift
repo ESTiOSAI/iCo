@@ -59,7 +59,13 @@ struct BookmarkBulkInsertView: View {
             }
         }
         .task {
-            
+            do {
+                guard vm.coinList == nil else { return }
+                vm.coinList = try await vm.fetchCoinList()
+                print(vm.coinList?.count)
+            } catch {
+                print(error)
+            }
         }
     }
 }

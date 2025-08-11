@@ -16,6 +16,7 @@ class ImageProcessViewModel: ObservableObject {
     @Published var showErrorMessage = false
     @Published var errorMessage = ""
     
+    @Published var coinList: [CoinDTO]?
     @Published var verifiedCoinIDs = [String]()
     
     @Published var processImageTask: Task<Void, Error>?
@@ -89,9 +90,17 @@ class ImageProcessViewModel: ObservableObject {
         }
     }
     
+    func fetchCoinList() async throws -> [CoinDTO] {
+        return try await UpBitAPIService().fetchMarkets()
+    }
+    
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
     private func performOCR(from selectedImage: UIImage) async throws -> [String] {
         try Task.checkCancellation()
+        
+        guard let coinList else {
+            throw ImageProcessError.noCoinFetched
+        }
         
         do {
             let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
