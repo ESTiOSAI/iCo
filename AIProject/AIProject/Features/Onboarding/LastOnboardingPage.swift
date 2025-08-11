@@ -44,6 +44,7 @@ struct LastOnboardingPage: View {
                 }
                 onFinish()
             }
+            .animation(.easeInOut(duration: 0.15), value: selectedType)
             .disabled(selectedType == nil)
             .opacity(selectedType == nil ? 0.5 : 1)
             .padding(.horizontal, 16)
