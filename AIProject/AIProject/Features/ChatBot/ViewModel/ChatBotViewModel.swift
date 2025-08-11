@@ -9,8 +9,24 @@ import Foundation
 
 final class ChatBotViewModel: ObservableObject {
     /// 사용자와 챗봇의 메세지를 담은 배열입니다.
-    @Published var messages: [ChatMessage] = []
-    @Published var isEditable: Bool = true
+    @Published private(set) var messages: [ChatMessage] = []
+    @Published private(set) var isEditable: Bool = false
+
+    @Published private(set) var isStreaming: Bool = false {
+        didSet {
+            Task { @MainActor in
+                checkValid()
+            }
+        }
+    }
+
+    @Published var searchText: String = "" {
+        didSet {
+            Task { @MainActor in
+                checkValid()
+            }
+        }
+    }
 
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
@@ -21,18 +37,21 @@ final class ChatBotViewModel: ObservableObject {
 
     /// 사용자가 입력한 메시지를 전송하고, 챗봇 응답 스트림을 관찰하여 UI에 반영합니다.
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
-    func sendMessage(with content: String) async {
-        await MainActor.run { isEditable = false }
+    func sendMessage() async {
+        let message = searchText
+
+        Task { @MainActor in searchText = "" }
+        await MainActor.run { isStreaming = true }
 
         do {
-            await addMessage(with: content)
-            try await chatBotClient.connect(content: content)
+            await addMessage(with: message)
+            try await chatBotClient.connect(content: message)
             try await observeStream()
         } catch {
             print(error.localizedDescription)
         }
 
-        await MainActor.run { isEditable = true }
+        await MainActor.run { isStreaming = false }
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
@@ -58,5 +77,10 @@ final class ChatBotViewModel: ObservableObject {
     private func addMessage(with content: String) {
         messages.append(ChatMessage(content: content, isUser: true))
         messages.append(ChatMessage(content: "", isUser: false))
+    }
+
+    @MainActor
+    private func checkValid() {
+        isEditable = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isStreaming
     }
 }
