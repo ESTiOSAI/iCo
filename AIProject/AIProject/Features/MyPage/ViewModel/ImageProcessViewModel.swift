@@ -27,13 +27,24 @@ class ImageProcessViewModel: ObservableObject {
             await MainActor.run { self.isLoading = true }
             
             do {
+                guard let coinList else {
+                    throw ImageProcessError.noCoinFetched
+                }
+                
+                // 코인 이름 Set 으로 변환하기
+                let coinNameSet: Set<String> = Set(coinList.flatMap {[
+                    String($0.coinID[$0.coinID.index($0.coinID.startIndex, offsetBy: 4)...].lowercased()), // 마켓 이름을 제외한 코인 심볼을 사용하기
+                    $0.koreanName,
+                    $0.englishName.lowercased()
+                ]})
+                
                 // 이미지에서 텍스트 읽어오기
                 try Task.checkCancellation()
-                let recognizedText = try await performOCR(from: selectedImage)
+                let recognizedText = try await performOCR(from: selectedImage, with: coinNameSet)
                 guard !recognizedText.isEmpty else {
                     throw ImageProcessError.noRecognizedText
                 }
-                
+                /*
                 // 읽어온 텍스트에서 코인 이름을 추출하기
                 try Task.checkCancellation()
                 let convertedSymbols = try await convertToSymbol(with: recognizedText)
@@ -55,10 +66,9 @@ class ImageProcessViewModel: ObservableObject {
                         throw ImageProcessError.noMatchingCoinIDAtAPI
                     }
                 }
-
+                */
                 print("🚀 최종 코인 목록 :", verifiedCoinIDs)
                 await showAnalysisResult()
-                
             } catch is CancellationError {
                 await terminateProcess()
             } catch let error as ImageProcessError {
@@ -95,15 +105,12 @@ class ImageProcessViewModel: ObservableObject {
     }
     
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
-    private func performOCR(from selectedImage: UIImage) async throws -> [String] {
+    private func performOCR(from selectedImage: UIImage, with coinNames: Set<String>) async throws -> [String] {
         try Task.checkCancellation()
         
-        guard let coinList else {
-            throw ImageProcessError.noCoinFetched
-        }
-        
         do {
-            let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
+            let recognizedText = try await TextRecognitionHelper(image: selectedImage, coinNames: coinNames).recognizeText()
+            print(recognizedText)
             
             return recognizedText
         } catch is CancellationError {
@@ -113,8 +120,6 @@ class ImageProcessViewModel: ObservableObject {
             throw ImageProcessError.unknownVisionError
         }
     }
-    
-    // TODO: 인식한 텍스트 주변에 박스 그리기
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
     private func convertToSymbol(with text: [String]) async throws -> [String] {
