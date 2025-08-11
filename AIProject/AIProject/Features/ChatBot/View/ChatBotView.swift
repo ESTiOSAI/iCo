@@ -15,40 +15,41 @@ struct ChatBotView: View {
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 15) {
-                ScrollViewReader { proxy in
-                    ScrollView(showsIndicators: false) {
-                        LazyVStack(spacing: 20) {
-                            ForEach(viewModel.messages) { message in
-                                Group {
-                                    if message.isUser {
-                                        UserMessageView(content: message.content)
-                                    } else {
-                                        BotMessageView(content: message.content)
-                                    }
+        VStack(spacing: 10) {
+            HeaderView(heading: "챗봇")
+                .padding(.top, 30)
+                .padding(.bottom, 20)
+
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 20) {
+                        ForEach(viewModel.messages) { message in
+                            Group {
+                                if message.isUser {
+                                    UserMessageView(content: message.content)
+                                } else {
+                                    BotMessageView(message: message)
                                 }
-                                .id(message.id)
                             }
+                            .id(message.id)
                         }
                     }
-                    .onChange(of: viewModel.messages) {
-                        proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
-                    }
                 }
-                .padding(.horizontal)
-                .navigationTitle("챗봇")
-                .navigationBarTitleDisplayMode(.large)
-                .onTapGesture {
-                    isFocused = false
+                .onChange(of: viewModel.messages) {
+                    proxy.scrollTo(viewModel.messages.last?.id, anchor: .bottom)
                 }
-
-                ChatInputView(viewModel: viewModel, isFocused: $isFocused)
             }
-            .background(Color.aiCoBackgroundWhite)
+            .padding(.horizontal)
+            .onTapGesture {
+                isFocused = false
+            }
+
+            ChatInputView(viewModel: viewModel, isFocused: $isFocused)
         }
+        .background(Color.aiCoBackground)
     }
 }
+
 
 #Preview {
     ChatBotView()

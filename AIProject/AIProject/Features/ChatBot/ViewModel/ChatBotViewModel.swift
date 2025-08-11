@@ -10,8 +10,9 @@ import Foundation
 final class ChatBotViewModel: ObservableObject {
     /// 사용자와 챗봇의 메세지를 담은 배열입니다.
     @Published private(set) var messages: [ChatMessage] = []
+    /// 현재 유저가 메세지를 전송할 수 있는지 상태를 기록합니다.
     @Published private(set) var isEditable: Bool = false
-
+	/// 현재 챗봇이 데이터를 스트림하는지 상태를 기록합니다.
     @Published private(set) var isStreaming: Bool = false {
         didSet {
             Task { @MainActor in
@@ -19,7 +20,7 @@ final class ChatBotViewModel: ObservableObject {
             }
         }
     }
-
+    /// 유저가 보낼 메세지 텍스트입니다.
     @Published var searchText: String = "" {
         didSet {
             Task { @MainActor in
@@ -48,7 +49,6 @@ final class ChatBotViewModel: ObservableObject {
             try await chatBotClient.connect(content: message)
             try await observeStream()
         } catch {
-            print(error.localizedDescription)
             await MainActor.run { showStreamError() }
         }
 
@@ -80,10 +80,17 @@ final class ChatBotViewModel: ObservableObject {
         messages.append(ChatMessage(content: "", isUser: false))
     }
 
+    /// 전송 버튼(편집 가능 상태)을 갱신합니다.
+    ///
+    /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
     private func checkValid() {
         isEditable = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isStreaming
     }
+    
+    /// SSE 데이터 전달 과정에서 에러가 발생했을 때 호출합니다.
+    ///
+    /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
     private func showStreamError() {
         if let index = messages.lastIndex(where: { !$0.isUser }) {
