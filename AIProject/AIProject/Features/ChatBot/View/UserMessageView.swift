@@ -20,12 +20,15 @@ struct UserMessageView: View {
                 Spacer()
             }
 
-            Text(content)
-                .font(.system(size: 13))
-                .padding()
-                .background(.aiCoBackground)
-                .clipShape(RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight]))
-                .frame(maxWidth: 300, alignment: .leading)
+            Group {
+                Text(content.isEmpty ? "..." : content)
+            }
+            .font(.system(size: 13))
+            .padding()
+            .background(.aiCoBackground)
+            .clipShape(RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight]))
+            .frame(maxWidth: 300, alignment: .leading)
+
             Spacer()
         }
     }

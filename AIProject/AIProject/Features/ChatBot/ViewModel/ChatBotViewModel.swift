@@ -22,36 +22,31 @@ final class ChatBotViewModel: ObservableObject {
     /// 사용자가 입력한 메시지를 전송하고, 챗봇 응답 스트림을 관찰하여 UI에 반영합니다.
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
     func sendMessage(with content: String) async {
+        await MainActor.run { isEditable = false }
+
         do {
-            await MainActor.run { isEditable = false }
             await addMessage(with: content)
             try await chatBotClient.connect(content: content)
-            await observeStream()
-            await MainActor.run { isEditable = true }
+            try await observeStream()
         } catch {
             print(error.localizedDescription)
-            await MainActor.run { isEditable = true }
         }
+
+        await MainActor.run { isEditable = true }
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
-    private func observeStream() async {
+    private func observeStream() async throws {
         guard let stream = chatBotClient.stream else { return }
 
-        do {
-            for try await content in stream {
-                await MainActor.run {
-                    if let message = messages.last(where: { !$0.isUser }) {
-                        if let index = messages.lastIndex(where: { !$0.isUser }) {
-                            messages[index] = ChatMessage(content: message.content + content, isUser: false)
-                        }
+        for try await content in stream {
+            await MainActor.run {
+                if let message = messages.last(where: { !$0.isUser }) {
+                    if let index = messages.lastIndex(where: { !$0.isUser }) {
+                        messages[index] = ChatMessage(content: message.content + content, isUser: false)
                     }
                 }
             }
-
-            print("작업 완료!")
-        } catch {
-            print("스트림 과정에서 에러가 발생했습니다.")
         }
     }
 
