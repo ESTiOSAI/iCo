@@ -10,7 +10,7 @@ import SwiftUI
 struct BotMessageView: View {
     @State private var bounce = false
 
-    let content: String
+    let message: ChatMessage
 
     var body: some View {
         HStack {
@@ -27,16 +27,16 @@ struct BotMessageView: View {
             }
 
             Group {
-                if content.isEmpty {
+                if message.content.isEmpty {
                     Image(systemName: "ellipsis")
                         .symbolEffect(.bounce, value: bounce)
                         .onAppear { bounce = true }
                         .onDisappear { bounce = false }
                 } else {
-                    Text(content)
+                    Text(message.content)
                 }
             }
-            .foregroundStyle(.aiCoLabel)
+            .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
             .font(.system(size: 13))
             .padding()
             .background {

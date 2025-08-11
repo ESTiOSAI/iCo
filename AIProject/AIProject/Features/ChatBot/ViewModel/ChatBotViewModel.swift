@@ -49,6 +49,7 @@ final class ChatBotViewModel: ObservableObject {
             try await observeStream()
         } catch {
             print(error.localizedDescription)
+            await MainActor.run { showStreamError() }
         }
 
         await MainActor.run { isStreaming = false }
@@ -82,5 +83,11 @@ final class ChatBotViewModel: ObservableObject {
     @MainActor
     private func checkValid() {
         isEditable = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isStreaming
+    }
+    @MainActor
+    private func showStreamError() {
+        if let index = messages.lastIndex(where: { !$0.isUser }) {
+            messages[index] = ChatMessage(content: "알 수 없는 에러가 발생했습니다.", isUser: false, isError: true)
+        }
     }
 }
