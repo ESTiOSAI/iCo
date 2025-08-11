@@ -9,4 +9,5 @@ import Foundation
 
 enum AppStorageKey {
     static let investmentType = "investmentType"
+    static let theme = "selectedTheme"
 }
