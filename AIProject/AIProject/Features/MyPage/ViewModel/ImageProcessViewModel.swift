@@ -110,7 +110,6 @@ class ImageProcessViewModel: ObservableObject {
         
         do {
             let recognizedText = try await TextRecognitionHelper(image: selectedImage, coinNames: coinNames).recognizeText()
-            print(recognizedText)
             
             return recognizedText
         } catch is CancellationError {
@@ -179,13 +178,12 @@ class ImageProcessViewModel: ObservableObject {
     
     // CoreData에 coinID를 일괄 삽입하는 함수
     func addToBookmark() {
-        print("To Be Handled in the following PR")
-        //do {
-            //for coinId in verifiedCoinIDs {
-                //try BookmarkManager.shared.add(coinID: coinId)
-            //}
-        //} catch {
-            //print(error)
-        //}
+        do {
+            for coin in verifiedCoinList {
+                try BookmarkManager.shared.add(coinID: coin.coinID, coinKoreanName: coin.koreanName)
+            }
+        } catch {
+            print(error)
+        }
     }
 }

@@ -38,7 +38,7 @@ struct RoundedButton: View {
             .frame(width: title != nil ? nil : 24, height: title != nil ? nil : 24)
             .background(
                 Capsule()
-                    .fill(.aiCoBackgroundWhite)
+                    .fill(.ultraThinMaterial)
             )
             .overlay {
                 Capsule()
