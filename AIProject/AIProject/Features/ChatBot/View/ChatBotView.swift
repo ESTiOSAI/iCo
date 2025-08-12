@@ -17,8 +17,6 @@ struct ChatBotView: View {
     var body: some View {
         VStack(spacing: 10) {
             HeaderView(heading: "챗봇")
-                .padding(.top, 30)
-                .padding(.bottom, 20)
 
             ScrollViewReader { proxy in
                 ScrollView(showsIndicators: false) {
