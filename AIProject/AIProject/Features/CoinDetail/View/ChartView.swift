@@ -12,13 +12,9 @@ import Charts
 /// `ChartViewModel`이 제공하는 시계열 데이터를 라인 차트로 렌더링
 struct ChartView: View {
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
-    @StateObject var viewModel: ChartViewModel
-    
-    /// 사용자 선택 기간 (현재는 1D만 표시, 나머지는 UI용)
-    @State private var selectedInterval: CoinInterval = CoinInterval.all.first!
+    @StateObject private var viewModel: ChartViewModel
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
     @State private var selectedTab = 0
-    
     /// 현재 선택된 테마 정보를 가져오기 위한 전역 상태 객체
     @EnvironmentObject var themeManager: ThemeManager
 
@@ -31,22 +27,16 @@ struct ChartView: View {
         _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
     }
     
-    func formattedDate() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd HH:mm"
-        return formatter.string(from: Date())
+    private static let headerDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy.MM.dd HH:mm"
+        return f
+    }()
+    private var lastUpdatedText: String {
+        Self.headerDateFormatter.string(from: Date()) + " 기준"
     }
     
     var body: some View {
-        /// 차트 시계열 데이터에서 마지막 포인트 (가장 최신 데이터)
-        let lastPoint = data.last
-
-        let isRising = summary?.change ?? 0 > 0
-        let isFalling = summary?.change ?? 0 < 0
-        let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
-        isFalling ? themeManager.selectedTheme.negativeColor :
-            .gray
-        
         VStack(alignment: .leading) {
             /// 기간 선택 탭 (UI용)
             GeometryReader { geometry in
@@ -57,25 +47,31 @@ struct ChartView: View {
                 )
                 .frame(width: geometry.size.width, height: 44)
             }
-            .frame(height: 40)
+            .frame(height: 44)
             .padding(.bottom, 20)
             
-            /// 타이틀 영역: 현재 시간 / 현재가 / 등락률, 등락가
+            /// 타이틀 영역
             HStack(alignment: .top, spacing: 8) {
+                /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(formattedDate()) 기준")
+                    Text(lastUpdatedText)
                         .font(.system(size: 10, weight: .regular))
                         .foregroundStyle(.aiCoLabel)
                     
                     // 상단 요약: 현재가 및 등락
                     if let summary {
+                        let isRising = summary.change > 0
+                        let isFalling = summary.change < 0
+                        let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
+                        isFalling ? themeManager.selectedTheme.negativeColor :
+                            .gray
+                        
                         Text(summary.lastPrice.formatKRW)
                             .font(.system(size: 20, weight: .bold))
                             .foregroundStyle(.aiCoLabel)
                         
                         let sign = isRising ? "+" : (isFalling ? "-" : "")
                         let arrow = isRising ? "▲" : (isFalling ? "▼" : "")
-                        
                         Text("\(sign)\(abs(summary.change).formatKRW) (\(arrow)\(abs(summary.changeRate).formatRate))")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(color)
@@ -171,19 +167,9 @@ struct ChartView: View {
                     .padding(.trailing, 10)
             }
         }
-        /// 뷰가 나타날 때 현재 코인의 북마크 여부 확인 (PR 테스트용으로 남겨둠, 추후 삭제 예정)
         .padding(20)
         .onAppear {
             viewModel.checkBookmark()
-            do {
-                let bookmarks = try BookmarkManager.shared.fetchAll()
-                print("현재 북마크된 코인 목록:")
-                for (idx, bookmark) in bookmarks.enumerated() {
-                    print("[\(idx)] \(bookmark.coinID ?? "<nil>") / \(bookmark.coinKoreanName ?? "<nil>")")
-                }
-            } catch {
-                print("북마크 목록 가져오기 실패: \(error)")
-            }
         }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
