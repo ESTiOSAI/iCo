@@ -95,77 +95,87 @@ struct ChartView: View {
                 }
             }
             
-            let yRange = viewModel.yAxisRange(from: data)
-            let xDomain = viewModel.xAxisDomain(for: data)
-            let scrollTo = viewModel.scrollToTime(for: data)
+            let chartRatio: CGFloat = 1.7
             
-            /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
-            Chart(data) { point in
-                /// 고가/저가 수직선 표시 (위꼬리/아래꼬리 역할)
-                RuleMark(
-                    x: .value("Date", point.date),
-                    yStart: .value("Low", point.low),
-                    yEnd: .value("High", point.high)
-                )
-                .foregroundStyle(
-                    point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
-                )
-                
-                /// 시가/종가 직사각형 (실체 바)
-                RectangleMark(
-                    x: .value("Date", point.date),
-                    yStart: .value("Open", point.open),
-                    yEnd: .value("Close", point.close),
-                    width: 6
-                )
-                .foregroundStyle(
-                    point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
-                )
-            }
-            .padding(.vertical, 40)
-            .frame(height: 380)
-            /// X축 도메인 설정 및 스크롤 위치 초기화
-            .chartXScale(domain: xDomain)
-            .chartScrollPosition(initialX: scrollTo)
-            .chartScrollableAxes(.horizontal)
-            /// Y축 도메인 설정 (동적 범위)
-            .chartYScale(domain: yRange)
-            /// 한 화면에서 보이는 X축 범위 (2880초 = 48분)
-            .chartXVisibleDomain(length: 2880)
-            /// X축 눈금 (15분 간격) + 1시간마다 세로선 표시
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .minute, count: 15)) { value in
-                    AxisTick()
-                    AxisValueLabel {
-                        if let date = value.as(Date.self) {
-                            Text(viewModel.timeFormatter.string(from: date))
-                        }
-                    }
+            ZStack {
+                if data.isEmpty {
+                    DefaultProgressView(message: "차트를 불러오는 중이에요")
+                } else {
+                    let yRange = viewModel.yAxisRange(from: data)
+                    let xDomain = viewModel.xAxisDomain(for: data)
+                    let scrollTo = viewModel.scrollToTime(for: data)
                     
-                    // 세로선은 1시간 단위(분 == 0)일 때만 표시
-                    if let date = value.as(Date.self),
-                       Calendar.current.component(.minute, from: date) == 0 {
-                        AxisGridLine()
+                    /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
+                    Chart(data) { point in
+                        /// 고가/저가 수직선 표시 (위꼬리/아래꼬리 역할)
+                        RuleMark(
+                            x: .value("Date", point.date),
+                            yStart: .value("Low", point.low),
+                            yEnd: .value("High", point.high)
+                        )
+                        .foregroundStyle(
+                            point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
+                        )
+                        
+                        /// 시가/종가 직사각형 (실체 바)
+                        RectangleMark(
+                            x: .value("Date", point.date),
+                            yStart: .value("Open", point.open),
+                            yEnd: .value("Close", point.close),
+                            width: 6
+                        )
+                        .foregroundStyle(
+                            point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
+                        )
                     }
-                }
-            }
-            /// Y축 눈금 (20만 원 단위) + 값 포맷을 M(억) 단위로 축약
-            .chartYAxis {
-                AxisMarks(values: .stride(by: 200_000)) { value in // 20만원 단위 눈금 표시
-                    AxisGridLine()
-                    AxisTick()
-                    if let price = value.as(Double.self) {
-                        AxisValueLabel {
-                            Text(String(format: "%.1fM", price / 1_000_000))
+                    /// X축 도메인 설정 및 스크롤 위치 초기화
+                    .chartXScale(domain: xDomain)
+                    .chartScrollPosition(initialX: scrollTo)
+                    .chartScrollableAxes(.horizontal)
+                    /// Y축 도메인 설정 (동적 범위)
+                    .chartYScale(domain: yRange)
+                    /// 한 화면에서 보이는 X축 범위 (2880초 = 48분)
+                    .chartXVisibleDomain(length: 2880)
+                    /// X축 눈금 (15분 간격) + 1시간마다 세로선 표시
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .minute, count: 15)) { value in
+                            AxisTick()
+                            AxisValueLabel {
+                                if let date = value.as(Date.self) {
+                                    Text(viewModel.timeFormatter.string(from: date))
+                                }
+                            }
+                            
+                            // 세로선은 1시간 단위(분 == 0)일 때만 표시
+                            if let date = value.as(Date.self),
+                               Calendar.current.component(.minute, from: date) == 0 {
+                                AxisGridLine()
+                            }
                         }
                     }
+                    /// Y축 눈금 (20만 원 단위) + 값 포맷을 M(억) 단위로 축약
+                    .chartYAxis {
+                        AxisMarks(values: .stride(by: 200_000)) { value in // 20만원 단위 눈금 표시
+                            AxisGridLine()
+                            AxisTick()
+                            if let price = value.as(Double.self) {
+                                AxisValueLabel {
+                                    Text(String(format: "%.1fM", price / 1_000_000))
+                                }
+                            }
+                        }
+                    }
+                    /// 차트 오른쪽 영역에 여백 추가
+                    .chartPlotStyle { plotArea in
+                        plotArea
+                            .padding(.trailing, 10)
+                            .padding(.bottom, 8) 
+                    }
                 }
             }
-            /// 차트 오른쪽 영역에 여백 추가
-            .chartPlotStyle { plotArea in
-                plotArea
-                    .padding(.trailing, 10)
-            }
+            .padding(.top, 40)
+            .padding(.bottom, 20)
+            .frame(height: 380)
         }
         .padding(20)
         .onAppear {
