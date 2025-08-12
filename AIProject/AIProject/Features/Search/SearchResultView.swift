@@ -15,9 +15,11 @@ struct SearchResultView: View {
 
     var body: some View {
         if viewModel.relatedCoins.isEmpty {
+            Spacer()
             Text("검색 결과가 없습니다")
                 .font(.system(size: 13))
                 .foregroundStyle(.aiCoLabelSecondary)
+            Spacer()
         } else {
             SearchListView(viewModel: viewModel, selectedCoin: $selectedCoin, isRecentSearch: false)
         }

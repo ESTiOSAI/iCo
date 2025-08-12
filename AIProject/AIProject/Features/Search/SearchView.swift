@@ -14,7 +14,6 @@ struct SearchView: View {
     var body: some View {
         VStack {
             HeaderView(heading: "검색")
-                .padding(.vertical, 15)
 
             SearchBarView(searchText: $searchText)
 
@@ -31,8 +30,6 @@ struct SearchView: View {
                 }
             }
             .padding(.horizontal, 16)
-
-            Spacer()
         }
         .onChange(of: searchText) {
             Task {

@@ -14,17 +14,22 @@ struct RecentSearchView: View {
     var body: some View {
         Group {
             if viewModel.recentSearchCoins.isEmpty {
-                Text("검색 내역이 없어요")
-                    .foregroundStyle(.aiCoLabelSecondary)
-                    .font(.system(size: 14))
+                HStack {
+                    Text("최근 검색 기록이 없어요")
+                        .foregroundStyle(.aiCoLabelSecondary)
+                        .font(.system(size: 14))
+
+                    Spacer()
+                }
+                .padding(.top, 5)
+
+                Spacer()
             } else {
                 SearchListView(viewModel: viewModel, selectedCoin: $selectedCoin, isRecentSearch: true)
             }
         }
         .onAppear {
-            Task {
-                await viewModel.loadRecentSearchKeyword()
-            }
+            viewModel.loadRecentSearchKeyword()
         }
     }
 }

@@ -28,27 +28,13 @@ final class SearchViewModel: ObservableObject {
     }
     
     /// 최근 검색 기록을 받아옵니다.
-    func loadRecentSearchKeyword() async {
-        do {
-            guard let recentSearchCoins = UserDefaults.standard.array(forKey: "recentSearchCoins") as? [Data] else {
-                recentSearchCoins = []
-                return
-            }
-
-            var coins = recentSearchCoins.compactMap { $0.toCoin }
-            let symbols = coins.map { $0.id.replacingOccurrences(of: "KRW-", with: "") }
-            let urls = try await imageService.fetchCoinImages(symbols: symbols).map { $0.imageURL }
-
-            for idx in 0..<coins.count {
-                coins[idx].imageURL = urls[idx]
-            }
-
-            Task { @MainActor in
-                self.recentSearchCoins = coins
-            }
-        } catch {
-            print(error.localizedDescription)
+    func loadRecentSearchKeyword() {
+        guard let recentSearchCoins = UserDefaults.standard.array(forKey: "recentSearchCoins") as? [Data] else {
+            recentSearchCoins = []
+            return
         }
+
+        self.recentSearchCoins = recentSearchCoins.compactMap { $0.toCoin }
     }
     
     /// 최근 검색 기록에 업데이트합니다.
@@ -83,7 +69,7 @@ final class SearchViewModel: ObservableObject {
         Task {
             do {
                 let coinDTOs = try await upbitService.fetchMarkets()
-                coins = coinDTOs.map { Coin(id: $0.coinID, koreanName: $0.koreanName) }
+                coins = coinDTOs.map { Coin(id: $0.coinID, koreanName: $0.koreanName.replacingOccurrences(of: "KRW-", with: "")) }
             } catch {
                 print(error.localizedDescription)
             }
@@ -108,11 +94,22 @@ final class SearchViewModel: ObservableObject {
     /// 주어진 키워드를 기반으로 관련 코인 목록을 필터링하여 갱신합니다.
     ///
     /// - Parameter keyword: 사용자가 입력한 검색어입니다.
-    @MainActor
-    private func performSearch(with keyword: String) {
-        guard !keyword.isEmpty else { return }
+    private func performSearch(with keyword: String) async {
+        guard !keyword.isEmpty else {
+            await MainActor.run { relatedCoins = [] }
+            return
+        }
 
-        relatedCoins = coins.filter { $0.koreanName.contains(keyword) || $0.id.lowercased().contains(keyword.lowercased()) }
+        let filteredCoins = coins.filter { $0.koreanName.contains(keyword) || $0.id.lowercased().contains(keyword.lowercased()) }
+
+        do {
+            // 이전 작업을 취소하는 어떤 기능이 필요함..
+            let coinWithURLs = try await setImageURL(filteredCoins)
+            await MainActor.run {relatedCoins = coinWithURLs }
+        } catch {
+            // ImageURL을 받아오는데 실패했기 때문에 대체 이미지를 가져와야 함.
+            await MainActor.run { relatedCoins = filteredCoins }
+        }
     }
 
     deinit {
@@ -122,11 +119,15 @@ final class SearchViewModel: ObservableObject {
 }
 
 extension SearchViewModel {
-    private func loadUIImage(from url: URL) async throws -> UIImage {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        guard let image = UIImage(data: data) else {
-            throw URLError(.badServerResponse)
+    private func setImageURL(_ coins: [Coin]) async throws -> [Coin] {
+        var tempCoins = coins
+        let symbols = coins.map { $0.id.replacingOccurrences(of: "KRW-", with: "") }
+        let urls = try await imageService.fetchCoinImages(symbols: symbols).map { $0.imageURL }
+
+        for i in 0..<urls.count {
+            tempCoins[i].imageURL = urls[i]
         }
-        return image
+
+        return tempCoins
     }
 }
