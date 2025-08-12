@@ -18,6 +18,7 @@ struct BookmarkView: View {
     @State private var isShowingShareSheet = false
     @State private var sharingItems: [Any] = []
     @State private var showingExportOptions = false
+    @State private var showDeleteConfirm = false
 
     // 정렬 데이터
     var sortedCoins: [BookmarkEntity] {
@@ -71,7 +72,14 @@ struct BookmarkView: View {
                     Spacer()
 
                     RoundedButton(title: "전체 삭제") {
-                        vm.deleteAllBookmarks()
+                        showDeleteConfirm = true
+                    }.alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
+                        Button("삭제", role: .destructive) {
+                            vm.deleteAllBookmarks()
+                        }
+                        Button("취소", role: .cancel) { }
+                    } message: {
+                        Text("모든 북마크를 삭제하시겠습니까?")
                     }
                 }
                 .padding(.trailing, 16)
@@ -98,11 +106,13 @@ struct BookmarkView: View {
                     .padding()
                 }
             }
-            .task {
-                async let imagesTask: () = vm.loadCoinImages()
-                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
-                await briefingTask
-                await imagesTask
+            .onAppear {
+                Task {
+                    async let imagesTask: () = vm.loadCoinImages()
+                    async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                    await briefingTask
+                    await imagesTask
+                }
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
@@ -150,12 +160,14 @@ struct BriefingSectionView: View {
                 BadgeLabelView(text: "📝 투자 브리핑 요약")
                 Text(briefing.briefing)
                     .font(.system(size: 12))
+                    .lineSpacing(6)
 
                 Spacer(minLength: 0)
 
                 BadgeLabelView(text: "✅ 전략 제안")
                 Text(briefing.strategy)
                     .font(.system(size: 12))
+                    .lineSpacing(6)
             } else if let errorMessage {
                 Text("예상치 못한 에러 발생: \(errorMessage)")
                     .foregroundColor(.red)
