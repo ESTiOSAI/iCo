@@ -29,7 +29,7 @@ struct SearchListView: View {
                                             .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
                                     }
                             } placeholder: {
-                                Text("C")
+                                Text(String(coin.koreanName.prefix(1)))
                                     .font(.system(size: 11))
                                     .foregroundStyle(.aiCoAccent)
                                     .frame(width: 20, height: 20)
