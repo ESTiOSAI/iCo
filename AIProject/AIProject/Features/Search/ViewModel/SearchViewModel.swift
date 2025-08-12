@@ -69,7 +69,8 @@ final class SearchViewModel: ObservableObject {
         Task {
             do {
                 let coinDTOs = try await upbitService.fetchMarkets()
-                coins = coinDTOs.map { Coin(id: $0.coinID, koreanName: $0.koreanName.replacingOccurrences(of: "KRW-", with: "")) }
+                coins = coinDTOs.map { Coin(id: $0.coinID.replacingOccurrences(of: "KRW-", with: ""), koreanName: $0.koreanName) }
+                print(coins)
             } catch {
                 print(error.localizedDescription)
             }
@@ -103,11 +104,10 @@ final class SearchViewModel: ObservableObject {
         let filteredCoins = coins.filter { $0.koreanName.contains(keyword) || $0.id.lowercased().contains(keyword.lowercased()) }
 
         do {
-            // 이전 작업을 취소하는 어떤 기능이 필요함..
             let coinWithURLs = try await setImageURL(filteredCoins)
             await MainActor.run {relatedCoins = coinWithURLs }
         } catch {
-            // ImageURL을 받아오는데 실패했기 때문에 대체 이미지를 가져와야 함.
+            // 이미지 URL을 받아오는데 실패함. (API Token 부족)
             await MainActor.run { relatedCoins = filteredCoins }
         }
     }
@@ -119,6 +119,9 @@ final class SearchViewModel: ObservableObject {
 }
 
 extension SearchViewModel {
+    /// CoinGecko API를 통해 이미지 URL을 가져옵니다.
+    /// - Parameter coins: 검색에 필터링된 Coin 배열입니다.
+    /// - Returns: imageURL 프로퍼티에 URL을 저장하고 반환합니다.
     private func setImageURL(_ coins: [Coin]) async throws -> [Coin] {
         var tempCoins = coins
         let symbols = coins.map { $0.id.replacingOccurrences(of: "KRW-", with: "") }
