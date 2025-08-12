@@ -199,4 +199,5 @@ struct ChartView: View {
 
 #Preview {
     ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
+        .environmentObject(ThemeManager())
 }

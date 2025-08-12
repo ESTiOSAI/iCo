@@ -34,4 +34,5 @@ struct CoinDetailView: View {
 #Preview {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
     CoinDetailView(coin: sampleCoin)
+        .environmentObject(ThemeManager())
 }
