@@ -27,17 +27,15 @@ struct ReportView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoNeutral)
                 
-                ReportSectionView(imageName: "text.page.badge.magnifyingglass",title: "한눈에 보는 \(viewModel.koreanName)", content: viewModel.coinOverView)
+                ReportSectionView(status: $viewModel.overviewState, imageName: "text.page.badge.magnifyingglass",title: "한눈에 보는 \(viewModel.koreanName)", content: viewModel.coinOverView)
                 
-                ReportSectionView(imageName: "calendar", title: "주간 동향", content: AttributedString(viewModel.coinWeeklyTrends))
+                ReportSectionView(status: $viewModel.weeklyState, imageName: "calendar", title: "주간 동향", content: AttributedString(viewModel.coinWeeklyTrends))
                 
-                ReportSectionView(imageName: "shareplay", title: "오늘 시장의 분위기", content: AttributedString(viewModel.coinTodayTrends))
+                ReportSectionView(status: $viewModel.todayState, imageName: "shareplay", title: "오늘 시장의 분위기", content: AttributedString(viewModel.coinTodayTrends))
                 
-                ReportNewsSectionView(articles: viewModel.coinTodayTopNews)
+                ReportNewsSectionView(status: $viewModel.todayState, articles: viewModel.coinTodayTopNews)
             }
-            .padding(.horizontal, 16)
         }
-        .padding(.top, 15)
     }
 }
 

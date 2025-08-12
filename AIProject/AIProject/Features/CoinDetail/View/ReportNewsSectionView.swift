@@ -16,6 +16,8 @@ import SwiftUI
 ///   - articles: 표시할 `CoinArticle` 목록
 struct ReportNewsSectionView: View {
     @State private var safariItem: IdentifiableURL?
+    @Binding var status: ResponseStatus
+    
     var title: String = "주요 뉴스"
     var articles: [CoinArticle]
     
@@ -27,37 +29,49 @@ struct ReportNewsSectionView: View {
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.aiCoAccent)
             
-            ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(article.title)
-                            .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(.aiCoLabel)
-                        
-                        Spacer()
-                        
-                        RoundedButton(title: "원문보기") {
-                            //                        if let url = URL(string: article.url) {
-                            //                            safariItem = IdentifiableURL(url: url)
-                            //                        }
+            switch status {
+            case .loading:
+                DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", backgroundColor: .aiCoBackgroundBlue)
+                    .frame(height: 300)
+            case .success:
+                ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(article.title)
+                                .font(.system(size: 15, weight: .bold))
+                                .foregroundStyle(.aiCoLabel)
                             
-                            safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/956560")!)
+                            Spacer()
+                            
+                            RoundedButton(title: "원문보기", imageName: "chevron.right") {
+                                //                        if let url = URL(string: article.newsSourceURL) {
+                                //                            safariItem = IdentifiableURL(url: url)
+                                //                        }
+                                
+                                safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/956560")!)
+                            }
                         }
+                        
+                        Text(article.summary)
+                            .font(.system(size: 15))
+                            .foregroundStyle(.aiCoLabel)
+                            .lineSpacing(6)
                     }
+                    .padding(.top, 12)
+                    .padding(.bottom, 16)
                     
-                    Text(article.summary)
-                        .font(.system(size: 15))
-                        .foregroundStyle(.aiCoLabel)
-                        .lineSpacing(6)
+                    if index < articles.count - 1 {
+                        Divider()
+                            .frame(height: 1)
+                            .background(.aiCoBorder)
+                    }
                 }
-                .padding(.top, 12)
-                .padding(.bottom, 16)
-                
-                if index < articles.count - 1 {
-                    Divider()
-                        .frame(height: 1)
-                        .background(.aiCoBorder)
-                }
+            case .failure(let networkError):
+                DefaultProgressView(status: .failure, message: networkError.localizedDescription, backgroundColor: .aiCoBackgroundBlue)
+                    .frame(height: 300)
+            case .cancel(let networkError):
+                DefaultProgressView(status: .cancel, message: networkError.localizedDescription, backgroundColor: .aiCoBackgroundBlue)
+                    .frame(height: 300)
             }
         }
         .sheet(item: $safariItem) { item in
@@ -76,6 +90,6 @@ struct ReportNewsSectionView: View {
 }
 
 #Preview {
-    ReportNewsSectionView(articles: [CoinArticle(title: "제목1", summary: "내용1", url: "https://example.com/"), CoinArticle(title: "제목2", summary: "내용2", url: "https://example.com/"), CoinArticle(title: "제목3", summary: "내용3", url: "https://example.com/")])
+    ReportNewsSectionView(status: .constant(.success), articles: [CoinArticle(title: "제목1", summary: "내용1", newsSourceURL: "https://example.com/"), CoinArticle(title: "제목2", summary: "내용2", newsSourceURL: "https://example.com/"), CoinArticle(title: "제목3", summary: "내용3", newsSourceURL: "https://example.com/")])
         .padding(16)
 }
