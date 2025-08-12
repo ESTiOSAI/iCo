@@ -90,9 +90,9 @@ struct DefaultProgressView: View {
             
             switch status {
             case .loading:
-                RoundedButton(title: "작업 취소", action: buttonAction ?? {})
+                RoundedButton(title: "작업 취소", imageName: "xmark", action: buttonAction ?? {})
             case .cancel, .failure:
-                RoundedButton(title: "다시 시도하기", action: buttonAction ?? {})
+                RoundedButton(title: "다시 시도하기", imageName: "arrow.counterclockwise", action: buttonAction ?? {})
             }
             
         }
