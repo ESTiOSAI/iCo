@@ -10,7 +10,16 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    static func recognizeText(from image: UIImage) async throws -> [String] {
+    private var image: UIImage
+    private var coinNames: Set<String>
+    
+    init(image: UIImage, coinNames: Set<String>) {
+        self.image = image
+        self.coinNames = coinNames
+    }
+    
+    /// OCR을 처리하는 함수
+    func recognizeText() async throws -> [String] {
         guard let cgImage = image.cgImage else {
             throw NSError(domain: "TextRecognitionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "🚨 CGImage가 유효하지 않음"])
         }
@@ -28,7 +37,7 @@ final class TextRecognitionHelper {
                 
                 let results = observations.compactMap { observation -> String? in
                     guard let topCandidate = observation.topCandidates(1).first else { return nil }
-                    return Self.redactNonKoreanText(in: topCandidate.string)
+                    return self.redactNonCoinName(in: topCandidate.string)
                 }
                 continuation.resume(returning: results)
             }
@@ -47,29 +56,64 @@ final class TextRecognitionHelper {
         }
     }
     
-    static func redactNonKoreanText(in text: String) -> String {
-        let tagger = NLTagger(tagSchemes: [.language])
-        tagger.string = text
-        
+    /// 비식별화를 처리하는 함수
+    private func redactNonCoinName(in text: String) -> String {
         var redacted = ""
+        
+        // lemma 스킴을 사용해 원형 단어를 반환하기
+        let tagger = NLTagger(tagSchemes: [.lemma])
+        tagger.string = text
         
         tagger.enumerateTags(
             in: text.startIndex ..< text.endIndex,
             unit: .word,
-            scheme: .language,
-            options: [.omitWhitespace, .omitPunctuation]
+            scheme: .lemma,
+            options: [.omitPunctuation, .omitWhitespace]
         ) { tag, range in
-            let word = String(text[range])
+            let token = String(text[range]).lowercased()
             
-            if tag?.rawValue == "ko" {
-                redacted += word
+            // 코인 리스트에 없으면 마스킹하기
+            if coinNames.contains(token) {
+                redacted += token
             } else {
-                redacted += String(repeating: "*", count: word.count)
+                redacted += String(repeating: "*", count: token.count)
             }
             redacted += " "
             return true
         }
         
         return redacted.trimmingCharacters(in: .whitespaces)
+    }
+    
+    /// 레벤슈타인의 거리를 계산하는 함수
+    private func calculateLevenshteinDistance(_ a: String, _ b: String) -> Int {
+        let aCount = a.count
+        let bCount = b.count
+        
+        var matrix = Array(repeating: Array(repeating: 0, count: bCount + 1), count: aCount + 1)
+        
+        for i in 0...aCount {
+            matrix[i][0] = i
+        }
+        
+        for j in 0...bCount {
+            matrix[0][j] = j
+        }
+        
+        for i in 1...aCount {
+            for j in 1...bCount {
+                let aChar = a[a.index(a.startIndex, offsetBy: i - 1)]
+                let bChar = b[b.index(b.startIndex, offsetBy: j - 1)]
+                let cost = (aChar == bChar) ? 0 : 1
+                
+                matrix[i][j] = min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                )
+            }
+        }
+        
+        return matrix[aCount][bCount]
     }
 }

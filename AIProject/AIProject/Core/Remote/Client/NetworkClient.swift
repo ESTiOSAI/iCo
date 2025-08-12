@@ -56,16 +56,3 @@ final class NetworkClient {
         }
     }
 }
-
-extension NetworkClient {
-    /// 서버에서 반환하는 상태 코드가 유효한지를 검증하고 Bool 타입으로 반환합니다.
-    func requestWithBool(_ request: URLRequest) async throws -> Bool {
-        let (_, response) = try await URLSession.shared.data(from: request.url!)
-        
-        if let httpResponse = response as? HTTPURLResponse, (200..<300) ~= httpResponse.statusCode {
-            return true
-        } else {
-            return false
-        }
-    }
-}

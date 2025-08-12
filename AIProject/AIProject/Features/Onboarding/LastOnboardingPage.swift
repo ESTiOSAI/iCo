@@ -27,7 +27,7 @@ struct LastOnboardingPage: View {
             ForEach(RiskTolerance.allCases, id: \.self) { type in
                 RoundedRectangleFillButton(
                     title: type.rawValue,
-                    isSelected: Binding(get: { selectedType == type }, set: { _ in })) {
+                    isHighlighted: Binding(get: { selectedType == type }, set: { _ in })) {
                         selectedType = type
                     }
                     .animation(.easeInOut(duration: 0.15), value: selectedType)
@@ -38,7 +38,7 @@ struct LastOnboardingPage: View {
             
             RoundedRectangleFillButton(
                 title: "시작하기",
-                isSelected: .init(get: { selectedType != nil }, set: { _ in })
+                isHighlighted: .init(get: { selectedType != nil }, set: { _ in })
             ) {
                 if let selected = selectedType {
                     storedInvestmentType = selected.rawValue

@@ -14,85 +14,19 @@ struct BookmarkBulkInsertView: View {
     
     @StateObject var vm = ImageProcessViewModel()
     
-    @State private var selectedItem: PhotosPickerItem? = nil
-    @State var selectedImage: UIImage? = nil
-    
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("코인 목록이 캡쳐된 스크린샷을 업로드하세요.")
-                    .font(.system(size: 18))
-                    .fontWeight(.medium)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Text("아이코가 자동으로 북마크를 등록해드려요.")
-                    .font(.system(size: 16))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding(.horizontal, 16)
-            .frame(maxWidth: .infinity)
-            
-            VStack(spacing: 18) {
-                Spacer()
-                
-                VStack {
-                    if selectedImage == nil {
-                        // 이미지 등록 전
-                        Spacer()
-                        
-                        Text("이미지를 선택해주세요")
-                            .foregroundStyle(.aiCoLabel.opacity(0.5))
-                        
-                        Spacer()
-                    } else {
-                        // 이미지 등록 후
-                        ZStack {
-                            ImagePreviewView(selectedImage: selectedImage!)
-                            
-                            if vm.isLoading {
-                                VStack(spacing: 16) {
-                                    DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요", buttonAction: vm.cancelTask)
-                                }
-                            }
-                        }
-                        .frame(maxHeight: .infinity)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .background(.aiCoBackground.opacity(0.5))
-                
-                PhotosPicker(
-                    selection: $selectedItem,
-                    matching: .images,
-                    photoLibrary: .shared()) {
-                        Text("이미지 선택하기")
-                            .foregroundStyle(.aiCoBackground)
-                            .frame(height: 50)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .background(.aiCoAccent)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .padding()
+            VStack {
+                HeaderSection()
+                ContentSection()
+                    .environmentObject(vm)
             }
             .navigationTitle("북마크 가져오기")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
+                    RoundedButton(imageName: "xmark") {
                         dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundStyle(.aiCoLabelSecondary)
-                    }
-                }
-            }
-            .onChange(of: selectedItem) { _, newValue in
-                Task {
-                    if let data = try? await newValue?.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
-                        selectedImage = uiImage
-                        vm.processImage(from: selectedImage!)
                     }
                 }
             }
@@ -111,8 +45,8 @@ struct BookmarkBulkInsertView: View {
                     Text("취소")
                 }
             } message: {
-                let formattedCoinIDs = vm.verifiedCoinIDs.joined(separator: ", ")
-                Text("이미지에서 \(formattedCoinIDs) 코인을 발견했어요.")
+                let formattedCoinNames = vm.verifiedCoinList.map { $0.koreanName }.joined(separator: ", ")
+                Text("이미지에서 아래의 코인을 발견했어요\n\n\(formattedCoinNames)")
             }
             .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
                 Button(role: .cancel) {
@@ -124,19 +58,20 @@ struct BookmarkBulkInsertView: View {
                 Text(vm.errorMessage)
             }
         }
-        .onAppear {
+        .task {
             do {
-                print(try BookmarkManager.shared.fetchAll().count)
+                guard vm.coinList == nil else { return }
+                vm.coinList = try await vm.fetchCoinList()
             } catch {
-                print("🚨 CoreData 에러", error)
+                print(error)
             }
         }
     }
 }
 
 extension BookmarkBulkInsertView {
-    private func clearCoinIDArray() {
-        vm.verifiedCoinIDs = []
+    func clearCoinIDArray() {
+        vm.verifiedCoinList = []
     }
 }
 

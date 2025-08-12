@@ -16,7 +16,8 @@ class ImageProcessViewModel: ObservableObject {
     @Published var showErrorMessage = false
     @Published var errorMessage = ""
     
-    @Published var verifiedCoinIDs = [String]()
+    @Published var coinList: [CoinDTO]?
+    @Published var verifiedCoinList = [CoinDTO]()
     
     @Published var processImageTask: Task<Void, Error>?
     
@@ -26,9 +27,20 @@ class ImageProcessViewModel: ObservableObject {
             await MainActor.run { self.isLoading = true }
             
             do {
+                guard let coinList else {
+                    throw ImageProcessError.noCoinFetched
+                }
+                
+                // 코인 이름 Set 으로 변환하기
+                let coinNameSet: Set<String> = Set(coinList.flatMap {[
+                    String($0.coinID[$0.coinID.index($0.coinID.startIndex, offsetBy: 4)...].lowercased()), // 마켓 이름을 제외한 코인 심볼을 사용하기
+                    $0.koreanName,
+                    $0.englishName.lowercased()
+                ]})
+                
                 // 이미지에서 텍스트 읽어오기
                 try Task.checkCancellation()
-                let recognizedText = try await performOCR(from: selectedImage)
+                let recognizedText = try await performOCR(from: selectedImage, with: coinNameSet)
                 guard !recognizedText.isEmpty else {
                     throw ImageProcessError.noRecognizedText
                 }
@@ -54,10 +66,9 @@ class ImageProcessViewModel: ObservableObject {
                         throw ImageProcessError.noMatchingCoinIDAtAPI
                     }
                 }
-
-                print("🚀 최종 코인 목록 :", verifiedCoinIDs)
-                await showAnalysisResult()
                 
+                print("🚀 최종 코인 목록 :", verifiedCoinList)
+                await showAnalysisResult()
             } catch is CancellationError {
                 await terminateProcess()
             } catch let error as ImageProcessError {
@@ -80,6 +91,7 @@ class ImageProcessViewModel: ObservableObject {
     @MainActor
     private func terminateProcess(with error: ImageProcessError? = nil) {
         self.isLoading = false
+        print("취소 완료")
         
         if let error {
             self.errorMessage = error.description
@@ -88,12 +100,16 @@ class ImageProcessViewModel: ObservableObject {
         }
     }
     
+    func fetchCoinList() async throws -> [CoinDTO] {
+        return try await UpBitAPIService().fetchMarkets()
+    }
+    
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
-    private func performOCR(from selectedImage: UIImage) async throws -> [String] {
+    private func performOCR(from selectedImage: UIImage, with coinNames: Set<String>) async throws -> [String] {
         try Task.checkCancellation()
         
         do {
-            let recognizedText = try await TextRecognitionHelper.recognizeText(from: selectedImage)
+            let recognizedText = try await TextRecognitionHelper(image: selectedImage, coinNames: coinNames).recognizeText()
             
             return recognizedText
         } catch is CancellationError {
@@ -103,8 +119,6 @@ class ImageProcessViewModel: ObservableObject {
             throw ImageProcessError.unknownVisionError
         }
     }
-    
-    // TODO: 인식한 텍스트 주변에 박스 그리기
     
     /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
     private func convertToSymbol(with text: [String]) async throws -> [String] {
@@ -136,17 +150,15 @@ class ImageProcessViewModel: ObservableObject {
 #if DEBUG
             print("ℹ️ 파싱 후 :", convertedSymbols)
 #endif
-            
             return convertedSymbols
-        } catch let error as URLError {
-            // 네트워크 작업에서 사용자가 작업을 취소하는 경우 CancellationError가 아닌 URLError로 넘어오기 때문에
-            // URLError로 타입 캐스팅하고 code 값으로 분기해서 에러를 상위 제어로 던짐
-            if error.code == .cancelled {
+        } catch let error as NetworkError {
+            switch error {
+            case .taskCancelled:
                 throw CancellationError()
+            default:
+                print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
+                throw ImageProcessError.unknownAlanError
             }
-            
-            print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
-            throw ImageProcessError.unknownAlanError
         }
     }
     
@@ -157,31 +169,21 @@ class ImageProcessViewModel: ObservableObject {
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
         let krwSymbolName = "KRW-\(symbol)"
         
-        do {
-            let verified = try await UpBitAPIService().verifyCoinID(id: krwSymbolName)
-            
-            if verified {
-                await MainActor.run {
-                    self.verifiedCoinIDs.append(krwSymbolName)
-                }
+        if let coinList {
+            await MainActor.run {
+                self.verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
             }
-        } catch let error as URLError {
-            if error.code == .cancelled {
-                throw CancellationError()
-            }
-            print(error)
         }
     }
     
     // CoreData에 coinID를 일괄 삽입하는 함수
     func addToBookmark() {
-        print("To Be Handled in the following PR")
-        //do {
-            //for coinId in verifiedCoinIDs {
-                //try BookmarkManager.shared.add(coinID: coinId)
-            //}
-        //} catch {
-            //print(error)
-        //}
+        do {
+            for coin in verifiedCoinList {
+                try BookmarkManager.shared.add(coinID: coin.coinID, coinKoreanName: coin.koreanName)
+            }
+        } catch {
+            print(error)
+        }
     }
 }
