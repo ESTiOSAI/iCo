@@ -52,9 +52,9 @@ extension NetworkError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .taskCancelled:
-            return "작업이 취소되었습니다. 아래 버튼을 눌러 다시 시도해 주세요."
+            return "작업이 취소됐어요"
         default:
-            return "데이터를 불러오는 데 실패했어요. 잠시 후 다시 시도해 주세요."
+            return "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요"
         }
     }
 }
@@ -77,7 +77,7 @@ extension NetworkError {
                     .dataCorrupted(let context):
                 message = context.debugDescription
             @unknown default:
-                message = "알 수 없는 디코딩 오류입니다."
+                message = "알 수 없는 디코딩 오류입니다"
             }
             let escaped = message.replacingOccurrences(of: "\"", with: "\\\"")
             return "decodingError(\"\(escaped)\")-\"\(file)#\(function)\""
