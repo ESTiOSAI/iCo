@@ -18,7 +18,7 @@ final class ReportViewModel: ObservableObject {
     @Published var coinOverView: AttributedString = AttributedString("AI가 정보를 준비하고 있어요")
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
-    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/")]
+    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", newsSourceURL: "https://example.com/")]
     
     let coin: Coin
     let koreanName: String
