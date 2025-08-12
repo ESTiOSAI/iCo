@@ -28,6 +28,7 @@ extension ChartViewModel {
             let close = value + Double.random(in: -2...2)
             let high = max(open, close) + Double.random(in: 0...1)
             let low = min(open, close) - Double.random(in: 0...1)
+            let tradeValue = Double.random(in: 50_000_000...200_000_000)
             
             priceSeries.append(
                 CoinPrice(
@@ -36,6 +37,7 @@ extension ChartViewModel {
                     high: high,
                     low: low,
                     close: close,
+                    tradeValue: tradeValue,
                     index: i
                 )
             )

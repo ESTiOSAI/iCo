@@ -21,6 +21,8 @@ struct CoinPrice: Identifiable {
     let low: Double
     /// 해당 시점의 종가 (캔들 차트 기준 종료 가격)
     let close: Double
+    /// 해당 시점의 거래대금
+    let tradeValue: Double
     // 배열 내 인덱스 (선택 시 원래 순서 유지에 사용)
     let index: Int
 }
