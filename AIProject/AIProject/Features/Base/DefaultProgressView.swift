@@ -65,10 +65,16 @@ struct DefaultProgressView: View {
                         .padding(16)
                 case .failure:
                     Image(systemName: "xmark.octagon")
+                        .font(.system(size: 35))
+                        .foregroundStyle(.aiCoNeutral)
                         .frame(width: 44, height: 44)
+                        .padding(5)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
+                        .font(.system(size: 35))
+                        .foregroundStyle(.aiCoNeutral)
                         .frame(width: 44, height: 44)
+                        .padding(5)
                 }
             }
             .background(.aiCoAccent.opacity(0.05))
@@ -97,5 +103,5 @@ struct DefaultProgressView: View {
 }
 
 #Preview {
-    DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", buttonAction: { print("Hi") })
+    DefaultProgressView(status: .failure, message: "아이코가 리포트를 작성하고 있어요", buttonAction: { print("Hi") })
 }
