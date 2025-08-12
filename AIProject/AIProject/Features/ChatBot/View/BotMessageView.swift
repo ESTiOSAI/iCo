@@ -8,17 +8,51 @@
 import SwiftUI
 
 struct BotMessageView: View {
-    let content: String
+    @State private var bounce = false
+
+    let message: ChatMessage
 
     var body: some View {
         HStack {
+            VStack {
+                Image(systemName: "swift")
+                    .foregroundStyle(.aiCoAccent)
+                    .padding(8)
+                    .overlay {
+                        Circle()
+                            .stroke(.accent, lineWidth: 0.5)
+                    }
+                    .background {
+                        Circle()
+                            .fill(.aiCoBackgroundAccent)
+                    }
+                Spacer()
+            }
+
+            Group {
+                if message.content.isEmpty {
+                    Image(systemName: "ellipsis")
+                        .symbolEffect(.bounce, value: bounce)
+                        .onAppear { bounce = true }
+                        .onDisappear { bounce = false }
+                } else {
+                    Text(message.content)
+                }
+            }
+            .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
+            .font(.system(size: 13))
+            .padding()
+            .background {
+                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
+                    .fill(.aiCoBackgroundAccent)
+            }
+            .overlay {
+                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
+                    .stroke(.accent, lineWidth: 0.5)
+            }
+            .frame(maxWidth: 300, alignment: .leading)
+
             Spacer()
-            Text(content)
-                .font(.system(size: 13))
-                .padding(15)
-                .background(.aiCoBackground)
-                .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight]))
-                .frame(maxWidth: 300, alignment: .trailing)
         }
     }
 }

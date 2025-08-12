@@ -10,34 +10,38 @@ import SwiftUI
 struct ChatInputView: View {
     @ObservedObject var viewModel: ChatBotViewModel
 
-    @State var searchText: String = ""
-
     let isFocused: FocusState<Bool>.Binding
 
     var body: some View {
         HStack {
-            TextField("무엇이든 물어보세요.", text: $searchText)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .cornerRadius(20)
+            TextField("무엇이든 물어보세요.", text: $viewModel.searchText)
+                .font(.system(size: 14))
+                .foregroundStyle(.aiCoLabel)
                 .focused(isFocused)
 
             Button {
-                let tempText = searchText
-                searchText = ""
-                Task { await viewModel.sendMessage(with: tempText) }
+                Task { await viewModel.sendMessage() }
             } label: {
                 Image(systemName: "arrow.up")
                     .padding(10)
-                    .background(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
             }
+            .background {
+                Circle()
+                    .fill(viewModel.isEditable ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
+            }
+            .overlay {
+                Circle()
+                    .stroke(viewModel.isEditable ? .accent : .default, lineWidth: 0.5)
+            }
+            .disabled(!viewModel.isEditable)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
-        .background(
+        .padding(.leading, 17)
+        .padding(.trailing, 14)
+        .padding(.vertical, 10)
+        .overlay {
             RoundedRectangle(cornerRadius: 30)
-                .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-        )
+                .stroke(.default, lineWidth: 0.5)
+        }
         .padding(.horizontal)
         .padding(.bottom, 10)
     }
