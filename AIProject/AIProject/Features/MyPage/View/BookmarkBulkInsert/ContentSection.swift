@@ -46,9 +46,9 @@ struct ContentSection: View {
                         
                         if vm.isLoading {
                             VStack(spacing: 16) {
-                                DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요") {
-                                    vm.cancelTask()
-                                }
+//                                DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요") {
+//                                    vm.cancelTask()
+//                                }
                             }
                         }
                     }
