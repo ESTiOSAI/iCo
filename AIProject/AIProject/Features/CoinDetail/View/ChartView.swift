@@ -81,9 +81,8 @@ struct ChartView: View {
                             .foregroundStyle(color)
                     }
                     
-                    let lastTradeValue = viewModel.prices.last?.tradeValue ?? 0
-                    
-                    Text("거래대금 \(lastTradeValue.formatMillion)")
+                    let trade = viewModel.prices.last?.trade ?? 0
+                    Text("거래대금 \(trade.formatMillion)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.aiCoLabelSecondary)
                 }

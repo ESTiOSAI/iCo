@@ -37,7 +37,7 @@ extension ChartViewModel {
                     high: high,
                     low: low,
                     close: close,
-                    tradeValue: tradeValue,
+                    trade: tradeValue,
                     index: i
                 )
             )
