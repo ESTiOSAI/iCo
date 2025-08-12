@@ -18,7 +18,10 @@ struct BotMessageView: View {
                 Image(systemName: "swift")
                     .foregroundStyle(.aiCoAccent)
                     .padding(8)
-                    .background(Circle().stroke(Gradient.aiCoGradientStyle(.accent), lineWidth: 0.5))
+                    .overlay {
+                        Circle()
+                            .stroke(.accent, lineWidth: 0.5)
+                    }
                     .background {
                         Circle()
                             .fill(.aiCoBackgroundAccent)
@@ -45,7 +48,7 @@ struct BotMessageView: View {
             }
             .overlay {
                 RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
-                    .stroke(Gradient.aiCoGradientStyle(.accent), lineWidth: 0.5)
+                    .stroke(.accent, lineWidth: 0.5)
             }
             .frame(maxWidth: 300, alignment: .leading)
 

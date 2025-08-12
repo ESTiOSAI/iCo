@@ -31,7 +31,7 @@ struct ChatInputView: View {
             }
             .overlay {
                 Circle()
-                    .stroke(Gradient.aiCoGradientStyle(viewModel.isEditable ? .accent : .default), lineWidth: 0.5)
+                    .stroke(viewModel.isEditable ? .accent : .default, lineWidth: 0.5)
             }
             .disabled(!viewModel.isEditable)
         }
@@ -40,7 +40,7 @@ struct ChatInputView: View {
         .padding(.vertical, 10)
         .overlay {
             RoundedRectangle(cornerRadius: 30)
-                .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+                .stroke(.default, lineWidth: 0.5)
         }
         .padding(.horizontal)
         .padding(.bottom, 10)
