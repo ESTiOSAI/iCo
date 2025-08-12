@@ -31,6 +31,12 @@ struct ChartView: View {
         _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
     }
     
+    func formattedDate() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd HH:mm"
+        return formatter.string(from: Date())
+    }
+    
     var body: some View {
         /// 차트 시계열 데이터에서 마지막 포인트 (가장 최신 데이터)
         let lastPoint = data.last
@@ -41,14 +47,46 @@ struct ChartView: View {
         isFalling ? themeManager.selectedTheme.negativeColor :
             .gray
         
-        VStack(alignment: .leading, spacing: 12) {
-            /// 타이틀 영역: 코인명 / 심볼
-            HStack(spacing: 8) {
-                Text(viewModel.coinName)
-                    .font(.title3).bold()
-                    .foregroundStyle(.aiCoLabel)
-                
-                CoinLabelView(text: viewModel.coinSymbol)
+        VStack(alignment: .leading) {
+            /// 기간 선택 탭 (UI용)
+            GeometryReader { geometry in
+                SegmentedControlView(
+                    selection: $selectedTab,
+                    tabTitles: CoinInterval.all.map(\.id),
+                    width: geometry.size.width
+                )
+                .frame(width: geometry.size.width, height: 44)
+            }
+            .frame(height: 40)
+            .padding(.bottom, 20)
+            
+            /// 타이틀 영역: 현재 시간 / 현재가 / 등락률, 등락가
+            HStack(alignment: .top, spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("\(formattedDate()) 기준")
+                        .font(.system(size: 10, weight: .regular))
+                        .foregroundStyle(.aiCoLabel)
+                    
+                    // 상단 요약: 현재가 및 등락
+                    if let summary {
+                        Text(summary.lastPrice.formatKRW)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundStyle(.aiCoLabel)
+                        
+                        let sign = isRising ? "+" : (isFalling ? "-" : "")
+                        let arrow = isRising ? "▲" : (isFalling ? "▼" : "")
+                        
+                        Text("\(sign)\(abs(summary.change).formatKRW) (\(arrow)\(abs(summary.changeRate).formatRate))")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(color)
+                    }
+                    
+                    let lastTradeValue = viewModel.prices.last?.tradeValue ?? 0
+                    
+                    Text("거래대금 \(lastTradeValue.formatMillion)")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.aiCoLabelSecondary)
+                }
                 
                 Spacer()
                 
@@ -58,30 +96,8 @@ struct ChartView: View {
                 Button(action: {
                     viewModel.toggleBookmark()
                 }) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(.systemGray5))
-                            .frame(width: 32, height: 32)
-                        Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundColor(.aiCoLabel)
-                    }
+                    CircleIconView(imageName: "bookmark")
                 }
-            }
-            
-            // 상단 요약: 현재가 및 등락
-            if let summary {
-                Text(summary.lastPrice.formatKRW)
-                    .font(.largeTitle).bold()
-                    .foregroundStyle(.aiCoLabel)
-                
-                let sign = isRising ? "+" : (isFalling ? "-" : "")
-                
-                Text("\(sign)\(abs(summary.change).formatKRW) (\(summary.changeRate.formatRate))")
-                    .font(.subheadline)
-                    .foregroundStyle(color)
             }
             
             let yRange = viewModel.yAxisRange(from: data)
@@ -111,6 +127,7 @@ struct ChartView: View {
                     point.close >= point.open ? themeManager.selectedTheme.positiveColor : themeManager.selectedTheme.negativeColor
                 )
             }
+            .padding(.vertical, 40)
             .frame(height: 380)
             /// X축 도메인 설정 및 스크롤 위치 초기화
             .chartXScale(domain: xDomain)
@@ -154,21 +171,9 @@ struct ChartView: View {
                 plotArea
                     .padding(.trailing, 10)
             }
-            
-            /// 기간 선택 탭 (UI용)
-            GeometryReader { proxy in
-                SegmentedControlView(
-                    selection: $selectedTab,
-                    tabTitles: CoinInterval.all.map(\.id),
-                    width: proxy.size.width
-                )
-                .frame(width: proxy.size.width, height: 44)
-            }
-            .frame(height: 44)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
         /// 뷰가 나타날 때 현재 코인의 북마크 여부 확인 (PR 테스트용으로 남겨둠, 추후 삭제 예정)
+        .padding(20)
         .onAppear {
             viewModel.checkBookmark()
             do {
@@ -181,7 +186,14 @@ struct ChartView: View {
                 print("북마크 목록 가져오기 실패: \(error)")
             }
         }
-        .background(.aiCoBackground)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.aiCoBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.default, lineWidth: 0.5)
+        )
     }
 }
 
