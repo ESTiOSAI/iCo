@@ -10,7 +10,7 @@ import SwiftUI
 struct MarketView: View {
     @State var isShowSearchView = false
     @State var selectedTabIndex: Int = 0
-    @State var viewModel: MarketViewModel = MarketViewModel(upbitService: .init(), coinListViewModel: CoinListViewModel(socket: .init()))
+    @State var viewModel: MarketViewModel = MarketViewModel(upbitService:  .init(), coinListViewModel: CoinListViewModel(tickerService: UpbitTickerService(client: .init(pingInterval: .seconds(120)))))
     
     var body: some View {
         NavigationStack {
