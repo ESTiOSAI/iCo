@@ -25,7 +25,6 @@ struct ContentSection: View {
                             Image("placeholder-no-image")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100)
                                 .frame(width: 150, height: 150)
                                 .opacity(0.8)
                                 .background(.aiCoBackground)
