@@ -13,13 +13,27 @@ struct SearchView: View {
 
     var body: some View {
         VStack {
+            HeaderView(heading: "검색")
+                .padding(.vertical, 15)
+
+            SearchBarView(searchText: $searchText)
+
             if searchText.isEmpty {
-                RecentSearchView(viewModel: viewModel)
-            } else {
-                SearchResultView(viewModel: viewModel, searchText: searchText)
+                SubheaderView(subheading: "최근 검색")
+                    .padding(.top, 15)
             }
+
+            Group {
+                if searchText.isEmpty {
+                    RecentSearchView(viewModel: viewModel)
+                } else {
+                    SearchResultView(viewModel: viewModel, searchText: searchText)
+                }
+            }
+            .padding(.horizontal, 16)
+
+            Spacer()
         }
-        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "코인 이름으로 검색하세요")
         .onChange(of: searchText) {
             Task {
                 await viewModel.sendKeyword(with: searchText)
@@ -29,5 +43,7 @@ struct SearchView: View {
 }
 
 #Preview {
-    SearchView()
+    NavigationStack {
+        SearchView()
+    }
 }

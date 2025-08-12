@@ -12,25 +12,15 @@ struct RecentSearchView: View {
     @State private var selectedCoin: Coin? = nil
 
     var body: some View {
-        ScrollView {
-            HStack {
-                Text("최근 검색")
-                    .padding(.vertical, 5)
-                Spacer()
-            }
-
+        Group {
             if viewModel.recentSearchCoins.isEmpty {
-                HStack {
-                    Text("검색 내역이 없어요.")
-                        .font(.system(size: 15))
-                        .foregroundStyle(.gray)
-                    Spacer()
-                }
+                Text("검색 내역이 없어요")
+                    .foregroundStyle(.aiCoLabelSecondary)
+                    .font(.system(size: 14))
             } else {
-                RecentSearchListView(viewModel: viewModel, selectedCoin: $selectedCoin)
+                SearchListView(viewModel: viewModel, selectedCoin: $selectedCoin, isRecentSearch: true)
             }
         }
-        .padding()
         .onAppear {
             viewModel.loadRecentSearchKeyword()
         }
