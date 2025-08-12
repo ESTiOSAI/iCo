@@ -18,10 +18,10 @@ struct ReportNewsSectionView: View {
     @State private var safariItem: IdentifiableURL?
     @Binding var status: ResponseStatus
     
+    private static let cornerRadius: CGFloat = 10
+    
     var title: String = "주요 뉴스"
     var articles: [CoinArticle]
-    
-    let cornerRadius: CGFloat = 10
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -29,11 +29,7 @@ struct ReportNewsSectionView: View {
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.aiCoAccent)
             
-            switch status {
-            case .loading:
-                DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", backgroundColor: .aiCoBackgroundBlue)
-                    .frame(height: 300)
-            case .success:
+            StatusSwitch(status: status, backgroundColor: .aiCoBackgroundBlue) {
                 ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -44,11 +40,12 @@ struct ReportNewsSectionView: View {
                             Spacer()
                             
                             RoundedButton(title: "원문보기", imageName: "chevron.right") {
-                                //                        if let url = URL(string: article.newsSourceURL) {
-                                //                            safariItem = IdentifiableURL(url: url)
-                                //                        }
+                                // FIXME: 앨런에게서 뉴스 출처 url 받아오기
+//                                if let url = URL(string: article.newsSourceURL) {
+//                                    safariItem = IdentifiableURL(url: url)
+//                                }
                                 
-                                safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/956560")!)
+                                safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/960242")!)
                             }
                         }
                         
@@ -56,6 +53,7 @@ struct ReportNewsSectionView: View {
                             .font(.system(size: 15))
                             .foregroundStyle(.aiCoLabel)
                             .lineSpacing(6)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.top, 12)
                     .padding(.bottom, 16)
@@ -66,12 +64,6 @@ struct ReportNewsSectionView: View {
                             .background(.aiCoBorder)
                     }
                 }
-            case .failure(let networkError):
-                DefaultProgressView(status: .failure, message: networkError.localizedDescription, backgroundColor: .aiCoBackgroundBlue)
-                    .frame(height: 300)
-            case .cancel(let networkError):
-                DefaultProgressView(status: .cancel, message: networkError.localizedDescription, backgroundColor: .aiCoBackgroundBlue)
-                    .frame(height: 300)
             }
         }
         .sheet(item: $safariItem) { item in
@@ -81,15 +73,22 @@ struct ReportNewsSectionView: View {
         .padding(.top, 20)
         .padding(.bottom, 8)
         .background(.aiCoBackgroundBlue)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius)
+            RoundedRectangle(cornerRadius: Self.cornerRadius)
                 .stroke(.default, lineWidth: 0.5)
         )
     }
 }
 
 #Preview {
-    ReportNewsSectionView(status: .constant(.success), articles: [CoinArticle(title: "제목1", summary: "내용1", newsSourceURL: "https://example.com/"), CoinArticle(title: "제목2", summary: "내용2", newsSourceURL: "https://example.com/"), CoinArticle(title: "제목3", summary: "내용3", newsSourceURL: "https://example.com/")])
+    ReportNewsSectionView(
+        status: .constant(.failure(NetworkError.invalidAPIKey)),
+        articles: [
+            CoinArticle(title: "제목1", summary: "내용1", newsSourceURL: "https://example.com/"),
+            CoinArticle(title: "제목2", summary: "내용2", newsSourceURL: "https://example.com/"),
+            CoinArticle(title: "제목3", summary: "내용3", newsSourceURL: "https://example.com/")
+        ]
+    )
         .padding(16)
 }

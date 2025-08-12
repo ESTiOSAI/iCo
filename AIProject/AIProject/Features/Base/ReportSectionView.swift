@@ -17,20 +17,17 @@ import SwiftUI
 struct ReportSectionView: View {
     @Binding var status: ResponseStatus
     
+    private static let cornerRadius: CGFloat = 10
+    
     var imageName: String
     var title: String
     var content: AttributedString
-    
-    let cornerRadius: CGFloat = 10
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: imageName)
-                    .resizable()
-                    .scaledToFit()
                     .font(.system(size: 14, weight: .bold))
-                    .frame(width: 20, height: 20)
                     .foregroundStyle(.aiCoAccent)
                 
                 Text(title)
@@ -39,36 +36,37 @@ struct ReportSectionView: View {
                 
                 Spacer()
             }
-            switch status {
-            case .loading:
-                DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", backgroundColor: .aiCoBackground)
-                    .frame(height: 300)
-            case .success:
+            
+            StatusSwitch(status: status, backgroundColor: .aiCoBackground) {
                 Text(content)
                     .font(.system(size: 14))
                     .foregroundStyle(.aiCoLabel)
                     .lineSpacing(6)
-            case .failure(let networkError):
-                // FIXME: cancel, failure 분기
-                DefaultProgressView(status: .failure, message: networkError.localizedDescription, backgroundColor: .aiCoBackground)
-                    .frame(height: 300)
-            case .cancel(let networkError):
-                DefaultProgressView(status: .cancel, message: networkError.localizedDescription, backgroundColor: .aiCoBackground)
-                    .frame(height: 300)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
         .background(.aiCoBackground)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius)
+            RoundedRectangle(cornerRadius: Self.cornerRadius)
                 .stroke(.default, lineWidth: 0.5)
         )
     }
 }
 
 #Preview {
-    ReportSectionView(status: .constant(.success), imageName: "text.page.badge.magnifyingglass",title: "한눈에 보는 이더리움", content: "- ﻿﻿심볼: ETH\n- ﻿﻿웹사이트: https://ethereum.org\n- ﻿﻿최초발행: 2015-07-30\n- ﻿﻿소개: 이더리움(Ethereum)은 블록체인 기술을 기반으로 한 탈중앙화 컴퓨팅 플랫폼으로, 스마트 계약 기능을 통해 분산 애플리케이션(DApps)을 구축할 수 있습니다. 2015년 7월 30일 비탈릭 부테린에 의해 출시되었으며, 이더리움의 네이티브 암호화폐는 이더(ETH)로, 플랫폼 내에서 거래 및 스마트 계약 실행에 사용됩니다.")
-        .padding(16)
+    ReportSectionView(
+        status: .constant(.success),
+        imageName: "text.page.badge.magnifyingglass",
+        title: "한눈에 보는 이더리움",
+        content: AttributedString("""
+        - 심볼: ETH
+        - 웹사이트: https://ethereum.org
+        - 최초발행: 2015-07-30
+        - 소개: 이더리움(Ethereum)은 블록체인 기술을 기반으로 한 탈중앙화 컴퓨팅 플랫폼으로, 스마트 계약 기능을 통해 분산 애플리케이션(DApps)을 구축할 수 있습니다. 2015년 7월 30일 비탈릭 부테린에 의해 출시되었으며, 이더리움의 네이티브 암호화폐는 이더(ETH)로, 플랫폼 내에서 거래 및 스마트 계약 실행에 사용됩니다.
+        """)
+    )
+    .padding(16)
 }
