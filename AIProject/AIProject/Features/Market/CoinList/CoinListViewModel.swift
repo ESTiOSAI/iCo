@@ -10,31 +10,67 @@ import AsyncAlgorithms
 
 @Observable
 class CoinListViewModel {
-    private let socket: WebSocketClient
+    private let tickerService: UpbitTickerService
     
     private let ticket = UUID().uuidString
     
     @ObservationIgnored
-    private let visibleCoinsChannel = AsyncChannel<Set<CoinListModel.ID>>()
+    private var visibleCoinsChannel = AsyncChannel<Set<CoinListModel.ID>>()
     
     private(set) var coins: [CoinListModel] = []
     
-    init(socket: WebSocketClient) {
-        self.socket = socket
+    init(tickerService: UpbitTickerService) {
+        self.tickerService = tickerService
+    }
+    
+    /// 북마크와 전체 코인 리스트를 변경합니다.
+    /// - Parameter coins: 보여줄 코인 리스트
+    func change(_ coins: [CoinListModel]) {
+        self.coins = coins
+    }
+    
+    /// 시세가 서비스에 연결합니다.
+    func connect() async {
         
+        // coin snapshot 채널 개설
+        visibleCoinsChannel = .init()
+        
+        // coin snapshot 전송 stream 연결
         Task {
-            await ticketStream()
+            await self.ticketStream()
         }
+        
+        // service 연결
+        await tickerService.connect()
+        
+        // 시세가
+        Task {
+            await consume()
+        }
+    }
+    
+    /// 서비스 연결 해제
+    ///  coin snapshot 채널 종료
+    func disconnect() async {
+        visibleCoinsChannel.finish()
+        await tickerService.disconnect()
+    }
+    
+    /// coin snapshot 구독 전송
+    /// - Parameter coins: coin snapshot
+    func sendTicket(_ coins: Set<CoinListModel.ID>) async {
+        await visibleCoinsChannel.send(coins)
     }
     
     // MARK: - Private
     
     private func ticketStream() async {
         let stream = visibleCoinsChannel
+            .filter { !$0.isEmpty }
             .removeDuplicates()
-            ._throttle(for: .milliseconds(500), latest: true)
+            ._throttle(for: .milliseconds(300), latest: true)
         for await visibleCoin in stream {
-            await socket.subscribe(ticket: ticket, coins: Array(visibleCoin))
+            await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
         }
     }
     
@@ -50,37 +86,8 @@ class CoinListViewModel {
     }
     
     private func consume() async {
-        guard let stream = socket.subscribe() else {
-            return
+        for try await ticker in tickerService.subscribeTickerStream() {
+            await performUpdate(ticker)
         }
-        do {
-            for try await ticker in stream {
-                await performUpdate(ticker)
-            }
-        } catch {
-            socket.disconnect()
-        }
-    }
-    
-    func change(_ coins: [CoinListModel]) {
-        self.coins = coins
-    }
-    
-    // TODO: error handling
-    func connect() async {
-        do {
-            try await socket.connect()
-            await consume()
-        } catch {
-            print(error)
-        }
-    }
-    
-    func disconnect() {
-        socket.disconnect()
-    }
-    
-    func sendTicket(_ coins: Set<CoinListModel.ID>) async {
-        await visibleCoinsChannel.send(coins)
     }
 }

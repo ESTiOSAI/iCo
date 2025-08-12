@@ -63,7 +63,9 @@ struct CoinListView: View {
             }
         }
         .onDisappear {
-            viewModel.disconnect()
+            Task {
+               await viewModel.disconnect()
+            }
         }
     }
 }
@@ -85,7 +87,7 @@ extension CoinListView {
         print(#function, phase)
         switch phase {
         case .background:
-            viewModel.disconnect()
+            await viewModel.disconnect()
         case .inactive:
             break
         case .active:
@@ -97,5 +99,5 @@ extension CoinListView {
 }
 
 #Preview {
-    CoinListView(viewModel: .init(socket: .init()))
+    CoinListView(viewModel: .init(tickerService: .init(client: .init())))
 }
