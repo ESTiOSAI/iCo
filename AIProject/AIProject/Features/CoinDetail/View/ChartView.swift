@@ -91,7 +91,7 @@ struct ChartView: View {
                 Button(action: {
                     viewModel.toggleBookmark()
                 }) {
-                    CircleIconView(imageName: "bookmark")
+                    CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
                 }
             }
             
