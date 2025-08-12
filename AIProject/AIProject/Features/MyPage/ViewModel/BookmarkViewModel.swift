@@ -121,64 +121,21 @@ final class BookmarkViewModel: ObservableObject {
     }
 
 // MARK: - 북마크 내보내기 관련
-    /// scale: 해상도 (2x, 레티나 해상도)
-    func makeFullReportImage(scale: CGFloat = 2.0) -> UIImage? {
-        guard let dto = briefing, !bookmarks.isEmpty else { return nil }
-
-        let targetWidth = currentScreenWidth()
-
-        let exportView = ExportReportView(
-            dto: dto, coins: bookmarks, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
+    func exportBriefingImage() {
+        let view = BriefingSectionView(
+            briefing: briefing,
+            isLoading: false,
+            bookmarksEmpty: false,
+            errorMessage: nil
         )
-            .frame(width: targetWidth, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
-        return exportView.snapshotImageExact(
-            scale: scale, colorScheme: .light, background: .white, isOpaque: true
-        )
-    }
+        let image = view.snapshot()
 
-    func makeFullReportPNGURL(scale: CGFloat = 2.0) -> URL? {
-        guard let image = makeFullReportImage(scale: scale),
-              let data = image.pngData() else { return nil }
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("briefing_report-\(UUID().uuidString).png")
-        do {
-            try data.write(to: url); return url
-        } catch {
-            return nil
+        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+
+        if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = scene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
         }
-    }
-
-
-    func makeFullReportPDF(scale: CGFloat = 2.0) -> URL? {
-        guard let image = makeFullReportImage(scale: scale) else { return nil }
-        let bounds = CGRect(origin: .zero, size: image.size)
-        let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("briefing_report-\(UUID().uuidString).pdf")
-        let renderer = UIGraphicsPDFRenderer(bounds: bounds)
-        do {
-            try renderer.writePDF(to: url) { ctx in
-                ctx.beginPage()
-                image.draw(in: bounds)
-            }
-            return url
-        } catch {
-            return nil
-        }
-    }
-
-    private func currentScreenWidth() -> CGFloat {
-        #if os(iOS)
-        if let scene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first(where: { $0.activationState == .foregroundActive }),
-           let window = scene.windows.first(where: { $0.isKeyWindow }) {
-            return window.bounds.width
-        }
-        return UIScreen.main.bounds.width
-        #else
-        return UIScreen.main.bounds.width
-        #endif
     }
 }
 
@@ -188,22 +145,19 @@ enum InvestmentCharacter {
     case longTerm
 }
 
-private extension View {
-    /// 캡처 대상 SwiftUI 뷰를 렌더링하여 UIImage로 반환합니다.
-    func snapshotImageExact(
-        scale: CGFloat = UIScreen.main.scale,
-        colorScheme: ColorScheme = .light,
-        background: Color = .white,
-        isOpaque: Bool = true
-    ) -> UIImage? {
-        let content = self
-            .fixedSize(horizontal: false, vertical: true)
-            .background(background)
-            .environment(\.colorScheme, colorScheme)
+extension View {
+    func snapshot() -> UIImage {
+        let controller = UIHostingController(rootView: self)
+        let view = controller.view
 
-        let renderer = ImageRenderer(content: content)
-        renderer.scale = scale
-        renderer.isOpaque = isOpaque
-        return renderer.uiImage
+        let targetSize = controller.view.intrinsicContentSize
+        view?.bounds = CGRect(origin: .zero, size: targetSize)
+        view?.backgroundColor = .clear
+
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
+
+        return renderer.image { _ in
+            view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+        }
     }
 }
