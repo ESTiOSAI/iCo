@@ -20,7 +20,7 @@ final class AlanAPIService {
     /// - Parameter content: 질문 또는 분석할 문장
     /// - Returns: 수신한 응답 데이터
     func fetchAnswer(content: String, action: AlanAction) async throws -> AlanResponseDTO {
-        guard let clientID = switchClientID(for: action) else { throw NetworkError.invalidAPIKey }
+        guard let clientID = switchClientID(for: action), !clientID.isEmpty else { throw NetworkError.invalidAPIKey }
         
         let urlString = "\(endpoint)?content=\(content)&client_id=\(clientID)"
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
