@@ -11,6 +11,8 @@ struct MarketView: View {
     @State var isShowSearchView = false
     @State var selectedTabIndex: Int = 0
     @State var viewModel: MarketViewModel = MarketViewModel(upbitService:  .init(), coinListViewModel: CoinListViewModel(tickerService: UpbitTickerService(client: .init(pingInterval: .seconds(120)))))
+    @State var bookmarkSelected = true
+    @State var totalSelected = false
     
     var body: some View {
         NavigationStack {
@@ -20,11 +22,20 @@ struct MarketView: View {
                 })
                 
                 VStack(spacing: 8) {
-                                    
-                SegmentedControlView(selection: $selectedTabIndex,
-                                     tabTitles: ["북마크한 코인", "전체 코인"],
-                                     width: 200)
-                .frame(height: 44)
+                    HStack {
+                        RoundedRectangleFillButton(title: "전체 코인", isHighlighted: $totalSelected) {
+                            viewModel.change(tab: .total)
+                        }
+                        .frame(width: 100, height: 44)
+                        
+                        RoundedRectangleFillButton(title: "북마크", isHighlighted: $bookmarkSelected) {
+                            viewModel.change(tab: .bookmark)
+                        }
+                        .frame(width: 100, height: 44)
+                        
+                        Spacer()
+                    }
+                    .padding(16)
                 
                     CoinListView(viewModel: viewModel.coinListViewModel)
                 }
@@ -35,11 +46,6 @@ struct MarketView: View {
                     }
                 }
             }
-            .onChange(of: selectedTabIndex, { _, newValue in
-                if let tab = MarketCoinTab(rawValue: newValue) {
-                    viewModel.change(tab: tab)
-                }
-            })
             .navigationDestination(isPresented: $isShowSearchView) {
                 SearchView()
             }

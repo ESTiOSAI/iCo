@@ -26,6 +26,7 @@ class MarketViewModel {
         
         Task {
             await setup()
+            change(tab: .total)
         }
     }
     

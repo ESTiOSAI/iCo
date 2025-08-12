@@ -12,6 +12,7 @@ struct CoinListView: View {
     @Bindable var viewModel: CoinListViewModel
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
+    @State var sortFilter = false
     
     init(viewModel: CoinListViewModel) {
         self.viewModel = viewModel
@@ -20,7 +21,7 @@ struct CoinListView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView()
+                CoinListHeaderView(selected: $sortFilter)
                     .fontWeight(.regular)
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoLabel)
@@ -44,6 +45,8 @@ struct CoinListView: View {
                             visibleCoins.remove(coin.id)
                         }
                     }
+                    .padding(.vertical, 18)
+                    .padding(.bottom)
                 }
             }
         }
