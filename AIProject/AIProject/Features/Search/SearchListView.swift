@@ -18,19 +18,18 @@ struct SearchListView: View {
             LazyVStack {
                 ForEach(isRecentSearch ? viewModel.recentSearchCoins : viewModel.relatedCoins) { coin in
                     HStack {
-                        Image(systemName: "swift")
-                            .resizable()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(.aiCoBackgroundWhite)
-                            .padding(5)
-                            .background {
-                                Circle()
-                                    .fill(.orange)
-                            }
-                            .overlay {
-                                Circle()
-                                    .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
-                            }
+                        AsyncImage(url: coin.imageURL) { image in
+                            image
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .clipShape(Circle())
+                                .overlay {
+                                    Circle()
+                                        .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+                                }
+                        } placeholder: {
+                            ProgressView()
+                        }
 
                         Text(coin.koreanName)
                             .font(.system(size: 15))

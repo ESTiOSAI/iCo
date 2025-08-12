@@ -22,7 +22,9 @@ struct RecentSearchView: View {
             }
         }
         .onAppear {
-            viewModel.loadRecentSearchKeyword()
+            Task {
+                await viewModel.loadRecentSearchKeyword()
+            }
         }
     }
 }

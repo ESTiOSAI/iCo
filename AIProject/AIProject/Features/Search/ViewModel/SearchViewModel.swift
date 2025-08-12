@@ -13,26 +13,42 @@ final class SearchViewModel: ObservableObject {
     @Published var relatedCoins: [Coin] = []
 
     private var upbitService: UpBitAPIService
+    private var imageService: CoinGeckoAPIService
 
     private var coins: [Coin] = []
 
     private var continuation: AsyncStream<String>.Continuation?
     private var task: Task<Void, Never>?
 
-    init() {
-        upbitService = UpBitAPIService()
+    init(upbitService: UpBitAPIService = UpBitAPIService(), imageService: CoinGeckoAPIService = CoinGeckoAPIService()) {
+        self.upbitService = upbitService
+        self.imageService = imageService
         setupCoinData()
         observeStream()
     }
     
     /// 최근 검색 기록을 받아옵니다.
-    func loadRecentSearchKeyword() {
-        guard let recentSearchCoins = UserDefaults.standard.array(forKey: "recentSearchCoins") as? [Data] else {
-            recentSearchCoins = []
-			return
-        }
+    func loadRecentSearchKeyword() async {
+        do {
+            guard let recentSearchCoins = UserDefaults.standard.array(forKey: "recentSearchCoins") as? [Data] else {
+                recentSearchCoins = []
+                return
+            }
 
-        self.recentSearchCoins = recentSearchCoins.compactMap { $0.toCoin }
+            var coins = recentSearchCoins.compactMap { $0.toCoin }
+            let symbols = coins.map { $0.id.replacingOccurrences(of: "KRW-", with: "") }
+            let urls = try await imageService.fetchCoinImages(symbols: symbols).map { $0.imageURL }
+
+            for idx in 0..<coins.count {
+                coins[idx].imageURL = urls[idx]
+            }
+
+            Task { @MainActor in
+                self.recentSearchCoins = coins
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     /// 최근 검색 기록에 업데이트합니다.
@@ -102,5 +118,15 @@ final class SearchViewModel: ObservableObject {
     deinit {
         task?.cancel()
         task = nil
+    }
+}
+
+extension SearchViewModel {
+    private func loadUIImage(from url: URL) async throws -> UIImage {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        guard let image = UIImage(data: data) else {
+            throw URLError(.badServerResponse)
+        }
+        return image
     }
 }
