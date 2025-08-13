@@ -25,9 +25,15 @@ final class TextRecognitionHelper {
         }
         
         return try await withCheckedThrowingContinuation { continuation in
-            let request = VNRecognizeTextRequest { request, error in
-                if let error = error {
+            let request = VNRecognizeTextRequest { [weak self] request, error in
+                guard let self else {
+                    continuation.resume(returning: [])
+                    return
+                }
+                
+                if let error {
                     continuation.resume(throwing: error)
+                    return
                 }
                 
                 guard let observations = request.results as? [VNRecognizedTextObservation] else {
@@ -115,5 +121,9 @@ final class TextRecognitionHelper {
         }
         
         return matrix[aCount][bCount]
+    }
+    
+    deinit {
+        print("helper", #function)
     }
 }

@@ -24,7 +24,9 @@ class ImageProcessViewModel: ObservableObject {
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: UIImage) {
         processImageTask = Task {
-            await MainActor.run { self.isLoading = true }
+            await MainActor.run {
+                isLoading = true
+            }
             
             do {
                 guard let coinList else {
@@ -79,23 +81,23 @@ class ImageProcessViewModel: ObservableObject {
     
     @MainActor
     func cancelTask() {
-        self.processImageTask?.cancel()
+        processImageTask?.cancel()
     }
     
     @MainActor
     private func showAnalysisResult() {
-        self.isLoading = false
-        self.showAnalysisResultAlert = true
+        isLoading = false
+        showAnalysisResultAlert = true
     }
     
     @MainActor
     private func terminateProcess(with error: ImageProcessError? = nil) {
-        self.isLoading = false
+        isLoading = false
         print("취소 완료")
         
         if let error {
-            self.errorMessage = error.description
-            self.showErrorMessage = true
+            errorMessage = error.description
+            showErrorMessage = true
             print("🚨 이미지 처리 중 에러 발생:", error)
         }
     }
@@ -106,10 +108,17 @@ class ImageProcessViewModel: ObservableObject {
     
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
     private func performOCR(from selectedImage: UIImage, with coinNames: Set<String>) async throws -> [String] {
+        var originalImage: UIImage? = selectedImage
+        
         try Task.checkCancellation()
         
+        defer {
+            originalImage = nil
+        }
+        
         do {
-            let recognizedText = try await TextRecognitionHelper(image: selectedImage, coinNames: coinNames).recognizeText()
+            guard let originalImage else { return [String]() }
+            let recognizedText = try await TextRecognitionHelper(image: originalImage, coinNames: coinNames).recognizeText()
             
             return recognizedText
         } catch is CancellationError {
@@ -171,7 +180,7 @@ class ImageProcessViewModel: ObservableObject {
         
         if let coinList {
             await MainActor.run {
-                self.verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
+                verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
             }
         }
     }
@@ -185,5 +194,9 @@ class ImageProcessViewModel: ObservableObject {
         } catch {
             print(error)
         }
+    }
+    
+    deinit {
+        print("vm", #function)
     }
 }
