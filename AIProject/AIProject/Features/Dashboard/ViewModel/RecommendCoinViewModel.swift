@@ -33,9 +33,8 @@ final class RecommendCoinViewModel: ObservableObject {
             let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
             if let jsonData = jsonString.data(using: .utf8) {
-                // TODO: 만약 디코딩이 제대로 되지 않았다면? 어떻게 다시 Alan에 찌르지?
                 let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonData)
-                let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
+                let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 Task { @MainActor in
                     state = .success(results)
@@ -48,28 +47,32 @@ final class RecommendCoinViewModel: ObservableObject {
         }
     }
 
-    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async throws -> [RecommendCoin] {
-        try await withThrowingTaskGroup(of: RecommendCoin?.self) { group in
+    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async -> [RecommendCoin] {
+        await withTaskGroup(of: RecommendCoin?.self) { group in
             for dto in dtos {
                 group.addTask {
-                    guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
+                    do {
+                        guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
+                            return nil
+                        }
+
+                        return RecommendCoin(
+                            imageURL: nil,
+                            comment: dto.comment,
+                            coinID: data.coinID,
+                            name: dto.name,
+                            tradePrice: data.tradePrice,
+                            changeRate: data.change == "FALL" ? -data.changeRate : data.changeRate
+                        )
+                    } catch {
                         return nil
                     }
-
-                    return RecommendCoin(
-                        imageURL: nil,
-                        comment: dto.comment,
-                        coinID: data.coinID,
-                        name: dto.name,
-                        tradePrice: data.tradePrice,
-                        changeRate: data.change == "FALL" ? -data.changeRate : data.changeRate
-                    )
                 }
             }
 
             var results: [RecommendCoin] = []
 
-            for try await coin in group {
+            for await coin in group {
                 if let coin = coin {
                     results.append(coin)
                 }

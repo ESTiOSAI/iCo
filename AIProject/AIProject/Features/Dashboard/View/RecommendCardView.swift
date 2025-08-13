@@ -23,7 +23,7 @@ struct RecommendCardView: View {
                                 .stroke(.default, lineWidth: 0.5)
                         }
                 } placeholder: {
-                    Text(String(recommendCoin.name.prefix(1)))
+                    Text(String(recommendCoin.id.prefix(1)))
                         .font(.system(size: 14))
                         .foregroundStyle(.aiCoAccent)
                         .frame(width: 40, height: 40)
