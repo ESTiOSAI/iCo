@@ -37,6 +37,8 @@ struct BookmarkView: View {
             case .none:
                 return vm.bookmarks
             }
+        case .volume:
+            return vm.bookmarks
 
         case .none:
             return vm.bookmarks

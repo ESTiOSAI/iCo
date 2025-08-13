@@ -26,6 +26,7 @@ class MarketViewModel {
         
         Task {
             await setup()
+            change(tab: .total)
         }
     }
     
@@ -53,7 +54,7 @@ class MarketViewModel {
     
     // TODO: 실제 BookMark Coin 가져오기
     private func fetchBookmarkCoin() async -> Set<CoinListModel.ID> {
-        return []
+        return Set( (try? BookmarkManager.shared.fetchAll().map(\.coinID)) ?? [])
     }
     
     private func fetchMarketCoinData() async -> [CoinListModel] {

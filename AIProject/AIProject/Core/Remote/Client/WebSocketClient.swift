@@ -193,14 +193,3 @@ extension WebSocketClient: URLSessionWebSocketDelegate {
         disconnect()
     }
 }
-
-enum WebSocket {
-    struct ErrorResponse: Decodable {
-        struct Message: Decodable {
-            let message: String
-            let name: String
-        }
-        
-        let error: Message
-    }
-}

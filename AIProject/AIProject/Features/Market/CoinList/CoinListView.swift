@@ -12,20 +12,52 @@ struct CoinListView: View {
     @Bindable var viewModel: CoinListViewModel
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
+    @State var sortCategory: SortCategory? = .volume
+    @State var volumeSortOrder: SortOrder = .descending
+    @State var nameSortOrder: SortOrder = .none
     
     init(viewModel: CoinListViewModel) {
         self.viewModel = viewModel
     }
     
+    var sortedCoins: [CoinListModel] {
+        switch sortCategory {
+        case .name:
+            switch nameSortOrder {
+            case .none:
+                return viewModel.coins
+            case .ascending:
+                return viewModel.coins.sorted { $0.name < $1.name }
+            case .descending:
+                return viewModel.coins.sorted { $0.name > $1.name }
+            }
+        case .volume:
+            switch volumeSortOrder {
+            case .none:
+                return viewModel.coins
+            case .ascending:
+                return viewModel.coins.sorted { $0.tradeAmount < $1.tradeAmount }
+            case .descending:
+                return viewModel.coins.sorted { $0.tradeAmount > $1.tradeAmount }
+            }
+        case nil:
+            return viewModel.coins
+        }
+    }
+   
+    
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView()
-                    .fontWeight(.regular)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.aiCoLabel)
+                CoinListHeaderView(sortCategory: $sortCategory, nameSortOrder: $nameSortOrder, volumeSortOrder: $volumeSortOrder, action: {
+                    
+                })
+                .fontWeight(.regular)
+                .font(.system(size: 11))
+                .foregroundStyle(.aiCoLabel)
+                .listRowBackground(Color.clear)
                 
-                ForEach(viewModel.coins) { coin in
+                ForEach(sortedCoins) { coin in
                     
                     // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
                     GeometryReader { geometry in
@@ -44,6 +76,23 @@ struct CoinListView: View {
                             visibleCoins.remove(coin.id)
                         }
                     }
+                    .padding(.vertical, 18)
+                    .padding(.bottom)
+                }
+                .listRowBackground(Color.clear)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.aiCoBorderGray, lineWidth: 1)
+                    .fill(Color.aiCoBackground)
+            }
+            .onChange(of: sortCategory) { oldValue, newValue in
+                if newValue == .name {
+                    volumeSortOrder = .none
+                } else {
+                    nameSortOrder = .none
                 }
             }
         }
@@ -63,7 +112,9 @@ struct CoinListView: View {
             }
         }
         .onDisappear {
-            viewModel.disconnect()
+            Task {
+                await viewModel.disconnect()
+            }
         }
     }
 }
@@ -85,7 +136,7 @@ extension CoinListView {
         print(#function, phase)
         switch phase {
         case .background:
-            viewModel.disconnect()
+            await viewModel.disconnect()
         case .inactive:
             break
         case .active:
@@ -97,5 +148,5 @@ extension CoinListView {
 }
 
 #Preview {
-    CoinListView(viewModel: .init(socket: .init()))
+    CoinListView(viewModel: .init(tickerService: .init(client: .init()), coinGeckoService: CoinGeckoAPIService(network: .init())))
 }
