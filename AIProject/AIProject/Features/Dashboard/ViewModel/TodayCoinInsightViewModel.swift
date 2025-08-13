@@ -36,16 +36,16 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let data = try await alanAPIService.fetchTodayInsight()
             
             await MainActor.run {
-                self.overViewSentiment = Sentiment.from(data.todaysSentiment)
-                self.overViewSummary = data.summary
-                self.overviewStatus = .success
+                overViewSentiment = Sentiment.from(data.todaysSentiment)
+                overViewSummary = data.summary
+                overviewStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.overviewStatus = .failure(ne)
+                overviewStatus = .failure(ne)
             }
         }
     }
@@ -55,9 +55,9 @@ final class TodayCoinInsightViewModel: ObservableObject {
     /// Reddit에서 데이터를 수집하고, 해당 내용을 요약 요청하여 감정과 요약을 설정합니다.
     private func fetchCommunityAsync() async {
         do {
-            let communityData = try await redditAPIService.fetchData()
+            let redditData = try await redditAPIService.fetchData()
             
-            let communitySummary = communityData.enumerated().reduce(into: "") { result, element in
+            let redditSummary = redditData.enumerated().reduce(into: "") { result, element in
                 let (index, item) = element
                 
                 result += "제목\(index): \(item.data.title)"
@@ -68,14 +68,14 @@ final class TodayCoinInsightViewModel: ObservableObject {
             }
                 .trimmingCharacters(in: .newlines)
             
-            let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
+            let alanData = try await alanAPIService.fetchCommunityInsight(from: redditSummary)
             
             await MainActor.run {
-                self.communitySentiment = Sentiment.from(alanData.todaysSentiment)
-                self.communitySummary = alanData.summary
+                communitySentiment = Sentiment.from(alanData.todaysSentiment)
+                communitySummary = alanData.summary
                 
-                if self.overviewStatus != .loading {
-                    self.communityStatus = .success
+                if overviewStatus != .loading {
+                    communityStatus = .success
                 }
             }
         } catch {
@@ -83,7 +83,7 @@ final class TodayCoinInsightViewModel: ObservableObject {
             
             print(ne.log())
             await MainActor.run {
-                self.communityStatus = .failure(ne)
+                communityStatus = .failure(ne)
             }
         }
     }
