@@ -188,7 +188,7 @@ struct ChartView: View {
                     }
                 }
             }
-            .padding(.top, 40)
+            .padding(.top, 20)
             .padding(.bottom, 20)
             .frame(height: 380)
         }
