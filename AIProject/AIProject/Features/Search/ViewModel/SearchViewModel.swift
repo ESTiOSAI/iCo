@@ -124,7 +124,7 @@ extension SearchViewModel {
     /// - Returns: imageURL 프로퍼티에 URL을 저장하고 반환합니다.
     private func setImageURL(_ coins: [Coin]) async throws -> [Coin] {
         var tempCoins = coins
-        let symbols = coins.map { $0.id.replacingOccurrences(of: "KRW-", with: "") }
+        let symbols = coins.map { $0.id }
         let urls = try await imageService.fetchCoinImages(symbols: symbols).map { $0.imageURL }
 
         for i in 0..<urls.count {
