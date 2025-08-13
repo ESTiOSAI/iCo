@@ -27,7 +27,7 @@ struct DefaultProgressView: View {
         case cancel
     }
     
-    @State var status: Status
+    let status: Status
     
     /// 로딩 중에 표시할 메시지를 친근한 말투로 작성
     /// 예: "아이코가 보고서를 생성하고 있어요"
