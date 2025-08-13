@@ -27,12 +27,22 @@ final class ChartViewModel: ObservableObject {
     /// 주기적 업데이트 태스크 (취소를 위해 저장)
     private var updateTask: Task<Void, Never>?
     
-    init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
+    /// 현재 시각을 제공하는 클로저
+    /// - 기본값: `Date()`
+    /// - 사용 목적: 테스트에서 현재 시각을 고정하여 시간 의존 로직(날짜 필터링 등)의 안정적인 검증을 가능하게 함
+    private let nowProvider: () -> Date
+    
+    init(
+        coin: Coin,
+        priceService: CoinPriceProvider = UpbitPriceService(),
+        nowProvider: @escaping () -> Date = { Date() }
+    ) {
         self.coinName = coin.koreanName
         self.coinSymbol = coin.id
         // id: "KRW-BTC" → currency: "KRW"
         self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
+        self.nowProvider = nowProvider
         startUpdating()
     }
     
