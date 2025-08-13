@@ -9,37 +9,42 @@ import SwiftUI
 
 struct MarketView: View {
     @State var isShowSearchView = false
-    @State var selectedTabIndex: Int = 0
-    @State var viewModel: MarketViewModel = MarketViewModel(upbitService: .init(), coinListViewModel: CoinListViewModel(socket: .init()))
+    @State var selectedTab = MarketCoinTab.total
+    @State var viewModel: MarketViewModel = MarketViewModel(upbitService:  .init(), coinListViewModel: CoinListViewModel(tickerService: UpbitTickerService(client: .init(pingInterval: .seconds(120))), coinGeckoService: CoinGeckoAPIService()))
+    @State var bookmarkSelected = true
+    @State var totalSelected = false
     
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 0) {
                 HeaderView(heading: "마켓", showSearchButton: true, onSearchTap: {
                     isShowSearchView = true
                 })
                 
                 VStack(spacing: 8) {
-                                    
-                SegmentedControlView(selection: $selectedTabIndex,
-                                     tabTitles: ["북마크한 코인", "전체 코인"],
-                                     width: 200)
-                .frame(height: 44)
+                    HStack(spacing: 16) {
+                        RoundedRectangleButton(title: "전체코인", isActive: selectedTab == .total) {
+                            selectedTab = .total
+                            viewModel.change(tab: .total)
+                        }
+                        
+                        RoundedRectangleButton(title: "북마크", isActive: selectedTab == .bookmark) {
+                            selectedTab = .bookmark
+                            viewModel.change(tab: .bookmark)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
                 
                     CoinListView(viewModel: viewModel.coinListViewModel)
+                        .padding(.horizontal, 16)
                 }
                 .refreshable {
                     Task {
                         await viewModel.refresh()
-                        viewModel.change(tab: MarketCoinTab(rawValue: selectedTabIndex) ?? .bookmark)
                     }
                 }
             }
-            .onChange(of: selectedTabIndex, { _, newValue in
-                if let tab = MarketCoinTab(rawValue: newValue) {
-                    viewModel.change(tab: tab)
-                }
-            })
             .navigationDestination(isPresented: $isShowSearchView) {
                 SearchView()
             }

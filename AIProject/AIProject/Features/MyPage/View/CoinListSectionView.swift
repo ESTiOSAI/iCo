@@ -36,20 +36,25 @@ struct CoinListSectionView: View {
             .font(.system(size: 12))
             .foregroundStyle(.aiCoLabel)
 
-            Divider()
-
             ForEach(sortedCoins, id: \.coinID) { coin in
                 NavigationLink {
                     CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
                     CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol), onDelete: onDelete)
                 }
-                Divider().padding(.leading, 16)
             }
         }
         .padding(.top, 16)
         .padding(.bottom, 16)
         .background(.aiCoBackground.opacity(0.7))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.aiCoBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(.gray, lineWidth: 0.5)
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

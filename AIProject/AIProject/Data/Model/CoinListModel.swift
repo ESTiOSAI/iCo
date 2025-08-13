@@ -31,7 +31,7 @@ struct CoinListModel: Identifiable {
         coinID
     }
     
-    let image: String
+    var image: String
     
     /// koreanName 예시: 비트코인
     let name: String
@@ -60,6 +60,12 @@ struct CoinListModel: Identifiable {
         self.changePrice = changePrice
         self.tradeAmount = tradeAmount
         self.change = change
+    }
+}
+
+extension CoinListModel: Equatable {
+    static func ==(lhs: CoinListModel, rhs: CoinListModel) -> Bool {
+        lhs.coinID == rhs.coinID
     }
 }
 

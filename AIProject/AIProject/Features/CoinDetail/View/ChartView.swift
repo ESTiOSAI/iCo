@@ -57,30 +57,41 @@ struct ChartView: View {
                     Text(lastUpdatedText)
                         .font(.system(size: 10, weight: .regular))
                         .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
                     
-                    // 상단 요약: 현재가 및 등락
-                    if let summary {
-                        let isRising = summary.change > 0
-                        let isFalling = summary.change < 0
-                        let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
-                        isFalling ? themeManager.selectedTheme.negativeColor :
-                            .gray
-                        
-                        Text(summary.lastPrice.formatKRW)
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundStyle(.aiCoLabel)
-                        
-                        let sign = isRising ? "+" : (isFalling ? "-" : "")
-                        let arrow = isRising ? "▲" : (isFalling ? "▼" : "")
-                        Text("\(sign)\(abs(summary.change).formatKRW) (\(arrow)\(abs(summary.changeRate).formatRate))")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(color)
-                    }
+                    // 요약 데이터 유무
+                    let hasSummary = (summary != nil)
+                    
+                    let lastPrice = summary?.lastPrice ?? 0
+                    let changeValue = summary?.change ?? 0
+                    let changeRate  = summary?.changeRate ?? 0
+                    
+                    let isRising = changeValue > 0
+                    let isFalling = changeValue < 0
+                    let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
+                    isFalling ? themeManager.selectedTheme.negativeColor :
+                        .gray
+                    let sign = isRising ? "+" : (isFalling ? "-" : "")
+                    let arrow = isRising ? "▲" : (isFalling ? "▼" : "")
+                    
+                    Text(lastPrice.formatKRW)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
+                        .opacity(hasSummary ? 1 : 0)
+                    
+                    Text("\(sign)\(abs(changeValue).formatKRW) (\(arrow)\(abs(changeRate).formatRate))")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(color)
+                        .lineLimit(1)
+                        .opacity(hasSummary ? 1 : 0)
                     
                     let trade = viewModel.prices.last?.trade ?? 0
                     Text("거래대금 \(trade.formatMillion)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.aiCoLabelSecondary)
+                        .lineLimit(1)
+                        .opacity(hasSummary ? 1 : 0)
                 }
                 
                 Spacer()
@@ -99,7 +110,11 @@ struct ChartView: View {
             
             ZStack {
                 if data.isEmpty {
-//                    DefaultProgressView(message: "차트를 불러오는 중이에요")
+                    DefaultProgressView(
+                        status: .loading,
+                        message: "차트를 불러오는 중이에요",
+                        buttonAction: { print("차트 불러오기 취소") }
+                    )
                 } else {
                     let yRange = viewModel.yAxisRange(from: data)
                     let xDomain = viewModel.xAxisDomain(for: data)

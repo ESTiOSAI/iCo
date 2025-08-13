@@ -28,7 +28,7 @@ struct RoundedRectangleFillButton: View {
         Button {
             action?()
         } label: {
-            RoundedRectangleFillButtonView(title: title, isHighlighted: $isHighlighted)
+            RoundedRectangleFillButtonView(title: title, imageName: imageName, isHighlighted: $isHighlighted)
         }
     }
 }

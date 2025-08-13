@@ -37,7 +37,6 @@ final class CoinGeckoAPIService {
         guard let url = comps?.url else { throw NetworkError.invalidURL }
 
         let dtos: [CoinGeckoImageDTO] = try await network.request(url: url)
-        print("dtos: \(dtos)")
         return dtos
     }
 

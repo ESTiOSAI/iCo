@@ -34,26 +34,20 @@ struct CoinRowView: View {
                 Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
             )
 
-            VStack(alignment: .leading, spacing: 2) {
+           	HStack(spacing: 8) {
                 Text(coin.coinKoreanName)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.primary)
 
-                Text(coin.coinID)
+                Text(coin.coinSymbol)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
 
             Spacer()
 
-            Button {
+            RoundedButton(imageName: "bookmark.fill") {
                 onDelete(coin)
-                print("북마크 삭제 삭제삭제")
-            } label: {
-                Image(systemName: "bookmark.fill")
-                    .resizable()
-                    .frame(width: size / 3, height: size / 2)
-                    .foregroundColor(.red)
             }
         }
         .padding(.vertical, 8)

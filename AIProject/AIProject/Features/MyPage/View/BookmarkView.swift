@@ -15,10 +15,15 @@ struct BookmarkView: View {
     @State private var priceOrder: SortOrder = .none
     @State private var volumeOrder: SortOrder = .none
 
+    @State private var showBulkInsertSheet = false
     @State private var isShowingShareSheet = false
     @State private var sharingItems: [Any] = []
     @State private var showingExportOptions = false
     @State private var showDeleteConfirm = false
+
+    private var isExportDisabled: Bool {
+        vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading
+    }
 
     // 정렬 데이터
     var sortedCoins: [BookmarkEntity] {
@@ -32,6 +37,8 @@ struct BookmarkView: View {
             case .none:
                 return vm.bookmarks
             }
+        case .volume:
+            return vm.bookmarks
 
         case .none:
             return vm.bookmarks
@@ -41,28 +48,33 @@ struct BookmarkView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 8) {
-                HeaderView(heading: "북마크 관리", isBookmarkView: true, onExportTap: {
-                    guard !(vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading) else { return }
-                    showingExportOptions = true
-                }
-                )
-                .padding(.bottom, 16)
+                HeaderView(heading: "북마크 관리")
 
                 HStack {
-                    SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
+                    SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
+                        .padding(.leading, -16)
+
+                    Spacer()
+
+                    RoundedButton(title: "내용 복사", imageName: "document.on.document") {
+                        //내용 복사
+
+                    }
+                    .disabled(isExportDisabled)
+                    .opacity(isExportDisabled ? 0.2 : 1.0)
                 }
+                .padding(.leading, 16)
+                .padding(.trailing, 16)
 
                 // 북마크 AI 한줄평
                 BriefingSectionView(briefing: vm.briefing, isLoading: vm.isLoading, bookmarksEmpty: vm.isBookmarkEmpty, errorMessage: vm.errorMessage)
 
-                HStack(spacing: 2) {
-                    Image(systemName: "info.circle")
-                    Text("해당 컨텐츠는 생성형 AI의 응답으로 오류가 있을 수 있습니다.")
-                }
-                .font(.system(size: 8))
-                .foregroundColor(.gray)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.trailing, 16)
+                Text(String.aiGeneratedContentNotice)
+                    .font(.system(size: 8))
+                    .foregroundColor(.aiCoNeutral)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 16)
+
 
                 Spacer()
 
@@ -71,7 +83,7 @@ struct BookmarkView: View {
  
                     Spacer()
 
-                    RoundedButton(title: "전체 삭제") {
+                    RoundedButton(title: "전체 삭제", imageName: "chevron.right") {
                         showDeleteConfirm = true
                     }.alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                         Button("삭제", role: .destructive) {
@@ -82,6 +94,21 @@ struct BookmarkView: View {
                         Text("모든 북마크를 삭제하시겠습니까?")
                     }
                 }
+                .padding(.trailing, 16)
+
+                HStack(spacing: 16) {
+                    RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) {
+						showBulkInsertSheet = true
+                    }
+                    RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
+                        guard !(vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading) else { return }
+                        showingExportOptions = true
+                    }
+                    .disabled(isExportDisabled)
+                    .opacity(isExportDisabled ? 0.2 : 1.0)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.leading, 16)
                 .padding(.trailing, 16)
 
                 Divider()
@@ -107,11 +134,18 @@ struct BookmarkView: View {
                 }
             }
             .onAppear {
-                Task {
+                //TODO: 북마크 갯수가 달라졌을 때만 Fetch
+                vm.fetchBookmarks()
+
+                Task { @MainActor in
+                    guard !vm.bookmarks.isEmpty else {
+                        vm.briefing = nil
+                        vm.imageMap = [:]
+                        return
+                    }
                     async let imagesTask: () = vm.loadCoinImages()
                     async let briefingTask: () = vm.loadBriefing(character: .longTerm)
-                    await briefingTask
-                    await imagesTask
+                    _ = await (imagesTask, briefingTask)
                 }
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
@@ -121,6 +155,7 @@ struct BookmarkView: View {
                 }
             }
         }
+        .backgroundStyle(.aiCoBackground)
         .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
             Button("이미지로 내보내기") {
                 if let url = vm.makeFullReportPNGURL(scale: 2.0) {
@@ -141,6 +176,9 @@ struct BookmarkView: View {
         .sheet(isPresented: $isShowingShareSheet) {
             ActivityView(activityItems: sharingItems)
         }
+        .sheet(isPresented: $showBulkInsertSheet) {
+            BookmarkBulkInsertView()
+        }
     }
 }
 
@@ -155,17 +193,27 @@ struct BriefingSectionView: View {
             if bookmarksEmpty {
                 Text("코인을 북마크 해보세요!")
             } else if isLoading {
-//                DefaultProgressView(message: "분석중...")
+                DefaultProgressView(status: .loading, message: "분석중...")
             } else if let briefing {
-                BadgeLabelView(text: "📝 투자 브리핑 요약")
-                Text(briefing.briefing)
+
+                Text("분석 결과")
+                    .font(.system(size: 14))
+                    .bold()
+                    .foregroundColor(Color(.aiCoAccent))
+
+                briefing.briefing.highlightTextForNumbersOperator()
                     .font(.system(size: 12))
                     .lineSpacing(6)
 
                 Spacer(minLength: 0)
 
-                BadgeLabelView(text: "✅ 전략 제안")
-                Text(briefing.strategy)
+                Text("전략 제안")
+                    .font(.system(size: 14))
+                    .bold()
+                    .foregroundColor(Color(.aiCoAccent))
+
+                briefing.strategy
+                    .highlightTextForNumbersOperator()
                     .font(.system(size: 12))
                     .lineSpacing(6)
             } else if let errorMessage {
@@ -176,7 +224,12 @@ struct BriefingSectionView: View {
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundColor(.primary)
-        .background(.gray.opacity(0.1))
+        .background(RoundedRectangle(cornerRadius: 12)
+            .fill(Color.aiCoBackgroundAccent)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(.accent, lineWidth: 0.5)
+            ))
         .cornerRadius(12)
         .padding(.horizontal, 16)
     }
