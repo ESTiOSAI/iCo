@@ -12,25 +12,22 @@ import Foundation
 /// AI 또는 커뮤니티 기반의 인사이트를 비동기적으로 불러오고,
 /// 감정(Sentiment)과 요약(summary)을 제공합니다.
 final class TodayCoinInsightViewModel: ObservableObject {
-    /// AI가 분석한 감정 결과입니다.
-    @Published var sentiment: Sentiment? = nil
-    /// AI 또는 커뮤니티 기반의 요약 내용입니다.
-    @Published var summary: String = "AI가 정보를 준비하고 있어요"
-    
+    @Published var overViewSentiment: Sentiment? = nil
+    @Published var communitySentiment: Sentiment? = nil
+    @Published var overViewSummary: String = ""
+    @Published var communitySummary: String = ""
     @Published var overviewStatus: ResponseStatus = .loading
     @Published var communityStatus: ResponseStatus = .loading
     
-    /// 커뮤니티 기반 인사이트인지 여부입니다.
-    let isCommunity: Bool
     let alanAPIService = AlanAPIService()
     let redditAPIService = RedditAPIService()
     
-    init(isCommunity: Bool = false) {
-        self.isCommunity = isCommunity
-        Task {
-            // FIXME: 순서대로 요청하도록 수정
-            await !isCommunity ? fetchOverallAsync() : fetchCommunityAsync()
-        }
+    private var overallTask: Task<Void, Never>?
+    private var communityTask: Task<Void, Never>?
+    
+    init() {
+        overallTask = Task { await fetchOverallAsync() }
+        communityTask = Task { await fetchCommunityAsync() }
     }
     
     /// AI 기반의 전체 인사이트를 비동기적으로 가져옵니다.
@@ -39,8 +36,8 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let data = try await alanAPIService.fetchTodayInsight()
             
             await MainActor.run {
-                self.sentiment = Sentiment.from(data.todaysSentiment)
-                self.summary = data.summary
+                self.overViewSentiment = Sentiment.from(data.todaysSentiment)
+                self.overViewSummary = data.summary
                 self.overviewStatus = .success
             }
         } catch {
@@ -74,9 +71,12 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
             
             await MainActor.run {
-                self.sentiment = Sentiment.from(alanData.todaysSentiment)
-                self.summary = alanData.summary
-                self.communityStatus = .success
+                self.communitySentiment = Sentiment.from(alanData.todaysSentiment)
+                self.communitySummary = alanData.summary
+                
+                if self.overviewStatus != .loading {
+                    self.communityStatus = .success
+                }
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }

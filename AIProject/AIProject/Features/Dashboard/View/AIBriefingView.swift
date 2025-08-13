@@ -23,8 +23,6 @@ struct AIBriefingView: View {
             VStack(spacing: 16) {
                 TodayCoinInsightView()
                 
-                TodayCoinInsightView(isCommunity: true)
-                
                 FearGreedView()
                     .padding(.bottom, 30)
             }
