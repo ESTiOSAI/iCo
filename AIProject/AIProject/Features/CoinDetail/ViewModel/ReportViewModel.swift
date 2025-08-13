@@ -15,9 +15,9 @@ import Foundation
 /// - Parameters:
 ///   - coin: 보고서 생성의 대상이 되는 코인입니다.
 final class ReportViewModel: ObservableObject {
-    @Published var overviewState: ResponseStatus = .loading
-    @Published var weeklyState: ResponseStatus = .loading
-    @Published var todayState: ResponseStatus = .loading
+    @Published var overviewStatus: ResponseStatus = .loading
+    @Published var weeklyStatus: ResponseStatus = .loading
+    @Published var todayStatus: ResponseStatus = .loading
     
     @Published var coinOverView: AttributedString = AttributedString("AI가 정보를 준비하고 있어요")
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
@@ -64,14 +64,14 @@ final class ReportViewModel: ObservableObject {
                 overview.append(AttributedString("- 소개: \(data.description)"))
 
                 self.coinOverView = overview
-                self.overviewState = .success
+                self.overviewStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.overviewState = .failure(ne)
+                self.overviewStatus = .failure(ne)
             }
         }
     }
@@ -85,14 +85,14 @@ final class ReportViewModel: ObservableObject {
                     - 거래량 변화: \(data.volumeChange)
                     - 원인: \(data.reason)
                     """
-                self.weeklyState = .success
+                self.weeklyStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.weeklyState = .failure(ne)
+                self.weeklyStatus = .failure(ne)
             }
         }
     }
@@ -103,14 +103,14 @@ final class ReportViewModel: ObservableObject {
             await MainActor.run {
                 self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
                 self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
-                self.todayState = .success
+                self.todayStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.todayState = .failure(ne)
+                self.todayStatus = .failure(ne)
             }
         }
     }
