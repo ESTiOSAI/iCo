@@ -10,6 +10,8 @@ import Foundation
 enum AlanAction {
     /// 코인 추천
     case coinRecomendation
+    /// 대시보드 AI 브리핑
+    case dashboardBriefingGeneration
     /// 코인 리포트
     case coinReportGeneration
     /// 코인 ID 추출

@@ -17,6 +17,9 @@ final class TodayCoinInsightViewModel: ObservableObject {
     /// AI 또는 커뮤니티 기반의 요약 내용입니다.
     @Published var summary: String = "AI가 정보를 준비하고 있어요"
     
+    @Published var overviewStatus: ResponseStatus = .loading
+    @Published var communityStatus: ResponseStatus = .loading
+    
     /// 커뮤니티 기반 인사이트인지 여부입니다.
     let isCommunity: Bool
     let alanAPIService = AlanAPIService()
@@ -25,6 +28,7 @@ final class TodayCoinInsightViewModel: ObservableObject {
     init(isCommunity: Bool = false) {
         self.isCommunity = isCommunity
         Task {
+            // FIXME: 순서대로 요청하도록 수정
             await !isCommunity ? fetchOverallAsync() : fetchCommunityAsync()
         }
     }
@@ -36,27 +40,15 @@ final class TodayCoinInsightViewModel: ObservableObject {
             
             await MainActor.run {
                 sentiment = Sentiment.from(data.todaysSentiment)
-                
-                self.summary = data.summary.reduce("") { partialResult, element in
-                    let (key, values) = element
-                    var segment = ""
-                    
-                    if data.summary.count > 1 {
-                        segment += "‣ \(key) 소식\n"
-                    }
-                    segment += values.joined(separator: "\n")
-                    
-                    // 두 개 이상의 섹션이 있을 경우 섹션 별로 빈 줄 추가
-                    return partialResult.isEmpty ? segment : partialResult + "\n\n" + segment
-                }
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+                self.summary = data.summary
+                self.overviewStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.summary = ne.localizedDescription
+                self.overviewStatus = .failure(ne)
             }
         }
     }
@@ -83,15 +75,15 @@ final class TodayCoinInsightViewModel: ObservableObject {
             
             await MainActor.run {
                 sentiment = Sentiment.from(alanData.todaysSentiment)
-                
                 self.summary = alanData.summary
+                self.communityStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.summary = ne.localizedDescription
+                self.communityStatus = .failure(ne)
             }
         }
     }

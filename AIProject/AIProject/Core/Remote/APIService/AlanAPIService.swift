@@ -56,6 +56,8 @@ extension AlanAPIService {
         switch action {
         case .coinRecomendation:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
+        case .dashboardBriefingGeneration:
+            return Bundle.main.infoDictionary?["ALAN_API_KEY_AI_BRIEFING_GENERATION"] as? String
         case .coinReportGeneration:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
         case .coinIDExtraction:
@@ -127,7 +129,7 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchTodayInsight() async throws -> TodayInsightDTO {
         let prompt = Prompt.generateTodayInsight
-        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
+        return try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
     }
     
     /// 주어진 코인에 대해 커뮤니티 기반 인사이트 데이터를 가져옵니다.
@@ -136,7 +138,7 @@ extension AlanAPIService {
     /// - Returns: 디코딩된 DTO
     func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
         let prompt = Prompt.generateCommunityInsight(redditPost: post)
-        return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
+        return try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
     }
 
     /// 북마크된 코인 전체에 대한 투자 브리핑과 전략 제안을 JSON 형식으로 가져옵니다.
