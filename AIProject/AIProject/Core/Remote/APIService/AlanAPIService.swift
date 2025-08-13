@@ -104,7 +104,12 @@ extension AlanAPIService {
         
         return dto
     }
-    
+
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO] {
+        let prompt = Prompt.recommendCoin(preference: preference, bookmark: bookmarkCoins)
+        return try await fetchDTO(prompt: prompt, action: .coinRecomendation)
+    }
+
     /// 주어진 코인에 대해 주간 트렌드 데이터를 가져옵니다.
     ///
     /// - Parameter coin: 대상 코인
