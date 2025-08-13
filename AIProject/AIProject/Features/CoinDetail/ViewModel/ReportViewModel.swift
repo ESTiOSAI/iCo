@@ -29,14 +29,24 @@ final class ReportViewModel: ObservableObject {
     
     private let alanAPIService = AlanAPIService()
     
+    private var overviewTask: Task<Void, Never>?
+    private var weeklyTask: Task<Void, Never>?
+    private var todayTask: Task<Void, Never>?
+    
     init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
         
-        Task.detached(priority: .background) {
-            await self.fetchOverViewAsync()
-            await self.fetchWeeklyTrendsAsync()
-            await self.fetchTodayTopNewsAsync()
+        overviewTask = Task { [weak self] in
+            await self?.fetchOverViewAsync()
+        }
+        
+        weeklyTask = Task { [weak self] in
+            await self?.fetchWeeklyTrendsAsync()
+        }
+        
+        todayTask = Task { [weak self] in
+            await self?.fetchTodayTopNewsAsync()
         }
     }
     
@@ -63,15 +73,15 @@ final class ReportViewModel: ObservableObject {
                 overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
                 overview.append(AttributedString("- 소개: \(data.description)"))
 
-                self.coinOverView = overview
-                self.overviewStatus = .success
+                coinOverView = overview
+                overviewStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.overviewStatus = .failure(ne)
+                overviewStatus = .failure(ne)
             }
         }
     }
@@ -80,19 +90,22 @@ final class ReportViewModel: ObservableObject {
         do {
             let data = try await alanAPIService.fetchWeeklyTrends(for: coin)
             await MainActor.run {
-                self.coinWeeklyTrends = """
+                coinWeeklyTrends = """
                     - 가격 추이: \(data.priceTrend)
                     - 거래량 변화: \(data.volumeChange)
                     - 원인: \(data.reason)
                     """
-                self.weeklyStatus = .success
+                
+                if overviewStatus != .loading {
+                    weeklyStatus = .success
+                }
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.weeklyStatus = .failure(ne)
+                weeklyStatus = .failure(ne)
             }
         }
     }
@@ -101,16 +114,19 @@ final class ReportViewModel: ObservableObject {
         do {
             let data = try await alanAPIService.fetchTodayNews(for: coin)
             await MainActor.run {
-                self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
-                self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
-                self.todayStatus = .success
+                coinTodayTrends = data.summaryOfTodaysMarketSentiment
+                coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
+                
+                if weeklyStatus != .loading {
+                    todayStatus = .success
+                }
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.todayStatus = .failure(ne)
+                todayStatus = .failure(ne)
             }
         }
     }
