@@ -12,7 +12,9 @@ struct CoinListView: View {
     @Bindable var viewModel: CoinListViewModel
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
-    @State var sortFilter = false
+    @State var sortCategory: SortCategory? = .volume
+    @State var volumeSortOrder: SortOrder = .descending
+    @State var nameSortOrder: SortOrder = .none
     
     init(viewModel: CoinListViewModel) {
         self.viewModel = viewModel
@@ -21,10 +23,13 @@ struct CoinListView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView(selected: $sortFilter)
-                    .fontWeight(.regular)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.aiCoLabel)
+                CoinListHeaderView(sortCategory: $sortCategory, nameSortOrder: $nameSortOrder, volumeSortOrder: $volumeSortOrder, action: {
+                    
+                })
+                .fontWeight(.regular)
+                .font(.system(size: 11))
+                .foregroundStyle(.aiCoLabel)
+                .listRowBackground(Color.clear)
                 
                 ForEach(viewModel.coins) { coin in
                     
@@ -48,6 +53,23 @@ struct CoinListView: View {
                     .padding(.vertical, 18)
                     .padding(.bottom)
                 }
+                .listRowBackground(Color.clear)
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.aiCoBorderGray, lineWidth: 0.5)
+                    .fill(Color.aiCoBackground)
+            }
+            .onChange(of: sortCategory) { oldValue, newValue in
+                if newValue == .name {
+                    volumeSortOrder = .none
+//                    viewModel.nameSort(asending: nameSortOrder == SortOrder.ascending)
+                } else {
+                    nameSortOrder = .none
+//                    viewModel.amountSort(asending: volumeSortOrder == SortOrder.ascending)
+                }
             }
         }
         .onChange(of: scenePhase, { _, newValue in
@@ -67,7 +89,7 @@ struct CoinListView: View {
         }
         .onDisappear {
             Task {
-               await viewModel.disconnect()
+                await viewModel.disconnect()
             }
         }
     }
@@ -102,5 +124,5 @@ extension CoinListView {
 }
 
 #Preview {
-    CoinListView(viewModel: .init(tickerService: .init(client: .init())))
+    CoinListView(viewModel: .init(tickerService: .init(client: .init()), coinGeckoService: CoinGeckoAPIService(network: .init())))
 }

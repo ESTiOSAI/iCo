@@ -8,25 +8,17 @@
 import SwiftUI
 
 struct CoinListHeaderView: View {
-    @Binding var selected: Bool
+    @Binding var sortCategory: SortCategory?
+    @Binding var nameSortOrder: SortOrder
+    @Binding var volumeSortOrder: SortOrder
     let action: (() -> Void)?
     
-    init(selected: Binding<Bool>, action: (() -> Void)? = nil) {
-        self._selected = selected
-        self.action = action
-    }
     var body: some View {
         HStack(spacing: 60) {
-            HStack {
-                Text("한글명")
-                RoundedButton(title: nil, imageName: selected ? "chevron.down" : "chevron.up") {
-                    selected.toggle()
-                    action?()
-                }
-            }
+            CoinSortButton(title: "한글명", sortCategory: .name, currentCategory: $sortCategory, sortOrder: $nameSortOrder)
             Spacer()
             
-            Text("현재가")
+            CoinSortButton(title: "거래대금", sortCategory: .volume, currentCategory: $sortCategory, sortOrder: $volumeSortOrder)
         }
         .frame(maxWidth: .infinity)
         .fontWeight(.medium)
@@ -43,8 +35,18 @@ struct CoinCell: View {
             HStack {
                 // 코인 레이블
                 HStack(spacing: 16) {
-                    Image(systemName: "swift")
-                        .frame(width: 30, height: 30)
+                    Group {
+                        if !coin.image.isEmpty, let url = URL(string: coin.image) {
+                            AsyncImage(url: url) { img in
+                                img.resizable().aspectRatio(contentMode: .fit)
+                            } placeholder: { ProgressView() }
+                        } else {
+                            Text(String(coin.coinName.prefix(1)))
+                                .font(.caption.bold())
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                    }
+                    .frame(width: 30, height: 30)
                     VStack(alignment: .leading, spacing: 6) {
                         Text(coin.name)
                             .lineLimit(2)
@@ -124,12 +126,4 @@ fileprivate struct CoinPriceView: View {
         .foregroundStyle(.aiCoLabel)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
-}
-
-#Preview {
-    VStack {
-        CoinListHeaderView(selected: .constant(true))
-        CoinCell(coin: CoinListModel.preview[0])
-    }
-    .padding(.horizontal)
 }
