@@ -39,7 +39,7 @@ struct FearGreedView: View {
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
-        .background(viewModel.fearGreed.color.opacity(0.05))
+        .background(viewModel.fearGreedBackgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: Self.cornerRadius)
