@@ -15,9 +15,9 @@ struct MarketView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                HeaderView(heading: "마켓", showSearchButton: true) {
+                HeaderView(heading: "마켓", showSearchButton: true, onSearchTap: {
                     isShowSearchView = true
-                }
+                })
                 
                 VStack(spacing: 8) {
                                     

@@ -41,7 +41,8 @@ struct BotMessageView: View {
             }
             .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
             .font(.system(size: 13))
-            .padding()
+            .padding(.vertical, 15)
+            .padding(.horizontal, 18)
             .background {
                 RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
                     .fill(.aiCoBackgroundAccent)

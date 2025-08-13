@@ -14,6 +14,7 @@ import Foundation
 struct Coin: Identifiable, Hashable, Codable {
     let id: String
     let koreanName: String
+    var imageURL: URL?
 }
 
 extension Coin {
