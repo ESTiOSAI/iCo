@@ -12,6 +12,8 @@ import SwiftUI
 /// - Parameters:
 ///   - imageName: SF Symbol 아이콘 이름
 ///   - title: 섹션 제목
+///   - sentiment: 선택적으로 표시할 감정(`Sentiment`) 정보.
+///                값이 제공되면 제목 우측에 감정 설명과 해당 색상을 함께 표시합니다.
 ///   - content: 표시할 본문 내용(`AttributedString`)
 ///              텍스트 스타일, 색상, 링크 등 리치 텍스트 속성을 적용하기 위해 사용합니다.
 struct ReportSectionView: View {
@@ -21,6 +23,7 @@ struct ReportSectionView: View {
     
     var imageName: String
     var title: String
+    var sentiment: Sentiment?
     var content: AttributedString
     
     var body: some View {
@@ -35,6 +38,12 @@ struct ReportSectionView: View {
                     .foregroundStyle(.aiCoLabel)
                 
                 Spacer()
+                
+                if let sentiment {
+                    Text(sentiment.description)
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(sentiment.color)
+                }
             }
             
             StatusSwitch(status: status, backgroundColor: .aiCoBackground) {
@@ -66,6 +75,19 @@ struct ReportSectionView: View {
         - 웹사이트: https://ethereum.org
         - 최초발행: 2015-07-30
         - 소개: 이더리움(Ethereum)은 블록체인 기술을 기반으로 한 탈중앙화 컴퓨팅 플랫폼으로, 스마트 계약 기능을 통해 분산 애플리케이션(DApps)을 구축할 수 있습니다. 2015년 7월 30일 비탈릭 부테린에 의해 출시되었으며, 이더리움의 네이티브 암호화폐는 이더(ETH)로, 플랫폼 내에서 거래 및 스마트 계약 실행에 사용됩니다.
+        """)
+    )
+    .padding(16)
+    
+    ReportSectionView(
+        status: .constant(.success),
+        imageName: "bitcoinsign.bank.building",
+        title: "전반적인 시장의 분위기",
+        sentiment: Sentiment.positive,
+        content: AttributedString("""
+        비트코인은 약 $114,900~115,000 수준에서 반등하며 강세 흐름을 이어가고 있고, 이더리움 역시 최근 상승세를 보이며 투자자 심리를 지지하고 있습니다.
+        연준의 금리 인하 기대가 커지면서 달러 약세 및 위험자산 선호로 전체적으로 긍정적인 투자 분위기가 조성되고 있습니다.
+        다만, 이더리움에 대한 기관 자금 유입이 활발한 상황에서 스테이킹 관련 규제와 시장 변동성은 여전히 주의 요인입니다.
         """)
     )
     .padding(16)

@@ -15,7 +15,7 @@ import SwiftUI
 /// - Parameters:
 ///   - isCommunity: 커뮤니티 기반 인사이트 여부를 나타내는 불리언 값입니다.
 struct TodayCoinInsightView: View {
-    @StateObject var viewModel: TodayCoinInsightViewModel
+    @StateObject private var viewModel: TodayCoinInsightViewModel
     
     let isCommunity: Bool
     
@@ -24,21 +24,31 @@ struct TodayCoinInsightView: View {
         _viewModel = StateObject(wrappedValue: TodayCoinInsightViewModel(isCommunity: isCommunity))
     }
     
+    // MARK: - Derived properties
+    private var statusBinding: Binding<ResponseStatus> {
+        isCommunity ? $viewModel.communityStatus : $viewModel.overviewStatus
+    }
+    
+    private var imageName: String {
+        isCommunity ? "shareplay" : "bitcoinsign.bank.building"
+    }
+    
+    private var title: String {
+        isCommunity ? "주요 커뮤니티의 분위기" : "전반적인 시장의 분위기"
+    }
+    
+    private var content: AttributedString {
+        AttributedString(viewModel.summary)
+    }
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 0) {
-                Text(!isCommunity ? "전체적인 시장은 " : "현재 커뮤니티 분위기는 ")
-                Text(viewModel.sentiment.description)
-                    .foregroundStyle(viewModel.sentiment.color)
-                Text("예요")
-            }
-            .foregroundStyle(.aiCoLabel)
-            
-            Text(viewModel.summary)
-        }
-        .font(.system(size: 13))
-        .padding(.horizontal)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        ReportSectionView(
+            status: statusBinding,
+            imageName: imageName,
+            title: title,
+            sentiment: viewModel.sentiment,
+            content: content
+        )
     }
 }
 
