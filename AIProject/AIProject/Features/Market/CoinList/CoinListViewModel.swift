@@ -77,7 +77,7 @@ class CoinListViewModel {
             .removeDuplicates()
             ._throttle(for: .milliseconds(300), latest: true)
         for await visibleCoin in stream {
-            await self.fetchImage(visibleCoin)
+//            await self.fetchImage(visibleCoin)
             await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
         }
     }
