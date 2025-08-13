@@ -17,6 +17,7 @@ import SwiftUI
 ///   - content: 표시할 본문 내용(`AttributedString`)
 ///              텍스트 스타일, 색상, 링크 등 리치 텍스트 속성을 적용하기 위해 사용합니다.
 struct ReportSectionView: View {
+    @EnvironmentObject var themeManager: ThemeManager
     @Binding var status: ResponseStatus
     
     private static let cornerRadius: CGFloat = 10
@@ -41,8 +42,8 @@ struct ReportSectionView: View {
                 
                 if let sentiment {
                     Text(sentiment.description)
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(sentiment.color)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(sentiment.color(for: themeManager.selectedTheme))
                 }
             }
             

@@ -55,7 +55,7 @@ enum Prompt {
             """
             struct CoinTodayNewsDTO: Codable {
                 let summaryOfTodaysMarketSentiment: String
-                let articles: [CoinArticleDTO]
+                let articles: [CoinArticleDTO] // 3개
             }
 
             struct CoinArticleDTO: Codable {
