@@ -32,8 +32,8 @@ enum SortOrder {
     var iconName: String {
         switch self {
         case .none: return "arrow.up.arrow.down"
-        case .ascending: return "arrow.up"
-        case .descending: return "arrow.down"
+        case .ascending: return "chevron.up"
+        case .descending: return "chevron.down"
         }
     }
 }
@@ -45,25 +45,20 @@ struct SortToggleButton: View {
     @Binding var sortOrder: SortOrder
 
     var body: some View {
-        Button {
-            if currentCategory == sortCategory {
-                sortOrder.toggle()
-            } else {
-                sortOrder = .ascending
-            }
 
-            currentCategory = sortCategory
-        } label: {
-            HStack(spacing: 4) {
-                Text(title)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.aiCoLabel)
-                Image(systemName: sortOrder.iconName)
-                    .resizable()
-                    .frame(width: 10, height: 10)
-                    .foregroundStyle(sortOrder == .none ? .aiCoLabelSecondary : .aiCoLabel)
+        HStack {
+            Text(title)
+                .font(.system(size: 11))
+                .foregroundStyle(.aiCoLabel)
+            RoundedButton(imageName: sortOrder.iconName) {
+                if currentCategory == sortCategory {
+                    sortOrder.toggle()
+                } else {
+                    sortOrder = .ascending
+                }
+
+                currentCategory = sortCategory
             }
         }
-        .buttonStyle(.plain)
     }
 }
