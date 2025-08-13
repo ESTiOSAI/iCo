@@ -18,15 +18,13 @@ struct HeaderView: View {
     var isBookmarkView = false
     
     let onSearchTap: () -> Void
-    let onExportTap: (() -> Void)?
 
-    init(showBulkInsertSheet: Bool = false, heading: String, showSearchButton: Bool = false, isBookmarkView: Bool = false, onSearchTap: @escaping () -> Void = { }, onExportTap: (() -> Void)? = nil) {
+    init(showBulkInsertSheet: Bool = false, heading: String, showSearchButton: Bool = false, isBookmarkView: Bool = false, onSearchTap: @escaping () -> Void = { }) {
         self.showBulkInsertSheet = showBulkInsertSheet
         self.heading = heading
         self.showSearchButton = showSearchButton
         self.isBookmarkView = isBookmarkView
         self.onSearchTap = onSearchTap
-        self.onExportTap = onExportTap
     }
     
     var body: some View {
@@ -59,7 +57,7 @@ struct HeaderView: View {
                         }
                         
                         Button {
-                            onExportTap?()
+
                         } label: {
                             Text("내보내기")
                         }
