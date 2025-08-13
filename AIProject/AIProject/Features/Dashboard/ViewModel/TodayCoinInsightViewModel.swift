@@ -36,20 +36,7 @@ final class TodayCoinInsightViewModel: ObservableObject {
             
             await MainActor.run {
                 sentiment = Sentiment.from(data.todaysSentiment)
-                
-                self.summary = data.summary.reduce("") { partialResult, element in
-                    let (key, values) = element
-                    var segment = ""
-                    
-                    if data.summary.count > 1 {
-                        segment += "‣ \(key) 소식\n"
-                    }
-                    segment += values.joined(separator: "\n")
-                    
-                    // 두 개 이상의 섹션이 있을 경우 섹션 별로 빈 줄 추가
-                    return partialResult.isEmpty ? segment : partialResult + "\n\n" + segment
-                }
-                .trimmingCharacters(in: .whitespacesAndNewlines)
+                self.summary = data.summary
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }

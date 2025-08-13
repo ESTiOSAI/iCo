@@ -12,5 +12,5 @@ struct TodayInsightDTO: Codable {
     let todaysSentiment: String
     
     /// 내용 요약
-    let summary: [String: [String]]
+    let summary: String
 }
