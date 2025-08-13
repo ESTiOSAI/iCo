@@ -49,12 +49,12 @@ struct BookmarkView: View {
                 HeaderView(heading: "북마크 관리")
 
                 HStack {
-                    SubheaderView(imageName: "sparkles", subheading: "북마크를 분석했어요")
+                    SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
                         .padding(.leading, -16)
 
                     Spacer()
 
-                    RoundedButton(title: "내용 복사하기", imageName: "document.on.document") {
+                    RoundedButton(title: "내용 복사", imageName: "document.on.document") {
                         //내용 복사
 
                     }
