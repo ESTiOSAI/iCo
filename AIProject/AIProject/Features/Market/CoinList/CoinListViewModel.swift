@@ -67,7 +67,7 @@ class CoinListViewModel {
     // MARK: - Private
     
     private func fetchImage(_ symbols: Set<CoinListModel.ID>) async {
-        let imageMap = await coinGeckoService.fetchImageMapBatched(symbols: Array(symbols))
+        let imageMap = await coinGeckoService.fetchImageMapBatched(symbols: Array(symbols.compactMap { $0.components(separatedBy: "-").last }))
         await updateImageCoinList(imageMap)
     }
     

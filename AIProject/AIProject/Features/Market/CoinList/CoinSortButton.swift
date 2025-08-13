@@ -41,13 +41,14 @@ struct CoinSortButton: View {
         } label: {
             HStack(spacing: 4) {
                 Text(title)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
+                    .fontWeight(currentCategory == sortCategory ? .bold : .regular)
                     .foregroundStyle(.aiCoLabel)
                 makeSymbol()
                     .foregroundStyle(.aiCoLabel)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 7)
-                    .frame(minWidth: 24, minHeight: 24)
+                    .frame(minWidth: 12, minHeight: 12)
                     .background(
                         Capsule()
                             .fill(.ultraThinMaterial)

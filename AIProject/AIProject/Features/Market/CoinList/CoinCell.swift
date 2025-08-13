@@ -40,13 +40,18 @@ struct CoinCell: View {
                             AsyncImage(url: url) { img in
                                 img.resizable().aspectRatio(contentMode: .fit)
                             } placeholder: { ProgressView() }
+                                .frame(width: 30, height: 30)
                         } else {
                             Text(String(coin.coinName.prefix(1)))
-                                .font(.caption.bold())
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .font(.system(size: 11))
+                                .foregroundStyle(.aiCoAccent)
+                                .overlay {
+                                    Circle()
+                                        .stroke(.default, lineWidth: 0.5)
+                                }
+                                .frame(width: 30, height: 30)
                         }
                     }
-                    .frame(width: 30, height: 30)
                     VStack(alignment: .leading, spacing: 6) {
                         Text(coin.name)
                             .lineLimit(2)

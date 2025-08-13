@@ -20,6 +20,32 @@ struct CoinListView: View {
         self.viewModel = viewModel
     }
     
+    var sortedCoins: [CoinListModel] {
+        switch sortCategory {
+        case .name:
+            switch nameSortOrder {
+            case .none:
+                return viewModel.coins
+            case .ascending:
+                return viewModel.coins.sorted { $0.name < $1.name }
+            case .descending:
+                return viewModel.coins.sorted { $0.name > $1.name }
+            }
+        case .volume:
+            switch volumeSortOrder {
+            case .none:
+                return viewModel.coins
+            case .ascending:
+                return viewModel.coins.sorted { $0.tradeAmount < $1.tradeAmount }
+            case .descending:
+                return viewModel.coins.sorted { $0.tradeAmount > $1.tradeAmount }
+            }
+        case nil:
+            return viewModel.coins
+        }
+    }
+   
+    
     var body: some View {
         VStack(spacing: 0) {
             List {
@@ -31,7 +57,7 @@ struct CoinListView: View {
                 .foregroundStyle(.aiCoLabel)
                 .listRowBackground(Color.clear)
                 
-                ForEach(viewModel.coins) { coin in
+                ForEach(sortedCoins) { coin in
                     
                     // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
                     GeometryReader { geometry in
@@ -59,16 +85,14 @@ struct CoinListView: View {
             .scrollContentBackground(.hidden)
             .background {
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.aiCoBorderGray, lineWidth: 0.5)
+                    .stroke(Color.aiCoBorderGray, lineWidth: 1)
                     .fill(Color.aiCoBackground)
             }
             .onChange(of: sortCategory) { oldValue, newValue in
                 if newValue == .name {
                     volumeSortOrder = .none
-//                    viewModel.nameSort(asending: nameSortOrder == SortOrder.ascending)
                 } else {
                     nameSortOrder = .none
-//                    viewModel.amountSort(asending: volumeSortOrder == SortOrder.ascending)
                 }
             }
         }
