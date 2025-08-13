@@ -14,9 +14,9 @@ struct DashboardView: View {
     var body: some View {
         ScrollView {
             HeaderView(heading: "대시보드")
-                .padding(.bottom, 16)
             
             RecommendCoinView()
+                .padding(.bottom, 50)
             
             AIBriefingView()
         }
