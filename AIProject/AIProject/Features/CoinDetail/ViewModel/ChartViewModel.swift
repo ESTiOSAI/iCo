@@ -77,11 +77,11 @@ final class ChartViewModel: ObservableObject {
             calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
 
             let nowKST = Date()
-            let todayStartKST = calendar.startOfDay(for: nowKST)
+            let last24hStartKST = nowKST.addingTimeInterval(-24 * 60 * 60)
 
             /// 당일 범위에 해당하는 가격만 필터링
             let filteredPrices = fetchedPrices.filter { price in
-                return price.date >= todayStartKST && price.date <= nowKST
+                return price.date >= last24hStartKST && price.date <= nowKST
             }
                         
             self.prices = filteredPrices.enumerated().map { idx, price in
@@ -135,7 +135,7 @@ extension ChartViewModel {
         let now = Date()
         let calendar = Calendar(identifier: .gregorian)
         let lastDate = data.last?.date ?? now
-        let xStart = calendar.startOfDay(for: now)
+        let xStart = now.addingTimeInterval(-60 * 60 * 24)
         let xEnd = lastDate.addingTimeInterval(60 * 5)
         return xStart...xEnd
     }
