@@ -33,12 +33,13 @@ struct ChatBotView: View {
                                 .id(message.id)
                             }
                         }
+                        .padding(.top, 16)
                     }
                     .onChange(of: viewModel.messages) {
                         proxy.scrollTo(viewModel.messages.last?.id)
                     }
                 }
-                .padding(.top, 16)
+                .padding(.bottom, 5) // TODO: 임시 패딩 ChatInputView가 Floating View로 변경되면 삭제될 예정.
                 .padding(.horizontal, 16)
                 .onTapGesture {
                     isFocused = false
