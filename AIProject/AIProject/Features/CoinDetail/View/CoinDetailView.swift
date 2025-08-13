@@ -15,18 +15,58 @@ struct CoinDetailView: View {
     private let tabs = ["차트", "AI 리포트"]
     
     var body: some View {
-        VStack {
-            HeaderView(heading: coin.koreanName)
-            
-            SegmentedControlView(selection: $selectedTab, tabTitles: tabs, width: 150)
-            
-            VStack {
-                switch selectedTab {
-                case 1: ReportView(coin: coin)
-                default: ChartView(coin: coin)
-                }
+        VStack(spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(coin.koreanName)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+
+                Text(coin.id)                        
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.aiCoLabelSecondary)
+
+                Spacer()
             }
-            .frame(maxHeight: .infinity)
+            .padding(.bottom, 5)
+            
+            HStack(spacing: 8) {
+                ForEach(tabs.indices, id: \.self) { index in
+                    RoundedRectangleButton(
+                        title: tabs[index],
+                        isActive: selectedTab == index
+                    ) {
+                        selectedTab = index
+                    }
+                    .frame(height: 36)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.bottom, 10)
+            
+            ZStack(alignment: .topLeading) {
+                /// 차트 탭
+                ChartView(coin: coin)
+                    .opacity(selectedTab == 0 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 0)
+                    .accessibilityHidden(selectedTab != 0)
+
+                /// AI 리포트 탭
+                ReportView(coin: coin)
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .allowsHitTesting(selectedTab == 1)
+                    .accessibilityHidden(selectedTab != 1)
+            }
+            .animation(.easeInOut(duration: 0.15), value: selectedTab)
+
+             Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 20) 
+        .background(.aiCoBackground)
+        .safeAreaInset(edge: .top) {
+            Color.clear.frame(height: 80)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 40)
         }
     }
 }
