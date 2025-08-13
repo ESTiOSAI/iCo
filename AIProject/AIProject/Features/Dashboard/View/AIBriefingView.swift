@@ -26,6 +26,7 @@ struct AIBriefingView: View {
                 TodayCoinInsightView(isCommunity: true)
                 
                 FearGreedView()
+                    .padding(.bottom, 30)
             }
         }
         .padding(.horizontal, 16)
