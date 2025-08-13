@@ -19,10 +19,10 @@ final class ReportViewModel: ObservableObject {
     @Published var weeklyStatus: ResponseStatus = .loading
     @Published var todayStatus: ResponseStatus = .loading
     
-    @Published var coinOverView: AttributedString = AttributedString("AI가 정보를 준비하고 있어요")
-    @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
-    @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
-    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", newsSourceURL: "https://example.com/")]
+    @Published var coinOverView: AttributedString?
+    @Published var coinWeeklyTrends: String?
+    @Published var coinTodayTrends: String?
+    @Published var coinTodayTopNews: [CoinArticle]?
     
     let coin: Coin
     let koreanName: String
@@ -53,10 +53,11 @@ final class ReportViewModel: ObservableObject {
     private func fetchOverViewAsync() async {
         do {
             let data = try await alanAPIService.fetchOverview(for: coin)
+            
             await MainActor.run {
                 var overview = AttributedString()
                 overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
-
+                
                 if let urlString = data.websiteURL, let url = URL(string: urlString) {
                     let prefix = AttributedString("- 웹사이트: ")
                     var link = AttributedString(URL(string: urlString)?.host ?? urlString)
@@ -72,9 +73,13 @@ final class ReportViewModel: ObservableObject {
                 
                 overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
                 overview.append(AttributedString("- 소개: \(data.description)"))
-
+                
                 coinOverView = overview
                 overviewStatus = .success
+                
+                if coinWeeklyTrends != nil {
+                    weeklyStatus = .success
+                }
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
@@ -89,6 +94,7 @@ final class ReportViewModel: ObservableObject {
     private func fetchWeeklyTrendsAsync() async {
         do {
             let data = try await alanAPIService.fetchWeeklyTrends(for: coin)
+            
             await MainActor.run {
                 coinWeeklyTrends = """
                     - 가격 추이: \(data.priceTrend)
@@ -98,6 +104,10 @@ final class ReportViewModel: ObservableObject {
                 
                 if overviewStatus != .loading {
                     weeklyStatus = .success
+                }
+                
+                if coinTodayTrends != nil {
+                    todayStatus = .success
                 }
             }
         } catch {

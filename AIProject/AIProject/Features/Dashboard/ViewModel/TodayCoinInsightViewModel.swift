@@ -22,6 +22,8 @@ final class TodayCoinInsightViewModel: ObservableObject {
     let alanAPIService = AlanAPIService()
     let redditAPIService = RedditAPIService()
     
+    private var pendingSentiment: Sentiment?
+    
     private var overallTask: Task<Void, Never>?
     private var communityTask: Task<Void, Never>?
     
@@ -39,6 +41,11 @@ final class TodayCoinInsightViewModel: ObservableObject {
                 overViewSentiment = Sentiment.from(data.todaysSentiment)
                 overViewSummary = data.summary
                 overviewStatus = .success
+                
+                if pendingSentiment != nil {
+                    communitySentiment = pendingSentiment
+                    communityStatus = .success
+                }
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
@@ -71,10 +78,11 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let alanData = try await alanAPIService.fetchCommunityInsight(from: redditSummary)
             
             await MainActor.run {
-                communitySentiment = Sentiment.from(alanData.todaysSentiment)
+                pendingSentiment = Sentiment.from(alanData.todaysSentiment)
                 communitySummary = alanData.summary
                 
                 if overviewStatus != .loading {
+                    communitySentiment = pendingSentiment
                     communityStatus = .success
                 }
             }
