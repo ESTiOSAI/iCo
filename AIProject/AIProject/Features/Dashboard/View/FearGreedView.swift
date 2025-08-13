@@ -33,9 +33,8 @@ struct FearGreedView: View {
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
                 
-                ChartView()
+                ChartView(viewModel: viewModel)
                     .frame(width: 80, height: 80)
-                    .environmentObject(viewModel)
             }
         }
         .padding(.horizontal, 22)
@@ -59,11 +58,15 @@ extension FearGreedView {
     /// - fearGreed.color: 감정 상태에 따른 색상
     /// - classification: 감정 상태에 대한 설명 텍스트
     fileprivate struct ChartView: View {
-        @EnvironmentObject private var viewModel: FearGreedViewModel
+        @ObservedObject private var viewModel: FearGreedViewModel
         
         private static let gaugeTrim: CGFloat = 0.75
         private static let lineWidth: CGFloat = 13
         private static let rotationDegrees: Double = 135
+        
+        init(viewModel: FearGreedViewModel) {
+            self._viewModel = ObservedObject(wrappedValue: viewModel)
+        }
         
         var body: some View {
             GeometryReader { geometry in
