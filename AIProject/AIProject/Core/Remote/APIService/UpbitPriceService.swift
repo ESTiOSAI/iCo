@@ -49,6 +49,7 @@ final class UpbitPriceService: CoinPriceProvider {
                     high: dto.highPrice,
                     low: dto.lowPrice,
                     close: dto.tradePrice,
+                    trade: dto.candleAccTradePrice,
                     index: idx
                 )
             }

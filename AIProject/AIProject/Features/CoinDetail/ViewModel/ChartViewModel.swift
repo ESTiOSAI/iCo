@@ -91,6 +91,7 @@ final class ChartViewModel: ObservableObject {
                     high: price.high,
                     low: price.low,
                     close: price.close,
+                    trade: price.trade,
                     index: idx
                 )
             }
