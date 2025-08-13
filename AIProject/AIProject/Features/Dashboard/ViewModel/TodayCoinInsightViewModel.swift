@@ -13,7 +13,7 @@ import Foundation
 /// 감정(Sentiment)과 요약(summary)을 제공합니다.
 final class TodayCoinInsightViewModel: ObservableObject {
     /// AI가 분석한 감정 결과입니다.
-    @Published var sentiment: Sentiment = .neutral
+    @Published var sentiment: Sentiment? = nil
     /// AI 또는 커뮤니티 기반의 요약 내용입니다.
     @Published var summary: String = "AI가 정보를 준비하고 있어요"
     
@@ -39,7 +39,7 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let data = try await alanAPIService.fetchTodayInsight()
             
             await MainActor.run {
-                sentiment = Sentiment.from(data.todaysSentiment)
+                self.sentiment = Sentiment.from(data.todaysSentiment)
                 self.summary = data.summary
                 self.overviewStatus = .success
             }
@@ -74,7 +74,7 @@ final class TodayCoinInsightViewModel: ObservableObject {
             let alanData = try await alanAPIService.fetchCommunityInsight(from: communitySummary)
             
             await MainActor.run {
-                sentiment = Sentiment.from(alanData.todaysSentiment)
+                self.sentiment = Sentiment.from(alanData.todaysSentiment)
                 self.summary = alanData.summary
                 self.communityStatus = .success
             }

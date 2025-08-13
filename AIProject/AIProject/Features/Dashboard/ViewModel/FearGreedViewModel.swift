@@ -16,7 +16,7 @@ final class FearGreedViewModel: ObservableObject {
     /// 공포-탐욕 지수 값입니다.
     @Published var indexValue: CGFloat = 0
     /// 한글로 표시된 공포-탐욕 분류입니다.
-    @Published var classification: String = "중립"
+    @Published var classification: String = ""
     
     var fearGreedBackgroundColor: Color {
         fearGreed.color.opacity(0.05)
