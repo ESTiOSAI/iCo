@@ -99,7 +99,7 @@ struct ChartView: View {
             
             ZStack {
                 if data.isEmpty {
-                    DefaultProgressView(message: "차트를 불러오는 중이에요")
+//                    DefaultProgressView(message: "차트를 불러오는 중이에요")
                 } else {
                     let yRange = viewModel.yAxisRange(from: data)
                     let xDomain = viewModel.xAxisDomain(for: data)

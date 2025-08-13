@@ -155,7 +155,7 @@ struct BriefingSectionView: View {
             if bookmarksEmpty {
                 Text("코인을 북마크 해보세요!")
             } else if isLoading {
-                DefaultProgressView(message: "분석중...")
+//                DefaultProgressView(message: "분석중...")
             } else if let briefing {
                 BadgeLabelView(text: "📝 투자 브리핑 요약")
                 Text(briefing.briefing)

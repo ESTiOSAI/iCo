@@ -15,5 +15,5 @@ struct CoinArticleDTO: Codable {
     let summary: String
     
     /// 뉴스 원문 링크
-    let url: String
+    let newsSourceURL: String
 }

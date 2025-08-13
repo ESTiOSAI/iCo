@@ -1,5 +1,5 @@
 //
-//  CoinArticleDTO.swift
+//  CoinArticle.swift
 //  AIProject
 //
 //  Created by 장지현 on 8/4/25.
@@ -15,10 +15,10 @@ struct CoinArticle: Identifiable {
     let summary: String
     
     /// 뉴스 원문 링크
-    let url: String
+    let newsSourceURL: String
     
     var id: Int {
-        "\(title)\(url)".hashValue
+        "\(title)\(newsSourceURL)".hashValue
     }
 }
 
@@ -26,6 +26,6 @@ extension CoinArticle {
     init(from dto: CoinArticleDTO) {
         self.title = dto.title
         self.summary = dto.summary
-        self.url = dto.url
+        self.newsSourceURL = dto.newsSourceURL
     }
 }

@@ -15,10 +15,14 @@ import Foundation
 /// - Parameters:
 ///   - coin: 보고서 생성의 대상이 되는 코인입니다.
 final class ReportViewModel: ObservableObject {
-    @Published var coinOverView: String = "AI가 정보를 준비하고 있어요"
+    @Published var overviewStatus: ResponseStatus = .loading
+    @Published var weeklyStatus: ResponseStatus = .loading
+    @Published var todayStatus: ResponseStatus = .loading
+    
+    @Published var coinOverView: AttributedString = AttributedString("AI가 정보를 준비하고 있어요")
     @Published var coinTodayTrends: String = "AI가 정보를 준비하고 있어요"
     @Published var coinWeeklyTrends: String = "AI가 정보를 준비하고 있어요"
-    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", url: "https://example.com/")]
+    @Published var coinTodayTopNews: [CoinArticle] = [CoinArticle(title: "", summary: "AI가 정보를 준비하고 있어요", newsSourceURL: "https://example.com/")]
     
     let coin: Coin
     let koreanName: String
@@ -40,21 +44,34 @@ final class ReportViewModel: ObservableObject {
         do {
             let data = try await alanAPIService.fetchOverview(for: coin)
             await MainActor.run {
-                self.coinOverView = """
-                    ‣ 심볼: \(data.symbol)
-                    ‣ 웹사이트: \(data.websiteURL ?? "없음")
-                    
-                    ‣ 최초발행: \(data.launchDate)
-                    
-                    ‣ 소개: \(data.description)
-                    """
+                var overview = AttributedString()
+                overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
+
+                if let urlString = data.websiteURL, let url = URL(string: urlString) {
+                    let prefix = AttributedString("- 웹사이트: ")
+                    var link = AttributedString(URL(string: urlString)?.host ?? urlString)
+                    link.link = url
+                    link.foregroundColor = .aiCoAccent
+                    link.underlineStyle = .single
+                    overview.append(prefix)
+                    overview.append(link)
+                    overview.append(AttributedString("\n"))
+                } else {
+                    overview.append(AttributedString("- 웹사이트: 없음\n"))
+                }
+                
+                overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
+                overview.append(AttributedString("- 소개: \(data.description)"))
+
+                self.coinOverView = overview
+                self.overviewStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.coinOverView = ne.localizedDescription
+                self.overviewStatus = .failure(ne)
             }
         }
     }
@@ -64,19 +81,18 @@ final class ReportViewModel: ObservableObject {
             let data = try await alanAPIService.fetchWeeklyTrends(for: coin)
             await MainActor.run {
                 self.coinWeeklyTrends = """
-                    ‣ 가격 추이: \(data.priceTrend)
-                    
-                    ‣ 거래량 변화: \(data.volumeChange)
-                    
-                    ‣ 원인: \(data.reason)
+                    - 가격 추이: \(data.priceTrend)
+                    - 거래량 변화: \(data.volumeChange)
+                    - 원인: \(data.reason)
                     """
+                self.weeklyStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.coinWeeklyTrends = ne.localizedDescription
+                self.weeklyStatus = .failure(ne)
             }
         }
     }
@@ -87,14 +103,14 @@ final class ReportViewModel: ObservableObject {
             await MainActor.run {
                 self.coinTodayTrends = data.summaryOfTodaysMarketSentiment
                 self.coinTodayTopNews = data.articles.map { CoinArticle(from: $0) }
+                self.todayStatus = .success
             }
         } catch {
             guard let ne = error as? NetworkError else { return print(error) }
             
             print(ne.log())
             await MainActor.run {
-                self.coinTodayTrends = ne.localizedDescription
-                self.coinTodayTopNews = [CoinArticle(title: ne.localizedDescription, summary: "", url: "")]
+                self.todayStatus = .failure(ne)
             }
         }
     }

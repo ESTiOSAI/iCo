@@ -61,7 +61,7 @@ enum Prompt {
             struct CoinArticleDTO: Codable {
                 let title: String
                 let summary: String
-                let url: String
+                let newsSourceURL: String
             }
 
             1. 현재 국내 시간을 기준으로 최근 24시간 뉴스 기반
