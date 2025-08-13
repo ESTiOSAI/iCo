@@ -49,10 +49,7 @@ struct BookmarkView: View {
                 HeaderView(heading: "북마크 관리")
 
                 HStack {
-                    Image(systemName: "sparkles")
-                        .foregroundStyle(Color.aiCoAccent)
-
-                    SubheaderView(subheading: "아이코가 북마크를 분석했어요")
+                    SubheaderView(imageName: "sparkles", subheading: "북마크를 분석했어요")
                         .padding(.leading, -16)
 
                     Spacer()
@@ -194,7 +191,7 @@ struct BriefingSectionView: View {
             if bookmarksEmpty {
                 Text("코인을 북마크 해보세요!")
             } else if isLoading {
-//                DefaultProgressView(message: "분석중...")
+                DefaultProgressView(status: .loading, message: "분석중...")
             } else if let briefing {
 
                 Text("분석 결과")
@@ -207,7 +204,6 @@ struct BriefingSectionView: View {
                     .lineSpacing(6)
 
                 Spacer(minLength: 0)
-
 
                 Text("전략 제안")
                     .font(.system(size: 14))

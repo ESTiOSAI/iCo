@@ -31,7 +31,7 @@ enum SortOrder {
 
     var iconName: String {
         switch self {
-        case .none: return "arrow.up.arrow.down"
+        case .none: return "minus"
         case .ascending: return "chevron.up"
         case .descending: return "chevron.down"
         }
