@@ -38,7 +38,7 @@ struct SearchListView: View {
                                             .stroke(.default, lineWidth: 0.5)
                                     }
                             }
-
+                            
                             Text(coin.koreanName)
                                 .font(.system(size: 15))
                                 .foregroundStyle(.aiCoLabel)
@@ -51,21 +51,8 @@ struct SearchListView: View {
                             Spacer()
 
                             if isRecentSearch {
-                                Button {
+                                CircleDeleteButton(fontSize: 9) {
                                     viewModel.removeRecentSearchKeyword(coin)
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 9))
-                                        .foregroundStyle(.aiCoLabelSecondary)
-                                        .padding(5)
-                                        .background {
-                                            Circle()
-                                                .fill(.aiCoBackgroundWhite)
-                                        }
-                                        .overlay {
-                                            Circle()
-                                                .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
-                                        }
                                 }
                             }
                         }

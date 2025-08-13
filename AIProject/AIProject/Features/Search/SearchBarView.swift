@@ -18,14 +18,9 @@ struct SearchBarView: View {
                 .padding(.horizontal, 8)
 
             if !searchText.isEmpty {
-                Button {
+                CircleDeleteButton(fontSize: 9) {
                     searchText = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .resizable()
-                        .frame(width: 10, height: 10)
                 }
-                .foregroundStyle(.aiCoLabelSecondary)
             }
         }
         .padding(.horizontal, 12)
