@@ -16,7 +16,8 @@ struct UserMessageView: View {
             Text(content)
                 .font(.system(size: 13))
                 .foregroundStyle(.aiCoLabel)
-                .padding(15)
+                .padding(.vertical, 15)
+                .padding(.horizontal, 18)
                 .background {
                     RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight])
                         .fill(Color.aiCoBackgroundWhite)

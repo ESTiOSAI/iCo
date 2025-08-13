@@ -15,36 +15,39 @@ struct ChatBotView: View {
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 0) {
             HeaderView(heading: "챗봇")
 
-            ScrollViewReader { proxy in
-                ScrollView(showsIndicators: false) {
-                    LazyVStack(spacing: 20) {
-                        ForEach(viewModel.messages) { message in
-                            Group {
-                                if message.isUser {
-                                    UserMessageView(content: message.content)
-                                } else {
-                                    BotMessageView(message: message)
+            Group {
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        LazyVStack(spacing: 20) {
+                            ForEach(viewModel.messages) { message in
+                                Group {
+                                    if message.isUser {
+                                        UserMessageView(content: message.content)
+                                    } else {
+                                        BotMessageView(message: message)
+                                    }
                                 }
+                                .id(message.id)
                             }
-                            .id(message.id)
                         }
                     }
+                    .onChange(of: viewModel.messages) {
+                        proxy.scrollTo(viewModel.messages.last?.id)
+                    }
                 }
-                .onChange(of: viewModel.messages) {
-                    proxy.scrollTo(viewModel.messages.last?.id)
+                .padding(.top, 16)
+                .padding(.horizontal, 16)
+                .onTapGesture {
+                    isFocused = false
                 }
-            }
-            .padding(.horizontal)
-            .onTapGesture {
-                isFocused = false
-            }
 
-            ChatInputView(viewModel: viewModel, isFocused: $isFocused)
+                ChatInputView(viewModel: viewModel, isFocused: $isFocused)
+            }
+            .background(.aiCoBackground)
         }
-        .background(Color.aiCoBackground)
     }
 }
 
