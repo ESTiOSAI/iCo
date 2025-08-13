@@ -20,7 +20,7 @@ enum Prompt {
         switch self {
         case .recommendCoin(let preference, let bookmark):
             """
-            코인 5개를 추천해줘.
+            코인 10개를 추천해줘.
 
             너가 추천해줘야 하는 코인은 "KRW"만 추천해줘야 해.
 
