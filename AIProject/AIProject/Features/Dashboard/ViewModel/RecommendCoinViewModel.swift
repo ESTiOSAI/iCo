@@ -28,10 +28,12 @@ final class RecommendCoinViewModel: ObservableObject {
                 state = .loading
             }
 
-            let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: "비트코인, 이더리움")
+            let bookmarkCoins = try BookmarkManager.shared.fetchRecent(limit: 5).map { $0.coinKoreanName }.joined(separator: ", ")
+            let prompt = Prompt.recommendCoin(preference: "초보자", bookmark: bookmarkCoins)
             let jsonString = try await alanService.fetchAnswer(content: prompt.content, action: .coinRecomendation).content.extractedJSON
 
             if let jsonData = jsonString.data(using: .utf8) {
+                // TODO: 만약 디코딩이 제대로 되지 않았다면? 어떻게 다시 Alan에 찌르지?
                 let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonData)
                 let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
 
@@ -55,12 +57,12 @@ final class RecommendCoinViewModel: ObservableObject {
                     }
 
                     return RecommendCoin(
-                        coinImage: nil,
+                        imageURL: nil,
                         comment: dto.comment,
                         coinID: data.coinID,
                         name: dto.name,
                         tradePrice: data.tradePrice,
-                        changeRate: data.changeRate
+                        changeRate: data.change == "FALL" ? -data.changeRate : data.changeRate
                     )
                 }
             }
