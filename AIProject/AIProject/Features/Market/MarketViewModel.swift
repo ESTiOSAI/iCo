@@ -26,10 +26,11 @@ class MarketViewModel {
         
         Task {
             await setup()
-            change(tab: .total)
+            await change(tab: .total)
         }
     }
     
+    @MainActor
     func change(tab: MarketCoinTab) {
         switch tab {
         case .bookmark:

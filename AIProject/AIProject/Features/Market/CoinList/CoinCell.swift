@@ -8,22 +8,25 @@
 import SwiftUI
 
 struct CoinListHeaderView: View {
-    @Binding var sortCategory: SortCategory?
+    @Binding var sortCategory: SortCategory
     @Binding var nameSortOrder: SortOrder
     @Binding var volumeSortOrder: SortOrder
-    let action: (() -> Void)?
     
     var body: some View {
         HStack(spacing: 60) {
-            CoinSortButton(title: "한글명", sortCategory: .name, currentCategory: $sortCategory, sortOrder: $nameSortOrder)
+            SortToggleButton2(title: "한글명", sortCategory: .name, sortOrder: $nameSortOrder) {
+                sortCategory = .name
+                volumeSortOrder = .none
+            }
+            
             Spacer()
             
-            CoinSortButton(title: "거래대금", sortCategory: .volume, currentCategory: $sortCategory, sortOrder: $volumeSortOrder)
+            SortToggleButton2(title: "거래대금", sortCategory: .volume, sortOrder: $volumeSortOrder) {
+                sortCategory = .volume
+                nameSortOrder = .none
+            }
         }
         .frame(maxWidth: .infinity)
-        .fontWeight(.medium)
-        .font(.system(size: 12))
-        .foregroundStyle(.aiCoLabelSecondary)
     }
 }
 
