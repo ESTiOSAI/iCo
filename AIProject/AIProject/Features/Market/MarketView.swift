@@ -8,42 +8,57 @@
 import SwiftUI
 
 struct MarketView: View {
+    @State var viewModel: MarketViewModel
+    @State var coinStore: CoinListStore
+
     @State var isShowSearchView = false
     @State var selectedTab = MarketCoinTab.total
-    @State var viewModel: MarketViewModel = MarketViewModel(upbitService:  .init(), coinListViewModel: CoinListViewModel(tickerService: UpbitTickerService(client: .init(pingInterval: .seconds(120))), coinGeckoService: CoinGeckoAPIService()))
     @State var bookmarkSelected = true
     @State var totalSelected = false
+    @State var collapse = false
+    
+    init(
+        coinService: UpBitAPIService,
+        tickerService: UpbitTickerService,
+        imageService: CoinGeckoAPIService
+    ) {
+        viewModel = MarketViewModel(coinService: coinService, imageService: imageService)
+        coinStore = CoinListStore(tickerService: tickerService)
+    }
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                HeaderView(heading: "마켓", showSearchButton: true, onSearchTap: {
-                    isShowSearchView = true
-                })
-                
-                VStack(spacing: 8) {
+                VStack(spacing: 16) {
+                    HeaderView(heading: "마켓", showSearchButton: true, onSearchTap: {
+                        isShowSearchView = true
+                    })
+                    
                     HStack(spacing: 16) {
                         RoundedRectangleButton(title: "전체코인", isActive: selectedTab == .total) {
-                            selectedTab = .total
-                            viewModel.change(tab: .total)
+                            changeTab(.total)
                         }
                         
                         RoundedRectangleButton(title: "북마크", isActive: selectedTab == .bookmark) {
-                            selectedTab = .bookmark
-                            viewModel.change(tab: .bookmark)
+                            changeTab(.bookmark)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
+                    .padding(.horizontal, 16)
                 
-                    CoinListView(viewModel: viewModel.coinListViewModel)
+                    CoinListView(store: coinStore)
                         .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
                 }
                 .refreshable {
                     Task {
                         await viewModel.refresh()
                     }
                 }
+            }
+            .task {
+                await viewModel.load()
+                coinStore.change(viewModel.totalCoins)
             }
             .navigationDestination(isPresented: $isShowSearchView) {
                 SearchView()
@@ -52,6 +67,22 @@ struct MarketView: View {
     }
 }
 
+extension MarketView {
+    func changeTab(_ tab: MarketCoinTab) {
+        selectedTab = tab
+        switch tab {
+        case .bookmark:
+            coinStore.change(viewModel.bookmaredCoins)
+        case .total:
+            coinStore.change(viewModel.totalCoins)
+        }
+    }
+}
+
 #Preview {
-    MarketView()
+    MarketView(
+        coinService: UpBitAPIService(),
+        tickerService: UpbitTickerService(),
+        imageService: CoinGeckoAPIService()
+    )
 }

@@ -9,58 +9,46 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    @Bindable var viewModel: CoinListViewModel
+    @Bindable var store: CoinListStore
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
-    @State var sortCategory: SortCategory? = .volume
+    @State var sortCategory: SortCategory = .volume
     @State var volumeSortOrder: SortOrder = .descending
     @State var nameSortOrder: SortOrder = .none
-    
-    init(viewModel: CoinListViewModel) {
-        self.viewModel = viewModel
-    }
     
     var sortedCoins: [CoinListModel] {
         switch sortCategory {
         case .name:
             switch nameSortOrder {
             case .none:
-                return viewModel.coins
+                return store.coins
             case .ascending:
-                return viewModel.coins.sorted { $0.name < $1.name }
+                return store.coins.sorted { $0.name < $1.name }
             case .descending:
-                return viewModel.coins.sorted { $0.name > $1.name }
+                return store.coins.sorted { $0.name > $1.name }
             }
         case .volume:
             switch volumeSortOrder {
             case .none:
-                return viewModel.coins
+                return store.coins
             case .ascending:
-                return viewModel.coins.sorted { $0.tradeAmount < $1.tradeAmount }
+                return store.coins.sorted { $0.tradeAmount < $1.tradeAmount }
             case .descending:
-                return viewModel.coins.sorted { $0.tradeAmount > $1.tradeAmount }
+                return store.coins.sorted { $0.tradeAmount > $1.tradeAmount }
             }
-        case nil:
-            return viewModel.coins
         }
     }
-   
     
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView(sortCategory: $sortCategory, nameSortOrder: $nameSortOrder, volumeSortOrder: $volumeSortOrder, action: {
-                    
-                })
-                .fontWeight(.regular)
-                .font(.system(size: 11))
-                .foregroundStyle(.aiCoLabel)
-                .listRowBackground(Color.clear)
+                CoinListHeaderView(sortCategory: $sortCategory, nameSortOrder: $nameSortOrder, volumeSortOrder: $volumeSortOrder)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
                 
                 ForEach(sortedCoins) { coin in
                     
                     // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
-                    GeometryReader { geometry in
                         ZStack {
                             CoinCell(coin: coin)
                             NavigationLink {
@@ -69,31 +57,23 @@ struct CoinListView: View {
                                 EmptyView()
                             }.opacity(0)
                         }
+                        .padding(.vertical, 14)
                         .onAppear {
-                            insertCoin(id: coin.id, proxy: geometry)
+                            visibleCoins.insert(coin.id)
                         }
                         .onDisappear {
                             visibleCoins.remove(coin.id)
                         }
-                    }
-                    .padding(.vertical, 18)
-                    .padding(.bottom)
                 }
                 .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
+            .coordinateSpace(name: "scroll")
             .scrollContentBackground(.hidden)
             .background {
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.aiCoBorderGray, lineWidth: 1)
                     .fill(Color.aiCoBackground)
-            }
-            .onChange(of: sortCategory) { oldValue, newValue in
-                if newValue == .name {
-                    volumeSortOrder = .none
-                } else {
-                    nameSortOrder = .none
-                }
             }
         }
         .onChange(of: scenePhase, { _, newValue in
@@ -103,17 +83,17 @@ struct CoinListView: View {
         })
         .onChange(of: visibleCoins, { oldValue, newValue in
             Task {
-                await viewModel.sendTicket(newValue)
+                await store.sendTicket(newValue)
             }
         })
         .onAppear {
             Task {
-                await viewModel.connect()
+                await store.connect()
             }
         }
         .onDisappear {
             Task {
-                await viewModel.disconnect()
+                await store.disconnect()
             }
         }
     }
@@ -136,17 +116,13 @@ extension CoinListView {
         print(#function, phase)
         switch phase {
         case .background:
-            await viewModel.disconnect()
+            await store.disconnect()
         case .inactive:
             break
         case .active:
-            await viewModel.connect()
+            await store.connect()
         @unknown default:
             break
         }
     }
-}
-
-#Preview {
-    CoinListView(viewModel: .init(tickerService: .init(client: .init()), coinGeckoService: CoinGeckoAPIService(network: .init())))
 }

@@ -8,27 +8,32 @@
 import SwiftUI
 
 struct CoinListHeaderView: View {
-    @Binding var sortCategory: SortCategory?
+    @Binding var sortCategory: SortCategory
     @Binding var nameSortOrder: SortOrder
     @Binding var volumeSortOrder: SortOrder
-    let action: (() -> Void)?
     
     var body: some View {
         HStack(spacing: 60) {
-            CoinSortButton(title: "한글명", sortCategory: .name, currentCategory: $sortCategory, sortOrder: $nameSortOrder)
+            SortToggleButton2(title: "한글명", sortCategory: .name, sortOrder: $nameSortOrder) {
+                sortCategory = .name
+                volumeSortOrder = .none
+            }
+            
             Spacer()
             
-            CoinSortButton(title: "거래대금", sortCategory: .volume, currentCategory: $sortCategory, sortOrder: $volumeSortOrder)
+            SortToggleButton2(title: "거래대금", sortCategory: .volume, sortOrder: $volumeSortOrder) {
+                sortCategory = .volume
+                nameSortOrder = .none
+            }
         }
         .frame(maxWidth: .infinity)
-        .fontWeight(.medium)
-        .font(.system(size: 12))
-        .foregroundStyle(.aiCoLabelSecondary)
     }
 }
 
 struct CoinCell: View {
+    
     let coin: CoinListModel
+    @State var imageMap: [String: URL] = [:]
     
     var body: some View {
         VStack {
@@ -36,22 +41,21 @@ struct CoinCell: View {
                 // 코인 레이블
                 HStack(spacing: 16) {
                     Group {
-                        if !coin.image.isEmpty, let url = URL(string: coin.image) {
-                            AsyncImage(url: url) { img in
-                                img.resizable().aspectRatio(contentMode: .fit)
-                            } placeholder: { ProgressView() }
-                                .frame(width: 30, height: 30)
+                        if let url = imageMap[coin.coinName] {
+                            CachedAsyncImage(url: url)
                         } else {
                             Text(String(coin.coinName.prefix(1)))
-                                .font(.system(size: 11))
-                                .foregroundStyle(.aiCoAccent)
-                                .overlay {
-                                    Circle()
-                                        .stroke(.default, lineWidth: 0.5)
-                                }
-                                .frame(width: 30, height: 30)
+                                .font(.caption.bold())
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                     }
+                    .frame(width: 30, height: 30)
+                    .clipShape(Circle())
+                    .contentShape(Circle())
+                    .overlay(
+                        Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
+                    )
+                    
                     VStack(alignment: .leading, spacing: 6) {
                         Text(coin.name)
                             .lineLimit(2)
@@ -72,6 +76,17 @@ struct CoinCell: View {
                 
                 CoinPriceView(change: coin.change, price: coin.currentPrice, rate: coin.changePrice, amount: coin.tradeAmount)
             }
+        }
+        .task {
+            initialMap()
+        }
+    }
+    
+    func initialMap() {
+        if let stringImageMap = UserDefaults.standard.object(forKey: AppStorageKey.imageMap) as? [String: String] {
+            imageMap = stringImageMap.compactMapValues({ string in
+                URL(string: string)
+            })
         }
     }
 }

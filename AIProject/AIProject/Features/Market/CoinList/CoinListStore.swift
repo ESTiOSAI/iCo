@@ -1,17 +1,26 @@
 //
-//  CoinListViewModel.swift
+//  CoinListStore.swift
 //  AIProject
 //
-//  Created by kangho lee on 8/4/25.
+//  Created by kangho lee on 8/14/25.
 //
 
 import Foundation
 import AsyncAlgorithms
 
+struct CoinMeta: Identifiable {
+    let id: String
+    
+    let koreanName: String
+    
+    var name: String {
+        id.components(separatedBy: "-").last ?? id
+    }
+}
+
 @Observable
-class CoinListViewModel {
+class CoinListStore {
     private let tickerService: UpbitTickerService
-    private let coinGeckoService: CoinGeckoAPIService
     
     private let ticket = UUID().uuidString
     
@@ -20,9 +29,8 @@ class CoinListViewModel {
     
     private(set) var coins: [CoinListModel] = []
     
-    init(tickerService: UpbitTickerService, coinGeckoService: CoinGeckoAPIService) {
+    init(tickerService: UpbitTickerService) {
         self.tickerService = tickerService
-        self.coinGeckoService = coinGeckoService
     }
     
     /// 북마크와 전체 코인 리스트를 변경합니다.
@@ -66,18 +74,12 @@ class CoinListViewModel {
     
     // MARK: - Private
     
-    private func fetchImage(_ symbols: Set<CoinListModel.ID>) async {
-        let imageMap = await coinGeckoService.fetchImageMapBatched(symbols: Array(symbols.compactMap { $0.components(separatedBy: "-").last }))
-        await updateImageCoinList(imageMap)
-    }
-    
     private func ticketStream() async {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
             .removeDuplicates()
             ._throttle(for: .milliseconds(300), latest: true)
         for await visibleCoin in stream {
-//            await self.fetchImage(visibleCoin)
             await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
         }
     }
@@ -90,24 +92,12 @@ class CoinListViewModel {
             return
         }
         
-        coins[index] = CoinListModel(coinID: ticker.coinID, image: "", name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
+        coins[index] = CoinListModel(coinID: ticker.coinID, image: coins[index].image, name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
     }
     
     private func consume() async {
         for try await ticker in tickerService.subscribeTickerStream() {
             await performUpdate(ticker)
-        }
-    }
-    
-    @MainActor
-    private func updateImageCoinList(_ imageMap: [String: URL]) {
-        imageMap.forEach { key, url in
-            guard let index = coins.firstIndex (where: {
-                $0.coinName == key
-            }) else { return }
-            var model = coins[index]
-            model.image = url.absoluteString
-            coins[index] = model
         }
     }
 }

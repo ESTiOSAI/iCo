@@ -14,29 +14,23 @@ enum MarketCoinTab: Int {
 
 @Observable
 class MarketViewModel {
-    private let upbitService: UpBitAPIService
-    let coinListViewModel: CoinListViewModel
+    private let coinService: UpBitAPIService
+    private let imageService: CoinGeckoAPIService
+    
+    private var hasLoaded = false
     
     private(set) var bookmaredCoins: [CoinListModel] = []
     private(set) var totalCoins: [CoinListModel] = []
     
-    init(upbitService: UpBitAPIService, coinListViewModel: CoinListViewModel) {
-        self.upbitService = upbitService
-        self.coinListViewModel = coinListViewModel
-        
-        Task {
-            await setup()
-            change(tab: .total)
-        }
+    init(coinService: UpBitAPIService, imageService: CoinGeckoAPIService) {
+        self.coinService = coinService
+        self.imageService = imageService
     }
     
-    func change(tab: MarketCoinTab) {
-        switch tab {
-        case .bookmark:
-            coinListViewModel.change(bookmaredCoins)
-        case .total:
-            coinListViewModel.change(totalCoins)
-        }
+    func load() async {
+        guard hasLoaded == false else { return }
+        defer { hasLoaded = true }
+        await setup()
     }
     
     func refresh() async {
@@ -48,8 +42,17 @@ class MarketViewModel {
         let coins = await fetchMarketCoinData()
         let bookmaredCoinID = await fetchBookmarkCoin()
         
-        self.bookmaredCoins = coins.filter { bookmaredCoinID.contains($0.coinID) }
-        self.totalCoins = coins
+        let coinSymbols = Array(coins.map(\.coinName.localizedLowercase).prefix(100))
+        let imageMap = await imageService.fetchImageMapByEnglishNames(englishNames: coinSymbols)
+        
+        let imageCoins = coins.map { meta in
+            var mutable = meta
+            mutable.image = imageMap[meta.coinName]?.absoluteString ?? ""
+            return mutable
+        }
+        
+        self.bookmaredCoins = imageCoins.filter { bookmaredCoinID.contains($0.coinID) }
+        self.totalCoins = imageCoins
     }
     
     // TODO: 실제 BookMark Coin 가져오기
@@ -59,8 +62,8 @@ class MarketViewModel {
     
     private func fetchMarketCoinData() async -> [CoinListModel] {
         do {
-            async let coins = try await upbitService.fetchMarkets()
-            async let tickers = try await upbitService.fetchTicker(by: "KRW")
+            async let coins = try await coinService.fetchMarkets()
+            async let tickers = try await coinService.fetchTicker(by: "KRW")
             
             let result = try await coins.reduce(into: [String: (korean: String, english: String)]()) { acc, coins in
                 acc[coins.coinID] = (coins.koreanName, coins.englishName)

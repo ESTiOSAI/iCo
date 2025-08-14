@@ -67,11 +67,11 @@ final actor WebSocketClient2: NSObject {
     }
     
     func send(data: Data) async throws {
-        guard isActive, let webSocketTask else {
-            await eventChannel.send(.error("send", SocketError.notConnected))
-            return
-        }
-        try await webSocketTask.send(.data(data))
+//        guard isActive, let webSocketTask else {
+//            await eventChannel.send(.error("send", SocketError.notConnected))
+//            return
+//        }
+        try await webSocketTask?.send(.data(data))
     }
     
     func stream() -> AsyncStream<URLSessionWebSocketTask.Message> {
@@ -111,7 +111,7 @@ final actor WebSocketClient2: NSObject {
                 case .complete(let error):
                     debugPrint("Socket Completed with: \(String(describing: error))")
                 case .error(let phase, let error):
-                    handleDisconnect(with: error, phase: phase)
+                    handleError(with: error, phase: phase)
                 }
             }
     }
@@ -153,15 +153,13 @@ final actor WebSocketClient2: NSObject {
         }
     }
     
-    private func handleDisconnect(with error: Error?, phase: String) {
-//        debugPrint(#function, "phase: \(phase), \(error)")
-        
-        guard isActive else {
-            debugPrint("Already Disconnected")
-            return
-        }
-        
-        release()
+    private func handleError(with error: Error?, phase: String) {
+        if let socketError = error as? SocketError {
+                debugPrint("phase - \(phase): \(socketError)")
+            } else {
+                debugPrint(error ?? "")
+                release()
+            }
     }
     
     private func handleDisconnect(code: URLSessionWebSocketTask.CloseCode, reason: String) {

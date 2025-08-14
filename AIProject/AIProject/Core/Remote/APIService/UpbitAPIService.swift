@@ -26,7 +26,6 @@ final class UpBitAPIService {
         return coinDTOs.filter { $0.coinID.contains("KRW") }
     }
     
-    
     /// 지정한 인용 화폐 마켓의 모든 코인을 현재 시세를 가져옵니다.
     /// - Parameter currency: 마켓 화폐 (ex. "KRW", "BTC")
     /// - Returns: 해당 카멧의 모든 코인 시세 정보
