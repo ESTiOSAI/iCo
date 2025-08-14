@@ -43,23 +43,64 @@ struct RecommendCoinView: View {
 struct SuccessCoinView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
 
-    var body: some View {
-        VStack(spacing: 30) {
-            SubheaderView(
-                imageName: "sparkles",
-                subheading: "이런 코인은 어떠세요?",
-                description: "회원님의 관심 코인을 기반으로\n새로운 코인을 추천해드려요",
-                imageColor: .aiCoBackgroundWhite,
-                fontColor: .aiCoBackgroundWhite
-            )
+    @GestureState var isDragging: Bool = false
+    @State var selection: String?
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    ForEach(viewModel.recommendCoins) { coin in
-                        RecommendCardView(recommendCoin: coin)
-                            .containerRelativeFrame(.horizontal) { value, axis in
-                                axis == .horizontal ? value * 0.7 : value
-                            }
+    var timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
+    var currentIndex: Int = 0
+
+    var body: some View {
+        VStack(spacing: 60) {
+            VStack(spacing: 0) {
+                HeaderView(heading: "대시보드")
+                    .foregroundStyle(.aiCoBackgroundWhite)
+                    .padding(.top, 40)
+
+                SubheaderView(
+                    imageName: "sparkles",
+                    subheading: "이런 코인은 어떠세요?",
+                    description: "회원님의 관심 코인을 기반으로\n새로운 코인을 추천해드려요",
+                    imageColor: .aiCoBackgroundWhite,
+                    fontColor: .aiCoBackgroundWhite
+                )
+            }
+
+            GeometryReader { geoProxy in
+                let horizonInset = geoProxy.size.width * 0.15
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.recommendCoins) { coin in
+                            RecommendCardView(recommendCoin: coin)
+                                .id(coin.id)
+                                .frame(width: geoProxy.size.width * 0.7)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .contentMargins(.horizontal, horizonInset)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $selection)
+                .simultaneousGesture(DragGesture().updating($isDragging) { _, state, _ in
+					state = true
+                })
+                .onChange(of: viewModel.recommendCoins.count) {
+                    guard !viewModel.recommendCoins.isEmpty else { return }
+                    selection = viewModel.recommendCoins[0].id
+                }
+                .onReceive(timer) { _ in
+                    guard !isDragging, !viewModel.recommendCoins.isEmpty else { return }
+                    viewModel.currentIndex = (viewModel.currentIndex + 1) % viewModel.recommendCoins.count
+
+                    withAnimation(.easeInOut) {
+                        selection = viewModel.recommendCoins[viewModel.currentIndex].id
+                    }
+                }
+                .onChange(of: selection) {
+                    if let selection {
+                        if let index = viewModel.recommendCoins.firstIndex(where: { $0.id == selection }) {
+                            viewModel.currentIndex = index
+                        }
                     }
                 }
             }
@@ -72,3 +113,6 @@ struct SuccessCoinView: View {
 #Preview {
     RecommendCoinView()
 }
+
+
+
