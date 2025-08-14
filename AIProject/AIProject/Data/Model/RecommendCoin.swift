@@ -7,7 +7,39 @@
 
 import SwiftUI
 
-struct RecommendCoin: Identifiable {
+struct RecommendCoin: Identifiable, Hashable {
+    enum TickerChangeType: String {
+        case rise = "RISE"
+        case even = "EVEN"
+        case fall = "FALL"
+
+        init(rawValue: String) {
+            switch rawValue {
+            case "RISE": self = .rise
+            case "EVEN": self = .even
+                case "FALL": self = .fall
+            default:
+                self = .rise
+            }
+        }
+
+        var changeColor: Color {
+            switch self {
+            case .rise: return .aiCoPositive
+            case .even: return .aiCoLabel
+            case .fall: return .aiCoNegative
+            }
+        }
+
+        var code: String {
+            switch self {
+            case .rise: return "▲"
+            case .even: return ""
+            case .fall: return "▼"
+            }
+        }
+    }
+
     var id: String { coinID }
 
     var imageURL: URL?
@@ -16,15 +48,5 @@ struct RecommendCoin: Identifiable {
     let name: String
     let tradePrice: Double
     let changeRate: Double
-}
-
-extension RecommendCoin {
-    static var dummyDatas: [RecommendCoin] =
-    	[
-        RecommendCoin(comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요. ", coinID: "BTX", name: "펏지펭귄", tradePrice: 1600, changeRate: 3.0),
-        RecommendCoin(comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요.", coinID: "BTC", name: "펏지펭귄", tradePrice: 1.33, changeRate: -3.0),
-        RecommendCoin(comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요.", coinID: "BEC", name: "펏지펭귄", tradePrice: 1.33, changeRate: -3.0),
-        RecommendCoin(comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요.", coinID: "BTZ", name: "펏지펭귄", tradePrice: 1.33, changeRate: -3.0),
-        RecommendCoin(comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요.", coinID: "BTT", name: "펏지펭귄", tradePrice: 1.33, changeRate: -3.0),
-        ]
+    let changeType: TickerChangeType
 }

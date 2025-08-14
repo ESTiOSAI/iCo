@@ -54,25 +54,25 @@ struct RecommendCardView: View {
                     Text(recommendCoin.tradePrice.formatKRW)
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeRate > 0 ? .aiCoPositive : .aiCoNegative) // TODO: 변동 없을때의 경우
+                        .foregroundStyle(recommendCoin.changeType.changeColor)
                 }
                 .padding(.top, 1)
 
                 HStack(spacing: 4) {
                     Text("전일대비")
                         .font(.system(size: 14))
+                        .foregroundStyle(.aiCoLabel)
 
                     HStack(spacing: 0) {
-                        // TODO: 변동 없을때의 경우
                         Group {
-                            Image(systemName: recommendCoin.changeRate > 0 ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
-                            Text(recommendCoin.changeRate.formatRate)
+                            Text("\(recommendCoin.changeType.code)\(recommendCoin.changeRate.formatRate)")
                         }
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeRate > 0 ? .aiCoPositive : .aiCoNegative) // TODO: 변동 없을때의 경우
+                        .foregroundStyle(recommendCoin.changeType.changeColor)
                     }
                 }
+                .padding(.top, 0.2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -80,12 +80,14 @@ struct RecommendCardView: View {
 
             VStack {
                 Text(recommendCoin.comment)
-                    .foregroundStyle(.aiCoLabel)
                     .font(.system(size: 14))
+                    .lineSpacing(6)
+                    .foregroundStyle(.aiCoLabel)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(20)
-        .frame(width: 280, height: 300)
+        .frame(height: 300)
         .background(.aiCoBackgroundWhite)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay {
@@ -103,8 +105,10 @@ struct RecommendCardView: View {
             coinID: "KRW-BTC",
             name: "비트코인",
             tradePrice: 1600,
-            changeRate: 4.27
+            changeRate: 4.27,
+            changeType: .rise
         )
     )
 }
+
 
