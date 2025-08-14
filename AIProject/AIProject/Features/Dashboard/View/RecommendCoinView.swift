@@ -20,17 +20,17 @@ struct RecommendCoinView: View {
             Group {
                 switch viewModel.status {
                 case .loading:
-                    DefaultProgressView(status: .loading, message: "이용자에 맞는 코인을 분석중이에요", buttonAction: {
+                    DefaultProgressView(status: .loading, message: "이용자에 맞는 코인을 분석중이에요") {
                         viewModel.cancelTask()
-                    }, backgroundColor: .clear)
+                    }
                 case .failure(let networkError):
-                    DefaultProgressView(status: .failure, message: networkError.localizedDescription, buttonAction: {
+                    DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
                         viewModel.loadRecommendCoin()
-                    }, backgroundColor: .clear)
+                    }
                 case .cancel(let networkError):
-                    DefaultProgressView(status: .cancel, message: networkError.localizedDescription, buttonAction: {
+                    DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
                         viewModel.loadRecommendCoin()
-                    }, backgroundColor: .clear)
+                    }
                 default:
                     EmptyView()
                 }
