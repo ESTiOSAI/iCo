@@ -56,7 +56,7 @@ class ImageProcessViewModel: ObservableObject {
                     throw ImageProcessError.noExtractedCoinID
                 }
                 
-                // 업비트 API 호출 테스트로 검증된 coinID만 배열에 담기
+                // 업비트 코인 리스트에 포함된 coinID만 배열에 담기
                 try Task.checkCancellation()
                 for symbol in convertedSymbols {
                     do {
@@ -64,13 +64,17 @@ class ImageProcessViewModel: ObservableObject {
                     } catch is CancellationError {
                         throw CancellationError()
                     } catch {
-                        print("ℹ️ 업비트 API 호출 테스트 :", symbol)
-                        throw ImageProcessError.noMatchingCoinIDAtAPI
+                        continue
                     }
                 }
                 
-                print("🚀 최종 코인 목록 :", verifiedCoinList)
-                await showAnalysisResult()
+                // 최종 리스트가 비어있을 경우
+                if verifiedCoinList.isEmpty {
+                    throw ImageProcessError.noExistingCoin
+                } else {
+                    print("🚀 최종 코인 목록 :", verifiedCoinList.map({ $0.koreanName }))
+                    await showAnalysisResult()
+                }
             } catch is CancellationError {
                 await terminateProcess()
             } catch let error as ImageProcessError {
@@ -176,7 +180,7 @@ class ImageProcessViewModel: ObservableObject {
         try Task.checkCancellation()
         
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
-        let krwSymbolName = "KRW-\(symbol)"
+        let krwSymbolName = "KRW-\(symbol.uppercased())"
         
         if let coinList {
             await MainActor.run {

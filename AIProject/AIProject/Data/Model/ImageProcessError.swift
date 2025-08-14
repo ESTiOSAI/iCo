@@ -19,7 +19,7 @@ enum ImageProcessError: Error, CustomStringConvertible {
     case noExtractedCoinID
     
     /// 업비트에서 제공하는 코인이 아닐 때
-    case noMatchingCoinIDAtAPI
+    case noExistingCoin
     
     /// 기타 Vision 자체에서 발생한 에러
     case unknownVisionError
@@ -33,7 +33,7 @@ enum ImageProcessError: Error, CustomStringConvertible {
             return "이미지에서 문자를 찾지 못했어요"
         case .noExtractedCoinID:
             return "이미지에서 코인을 찾지 못했어요"
-        case .noMatchingCoinIDAtAPI:
+        case .noExistingCoin:
             return "아이코에 등록되지 않은 코인이에요"
         default:
             return "이미지 처리 중 예상치 못한 문제가 발생했어요"
