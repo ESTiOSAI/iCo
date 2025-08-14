@@ -21,7 +21,7 @@ struct ReportView: View {
     }
     
     var body: some View {
-        ScrollView() {
+        ScrollView {
             VStack(spacing: 16) {
                 Text(String.aiGeneratedContentNotice)
                     .font(.system(size: 11))
@@ -34,8 +34,10 @@ struct ReportView: View {
                 ReportSectionView(status: $viewModel.todayStatus, imageName: "shareplay", title: "오늘 시장의 분위기", content: AttributedString(viewModel.coinTodayTrends))
                 
                 ReportNewsSectionView(status: $viewModel.todayStatus, articles: viewModel.coinTodayTopNews)
+                    .padding(.bottom, 30)
             }
         }
+        .scrollIndicators(.hidden)
     }
 }
 

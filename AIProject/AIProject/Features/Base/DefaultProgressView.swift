@@ -13,7 +13,6 @@ import SwiftUI
 ///   - status: 현재 진행 상태(`loading`, `failure`, `cancel`)
 ///   - message: 상태와 함께 표시할 설명 문구
 ///   - buttonAction: 취소 또는 재시도 버튼의 액션. 기본값은 `nil`이며 버튼이 필요 없는 경우 생략 가능
-///   - backgroundColor: 배경색. 기본값은 `.aiCoBackgroundWhite`
 struct DefaultProgressView: View {
     
     /// 진행 상태를 나타내는 열거형입니다.
@@ -39,19 +38,15 @@ struct DefaultProgressView: View {
     /// 이 뷰를 사용할 때 취소 버튼이 필요하지 않다면 생략 가능함.
     /// 예: `DefaultProgressView(message: "불러오는 중...")`
     let buttonAction: (() -> Void)?
-
-    var backgroundColor: Color = .aiCoBackgroundWhite
     
     init(
         status: Status,
         message: String,
-        buttonAction: (() -> Void)? = nil,
-        backgroundColor: Color = .aiCoBackgroundWhite
+        buttonAction: (() -> Void)? = nil
     ) {
         self.status = status
         self.message = message
         self.buttonAction = buttonAction
-        self.backgroundColor = backgroundColor
     }
     
     var body: some View {
@@ -63,28 +58,33 @@ struct DefaultProgressView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .aiCoAccent))
                         .scaleEffect(1.7) // 크기 살짝 키우기
                         .padding(16)
+                        .background(.aiCoBackgroundAccent)
                 case .failure:
                     Image(systemName: "xmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
+                        .background(.aiCoBackground)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
+                        .background(.aiCoBackground)
                 }
             }
-            .background(.aiCoAccent.opacity(0.05))
             .clipShape(.circle)
             .overlay {
                 Circle()
                     .stroke(.accent, lineWidth: 0.5)
             }
+            .padding(15)
             
             Text(message)
-                .font(.system(size: 16))
+                .font(.system(size: 14))
                 .foregroundColor(.aiCoLabel)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
             
             switch status {
             case .loading:
@@ -96,11 +96,11 @@ struct DefaultProgressView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding()
-        .background(backgroundColor)
     }
 }
 
 #Preview {
     DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", buttonAction: { print("Hi") })
     DefaultProgressView(status: .cancel, message: "작업이 취소됐어요", buttonAction: { print("Hi") })
+    DefaultProgressView(status: .cancel, message: "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요", buttonAction: { print("Hi") })
 }

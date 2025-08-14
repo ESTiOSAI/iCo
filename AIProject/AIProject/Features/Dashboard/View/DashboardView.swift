@@ -20,6 +20,7 @@ struct DashboardView: View {
             
             AIBriefingView()
         }
+        .scrollIndicators(.hidden)
     }
 }
 
