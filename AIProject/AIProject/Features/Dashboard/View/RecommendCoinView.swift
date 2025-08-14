@@ -45,8 +45,8 @@ struct SuccessCoinView: View {
 
     @GestureState var isDragging: Bool = false
     @State var selection: String?
+    @State var selectedCoin: RecommendCoin?
 
-    var timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     var currentIndex: Int = 0
 
     var body: some View {
@@ -81,6 +81,9 @@ struct SuccessCoinView: View {
                             RecommendCardView(recommendCoin: coin)
                                 .id(coin.id)
                                 .frame(width: geoProxy.size.width * 0.7)
+                                .onTapGesture {
+                                    selectedCoin = coin
+                                }
                         }
                     }
                     .scrollTargetLayout()
@@ -102,13 +105,16 @@ struct SuccessCoinView: View {
                         }
                     }
                 }
-                .onReceive(timer) { _ in
+                .onReceive(viewModel.timer) { _ in
                     guard !isDragging, !viewModel.recommendCoins.isEmpty else { return }
                     viewModel.currentIndex = (viewModel.currentIndex + 1) % viewModel.recommendCoins.count
 
                     withAnimation(.easeInOut) {
                         selection = viewModel.recommendCoins[viewModel.currentIndex].id
                     }
+                }
+                .navigationDestination(item: $selectedCoin) { coin in
+                    CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
                 }
             }
             .frame(height: 300)

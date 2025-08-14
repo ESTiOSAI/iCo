@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RecommendCoin: Identifiable {
+struct RecommendCoin: Identifiable, Hashable {
     enum TickerChangeType: String {
         case rise = "RISE"
         case even = "EVEN"

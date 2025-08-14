@@ -12,11 +12,14 @@ import SwiftUI
 /// 관심 코인 기반 추천, AI 브리핑으로 구성합니다.
 struct DashboardView: View {
     var body: some View {
-        ScrollView {
-            RecommendCoinView()
-                .padding(.bottom, 50)
-            
-            AIBriefingView()
+        NavigationStack {
+            ScrollView {
+                RecommendCoinView()
+                    .padding(.bottom, 50)
+
+                AIBriefingView()
+            }
+            .ignoresSafeArea(edges: .top)
         }
         .scrollIndicators(.hidden)
         .ignoresSafeArea(edges: .top)
