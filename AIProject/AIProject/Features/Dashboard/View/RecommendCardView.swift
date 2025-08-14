@@ -80,12 +80,12 @@ struct RecommendCardView: View {
 
             VStack {
                 Text(recommendCoin.comment)
-                    .foregroundStyle(.aiCoLabel)
                     .font(.system(size: 14))
+                    .foregroundStyle(.aiCoLabel)
             }
         }
         .padding(20)
-        .frame(width: 280, height: 300)
+        .frame(height: 300)
         .background(.aiCoBackgroundWhite)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay {
@@ -107,4 +107,5 @@ struct RecommendCardView: View {
         )
     )
 }
+
 

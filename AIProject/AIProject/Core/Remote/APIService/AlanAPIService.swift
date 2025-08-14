@@ -37,7 +37,7 @@ final class AlanAPIService {
     /// - Returns: 디코딩된 DTO 객체
     private func fetchDTO<T: Decodable>(prompt: Prompt, action: AlanAction) async throws -> T {
         let answer = try await fetchAnswer(content: prompt.content, action: action)
-        
+
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw NetworkError.encodingError
         }
@@ -105,6 +105,13 @@ extension AlanAPIService {
         return dto
     }
 
+    /// 사용자의 투자 성향과 관심 코인을 기반으로 추천 코인 목록을 요청합니다.
+    ///
+    /// - Parameters:
+    ///   - preference: 사용자의 투자 성향을 나타내는 문자열입니다.
+    ///     예: `"초보자"`, `"중수"`, `"고수"`
+    ///   - bookmarkCoins: 사용자가 북마크한 코인 이름을 쉼표로 구분한 문자열입니다.
+    ///     예: `"비트코인, 이더리움"`
     func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO] {
         let prompt = Prompt.recommendCoin(preference: preference, bookmark: bookmarkCoins)
         return try await fetchDTO(prompt: prompt, action: .coinRecomendation)

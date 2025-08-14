@@ -12,6 +12,8 @@ struct RecommendCoinView: View {
 
     var body: some View {
         ZStack {
+            LinearGradient(colors: [.aiBackgroundGradientProminent, .aiBackgroundGradientLight], startPoint: .topLeading, endPoint: .bottomTrailing)
+
             SuccessCoinView(viewModel: viewModel)
                 .opacity(viewModel.isSuccess ? 1 : 0)
 
@@ -34,10 +36,6 @@ struct RecommendCoinView: View {
             default:
                 EmptyView()
             }
-        }
-        .background(LinearGradient(colors: [.aiBackgroundGradientProminent, .aiBackgroundGradientLight], startPoint: .topLeading, endPoint: .bottomTrailing))
-        .onAppear {
-            viewModel.loadRecommendCoin()
         }
     }
 }
@@ -64,13 +62,10 @@ struct SuccessCoinView: View {
                             }
                     }
                 }
-                .padding(.horizontal)
-                .scrollTargetLayout()
             }
             .frame(height: 300)
-            .scrollTargetBehavior(.viewAligned)
         }
-        .padding(.vertical, 40)
+        .padding(.bottom, 40)
     }
 }
 

@@ -13,14 +13,13 @@ import SwiftUI
 struct DashboardView: View {
     var body: some View {
         ScrollView {
-            HeaderView(heading: "대시보드")
-            
             RecommendCoinView()
                 .padding(.bottom, 50)
             
             AIBriefingView()
         }
         .scrollIndicators(.hidden)
+        .ignoresSafeArea(edges: .top)
     }
 }
 
