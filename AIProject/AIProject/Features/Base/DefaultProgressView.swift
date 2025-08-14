@@ -82,6 +82,7 @@ struct DefaultProgressView: View {
             Text(message)
                 .font(.system(size: 16))
                 .foregroundColor(.aiCoLabel)
+                .multilineTextAlignment(.center)
             
             switch status {
             case .loading:
