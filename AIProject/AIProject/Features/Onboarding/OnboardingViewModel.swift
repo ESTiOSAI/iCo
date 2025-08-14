@@ -26,8 +26,11 @@ final class OnboardingViewModel: ObservableObject {
                 englishNames: englishNames,
                 vsCurrency: "krw"
             )
-
-            print(imageMap)
+            
+            let primitive = imageMap.mapValues { url in
+                url.absoluteString
+            }
+            UserDefaults.standard.set(primitive, forKey: AppStorageKey.imageMap)
         } catch {
             print("업비트 마켓 불러오기 에러:", error.localizedDescription)
         }

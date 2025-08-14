@@ -140,19 +140,25 @@ final class CoinGeckoAPIService {
         do {
             // 1. 메타 데이터(API로 이미지 URL 목록 가져오기)
             let dtos = try await fetchCoinImagesByIDs(ids: englishNames, vsCurrency: vsCurrency)
-
-            // 2. URLCache에 이미지 저장 (ImageLoader 활용)
-            var result: [String: URL] = [:]
-            for dto in dtos {
-                guard let url = dto.imageURL else { continue }
-                let symbol = dto.symbol.uppercased()
-                result[symbol] = url
-
-                // 미리 캐싱 — 네트워크 요청이 필요해도 URLCache에 저장됨
-                _ = try? await ImageLoader.shared.image(for: url)
+            
+            return await withTaskGroup(of: (String, URL).self) { group in
+                for dto in dtos {
+                    guard let url = dto.imageURL else { continue }
+                    let symbol = dto.symbol.uppercased()
+                    
+                    group.addTask {
+                        // 미리 캐싱 — 네트워크 요청이 필요해도 URLCache에 저장됨
+                        _ = try? await ImageLoader.shared.image(for: url)
+                        return (symbol, url)
+                    }
+                }
+            
+                var result: [String: URL] = [:]
+                for await (symbol, url) in group {
+                    result[symbol] = url
+                }
+                return result
             }
-
-            return result
         } catch {
             print("네트워크 에러:", error.localizedDescription)
             return [:]
