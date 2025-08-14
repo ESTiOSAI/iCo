@@ -7,24 +7,34 @@
 
 import SwiftUI
 
-/// 북마크 대량 등록을 관련 작업들을 처리하는 뷰모델
+/// 북마크 대량 등록 관련 작업들을 처리하는 뷰모델
 class ImageProcessViewModel: ObservableObject {
+    /// 업비트에서 받아온 한국 마켓의 코인들을 담는 배열
+    /// 1 ) 뷰 생성 시 fetch 한 후 OCR 비식별화 단계에서 사용, 2 ) CoreData 삽입 직전에 더블 체크용으로 사용
+    @Published var coinList: [CoinDTO]?
+    
+    /// 비동기 작업 흐름 제어를 위한  Task
+    @Published var processImageTask: Task<Void, Error>?
+    
+    /// 이미지 처리 상태를 담는 변수
     @Published var isLoading = false
     
+    /// 이미지 처리 성공 시, 처리 결과를 알려주는 Alert 의 상태를 제어하는 변수
     @Published var showAnalysisResultAlert = false
     
+    /// 이미지 실패 시, 처리 결과를 알려주는 Alert 의 상태와 메시지를 제어하는 변수
     @Published var showErrorMessage = false
     @Published var errorMessage = ""
     
-    @Published var coinList: [CoinDTO]?
+    /// Alan 식별 + 업비트 검증을 거친 최종 코인의 배열
     @Published var verifiedCoinList = [CoinDTO]()
-    
-    @Published var processImageTask: Task<Void, Error>?
     
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: UIImage) {
         processImageTask = Task {
-            await MainActor.run { self.isLoading = true }
+            await MainActor.run {
+                isLoading = true
+            }
             
             do {
                 guard let coinList else {
@@ -54,7 +64,7 @@ class ImageProcessViewModel: ObservableObject {
                     throw ImageProcessError.noExtractedCoinID
                 }
                 
-                // 업비트 API 호출 테스트로 검증된 coinID만 배열에 담기
+                // 업비트 코인 리스트에 포함된 coinID만 배열에 담기
                 try Task.checkCancellation()
                 for symbol in convertedSymbols {
                     do {
@@ -62,13 +72,17 @@ class ImageProcessViewModel: ObservableObject {
                     } catch is CancellationError {
                         throw CancellationError()
                     } catch {
-                        print("ℹ️ 업비트 API 호출 테스트 :", symbol)
-                        throw ImageProcessError.noMatchingCoinIDAtAPI
+                        continue
                     }
                 }
                 
-                print("🚀 최종 코인 목록 :", verifiedCoinList)
-                await showAnalysisResult()
+                // 최종 리스트가 비어있을 경우
+                if verifiedCoinList.isEmpty {
+                    throw ImageProcessError.noExistingCoin
+                } else {
+                    print("🚀 최종 코인 목록 :", verifiedCoinList.map({ $0.koreanName }))
+                    await showAnalysisResult()
+                }
             } catch is CancellationError {
                 await terminateProcess()
             } catch let error as ImageProcessError {
@@ -79,23 +93,22 @@ class ImageProcessViewModel: ObservableObject {
     
     @MainActor
     func cancelTask() {
-        self.processImageTask?.cancel()
+        processImageTask?.cancel()
     }
     
     @MainActor
     private func showAnalysisResult() {
-        self.isLoading = false
-        self.showAnalysisResultAlert = true
+        isLoading = false
+        showAnalysisResultAlert = true
     }
     
     @MainActor
     private func terminateProcess(with error: ImageProcessError? = nil) {
-        self.isLoading = false
-        print("취소 완료")
+        isLoading = false
         
         if let error {
-            self.errorMessage = error.description
-            self.showErrorMessage = true
+            errorMessage = error.description
+            showErrorMessage = true
             print("🚨 이미지 처리 중 에러 발생:", error)
         }
     }
@@ -106,10 +119,17 @@ class ImageProcessViewModel: ObservableObject {
     
     /// 전달된 이미지에 OCR을 처리하고 비식별화된 문자열 배열을 받아오는 함수
     private func performOCR(from selectedImage: UIImage, with coinNames: Set<String>) async throws -> [String] {
+        var originalImage: UIImage? = selectedImage
+        
         try Task.checkCancellation()
         
+        defer {
+            originalImage = nil
+        }
+        
         do {
-            let recognizedText = try await TextRecognitionHelper(image: selectedImage, coinNames: coinNames).recognizeText()
+            guard let originalImage else { return [String]() }
+            let recognizedText = try await TextRecognitionHelper(image: originalImage, coinNames: coinNames).handleOCR()
             
             return recognizedText
         } catch is CancellationError {
@@ -135,10 +155,8 @@ class ImageProcessViewModel: ObservableObject {
             
             var answerContent = answer.content
             
-#if DEBUG
             print("ℹ️ 앨런 프롬프트 :", prompt)
             print("ℹ️ 앨런 응답 :", answerContent)
-#endif
             
             // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
             if answerContent.starts(with: "```json") {
@@ -147,9 +165,7 @@ class ImageProcessViewModel: ObservableObject {
             
             let convertedSymbols = answerContent.convertIntoArray
 
-#if DEBUG
             print("ℹ️ 파싱 후 :", convertedSymbols)
-#endif
             return convertedSymbols
         } catch let error as NetworkError {
             switch error {
@@ -167,11 +183,11 @@ class ImageProcessViewModel: ObservableObject {
         try Task.checkCancellation()
         
         // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
-        let krwSymbolName = "KRW-\(symbol)"
+        let krwSymbolName = "KRW-\(symbol.uppercased())"
         
         if let coinList {
             await MainActor.run {
-                self.verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
+                verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
             }
         }
     }
@@ -185,5 +201,9 @@ class ImageProcessViewModel: ObservableObject {
         } catch {
             print(error)
         }
+    }
+    
+    deinit {
+        print("vm", #function)
     }
 }

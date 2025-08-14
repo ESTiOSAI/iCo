@@ -10,7 +10,7 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    private var image: UIImage
+    private var image: UIImage?
     private var coinNames: Set<String>
     
     init(image: UIImage, coinNames: Set<String>) {
@@ -18,16 +18,28 @@ final class TextRecognitionHelper {
         self.coinNames = coinNames
     }
     
+    func handleOCR() async throws -> [String] {
+        let texts = try await recognizeText()
+        let redacted = texts.map { redactNonCoinName(in: $0) }
+        return redacted
+    }
+    
     /// OCR을 처리하는 함수
     func recognizeText() async throws -> [String] {
-        guard let cgImage = image.cgImage else {
+        guard let cgImage = image?.cgImage else {
             throw NSError(domain: "TextRecognitionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "🚨 CGImage가 유효하지 않음"])
         }
         
         return try await withCheckedThrowingContinuation { continuation in
-            let request = VNRecognizeTextRequest { request, error in
-                if let error = error {
+            let request = VNRecognizeTextRequest { [weak self] request, error in
+                guard self != nil else {
+                    continuation.resume(returning: [])
+                    return
+                }
+                
+                if let error {
                     continuation.resume(throwing: error)
+                    return
                 }
                 
                 guard let observations = request.results as? [VNRecognizedTextObservation] else {
@@ -35,10 +47,7 @@ final class TextRecognitionHelper {
                     return
                 }
                 
-                let results = observations.compactMap { observation -> String? in
-                    guard let topCandidate = observation.topCandidates(1).first else { return nil }
-                    return self.redactNonCoinName(in: topCandidate.string)
-                }
+                let results = observations.compactMap { $0.topCandidates(1).first?.string }
                 continuation.resume(returning: results)
             }
             
@@ -115,5 +124,10 @@ final class TextRecognitionHelper {
         }
         
         return matrix[aCount][bCount]
+    }
+    
+    deinit {
+        image = nil
+        print("helper", #function)
     }
 }

@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ContentSection: View {
-    @EnvironmentObject var vm: ImageProcessViewModel
+    @ObservedObject var vm: ImageProcessViewModel
     
     @State var selectedItem: PhotosPickerItem?
     @State var selectedImage: UIImage?
@@ -22,21 +22,21 @@ struct ContentSection: View {
                 if selectedImage == nil {
                     // 이미지 등록 전
                     ContentUnavailableView {
-                            Image("placeholder-no-image")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 150, height: 150)
-                                .opacity(0.8)
-                                .background(.aiCoBackground)
-                                .clipShape(.circle)
-                                .overlay {
-                                    Circle()
-                                        .stroke(.default, lineWidth: 0.5)
-                                }
-                                .padding(.bottom, 16)
+                        Image("placeholder-no-image")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 120)
+                            .padding(50)
+                            .background(.aiCoBackground)
+                            .clipShape(.circle)
+                            .overlay {
+                                Circle()
+                                    .stroke(.default, lineWidth: 0.5)
+                            }
+                            .padding(.bottom, 16)
                         
                         Text("선택된 이미지가 없어요")
-                            .font(.system(size: 16))
+                            .font(.system(size: 14))
                             .foregroundStyle(.aiCoLabelSecondary)
                     }
                 } else {
@@ -46,9 +46,9 @@ struct ContentSection: View {
                         
                         if vm.isLoading {
                             VStack(spacing: 16) {
-//                                DefaultProgressView(message: "아이코가 이미지를 분석하고 있어요") {
-//                                    vm.cancelTask()
-//                                }
+                                DefaultProgressView(status: .loading, message: "아이코가 이미지를 분석하고 있어요") {
+                                    vm.cancelTask()
+                                }
                             }
                         }
                     }
