@@ -34,6 +34,7 @@ struct ReportView: View {
                 ReportSectionView(status: $viewModel.todayStatus, imageName: "shareplay", title: "오늘 시장의 분위기", content: AttributedString(viewModel.coinTodayTrends))
                 
                 ReportNewsSectionView(status: $viewModel.todayStatus, articles: viewModel.coinTodayTopNews)
+                    .padding(.bottom, 30)
             }
         }
         .scrollIndicators(.hidden)
