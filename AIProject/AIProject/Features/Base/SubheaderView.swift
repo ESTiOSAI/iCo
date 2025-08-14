@@ -39,6 +39,7 @@ struct SubheaderView: View {
                 Text(description)
                     .font(.system(size: 15))
                     .foregroundStyle(fontColor)
+                    .lineSpacing(6)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

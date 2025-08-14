@@ -61,6 +61,7 @@ struct RecommendCardView: View {
                 HStack(spacing: 4) {
                     Text("전일대비")
                         .font(.system(size: 14))
+                        .foregroundStyle(.aiCoLabel)
 
                     HStack(spacing: 0) {
                         Group {
@@ -71,6 +72,7 @@ struct RecommendCardView: View {
                         .foregroundStyle(recommendCoin.changeType.changeColor)
                     }
                 }
+                .padding(.top, 0.2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -79,8 +81,10 @@ struct RecommendCardView: View {
             VStack {
                 Text(recommendCoin.comment)
                     .font(.system(size: 14))
+                    .lineSpacing(6)
                     .foregroundStyle(.aiCoLabel)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(20)
         .frame(height: 300)
