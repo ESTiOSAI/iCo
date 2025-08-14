@@ -17,8 +17,12 @@ struct MarketView: View {
     @State var totalSelected = false
     @State var collapse = false
     
-    init(upbitService: UpBitAPIService, tickerService: UpbitTickerService) {
-        viewModel = MarketViewModel(upbitService: upbitService)
+    init(
+        coinService: UpBitAPIService,
+        tickerService: UpbitTickerService,
+        imageService: CoinGeckoAPIService
+    ) {
+        viewModel = MarketViewModel(coinService: coinService, imageService: imageService)
         coinStore = CoinListStore(tickerService: tickerService)
     }
     
@@ -53,6 +57,7 @@ struct MarketView: View {
                 }
             }
             .task {
+                await viewModel.load()
                 coinStore.change(viewModel.totalCoins)
             }
             .navigationDestination(isPresented: $isShowSearchView) {
@@ -75,5 +80,9 @@ extension MarketView {
 }
 
 #Preview {
-    MarketView(upbitService: UpBitAPIService(), tickerService: UpbitTickerService())
+    MarketView(
+        coinService: UpBitAPIService(),
+        tickerService: UpbitTickerService(),
+        imageService: CoinGeckoAPIService()
+    )
 }
