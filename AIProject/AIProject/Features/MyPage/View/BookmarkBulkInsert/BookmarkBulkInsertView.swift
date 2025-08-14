@@ -29,7 +29,7 @@ struct BookmarkBulkInsertView: View {
                     }
                 }
             }
-            .alert("북마크 분석 결과", isPresented: $vm.showAnalysisResultAlert) {
+            .alert("이미지 분석 결과", isPresented: $vm.showAnalysisResultAlert) {
                 Button {
                     vm.addToBookmark()
                     clearCoinIDArray()
@@ -45,9 +45,9 @@ struct BookmarkBulkInsertView: View {
                 }
             } message: {
                 let formattedCoinNames = vm.verifiedCoinList.map { $0.koreanName }.joined(separator: ", ")
-                Text("이미지에서 아래의 코인을 발견했어요\n\n\(formattedCoinNames)")
+                Text("이미지에서 아래의 코인을 발견했어요\n\(formattedCoinNames)")
             }
-            .alert("북마크 분석 실패", isPresented: $vm.showErrorMessage) {
+            .alert("이미지 분석 실패", isPresented: $vm.showErrorMessage) {
                 Button(role: .cancel) {
                     vm.showErrorMessage = false
                 } label: {
