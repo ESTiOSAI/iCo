@@ -15,28 +15,15 @@ enum MarketCoinTab: Int {
 @Observable
 class MarketViewModel {
     private let upbitService: UpBitAPIService
-    let coinListViewModel: CoinListViewModel
     
     private(set) var bookmaredCoins: [CoinListModel] = []
     private(set) var totalCoins: [CoinListModel] = []
     
-    init(upbitService: UpBitAPIService, coinListViewModel: CoinListViewModel) {
+    init(upbitService: UpBitAPIService) {
         self.upbitService = upbitService
-        self.coinListViewModel = coinListViewModel
         
         Task {
             await setup()
-            await change(tab: .total)
-        }
-    }
-    
-    @MainActor
-    func change(tab: MarketCoinTab) {
-        switch tab {
-        case .bookmark:
-            coinListViewModel.change(bookmaredCoins)
-        case .total:
-            coinListViewModel.change(totalCoins)
         }
     }
     

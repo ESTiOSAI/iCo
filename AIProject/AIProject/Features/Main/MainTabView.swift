@@ -15,7 +15,7 @@ struct MainTabView: View {
                     Label("대쉬보드", systemImage: "square.grid.2x2")
                 }
             
-            MarketView()
+            MarketView(upbitService: UpBitAPIService(), tickerService: UpbitTickerService())
                 .tabItem {
                     Label("마켓", systemImage: "bitcoinsign.bank.building")
                 }

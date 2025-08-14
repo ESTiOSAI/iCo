@@ -65,7 +65,7 @@ struct CoinListModel: Identifiable {
 
 extension CoinListModel: Equatable {
     static func ==(lhs: CoinListModel, rhs: CoinListModel) -> Bool {
-        lhs.coinID == rhs.coinID
+        lhs.coinID == rhs.coinID && lhs.currentPrice == rhs.currentPrice
     }
 }
 

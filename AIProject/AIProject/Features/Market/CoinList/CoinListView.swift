@@ -9,35 +9,35 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    @Bindable var viewModel: CoinListViewModel
+    @Bindable var store: CoinListStore
     @State private var visibleCoins: Set<CoinListModel.ID> = []
     @Environment(\.scenePhase) private var scenePhase
     @State var sortCategory: SortCategory = .volume
     @State var volumeSortOrder: SortOrder = .descending
     @State var nameSortOrder: SortOrder = .none
     
-//    var sortedCoins: [CoinListModel] {
-//        switch sortCategory {
-//        case .name:
-//            switch nameSortOrder {
-//            case .none:
-//                return viewModel.coins
-//            case .ascending:
-//                return viewModel.coins.sorted { $0.name < $1.name }
-//            case .descending:
-//                return viewModel.coins.sorted { $0.name > $1.name }
-//            }
-//        case .volume:
-//            switch volumeSortOrder {
-//            case .none:
-//                return viewModel.coins
-//            case .ascending:
-//                return viewModel.coins.sorted { $0.tradeAmount < $1.tradeAmount }
-//            case .descending:
-//                return viewModel.coins.sorted { $0.tradeAmount > $1.tradeAmount }
-//            }
-//        }
-//    }
+    var sortedCoins: [CoinListModel] {
+        switch sortCategory {
+        case .name:
+            switch nameSortOrder {
+            case .none:
+                return store.coins
+            case .ascending:
+                return store.coins.sorted { $0.name < $1.name }
+            case .descending:
+                return store.coins.sorted { $0.name > $1.name }
+            }
+        case .volume:
+            switch volumeSortOrder {
+            case .none:
+                return store.coins
+            case .ascending:
+                return store.coins.sorted { $0.tradeAmount < $1.tradeAmount }
+            case .descending:
+                return store.coins.sorted { $0.tradeAmount > $1.tradeAmount }
+            }
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -46,7 +46,7 @@ struct CoinListView: View {
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                 
-                ForEach(viewModel.tickerCoins) { coin in
+                ForEach(sortedCoins) { coin in
                     
                     // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
                         ZStack {
@@ -60,7 +60,6 @@ struct CoinListView: View {
                         .padding(.vertical, 14)
                         .onAppear {
                             visibleCoins.insert(coin.id)
-//                            insertCoin(id: coin.id, proxy: geometry)
                         }
                         .onDisappear {
                             visibleCoins.remove(coin.id)
@@ -84,17 +83,17 @@ struct CoinListView: View {
         })
         .onChange(of: visibleCoins, { oldValue, newValue in
             Task {
-                await viewModel.sendTicket(newValue)
+                await store.sendTicket(newValue)
             }
         })
         .onAppear {
             Task {
-                await viewModel.connect()
+                await store.connect()
             }
         }
         .onDisappear {
             Task {
-                await viewModel.disconnect()
+                await store.disconnect()
             }
         }
     }
@@ -117,11 +116,11 @@ extension CoinListView {
         print(#function, phase)
         switch phase {
         case .background:
-            await viewModel.disconnect()
+            await store.disconnect()
         case .inactive:
             break
         case .active:
-            await viewModel.connect()
+            await store.connect()
         @unknown default:
             break
         }

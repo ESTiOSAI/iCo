@@ -38,23 +38,23 @@ struct CoinCell: View {
             HStack {
                 // 코인 레이블
                 HStack(spacing: 16) {
-                    Group {
-                        if !coin.image.isEmpty, let url = URL(string: coin.image) {
-                            AsyncImage(url: url) { img in
-                                img.resizable().aspectRatio(contentMode: .fit)
-                            } placeholder: { ProgressView() }
-                                .frame(width: 30, height: 30)
-                        } else {
-                            Text(String(coin.coinName.prefix(1)))
-                                .font(.system(size: 11))
-                                .foregroundStyle(.aiCoAccent)
-                                .overlay {
-                                    Circle()
-                                        .stroke(.default, lineWidth: 0.5)
-                                }
-                                .frame(width: 30, height: 30)
-                        }
-                    }
+//                    Group {
+//                        if !coin.image.isEmpty, let url = URL(string: coin.image) {
+//                            AsyncImage(url: url) { img in
+//                                img.resizable().aspectRatio(contentMode: .fit)
+//                            } placeholder: { ProgressView() }
+//                                .frame(width: 30, height: 30)
+//                        } else {
+//                            Text(String(coin.coinName.prefix(1)))
+//                                .font(.system(size: 11))
+//                                .foregroundStyle(.aiCoAccent)
+//                                .overlay {
+//                                    Circle()
+//                                        .stroke(.default, lineWidth: 0.5)
+//                                }
+//                                .frame(width: 30, height: 30)
+//                        }
+//                    }
                     VStack(alignment: .leading, spacing: 6) {
                         Text(coin.name)
                             .lineLimit(2)

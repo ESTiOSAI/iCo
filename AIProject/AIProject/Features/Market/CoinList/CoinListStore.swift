@@ -1,38 +1,42 @@
 //
-//  CoinListViewModel.swift
+//  CoinListStore.swift
 //  AIProject
 //
-//  Created by kangho lee on 8/4/25.
+//  Created by kangho lee on 8/14/25.
 //
 
 import Foundation
 import AsyncAlgorithms
 
+struct CoinMeta: Identifiable {
+    let id: String
+    
+    let koreanName: String
+    
+    var name: String {
+        id.components(separatedBy: "-").last ?? id
+    }
+}
+
 @Observable
-class CoinListViewModel {
+class CoinListStore {
     private let tickerService: UpbitTickerService
-    private let coinGeckoService: CoinGeckoAPIService
-    private var lastTicketCoins: Set<CoinListModel.ID> = []
     
     private let ticket = UUID().uuidString
-    
-    private(set) var tickerCoins: [CoinListModel] = []
     
     @ObservationIgnored
     private var visibleCoinsChannel = AsyncChannel<Set<CoinListModel.ID>>()
     
     private(set) var coins: [CoinListModel] = []
     
-    init(tickerService: UpbitTickerService, coinGeckoService: CoinGeckoAPIService) {
+    init(tickerService: UpbitTickerService) {
         self.tickerService = tickerService
-        self.coinGeckoService = coinGeckoService
     }
     
     /// 북마크와 전체 코인 리스트를 변경합니다.
     /// - Parameter coins: 보여줄 코인 리스트
     func change(_ coins: [CoinListModel]) {
         self.coins = coins
-        self.tickerCoins = coins
     }
     
     /// 시세가 서비스에 연결합니다.
@@ -42,13 +46,13 @@ class CoinListViewModel {
         visibleCoinsChannel = .init()
         
         // coin snapshot 전송 stream 연결
+        Task {
+            await self.ticketStream()
+        }
         
         // service 연결
         await tickerService.connect()
         
-        Task {
-            await self.ticketStream()
-        }
         // 시세가
         Task {
             await consume()
@@ -76,24 +80,19 @@ class CoinListViewModel {
             .removeDuplicates()
             ._throttle(for: .milliseconds(300), latest: true)
         for await visibleCoin in stream {
-            debugPrint("send Ticket")
-            lastTicketCoins = visibleCoin
             await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
         }
     }
     
+    @MainActor
     private func performUpdate(_ ticker: RealTimeTickerDTO) async {
-        guard let index = tickerCoins.firstIndex(where: {
+        guard let index = coins.firstIndex(where: {
             $0.coinID == ticker.coinID
         }) else {
             return
         }
         
-        let updated = CoinListModel(coinID: ticker.coinID, image: tickerCoins[index].image, name: tickerCoins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: tickerCoins[index].tradeAmount, change: .init(rawValue: ticker.change))
-        
-        var copy = tickerCoins
-        copy[index] = updated
-        tickerCoins = copy
+        coins[index] = CoinListModel(coinID: ticker.coinID, image: coins[index].image, name: coins[index].name, currentPrice: ticker.tradePrice, changePrice: ticker.changeRate, tradeAmount: coins[index].tradeAmount, change: .init(rawValue: ticker.change))
     }
     
     private func consume() async {
