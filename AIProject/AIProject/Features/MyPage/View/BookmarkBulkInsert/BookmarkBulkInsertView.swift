@@ -18,8 +18,7 @@ struct BookmarkBulkInsertView: View {
         NavigationStack {
             VStack {
                 HeaderSection()
-                ContentSection()
-                    .environmentObject(vm)
+                ContentSection(vm: vm)
             }
             .navigationTitle("북마크 가져오기")
             .navigationBarTitleDisplayMode(.inline)

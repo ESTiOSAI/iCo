@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ContentSection: View {
-    @EnvironmentObject var vm: ImageProcessViewModel
+    @ObservedObject var vm: ImageProcessViewModel
     
     @State var selectedItem: PhotosPickerItem?
     @State var selectedImage: UIImage?
