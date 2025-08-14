@@ -13,7 +13,6 @@ import SwiftUI
 ///   - status: 현재 진행 상태(`loading`, `failure`, `cancel`)
 ///   - message: 상태와 함께 표시할 설명 문구
 ///   - buttonAction: 취소 또는 재시도 버튼의 액션. 기본값은 `nil`이며 버튼이 필요 없는 경우 생략 가능
-///   - backgroundColor: 배경색. 기본값은 `.aiCoBackgroundWhite`
 struct DefaultProgressView: View {
     
     /// 진행 상태를 나타내는 열거형입니다.
@@ -39,19 +38,15 @@ struct DefaultProgressView: View {
     /// 이 뷰를 사용할 때 취소 버튼이 필요하지 않다면 생략 가능함.
     /// 예: `DefaultProgressView(message: "불러오는 중...")`
     let buttonAction: (() -> Void)?
-
-    var backgroundColor: Color = .aiCoBackgroundWhite
     
     init(
         status: Status,
         message: String,
-        buttonAction: (() -> Void)? = nil,
-        backgroundColor: Color = .aiCoBackgroundWhite
+        buttonAction: (() -> Void)? = nil
     ) {
         self.status = status
         self.message = message
         self.buttonAction = buttonAction
-        self.backgroundColor = backgroundColor
     }
     
     var body: some View {
@@ -98,7 +93,6 @@ struct DefaultProgressView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .padding()
-        .background(backgroundColor)
     }
 }
 

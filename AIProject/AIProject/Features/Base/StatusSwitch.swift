@@ -25,16 +25,16 @@ struct StatusSwitch<Success: View>: View {
     var body: some View {
         switch status {
         case .loading:
-            DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", backgroundColor: backgroundColor)
                 .frame(height: 300)
+            DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요")
         case .success:
             success()
         case .failure(let networkError):
-            DefaultProgressView(status: .failure, message: networkError.localizedDescription, backgroundColor: backgroundColor)
                 .frame(height: 300)
+            DefaultProgressView(status: .failure, message: networkError.localizedDescription)
         case .cancel(let networkError):
-            DefaultProgressView(status: .cancel, message: networkError.localizedDescription, backgroundColor: backgroundColor)
                 .frame(height: 300)
+            DefaultProgressView(status: .cancel, message: networkError.localizedDescription)
         }
     }
 }
