@@ -63,19 +63,21 @@ struct DefaultProgressView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: .aiCoAccent))
                         .scaleEffect(1.7) // 크기 살짝 키우기
                         .padding(16)
+                        .background(.aiCoBackgroundAccent)
                 case .failure:
                     Image(systemName: "xmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
+                        .background(.aiCoBackground)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
+                        .background(.aiCoBackground)
                 }
             }
-            .background(.aiCoAccent.opacity(0.05))
             .clipShape(.circle)
             .overlay {
                 Circle()
