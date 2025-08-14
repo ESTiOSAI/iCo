@@ -78,11 +78,13 @@ struct DefaultProgressView: View {
                 Circle()
                     .stroke(.accent, lineWidth: 0.5)
             }
+            .padding(15)
             
             Text(message)
-                .font(.system(size: 16))
+                .font(.system(size: 14))
                 .foregroundColor(.aiCoLabel)
                 .multilineTextAlignment(.center)
+                .lineSpacing(4)
             
             switch status {
             case .loading:
@@ -100,4 +102,5 @@ struct DefaultProgressView: View {
 #Preview {
     DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요", buttonAction: { print("Hi") })
     DefaultProgressView(status: .cancel, message: "작업이 취소됐어요", buttonAction: { print("Hi") })
+    DefaultProgressView(status: .cancel, message: "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요", buttonAction: { print("Hi") })
 }
