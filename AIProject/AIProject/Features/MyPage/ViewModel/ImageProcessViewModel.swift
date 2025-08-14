@@ -118,7 +118,7 @@ class ImageProcessViewModel: ObservableObject {
         
         do {
             guard let originalImage else { return [String]() }
-            let recognizedText = try await TextRecognitionHelper(image: originalImage, coinNames: coinNames).recognizeText()
+            let recognizedText = try await TextRecognitionHelper(image: originalImage, coinNames: coinNames).handleOCR()
             
             return recognizedText
         } catch is CancellationError {

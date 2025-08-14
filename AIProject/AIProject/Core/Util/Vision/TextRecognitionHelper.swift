@@ -18,6 +18,12 @@ final class TextRecognitionHelper {
         self.coinNames = coinNames
     }
     
+    func handleOCR() async throws -> [String] {
+        let texts = try await recognizeText()
+        let redacted = texts.map { redactNonCoinName(in: $0) }
+        return redacted
+    }
+    
     /// OCR을 처리하는 함수
     func recognizeText() async throws -> [String] {
         guard let cgImage = image.cgImage else {
@@ -26,7 +32,7 @@ final class TextRecognitionHelper {
         
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { [weak self] request, error in
-                guard let self else {
+                guard self != nil else {
                     continuation.resume(returning: [])
                     return
                 }
@@ -41,10 +47,7 @@ final class TextRecognitionHelper {
                     return
                 }
                 
-                let results = observations.compactMap { observation -> String? in
-                    guard let topCandidate = observation.topCandidates(1).first else { return nil }
-                    return self.redactNonCoinName(in: topCandidate.string)
-                }
+                let results = observations.compactMap { $0.topCandidates(1).first?.string }
                 continuation.resume(returning: results)
             }
             
