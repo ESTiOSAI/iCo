@@ -7,19 +7,27 @@
 
 import SwiftUI
 
-/// 북마크 대량 등록을 관련 작업들을 처리하는 뷰모델
+/// 북마크 대량 등록 관련 작업들을 처리하는 뷰모델
 class ImageProcessViewModel: ObservableObject {
+    /// 업비트에서 받아온 한국 마켓의 코인들을 담는 배열
+    /// 1 ) 뷰 생성 시 fetch 한 후 OCR 비식별화 단계에서 사용, 2 ) CoreData 삽입 직전에 더블 체크용으로 사용
+    @Published var coinList: [CoinDTO]?
+    
+    /// 비동기 작업 흐름 제어를 위한  Task
+    @Published var processImageTask: Task<Void, Error>?
+    
+    /// 이미지 처리 상태를 담는 변수
     @Published var isLoading = false
     
+    /// 이미지 처리 성공 시, 처리 결과를 알려주는 Alert 의 상태를 제어하는 변수
     @Published var showAnalysisResultAlert = false
     
+    /// 이미지 실패 시, 처리 결과를 알려주는 Alert 의 상태와 메시지를 제어하는 변수
     @Published var showErrorMessage = false
     @Published var errorMessage = ""
     
-    @Published var coinList: [CoinDTO]?
+    /// Alan 식별 + 업비트 검증을 거친 최종 코인의 배열
     @Published var verifiedCoinList = [CoinDTO]()
-    
-    @Published var processImageTask: Task<Void, Error>?
     
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: UIImage) {
@@ -97,7 +105,6 @@ class ImageProcessViewModel: ObservableObject {
     @MainActor
     private func terminateProcess(with error: ImageProcessError? = nil) {
         isLoading = false
-        print("취소 완료")
         
         if let error {
             errorMessage = error.description
@@ -148,10 +155,8 @@ class ImageProcessViewModel: ObservableObject {
             
             var answerContent = answer.content
             
-#if DEBUG
             print("ℹ️ 앨런 프롬프트 :", prompt)
             print("ℹ️ 앨런 응답 :", answerContent)
-#endif
             
             // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
             if answerContent.starts(with: "```json") {
@@ -160,9 +165,7 @@ class ImageProcessViewModel: ObservableObject {
             
             let convertedSymbols = answerContent.convertIntoArray
 
-#if DEBUG
             print("ℹ️ 파싱 후 :", convertedSymbols)
-#endif
             return convertedSymbols
         } catch let error as NetworkError {
             switch error {
