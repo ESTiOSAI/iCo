@@ -38,18 +38,6 @@ struct ChartView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            /// 기간 선택 탭 (UI용)
-            GeometryReader { geometry in
-                SegmentedControlView(
-                    selection: $selectedTab,
-                    tabTitles: CoinInterval.all.map(\.id),
-                    width: geometry.size.width
-                )
-                .frame(width: geometry.size.width, height: 44)
-            }
-            .frame(height: 44)
-            .padding(.bottom, 20)
-            
             /// 타이틀 영역
             HStack(alignment: .top, spacing: 8) {
                 /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
