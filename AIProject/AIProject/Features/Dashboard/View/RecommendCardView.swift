@@ -54,7 +54,7 @@ struct RecommendCardView: View {
                     Text(recommendCoin.tradePrice.formatKRW)
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeRate > 0 ? .aiCoPositive : .aiCoNegative) // TODO: 변동 없을때의 경우
+                        .foregroundStyle(recommendCoin.changeType.changeColor)
                 }
                 .padding(.top, 1)
 
@@ -63,14 +63,12 @@ struct RecommendCardView: View {
                         .font(.system(size: 14))
 
                     HStack(spacing: 0) {
-                        // TODO: 변동 없을때의 경우
                         Group {
-                            Image(systemName: recommendCoin.changeRate > 0 ? "arrowtriangle.up.fill" : "arrowtriangle.down.fill")
-                            Text(recommendCoin.changeRate.formatRate)
+                            Text("\(recommendCoin.changeType.code)\(recommendCoin.changeRate.formatRate)")
                         }
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeRate > 0 ? .aiCoPositive : .aiCoNegative) // TODO: 변동 없을때의 경우
+                        .foregroundStyle(recommendCoin.changeType.changeColor)
                     }
                 }
             }
@@ -103,7 +101,8 @@ struct RecommendCardView: View {
             coinID: "KRW-BTC",
             name: "비트코인",
             tradePrice: 1600,
-            changeRate: 4.27
+            changeRate: 4.27,
+            changeType: .rise
         )
     )
 }

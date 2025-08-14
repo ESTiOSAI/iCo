@@ -81,9 +81,9 @@ final class RecommendCoinViewModel: ObservableObject {
                     status = .loading
                 }
 
-                let bookmarkCoins = try BookmarkManager.shared.fetchRecent(limit: 5).map { $0.coinKoreanName }.joined(separator: ", ")
-                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: "초보자", bookmarkCoins: bookmarkCoins)
-                //let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonString.data(using: .utf8)!)
+//                let bookmarkCoins = try BookmarkManager.shared.fetchRecent(limit: 5).map { $0.coinKoreanName }.joined(separator: ", ")
+//                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: "초보자", bookmarkCoins: bookmarkCoins)
+                let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonString.data(using: .utf8)!)
                 let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
@@ -119,10 +119,11 @@ final class RecommendCoinViewModel: ObservableObject {
                     return RecommendCoin(
                         imageURL: nil,
                         comment: dto.comment,
-                        coinID: data.coinID,
+                        coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
                         name: dto.name,
                         tradePrice: data.tradePrice,
-                        changeRate: data.change == "FALL" ? -data.changeRate : data.changeRate
+                        changeRate: data.changeRate,
+                        changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
                     )
                 }
             }
