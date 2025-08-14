@@ -21,7 +21,7 @@ struct ReportView: View {
     }
     
     var body: some View {
-        ScrollView() {
+        ScrollView {
             VStack(spacing: 16) {
                 Text(String.aiGeneratedContentNotice)
                     .font(.system(size: 11))
@@ -36,6 +36,7 @@ struct ReportView: View {
                 ReportNewsSectionView(status: $viewModel.todayStatus, articles: viewModel.coinTodayTopNews)
             }
         }
+        .scrollIndicators(.hidden)
     }
 }
 
