@@ -19,6 +19,9 @@ final class BookmarkViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     @Published var imageMap: [String: URL] = [:]
+    @Published var status: ResponseStatus = .loading
+
+    private var task: Task<Void, Never>?
 
     var isBookmarkEmpty: Bool {
         bookmarks.isEmpty
@@ -32,24 +35,38 @@ final class BookmarkViewModel: ObservableObject {
 
     func loadBriefing(character: InvestmentCharacter) async {
         guard !bookmarks.isEmpty else {
-            print("북마크 is empty!")
             return
         }
-
-        isLoading = true
-        defer { isLoading = false }
-
-        do {
-            let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
-            briefing = dto
-            errorMessage = nil
-        } catch let error as NetworkError {
-            errorMessage = "네트워크 에러: \(error.localizedDescription)"
-            print("❌ loadBriefing NetworkError:", error)
-        } catch {
-            errorMessage = "기타 에러: \(error.localizedDescription)"
-            print("❌ loadBriefing error:", error)
+        task = Task {
+            await MainActor.run {
+                status = .loading
+            }
+            do {
+                let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+                await MainActor.run {
+                    briefing = dto
+                    status = .success
+                }
+            } catch is CancellationError {
+                await MainActor.run {
+                    status = .cancel(.taskCancelled)
+                }
+            } catch let error as NetworkError {
+                await MainActor.run {
+                    status = .failure(error)
+                }
+            } catch {
+                await MainActor.run {
+                    // 수정 필요
+                    status = .failure(NetworkError.unknown(700))
+                }
+            }
         }
+    }
+
+    func cancelTask() {
+        task?.cancel()
+        task = nil
     }
 
     func fetchBookmarks() {

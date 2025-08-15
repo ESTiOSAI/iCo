@@ -20,9 +20,19 @@ struct BookmarkView: View {
     @State private var sharingItems: [Any] = []
     @State private var showingExportOptions = false
     @State private var showDeleteConfirm = false
+    @State private var didCopy = false
 
     private var isExportDisabled: Bool {
-        vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading
+        if vm.isBookmarkEmpty || vm.briefing == nil {
+            return true
+        }
+
+        switch vm.status {
+        case .success:
+            return false
+        default:
+            return true
+        }
     }
 
     // 정렬 데이터
@@ -56,9 +66,24 @@ struct BookmarkView: View {
 
                     Spacer()
 
-                    RoundedButton(title: "내용 복사", imageName: "document.on.document") {
-                        //내용 복사
+                    RoundedButton(title: didCopy ? "복사 완료" : "내용 복사", imageName: didCopy ? "checkmark" : "document.on.document") {
+                        guard let dto = vm.briefing else { return }
+                        let text =
+                        """
+                        [분석 결과]
+                        \(dto.briefing)
+                        
+                        [전략 제안]
+                        \(dto.strategy)
+                        """
 
+                        UIPasteboard.general.string = text
+                        didCopy = true
+
+                        Task {
+                            try? await Task.sleep(nanoseconds: 2_000_000_000)
+                            await MainActor.run { didCopy = false }
+                        }
                     }
                     .disabled(isExportDisabled)
                     .opacity(isExportDisabled ? 0.2 : 1.0)
@@ -66,8 +91,26 @@ struct BookmarkView: View {
                 .padding(.leading, 16)
                 .padding(.trailing, 16)
 
-                // 북마크 AI 한줄평
-                BriefingSectionView(briefing: vm.briefing, isLoading: vm.isLoading, bookmarksEmpty: vm.isBookmarkEmpty, errorMessage: vm.errorMessage)
+                Group {
+                    switch vm.status {
+                    case .loading:
+                        DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                            vm.cancelTask()
+                        }
+                    case .success:
+                        if let briefing = vm.briefing {
+                        	BriefingSectionView(briefing: briefing)
+                        }
+                    case .failure(let networkError):
+                        DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                            Task { await vm.loadBriefing(character: .longTerm) }
+                        }
+                    case .cancel(let networkError):
+                        DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                            Task { await vm.loadBriefing(character: .longTerm) }
+                        }
+                    }
+                }
 
                 Text(String.aiGeneratedContentNotice)
                     .font(.system(size: 8))
@@ -182,54 +225,44 @@ struct BookmarkView: View {
     }
 }
 
-struct BriefingSectionView: View {
-    let briefing: PortfolioBriefingDTO?
-    let isLoading: Bool
-    let bookmarksEmpty: Bool
-    let errorMessage: String?
+struct BriefingSectionView: View { // 수정됨
+    let briefing: PortfolioBriefingDTO
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if bookmarksEmpty {
-                Text("코인을 북마크 해보세요!")
-            } else if isLoading {
-                DefaultProgressView(status: .loading, message: "분석중...")
-            } else if let briefing {
+            Text("분석 결과")
+                .font(.system(size: 14))
+                .bold()
+                .foregroundColor(Color(.aiCoAccent))
 
-                Text("분석 결과")
-                    .font(.system(size: 14))
-                    .bold()
-                    .foregroundColor(Color(.aiCoAccent))
+            briefing.briefing
+                .highlightTextForNumbersOperator()
+                .font(.system(size: 12))
+                .lineSpacing(6)
 
-                briefing.briefing.highlightTextForNumbersOperator()
-                    .font(.system(size: 12))
-                    .lineSpacing(6)
+            Spacer(minLength: 0)
 
-                Spacer(minLength: 0)
+            Text("전략 제안")
+                .font(.system(size: 14))
+                .bold()
+                .foregroundColor(Color(.aiCoAccent))
 
-                Text("전략 제안")
-                    .font(.system(size: 14))
-                    .bold()
-                    .foregroundColor(Color(.aiCoAccent))
-
-                briefing.strategy
-                    .highlightTextForNumbersOperator()
-                    .font(.system(size: 12))
-                    .lineSpacing(6)
-            } else if let errorMessage {
-                Text("예상치 못한 에러 발생: \(errorMessage)")
-                    .foregroundColor(.red)
-            }
+            briefing.strategy
+                .highlightTextForNumbersOperator()
+                .font(.system(size: 12))
+                .lineSpacing(6)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundColor(.primary)
-        .background(RoundedRectangle(cornerRadius: 12)
-            .fill(Color.aiCoBackgroundAccent)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(.accent, lineWidth: 0.5)
-            ))
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.aiCoBackgroundAccent)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(.accent, lineWidth: 0.5)
+                )
+        )
         .cornerRadius(12)
         .padding(.horizontal, 16)
     }
@@ -268,12 +301,7 @@ struct ExportReportView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 브리핑
-            BriefingSectionView(
-                briefing: dto,
-                isLoading: false,
-                bookmarksEmpty: false,
-                errorMessage: nil
-            )
+            BriefingSectionView(briefing: dto)
 
             HStack {
                 SubheaderView(subheading: "북마크한 코인")
