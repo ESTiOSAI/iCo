@@ -72,10 +72,10 @@ struct MyPageView: View {
                             .stroke(.default, lineWidth: 0.5)
                     )
                 }
+                .padding(.horizontal, 16)
                 
                 Spacer()
             }
-            .padding(.horizontal, 16)
         }
     }
 }
