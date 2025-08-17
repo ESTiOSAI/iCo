@@ -8,9 +8,9 @@
 import Foundation
 
 final class UpbitTickerService {
-    private let client: WebSocketClient2
+    private let client: WebSocketClient
     
-    init(client: WebSocketClient2 = .init(pingInterval: .seconds(120))) {
+    init(client: WebSocketClient = .init(pingInterval: .seconds(120))) {
         self.client = client
     }
     
@@ -45,14 +45,8 @@ final class UpbitTickerService {
     func sendTicket(ticket: String, coins: [CoinListModel.ID]) async {
         guard !coins.isEmpty else { return }
         
-        /// 요청 JSON 포맷
-        let jsonData: [[String: Any]] = [
-            ["ticket": ticket],
-            ["type": "ticker", "codes": coins]
-        ]
-        
         do {
-            let ticketData = try JSONSerialization.data(withJSONObject: jsonData)
+            let ticketData = try JSONEncoder().encode(SubscribeRequest.ticker(ticket: ticket, codes: coins).components())
             try await client.send(data: ticketData)
         } catch {
             debugPrint(error)
