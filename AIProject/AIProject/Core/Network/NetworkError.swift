@@ -10,7 +10,7 @@ import Foundation
 /// 네트워크 에러를 정의한 객체입니다.
 enum NetworkError: Error {
     /// 일반 네트워크 연결 오류입니다.
-    case networkError(_ error: Error)
+    case networkError(_ error: URLError)
     /// 사용자가 작업을 취소한 경우입니다.
     case taskCancelled
     /// 잘못된 URL 요청입니다.
