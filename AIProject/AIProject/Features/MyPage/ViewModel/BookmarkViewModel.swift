@@ -27,7 +27,9 @@ final class BookmarkViewModel: ObservableObject {
 
     func loadBriefing(character: InvestmentCharacter) async {
         do {
+            cancelTask()
             let bookmarks = try manager.fetchAll()
+            print("북마크된 코인: ", bookmarks)
             guard !bookmarks.isEmpty else {
                 await MainActor.run {
                     briefing = nil
@@ -60,6 +62,7 @@ final class BookmarkViewModel: ObservableObject {
     func cancelTask() {
         task?.cancel()
         task = nil
+        print("cancel Task!")
     }
 
     func deleteAllBookmarks() {

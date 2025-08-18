@@ -201,6 +201,7 @@ extension AlanAPIService {
         let cacheEntry = CachedURLResponse(response: response, data: jsonData)
         URLCache.shared.storeCachedResponse(cacheEntry, for: request)
 
+        print("dto :", dto)
         return dto
     }
 }
