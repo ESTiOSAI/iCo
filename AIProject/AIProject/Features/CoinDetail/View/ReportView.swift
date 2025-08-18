@@ -27,14 +27,40 @@ struct ReportView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoNeutral)
                 
-                ReportSectionView(status: $viewModel.overviewStatus, imageName: "text.page.badge.magnifyingglass",title: "한눈에 보는 \(viewModel.koreanName)", content: viewModel.coinOverView)
+                ReportSectionView(
+                    icon: "text.page.badge.magnifyingglass",
+                    title: "한눈에 보는 \(viewModel.koreanName)",
+                    state: viewModel.overview,
+                    onCancel: { viewModel.cancelOverview() },
+                    onRetry: { print("다시 시작 구현") }
+                ) { value in
+                    Text(value)
+                }
                 
-                ReportSectionView(status: $viewModel.weeklyStatus, imageName: "calendar", title: "주간 동향", content: AttributedString(viewModel.coinWeeklyTrends))
+                ReportSectionView(
+                    icon: "calendar",
+                    title: "주간 동향",
+                    state: viewModel.weekly,
+                    onCancel: { viewModel.cancelWeekly() },
+                    onRetry: { print("다시 시작 구현") }
+                ) { value in
+                    Text(AttributedString(value))
+                }
                 
-                ReportSectionView(status: $viewModel.todayStatus, imageName: "shareplay", title: "오늘 시장의 분위기", content: AttributedString(viewModel.coinTodayTrends))
+                ReportSectionView(
+                    icon: "shareplay",
+                    title: "오늘 시장의 분위기",
+                    state: viewModel.today,
+                    onCancel: { viewModel.cancelToday() },
+                    onRetry: { print("다시 시작 구현") }
+                ) { value in
+                    Text(AttributedString(value))
+                }
                 
-                ReportNewsSectionView(status: $viewModel.todayStatus, articles: viewModel.coinTodayTopNews)
-                    .padding(.bottom, 30)
+                if case .success = viewModel.today {
+                    ReportNewsSectionView(articles: viewModel.news)
+                        .padding(.bottom, 30)
+                }
             }
         }
         .scrollIndicators(.hidden)
@@ -43,5 +69,5 @@ struct ReportView: View {
 
 #Preview {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
-    return ReportView(coin: sampleCoin)
+    return ReportView(coin: sampleCoin).padding(.horizontal, 16)
 }

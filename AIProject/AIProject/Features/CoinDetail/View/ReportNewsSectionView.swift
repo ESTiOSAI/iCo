@@ -16,9 +16,8 @@ import SwiftUI
 ///   - articles: 표시할 `CoinArticle` 목록
 struct ReportNewsSectionView: View {
     @State private var safariItem: IdentifiableURL?
-    @Binding var status: ResponseStatus
     
-    private static let cornerRadius: CGFloat = 10
+    private static let cornerRadius: CGFloat = 20
     
     var title: String = "주요 뉴스"
     var articles: [CoinArticle]
@@ -29,40 +28,39 @@ struct ReportNewsSectionView: View {
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.aiCoAccent)
             
-            StatusSwitch(status: status, backgroundColor: .aiCoBackgroundBlue) {
-                ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(article.title)
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundStyle(.aiCoLabel)
-                            
-                            Spacer()
-                            
-                            RoundedButton(title: "원문보기", imageName: "chevron.right") {
-                                // FIXME: 앨런에게서 뉴스 출처 url 받아오기
-//                                if let url = URL(string: article.newsSourceURL) {
-//                                    safariItem = IdentifiableURL(url: url)
-//                                }
-                                
-                                safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/960242")!)
-                            }
-                        }
-                        
-                        Text(article.summary)
-                            .font(.system(size: 15))
+            ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text(article.title)
+                            .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(.aiCoLabel)
-                            .lineSpacing(6)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(1)
+                        
+                        Spacer()
+                        
+                        RoundedButton(title: "원문보기", imageName: "chevron.right") {
+                            // FIXME: 앨런에게서 뉴스 출처 url 받아오기
+                            // if let url = URL(string: article.newsSourceURL) {
+                            //     safariItem = IdentifiableURL(url: url)
+                            // }
+                            
+                            safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/960242")!)
+                        }
                     }
-                    .padding(.top, 12)
-                    .padding(.bottom, 16)
                     
-                    if index < articles.count - 1 {
-                        Divider()
-                            .frame(height: 1)
-                            .background(.aiCoBorder)
-                    }
+                    Text(article.summary)
+                        .font(.system(size: 15))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineSpacing(6)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, 12)
+                .padding(.bottom, 16)
+                
+                if index < articles.count - 1 {
+                    Divider()
+                        .frame(height: 1)
+                        .background(.aiCoBorder)
                 }
             }
         }
@@ -83,12 +81,11 @@ struct ReportNewsSectionView: View {
 
 #Preview {
     ReportNewsSectionView(
-        status: .constant(.failure(NetworkError.invalidAPIKey)),
         articles: [
             CoinArticle(title: "제목1", summary: "내용1", newsSourceURL: "https://example.com/"),
             CoinArticle(title: "제목2", summary: "내용2", newsSourceURL: "https://example.com/"),
             CoinArticle(title: "제목3", summary: "내용3", newsSourceURL: "https://example.com/")
         ]
     )
-        .padding(16)
+    .padding(16)
 }

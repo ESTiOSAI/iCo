@@ -11,6 +11,13 @@ import SwiftUI
 ///
 /// 오늘의 인사이트, 커뮤니티 반응, 공포 탐욕 지수으로 구성합니다.
 struct AIBriefingView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    @StateObject private var viewModel: InsightViewModel
+    
+    init() {
+        _viewModel = StateObject(wrappedValue: InsightViewModel())
+    }
+    
     var body: some View {
         SubheaderView(subheading: "새로운 소식들이 있어요")
             .padding(.bottom, 4)
@@ -21,9 +28,34 @@ struct AIBriefingView: View {
                 .foregroundStyle(.aiCoNeutral)
             
             VStack(spacing: 16) {
-                TodayCoinInsightView()
+                // FIXME: ViewType enum + struct -> 프로퍼티를 enum 값에 따라 전달
+                ReportSectionView( // ReportSectionView 대체
+                    icon: "bitcoinsign.bank.building",
+                    title: "전반적인 시장의 분위기",
+                    state: viewModel.overall,
+                    onCancel: { viewModel.cancelOverall() },
+                    onRetry: { print("다시 시작 구현") }
+                ) { value in
+                    Text(value.sentiment.rawValue)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
+                } content: { value in
+                    Text(AttributedString(value.summary))
+                }
                 
-                TodayCoinInsightView(isCommunity: true)
+                ReportSectionView(
+                    icon: "shareplay",
+                    title: "주요 커뮤니티의 분위기",
+                    state: viewModel.community,
+                    onCancel: { viewModel.cancelCommunity() },
+                    onRetry: { print("다시 시작 구현") }
+                ) { value in
+                    Text(value.sentiment.rawValue)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
+                } content: { value in
+                    Text(AttributedString(value.summary))
+                }
                 
                 FearGreedView()
                     .padding(.bottom, 30)
