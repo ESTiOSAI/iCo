@@ -29,6 +29,8 @@ final class RecommendCoinViewModel: ObservableObject {
 
     var timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     var currentIndex: Int = 0
+    
+    private let userInvestmentType = UserDefaults.standard.string(forKey: AppStorageKey.investmentType) ?? "conservative"
 
     var isSuccess: Bool {
         switch status {
@@ -58,7 +60,7 @@ final class RecommendCoinViewModel: ObservableObject {
                 }
 
                 let bookmarkCoins = try BookmarkManager.shared.fetchAll().map { $0.coinKoreanName }.joined(separator: ", ")
-                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: "초보자", bookmarkCoins: bookmarkCoins)
+                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: userInvestmentType, bookmarkCoins: bookmarkCoins)
                 let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
