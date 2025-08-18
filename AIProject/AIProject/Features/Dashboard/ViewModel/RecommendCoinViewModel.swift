@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+protocol AlanAPIServiceProtocol {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO]
+}
+
+protocol UpBitApiServiceProtocol {
+    func fetchQuotes(id: String) async throws -> [TickerDTO]
+}
+
 final class RecommendCoinViewModel: ObservableObject {
     /// 현재 추천 코인 뷰의 UI 상태를 나타냅니다.
     ///
@@ -14,8 +22,8 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var status: ResponseStatus = .loading
     @Published var recommendCoins: [RecommendCoin] = []
 
-    private var alanService: AlanAPIService
-    private var upbitService: UpBitAPIService
+    private var alanService: AlanAPIServiceProtocol
+    private var upbitService: UpBitApiServiceProtocol
 
     private var task: Task<Void, Never>?
 
@@ -31,9 +39,12 @@ final class RecommendCoinViewModel: ObservableObject {
         }
     }
 
-    init() {
-        alanService = AlanAPIService()
-        upbitService = UpBitAPIService()
+    init(
+        alanService: AlanAPIServiceProtocol = AlanAPIService(),
+        upbitService: UpBitApiServiceProtocol = UpBitAPIService()
+    ) {
+        self.alanService = alanService
+        self.upbitService = upbitService
         loadRecommendCoin()
     }
 
