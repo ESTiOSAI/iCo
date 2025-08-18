@@ -7,13 +7,25 @@
 
 import SwiftUI
 
-struct CachedAsyncImage: View {
-    let url: URL
-    var useCacheOnly: Bool = false
-    var placeholder: Image = Image(systemName: "photo")
+enum CoinResource {
+    case url(URL)
+    case symbol(String)
+}
+
+struct CachedAsyncImage<Content: View>: View {
+    let resource: CoinResource
+    let useCacheOnly: Bool
+    
+    let placeholder: Content
 
     @State private var image: UIImage?
     @State private var isLoading = false
+    
+    init(resource: CoinResource, useCacheOnly: Bool = false, @ViewBuilder placeholder: () -> Content) {
+        self.resource = resource
+        self.useCacheOnly = useCacheOnly
+        self.placeholder = placeholder()
+    }
 
     var body: some View {
         Group {
@@ -23,9 +35,6 @@ struct CachedAsyncImage: View {
                     .scaledToFit()
             } else {
                 placeholder
-                    .resizable()
-                    .scaledToFit()
-                    .opacity(isLoading ? 0.5 : 1.0)
             }
         }
         .task {
@@ -38,7 +47,7 @@ struct CachedAsyncImage: View {
         guard !isLoading else { return }
         isLoading = true
         do {
-            image = try await ImageLoader.shared.image(for: url, useCacheOnly: useCacheOnly)
+            image = try await ImageLoader.shared.image(for: resource, useCacheOnly: useCacheOnly)
         } catch {
             print("이미지 로드 실패:", error.localizedDescription)
         }

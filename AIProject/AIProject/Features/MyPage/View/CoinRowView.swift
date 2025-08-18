@@ -16,21 +16,7 @@ struct CoinRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Group {
-                if let url = imageURL {
-                    CachedAsyncImage(url: url)
-                } else {
-                    Text(String(coin.coinSymbol.prefix(1)))
-                        .font(.caption.bold())
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-            }
-            .frame(width: size, height: size)
-            .clipShape(Circle())
-            .contentShape(Circle())
-            .overlay(
-                Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
-            )
+            CoinView(symbol: coin.coinSymbol, size: size)
 
            	HStack(spacing: 8) {
                 Text(coin.coinKoreanName)

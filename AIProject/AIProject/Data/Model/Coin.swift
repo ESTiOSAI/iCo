@@ -22,3 +22,13 @@ extension Coin {
         try? JSONEncoder().encode(self)
     }
 }
+
+protocol CoinSymbolConvertible {
+    var coinSymbol: String { get }
+}
+
+extension Coin: CoinSymbolConvertible {
+    var coinSymbol: String {
+        id.components(separatedBy: "-").last ?? id
+    }
+}
