@@ -22,11 +22,14 @@ struct BookmarkView: View {
     @State private var showDeleteConfirm = false
     @State private var didCopy = false
 
-    private var isExportDisabled: Bool {
-        if vm.isBookmarkEmpty || vm.briefing == nil {
-            return true
-        }
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
+            animation: .default
+    )
+    private var bookmarks: FetchedResults<BookmarkEntity>
 
+    private var isExportDisabled: Bool {
+           if bookmarks.isEmpty || vm.briefing == nil { return true }
         switch vm.status {
         case .success:
             return false
@@ -41,17 +44,17 @@ struct BookmarkView: View {
         case .name:
             switch nameOrder {
             case .ascending:
-                return vm.bookmarks.sorted { $0.coinKoreanName < $1.coinKoreanName }
+                return Array(bookmarks).sorted { $0.coinKoreanName < $1.coinKoreanName }
             case .descending:
-                return vm.bookmarks.sorted { $0.coinKoreanName > $1.coinKoreanName }
+                return Array(bookmarks).sorted { $0.coinKoreanName > $1.coinKoreanName }
             case .none:
-                return vm.bookmarks
+                return Array(bookmarks)
             }
         case .volume:
-            return vm.bookmarks
+            return Array(bookmarks)
 
         case .none:
-            return vm.bookmarks
+            return Array(bookmarks)
         }
     }
 
@@ -60,7 +63,7 @@ struct BookmarkView: View {
             LazyVStack(alignment: .leading, spacing: 8) {
                 HeaderView(heading: "북마크 관리")
 
-                if !vm.isBookmarkEmpty {
+                if !bookmarks.isEmpty {
                     HStack {
                         SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
                             .padding(.leading, -16)
@@ -178,25 +181,25 @@ struct BookmarkView: View {
                 }
             }
             .onAppear {
-                //TODO: 북마크 갯수가 달라졌을 때만 Fetch
-                vm.fetchBookmarks()
+                guard !bookmarks.isEmpty else {
+                    vm.briefing = nil
+                    vm.imageMap = [:]
+                    return
+                }
 
                 Task { @MainActor in
-                    guard !vm.bookmarks.isEmpty else {
-                        vm.briefing = nil
-                        vm.imageMap = [:]
-                        return
-                    }
                     async let imagesTask: () = vm.loadCoinImages()
                     async let briefingTask: () = vm.loadBriefing(character: .longTerm)
                     _ = await (imagesTask, briefingTask)
                 }
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
-            .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
-                Task { @MainActor in
-                    await vm.loadCoinImages()
-                }
+            .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
+                Task { @MainActor in await vm.loadCoinImages() }
+            }
+            // 북마크 개수 변화 시 브리핑 갱신
+            .onChange(of: bookmarks.count, initial: false) { _,_  in
+                Task { @MainActor in await vm.loadBriefing(character: .longTerm) }
             }
         }
         .backgroundStyle(.aiCoBackground)

@@ -14,48 +14,46 @@ final class BookmarkViewModel: ObservableObject {
     private let service: AlanAPIService
     private let geckoService: CoinGeckoAPIService
 
-    @Published var bookmarks: [BookmarkEntity] = []
     @Published var briefing: PortfolioBriefingDTO?
     @Published var imageMap: [String: URL] = [:]
     @Published var status: ResponseStatus = .loading
 
     private var task: Task<Void, Never>?
 
-    var isBookmarkEmpty: Bool {
-        bookmarks.isEmpty
-    }
-
     init(service: AlanAPIService = AlanAPIService(), geckoService: CoinGeckoAPIService = CoinGeckoAPIService()) {
         self.service = service
         self.geckoService = geckoService
-        fetchBookmarks()
     }
 
     func loadBriefing(character: InvestmentCharacter) async {
-        guard !bookmarks.isEmpty else {
-            return
-        }
-        task = Task {
-            await MainActor.run {
-                status = .loading
-            }
-            do {
-                let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+        do {
+            let bookmarks = try manager.fetchAll()
+            guard !bookmarks.isEmpty else {
                 await MainActor.run {
-                    briefing = dto
+                    briefing = nil
                     status = .success
                 }
-            } catch is CancellationError {
-                await MainActor.run {
-                    status = .cancel(.taskCancelled)
-                }
-            } catch let error as NetworkError {
-                await MainActor.run {
-                    status = .failure(error)
-                }
-            } catch {
-                print("알 수 없는 에러발생")
+                return
             }
+
+            task = Task { [service] in
+                await MainActor.run { status = .loading }
+                do {
+                    let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+                    await MainActor.run {
+                        briefing = dto
+                        status = .success
+                    }
+                } catch is CancellationError {
+                    await MainActor.run { status = .cancel(.taskCancelled) }
+                } catch let error as NetworkError {
+                    await MainActor.run { status = .failure(error) }
+                } catch {
+                    print("알 수 없는 에러발생: \(error)")
+                }
+            }
+        } catch {
+            print("북마크 조회 실패: \(error)")
         }
     }
 
@@ -64,20 +62,11 @@ final class BookmarkViewModel: ObservableObject {
         task = nil
     }
 
-    func fetchBookmarks() {
-        do {
-            bookmarks = try manager.fetchAll()
-        } catch {
-            bookmarks = []
-        }
-    }
-
     func deleteAllBookmarks() {
         do {
             try manager.deleteAll()
-                bookmarks = []
-                imageMap = [:]       
-                briefing = nil
+            briefing = nil
+            imageMap = [:]
         } catch {
             print(error)
         }
@@ -86,12 +75,6 @@ final class BookmarkViewModel: ObservableObject {
     func deleteBookmark(_ bookmark: BookmarkEntity) {
         do {
             try manager.remove(coinID: bookmark.coinID)
-
-            withAnimation {
-                // 리스트에서 제거
-                bookmarks.removeAll { $0.objectID == bookmark.objectID }
-            }
-
             Task { await loadCoinImages() }
         } catch {
             print(error)
@@ -100,27 +83,32 @@ final class BookmarkViewModel: ObservableObject {
 
 // MARK: - CoinGecko관련
     func loadCoinImages() async {
-        guard !bookmarks.isEmpty else {
-            await MainActor.run { imageMap = [:] }
-            return
-        }
+        do {
+            let bookmarks = try manager.fetchAll()
+            guard !bookmarks.isEmpty else {
+                await MainActor.run { imageMap = [:] }
+                return
+            }
 
-        let symbols = Array(
-            Set(
-                bookmarks.compactMap {
-                    $0.coinID.split(separator: "-").last.map { String($0).uppercased() }
-                }
+            let symbols = Array(
+                Set(
+                    bookmarks.compactMap {
+                        $0.coinID.split(separator: "-").last.map { String($0).uppercased() }
+                    }
+                )
             )
-        )
 
-        let map = await geckoService.fetchImageMapBatched(
-            symbols: symbols,
-            vsCurrency: "krw",
-            batchSize: 50,
-            maxConcurrentBatches: 3
-        )
+            let map = await geckoService.fetchImageMapBatched(
+                symbols: symbols,
+                vsCurrency: "krw",
+                batchSize: 50,
+                maxConcurrentBatches: 3
+            )
 
-        await MainActor.run { imageMap = map }
+            await MainActor.run { imageMap = map }
+        } catch {
+            print("이미지 로드 실패: \(error)")
+        }
     }
 
     func imageURL(for symbol: String) -> URL? {
@@ -133,12 +121,21 @@ final class BookmarkViewModel: ObservableObject {
 // MARK: - 북마크 내보내기 관련
     /// scale: 해상도 (2x, 레티나 해상도)
     func makeFullReportImage(scale: CGFloat = 2.0) -> UIImage? {
-        guard let dto = briefing, !bookmarks.isEmpty else { return nil }
+        guard let dto = briefing else { return nil }
+
+        let coins: [BookmarkEntity]
+            do {
+                coins = try manager.fetchAll()
+            } catch {
+                print("북마크 조회 실패: \(error)")
+                return nil
+            }
+        guard !coins.isEmpty else { return nil }
 
         let targetWidth = currentScreenWidth()
 
         let exportView = ExportReportView(
-            dto: dto, coins: bookmarks, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
+            dto: dto, coins: coins, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
         )
             .frame(width: targetWidth, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
