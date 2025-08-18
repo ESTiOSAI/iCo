@@ -25,7 +25,7 @@ final class RecommendCoinViewModel: ObservableObject {
     private var alanService: AlanAPIServiceProtocol
     private var upbitService: UpBitApiServiceProtocol
 
-    private var task: Task<Void, Never>?
+    var task: Task<Void, Never>?
 
     var timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     var currentIndex: Int = 0
@@ -67,9 +67,15 @@ final class RecommendCoinViewModel: ObservableObject {
                 }
 
             } catch is CancellationError {
-                await MainActor.run { status = .cancel(.taskCancelled) }
+                await MainActor.run {
+                    status = .cancel(.taskCancelled)
+                    recommendCoins = []
+                }
             } catch let error as NetworkError {
-                await MainActor.run { status = .failure(error) }
+                await MainActor.run {
+                    status = .failure(error)
+                    recommendCoins = []
+                }
             } catch {
                 print("알 수 없는 에러 발생.")
             }
@@ -77,8 +83,9 @@ final class RecommendCoinViewModel: ObservableObject {
     }
 
     /// 코인 추천 작업을 취소합니다.
-    func cancelTask() {
+    func cancelTask() async {
         task?.cancel()
+        await task?.value
         task = nil
     }
 

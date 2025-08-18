@@ -18,7 +18,9 @@ struct RecommendCoinScreen: View {
                 switch viewModel.status {
                 case .loading:
                     DefaultProgressView(status: .loading, message: "이용자에 맞는 코인을 분석중이에요") {
-                        viewModel.cancelTask()
+                        Task {
+                            await viewModel.cancelTask()
+                        }
                     }
                     .padding(.horizontal, 16)
                 case .success:
