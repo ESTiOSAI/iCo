@@ -51,6 +51,24 @@
 			);
 			target = B7B040022E387FCF005DE0BA /* AIProject */;
 		};
+		A9E81AC42E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
+				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
+				Data/CoreData/CoinImage/CoinImageManager.swift,
+			);
+			target = B7B040142E387FD1005DE0BA /* AIProjectTests */;
+		};
+		A9E81AC52E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
+				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
+				Data/CoreData/CoinImage/CoinImageManager.swift,
+			);
+			target = B7B0401E2E387FD1005DE0BA /* AIProjectUITests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -58,6 +76,8 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
+				A9E81AC42E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectTests" target */,
+				A9E81AC52E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectUITests" target */,
 			);
 			path = AIProject;
 			sourceTree = "<group>";
