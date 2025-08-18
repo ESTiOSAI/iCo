@@ -72,16 +72,12 @@ final class ChartViewModel: ObservableObject {
             let marketCode = coinSymbol
             let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
             
-            /// KST 기준으로 오늘의 시작 시간과 현재 시각 계산
-            var calendar = Calendar.current
-            calendar.timeZone = TimeZone(identifier: "Asia/Seoul")!
-
-            let nowKST = Date()
-            let last24hStartKST = nowKST.addingTimeInterval(-24 * 60 * 60)
+            let now = Date()
+            let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
             /// 당일 범위에 해당하는 가격만 필터링
             let filteredPrices = fetchedPrices.filter { price in
-                return price.date >= last24hStartKST && price.date <= nowKST
+                return price.date >= startTime && price.date <= now
             }
                         
             self.prices = filteredPrices.enumerated().map { idx, price in
