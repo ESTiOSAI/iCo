@@ -98,6 +98,8 @@ final class RecommendCoinViewModel: ObservableObject {
 //                let bookmarkCoins = try BookmarkManager.shared.fetchAll().map { $0.coinKoreanName }.joined(separator: ", ")
 //                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: userInvestmentType, bookmarkCoins: bookmarkCoins)
                 let recommendCoinDTOs = try JSONDecoder().decode([RecommendCoinDTO].self, from: jsonString.data(using: .utf8)!)
+                try await Task.sleep(for: .seconds(3))
+                
                 let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
