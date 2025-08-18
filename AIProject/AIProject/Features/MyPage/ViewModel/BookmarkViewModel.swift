@@ -130,7 +130,6 @@ final class BookmarkViewModel: ObservableObject {
                 print("북마크 조회 실패: \(error)")
                 return nil
             }
-        guard !coins.isEmpty else { return nil }
 
         let targetWidth = currentScreenWidth()
 

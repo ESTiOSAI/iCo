@@ -19,14 +19,6 @@ final class BookmarkExportTests: XCTestCase {
         sut = BookmarkViewModel(service: AlanAPIService(), geckoService: CoinGeckoAPIService())
 
         sut.briefing = PortfolioBriefingDTO(briefing: "투자 브리핑", strategy: "전략 제안")
-
-        sut.bookmarks = {
-            let fake = FakeBookmarkEntity()
-            fake.coinID = "KRW-BTC"
-            fake.coinKoreanName = "비트코인"
-            fake.timestamp = Date()
-            return [fake]
-        }()
     }
 
     override func tearDown() {
@@ -35,6 +27,12 @@ final class BookmarkExportTests: XCTestCase {
     }
 
     func test_makeReportPNGURL_createValidExport() {
+        let fake = FakeBookmarkEntity()
+        fake.coinID = "KRW-BTC"
+        fake.coinKoreanName = "비트코인"
+        fake.timestamp = Date()
+        let coins: [BookmarkEntity] = [fake]
+
         guard let url = sut.makeFullReportPNGURL(scale: 2.0) else {
             XCTFail("PNG 생성 실패")
             return
@@ -48,6 +46,12 @@ final class BookmarkExportTests: XCTestCase {
     }
 
     func test_makeFullReportPDF_createsValidFile() {
+        let fake = FakeBookmarkEntity()
+        fake.coinID = "KRW-BTC"
+        fake.coinKoreanName = "비트코인"
+        fake.timestamp = Date()
+        let coins: [BookmarkEntity] = [fake]
+
         guard let url = sut.makeFullReportPDF(scale: 1.0) else {
             XCTFail("PDF URL 생성 실패")
             return
