@@ -45,6 +45,7 @@ final class ReportViewModel: ObservableObject {
         load()
     }
     
+    // 코인 개요, 주간 동향, 오늘 시장 요약/뉴스를 동시에 로드
     private func load() {
         cancelAll()
         
@@ -74,6 +75,7 @@ final class ReportViewModel: ObservableObject {
             await assignResult(overviewTask, assign: { [weak self] state in
                 self?.overview = state
             }) { data in
+                // TODO: 받아온 데이터 가공을 extension으로 빼는 것이 좋을지 고민해보기
                 var overview = AttributedString()
                 overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
                 
@@ -154,11 +156,100 @@ final class ReportViewModel: ObservableObject {
         }
     }
     
+    // overview만 다시 시도
+    func retryOverview() {
+        if overview.isLoading { return }
+        overviewTask?.cancel()
+        
+        Task { @MainActor in
+            overview = .loading
+        }
+        
+        overviewTask = Task { try await alanAPIService.fetchOverview(for: coin) }
+        
+        Task {
+            await assignResult(overviewTask, assign: { [weak self] state in
+                self?.overview = state
+            }) { data in
+                var overview = AttributedString()
+                overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
+                
+                if let urlString = data.websiteURL, let url = URL(string: urlString) {
+                    let prefix = AttributedString("- 웹사이트: ")
+                    var link = AttributedString(URL(string: urlString)?.host ?? urlString)
+                    link.link = url
+                    link.foregroundColor = .aiCoAccent
+                    link.underlineStyle = .single
+                    overview.append(prefix)
+                    overview.append(link)
+                    overview.append(AttributedString("\n"))
+                } else {
+                    overview.append(AttributedString("- 웹사이트: 없음\n"))
+                }
+                
+                overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
+                overview.append(AttributedString("- 소개: \(data.description)"))
+                
+                return overview
+            }
+        }
+    }
+    
+    // weekly만 다시 시도
+    func retryWeekly() {
+        if weekly.isLoading { return }
+        weeklyMonitor?.cancel()
+        weeklyTask?.cancel()
+        
+        Task { @MainActor in
+            weekly = .loading
+        }
+        
+        weeklyTask = Task { try await alanAPIService.fetchWeeklyTrends(for: coin) }
+        
+        Task {
+            await assignResult(weeklyTask, assign: { [weak self] state in
+                self?.weekly = state
+            }) { data in
+                let weekly = """
+                - 가격 추이: \(data.priceTrend)
+                - 거래량 변화: \(data.volumeChange)
+                - 원인: \(data.reason)
+                """
+                return weekly
+            }
+        }
+    }
+    
+    // retry만 다시 시도
+    func retryToday() {
+        if today.isLoading { return }
+        todayMonitor?.cancel()
+        todayTask?.cancel()
+        
+        Task { @MainActor in
+            today = .loading
+        }
+        
+        todayTask = Task { try await alanAPIService.fetchTodayNews(for: coin) }
+        
+        Task {
+            await assignResult(todayTask, assign: { [weak self] state in
+                self?.today = state
+            }) { data in
+                await MainActor.run {
+                    news = data.articles.map { CoinArticle(from: $0) }
+                }
+                return data.summaryOfTodaysMarketSentiment
+            }
+        }
+    }
+    
     func cancelOverview() { overviewTask?.cancel() }
     func cancelWeekly() { weeklyTask?.cancel() }
     func cancelToday() { todayTask?.cancel() }
     
-    // FIXME: 탭 전환시에도 cancel
+    // 전체 Task 취소
     func cancelAll() {
         weeklyMonitor?.cancel()
         todayMonitor?.cancel()

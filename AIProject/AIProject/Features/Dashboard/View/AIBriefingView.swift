@@ -34,7 +34,7 @@ struct AIBriefingView: View {
                     title: "전반적인 시장의 분위기",
                     state: viewModel.overall,
                     onCancel: { viewModel.cancelOverall() },
-                    onRetry: { print("다시 시작 구현") }
+                    onRetry: { viewModel.retryOverall() }
                 ) { value in
                     Text(value.sentiment.rawValue)
                         .font(.system(size: 16, weight: .bold))
@@ -48,7 +48,7 @@ struct AIBriefingView: View {
                     title: "주요 커뮤니티의 분위기",
                     state: viewModel.community,
                     onCancel: { viewModel.cancelCommunity() },
-                    onRetry: { print("다시 시작 구현") }
+                    onRetry: { viewModel.retryCommunity() }
                 ) { value in
                     Text(value.sentiment.rawValue)
                         .font(.system(size: 16, weight: .bold))

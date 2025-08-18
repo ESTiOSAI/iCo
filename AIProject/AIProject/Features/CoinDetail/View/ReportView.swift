@@ -32,7 +32,7 @@ struct ReportView: View {
                     title: "한눈에 보는 \(viewModel.koreanName)",
                     state: viewModel.overview,
                     onCancel: { viewModel.cancelOverview() },
-                    onRetry: { print("다시 시작 구현") }
+                    onRetry: { viewModel.retryOverview() }
                 ) { value in
                     Text(value)
                 }
@@ -42,7 +42,7 @@ struct ReportView: View {
                     title: "주간 동향",
                     state: viewModel.weekly,
                     onCancel: { viewModel.cancelWeekly() },
-                    onRetry: { print("다시 시작 구현") }
+                    onRetry: { viewModel.retryWeekly() }
                 ) { value in
                     Text(AttributedString(value))
                 }
@@ -52,7 +52,7 @@ struct ReportView: View {
                     title: "오늘 시장의 분위기",
                     state: viewModel.today,
                     onCancel: { viewModel.cancelToday() },
-                    onRetry: { print("다시 시작 구현") }
+                    onRetry: { viewModel.retryToday() }
                 ) { value in
                     Text(AttributedString(value))
                 }

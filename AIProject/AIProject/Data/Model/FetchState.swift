@@ -23,3 +23,10 @@ enum FetchState<Value> {
     case cancel(NetworkError)
     case failure(NetworkError)
 }
+
+extension FetchState {
+    var isLoading: Bool {
+        if case .loading = self { return true }
+        return false
+    }
+}
