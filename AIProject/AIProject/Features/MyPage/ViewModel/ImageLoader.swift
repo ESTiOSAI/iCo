@@ -37,6 +37,7 @@ actor ImageLoader {
         return try await image(for: key, useCacheOnly: useCacheOnly)
     }
 
+    @discardableResult
     func image(for url: URL, useCacheOnly: Bool = false) async throws -> UIImage {
         let key = url as NSURL
 
@@ -52,7 +53,7 @@ actor ImageLoader {
             // 디스크 캐시 확인
             if let cached = URLCache.shared.cachedResponse(for: request),
                let img = UIImage(data: cached.data) {
-                print("캐시(디스크0)에서 이미지 로드됨:", url.lastPathComponent)
+                print("캐시(디스크)에서 이미지 로드됨:", url.lastPathComponent)
                 return img
             }
 
