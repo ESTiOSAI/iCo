@@ -41,7 +41,7 @@ struct ReportSectionView: View {
                 Spacer()
                 
                 if let sentiment {
-                    Text(sentiment.description)
+                    Text(sentiment.rawValue)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(sentiment.color(for: themeManager.selectedTheme))
                 }
