@@ -7,6 +7,8 @@
 
 import Foundation
 
+// View 갱신 주기를 이해하고 애니메이션 처리하기 간단한거부터
+
 struct CoinListModel: Identifiable {
     enum TickerChangeType: String {
         case rise = "RISE"
@@ -19,7 +21,7 @@ struct CoinListModel: Identifiable {
             case "EVEN": self = .even
                 case "FALL": self = .fall
             default:
-                self = .rise
+                self = .even
             }
         }
     }

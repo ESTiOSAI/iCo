@@ -23,3 +23,8 @@ struct CoinDTO: Codable {
     }
 }
 
+extension CoinDTO: CoinSymbolConvertible {
+    var coinSymbol: String {
+        coinID.components(separatedBy: "-").last ?? ""
+    }
+}

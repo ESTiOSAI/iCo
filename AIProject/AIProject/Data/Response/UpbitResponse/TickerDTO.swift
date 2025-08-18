@@ -77,7 +77,7 @@ struct TickerDTO: Codable {
     }
 }
 
-extension TickerDTO {
+extension TickerDTO: Sendable {
     /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(tradeTimestamp) / 1000)
