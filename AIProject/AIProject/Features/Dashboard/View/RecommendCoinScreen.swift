@@ -51,7 +51,7 @@ struct SuccessCoinView: View {
     var body: some View {
         GeometryReader { geoProxy in
             let horizonInset = geoProxy.size.width * 0.15
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(viewModel.recommendCoins) { coin in
@@ -98,6 +98,14 @@ struct SuccessCoinView: View {
             }
             .navigationDestination(item: $selectedCoin) { coin in
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
+            }
+            .onAppear {
+                selection = viewModel.recommendCoins[0].id
+                viewModel.startTimer()
+            }
+            .onDisappear {
+                viewModel.stopTimer()
+                viewModel.currentIndex = 0
             }
         }
     }

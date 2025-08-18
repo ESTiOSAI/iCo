@@ -28,7 +28,7 @@ final class RecommendCoinViewModel: ObservableObject {
     var task: Task<Void, Never>?
 
     @Published var timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
-    var currentIndex: Int = 0
+    @Published var currentIndex: Int = 0
     
     private let userInvestmentType = UserDefaults.standard.string(forKey: AppStorageKey.investmentType) ?? "conservative"
 
