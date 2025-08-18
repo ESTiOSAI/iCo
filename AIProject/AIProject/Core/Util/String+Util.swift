@@ -38,6 +38,10 @@ extension String {
                 .filter { !$0.isEmpty }
             
             return cleanArray
+        } else if cleaned != "" {
+            // "," 은 없지만 빈 문자열이 아닐 경우: 코인이 1개일 경우
+            // 그대로 반환하기
+            return [cleaned]
         } else {
             // 빈 문자열일 경우 빈 배열로 반환하기
             return []
