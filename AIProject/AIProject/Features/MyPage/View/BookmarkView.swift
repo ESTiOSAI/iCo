@@ -237,6 +237,7 @@ struct BriefingSectionView: View {
                 .foregroundColor(Color(.aiCoAccent))
 
             briefing.briefing
+                .byCharWrapping
                 .highlightTextForNumbersOperator()
                 .font(.system(size: 12))
                 .lineSpacing(6)
@@ -249,6 +250,7 @@ struct BriefingSectionView: View {
                 .foregroundColor(Color(.aiCoAccent))
 
             briefing.strategy
+                .byCharWrapping
                 .highlightTextForNumbersOperator()
                 .font(.system(size: 12))
                 .lineSpacing(6)
