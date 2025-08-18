@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SubscribeRequest {
+public enum SubscribeRequest: Encodable {
     enum Component: Encodable {
         case ticket(String)
         case format(FormatType)
@@ -43,6 +43,14 @@ enum SubscribeRequest {
     }
     
     case ticker(ticket: String, codes: [String])
+    
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        
+        for component in components() {
+            try container.encode(component)
+        }
+    }
     
     func components() -> [Component] {
         switch self {

@@ -15,7 +15,6 @@
 		B75D1B1E2E4597FC006839B5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */; };
 		B75D1B202E459806006839B5 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */; };
 		B75D1B222E459ADB006839B5 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75D1B212E459ADB006839B5 /* AdSupport.framework */; };
-		B7D989842E51DBCF00C3D734 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = B7D989832E51DBCF00C3D734 /* FirebaseCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,7 +109,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B7D989842E51DBCF00C3D734 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,7 +200,6 @@
 			);
 			name = AIProjectTests;
 			packageProductDependencies = (
-				B7D989832E51DBCF00C3D734 /* FirebaseCore */,
 			);
 			productName = AIProjectTests;
 			productReference = B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */;
@@ -723,11 +720,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		B7D989832E51DBCF00C3D734 /* FirebaseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B75D1B1B2E4597D3006839B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

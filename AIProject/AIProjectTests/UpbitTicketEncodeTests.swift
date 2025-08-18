@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+import AIProject
 
 final class UpbitTicketEncodeTests: XCTestCase {
 
@@ -28,7 +28,7 @@ final class UpbitTicketEncodeTests: XCTestCase {
           }
         ]
 """.utf8)
-        let target = SubscribeRequest.ticker(ticket: ticket, codes: coins).components()
+        let target = SubscribeRequest.ticker(ticket: ticket, codes: coins)
         let encoder = JSONEncoder()
         let model = try encoder.encode(target)
         

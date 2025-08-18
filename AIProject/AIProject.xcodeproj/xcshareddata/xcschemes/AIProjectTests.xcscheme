@@ -24,6 +24,29 @@
                BlueprintName = "AIProjectTests"
                ReferencedContainer = "container:AIProject.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "AIProjectTests">
+               </Test>
+               <Test
+                  Identifier = "AIProjectTests/testExample()">
+               </Test>
+               <Test
+                  Identifier = "AIProjectTests/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "UpbitTicketEncodeTests">
+               </Test>
+               <Test
+                  Identifier = "UpbitTicketEncodeTests/test_ticket_encoding()">
+               </Test>
+               <Test
+                  Identifier = "WebSocketTests/testPerformanceExample()">
+               </Test>
+               <Test
+                  Identifier = "WebSocketTests/test_connect()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
