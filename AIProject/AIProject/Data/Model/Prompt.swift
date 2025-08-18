@@ -49,7 +49,7 @@ enum Prompt {
                 let description: String
             }
             
-            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지, 실제 뉴스 링크 전달)
+            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
             """
         case .generateTodayNews(let coinKName):
             """
@@ -88,7 +88,7 @@ enum Prompt {
             """
         case.generateTodayInsight:
             """
-            struct TodayInsightDTO: Codable {
+            struct InsightDTO: Codable {
                 /// 주어진 시간 동안의 암호화폐 전체 시장 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
                 
@@ -108,14 +108,14 @@ enum Prompt {
             \(redditPost)
             지금 보낸 건, reddit의 r/CryptoCurrecy community에서, 하루동안 좋아요를 가장 많이 받은 게시물 5개의 제목과 내용이야.
             
-            struct CommunityInsightDTO: Codable {
+            struct InsightDTO: Codable {
                 /// 게시물을 기반으로 평가한 커뮤니티 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
                 /// 커뮤니티 분위기를 그렇게 평가한 이유를 문자열로 요약
                 let summary: String
             }
             
-            이 게시물들을 CommunityInsightDTO를 기반으로 JSON으로 응답해줘.
+            이 게시물들을 InsightDTO를 기반으로 JSON으로 응답해줘.
             """
         case .generateBookmarkBriefing(let importance, let bookmarks):
             """
