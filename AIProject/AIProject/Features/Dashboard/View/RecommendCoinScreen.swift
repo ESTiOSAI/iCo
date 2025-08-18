@@ -70,9 +70,15 @@ struct SuccessCoinView: View {
             .contentMargins(.horizontal, horizonInset)
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $selection)
-            .simultaneousGesture(DragGesture().updating($isDragging) { _, state, _ in
-                state = true
-            })
+            .simultaneousGesture(DragGesture()
+                .updating($isDragging) { _, state, _ in
+                    state = true
+                }
+                .onEnded({ _ in
+                    viewModel.timer.upstream.connect().cancel()
+                    viewModel.timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+                }
+            ))
             .onChange(of: viewModel.recommendCoins.count) {
                 guard !viewModel.recommendCoins.isEmpty else { return }
                 selection = viewModel.recommendCoins[0].id
