@@ -12,7 +12,6 @@ import SwiftUI
 final class BookmarkViewModel: ObservableObject {
     private let manager: BookmarkManaging = BookmarkManager.shared
     private let service: AlanAPIService
-    private let geckoService: CoinGeckoAPIService
 
     @Published var briefing: PortfolioBriefingDTO?
     @Published var imageMap: [String: URL] = [:]
@@ -20,9 +19,8 @@ final class BookmarkViewModel: ObservableObject {
 
     private var task: Task<Void, Never>?
 
-    init(service: AlanAPIService = AlanAPIService(), geckoService: CoinGeckoAPIService = CoinGeckoAPIService()) {
+    init(service: AlanAPIService = AlanAPIService()) {
         self.service = service
-        self.geckoService = geckoService
     }
 
     func loadBriefing(character: InvestmentCharacter) async {
@@ -89,7 +87,7 @@ final class BookmarkViewModel: ObservableObject {
         do {
             let bookmarks = try manager.fetchAll()
             guard !bookmarks.isEmpty else {
-                await MainActor.run { imageMap = [:] }
+                imageMap = [:]
                 return
             }
 
@@ -101,16 +99,19 @@ final class BookmarkViewModel: ObservableObject {
                 )
             )
 
-            let map = await geckoService.fetchImageMapBatched(
-                symbols: symbols,
-                vsCurrency: "krw",
-                batchSize: 50,
-                maxConcurrentBatches: 3
-            )
+            let stored = UserDefaults.standard.dictionary(forKey: AppStorageKey.imageMap) as? [String: String] ?? [:]
+            var map: [String: URL] = [:]
 
-            await MainActor.run { imageMap = map }
+            for symbol in symbols {
+                if let urlString = stored[symbol], let url = URL(string: urlString) {
+                    map[symbol] = url
+                }
+            }
+
+            imageMap = map
         } catch {
-            print("이미지 로드 실패: \(error)")
+            print("이미지 로드 실패:", error)
+            imageMap = [:]
         }
     }
 
