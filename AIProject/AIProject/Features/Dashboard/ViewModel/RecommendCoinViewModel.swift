@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+protocol AlanAPIServiceProtocol {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO]
+}
+
+protocol UpBitApiServiceProtocol {
+    func fetchQuotes(id: String) async throws -> [TickerDTO]
+}
+
 final class RecommendCoinViewModel: ObservableObject {
     /// 현재 추천 코인 뷰의 UI 상태를 나타냅니다.
     ///
@@ -14,10 +22,10 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var status: ResponseStatus = .loading
     @Published var recommendCoins: [RecommendCoin] = []
 
-    private var alanService: AlanAPIService
-    private var upbitService: UpBitAPIService
+    private var alanService: AlanAPIServiceProtocol
+    private var upbitService: UpBitApiServiceProtocol
 
-    private var task: Task<Void, Never>?
+    var task: Task<Void, Never>?
 
     var timer = Timer.publish(every: 3, on: .main, in: .common).autoconnect()
     var currentIndex: Int = 0
@@ -31,9 +39,12 @@ final class RecommendCoinViewModel: ObservableObject {
         }
     }
 
-    init() {
-        alanService = AlanAPIService()
-        upbitService = UpBitAPIService()
+    init(
+        alanService: AlanAPIServiceProtocol = AlanAPIService(),
+        upbitService: UpBitApiServiceProtocol = UpBitAPIService()
+    ) {
+        self.alanService = alanService
+        self.upbitService = upbitService
         loadRecommendCoin()
     }
 
@@ -48,7 +59,7 @@ final class RecommendCoinViewModel: ObservableObject {
 
                 let bookmarkCoins = try BookmarkManager.shared.fetchAll().map { $0.coinKoreanName }.joined(separator: ", ")
                 let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: "초보자", bookmarkCoins: bookmarkCoins)
-                let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
+                let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
                     recommendCoins = results
@@ -56,9 +67,15 @@ final class RecommendCoinViewModel: ObservableObject {
                 }
 
             } catch is CancellationError {
-                await MainActor.run { status = .cancel(.taskCancelled) }
+                await MainActor.run {
+                    status = .cancel(.taskCancelled)
+                    recommendCoins = []
+                }
             } catch let error as NetworkError {
-                await MainActor.run { status = .failure(error) }
+                await MainActor.run {
+                    status = .failure(error)
+                    recommendCoins = []
+                }
             } catch {
                 print("알 수 없는 에러 발생.")
             }
@@ -66,36 +83,39 @@ final class RecommendCoinViewModel: ObservableObject {
     }
 
     /// 코인 추천 작업을 취소합니다.
-    func cancelTask() {
+    func cancelTask() async {
         task?.cancel()
+        await task?.value
         task = nil
     }
 
-    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async throws -> [RecommendCoin] {
-        try await withThrowingTaskGroup(of: RecommendCoin?.self) { group in
+    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async -> [RecommendCoin] {
+        await withTaskGroup(of: RecommendCoin?.self) { group in
             for dto in dtos {
                 group.addTask {
+                    do {
+                        guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
+                            return nil
+                        }
 
-                    guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
-                        print("CoinRecommendViewModel - 존재하지 않는 CoinID")
+                        return RecommendCoin(
+                            imageURL: nil,
+                            comment: dto.comment,
+                            coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
+                            name: dto.name,
+                            tradePrice: data.tradePrice,
+                            changeRate: data.changeRate,
+                            changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
+                        )
+                    } catch {
                         return nil
                     }
-
-                    return RecommendCoin(
-                        imageURL: nil,
-                        comment: dto.comment,
-                        coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
-                        name: dto.name,
-                        tradePrice: data.tradePrice,
-                        changeRate: data.changeRate,
-                        changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
-                    )
                 }
             }
 
             var results: [RecommendCoin] = []
 
-            for try await coin in group {
+            for await coin in group {
                 if let coin = coin {
                     results.append(coin)
 

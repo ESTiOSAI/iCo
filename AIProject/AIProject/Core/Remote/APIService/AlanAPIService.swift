@@ -8,7 +8,7 @@
 import Foundation
 
 /// 앨런 API 관련 서비스를 제공합니다.
-final class AlanAPIService {
+final class AlanAPIService: AlanAPIServiceProtocol {
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
     
