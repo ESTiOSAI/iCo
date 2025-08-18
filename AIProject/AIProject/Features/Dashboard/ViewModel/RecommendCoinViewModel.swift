@@ -59,7 +59,7 @@ final class RecommendCoinViewModel: ObservableObject {
 
                 let bookmarkCoins = try BookmarkManager.shared.fetchAll().map { $0.coinKoreanName }.joined(separator: ", ")
                 let recommendCoinDTOs = try await alanService.fetchRecommendCoins(preference: "초보자", bookmarkCoins: bookmarkCoins)
-                let results = try await fetchRecommendCoins(from: recommendCoinDTOs)
+                let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
                     recommendCoins = results
@@ -89,31 +89,33 @@ final class RecommendCoinViewModel: ObservableObject {
         task = nil
     }
 
-    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async throws -> [RecommendCoin] {
-        try await withThrowingTaskGroup(of: RecommendCoin?.self) { group in
+    private func fetchRecommendCoins(from dtos: [RecommendCoinDTO]) async -> [RecommendCoin] {
+        await withTaskGroup(of: RecommendCoin?.self) { group in
             for dto in dtos {
                 group.addTask {
+                    do {
+                        guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
+                            return nil
+                        }
 
-                    guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
-                        print("CoinRecommendViewModel - 존재하지 않는 CoinID")
+                        return RecommendCoin(
+                            imageURL: nil,
+                            comment: dto.comment,
+                            coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
+                            name: dto.name,
+                            tradePrice: data.tradePrice,
+                            changeRate: data.changeRate,
+                            changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
+                        )
+                    } catch {
                         return nil
                     }
-
-                    return RecommendCoin(
-                        imageURL: nil,
-                        comment: dto.comment,
-                        coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
-                        name: dto.name,
-                        tradePrice: data.tradePrice,
-                        changeRate: data.changeRate,
-                        changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
-                    )
                 }
             }
 
             var results: [RecommendCoin] = []
 
-            for try await coin in group {
+            for await coin in group {
                 if let coin = coin {
                     results.append(coin)
 

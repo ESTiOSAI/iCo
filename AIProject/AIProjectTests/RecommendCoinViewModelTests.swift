@@ -34,8 +34,6 @@ struct AlanServiceStub: AlanAPIServiceProtocol {
             throw NetworkError.invalidAPIKey
         }
 
-        try await Task.sleep(for: .seconds(1))
-
         return try result.get()
     }
 }
@@ -65,7 +63,6 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_taskCancelsProperly() async {
-        sut.loadRecommendCoin()
         await sut.cancelTask()
 
         await MainActor.run {
@@ -79,7 +76,6 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_taskCompletesSuccessfully() async {
-        sut.loadRecommendCoin()
         await sut.task?.value
 
         await MainActor.run {
@@ -93,10 +89,11 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_whenErrorOccurs_errorIsHandled() async {
-        sutWithError.loadRecommendCoin()
         await sutWithError.task?.value
 
         await MainActor.run {
+            XCTAssertTrue(sut.recommendCoins.isEmpty)
+
             guard case .failure(.invalidAPIKey) = sutWithError.status else {
                 XCTFail("Expected .failure, But got \(sut.status)")
                 return
