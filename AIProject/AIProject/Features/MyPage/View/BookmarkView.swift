@@ -180,18 +180,15 @@ struct BookmarkView: View {
                     .padding()
                 }
             }
-            .onAppear {
+            .task {
                 guard !bookmarks.isEmpty else {
                     vm.briefing = nil
                     vm.imageMap = [:]
                     return
                 }
-
-                Task { @MainActor in
-                    async let imagesTask: () = vm.loadCoinImages()
-                    async let briefingTask: () = vm.loadBriefing(character: .longTerm)
-                    _ = await (imagesTask, briefingTask)
-                }
+                async let imagesTask: () = vm.loadCoinImages()
+                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                _ = await (imagesTask, briefingTask)
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
