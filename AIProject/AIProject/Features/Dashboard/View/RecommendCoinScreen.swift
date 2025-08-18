@@ -47,9 +47,7 @@ struct SuccessCoinView: View {
     @GestureState var isDragging: Bool = false
     @State var selection: String?
     @State var selectedCoin: RecommendCoin?
-
-    var currentIndex: Int = 0
-
+    
     var body: some View {
         GeometryReader { geoProxy in
             let horizonInset = geoProxy.size.width * 0.15
@@ -75,8 +73,8 @@ struct SuccessCoinView: View {
                     state = true
                 }
                 .onEnded({ _ in
-                    viewModel.timer.upstream.connect().cancel()
-                    viewModel.timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+                    viewModel.stopTimer()
+                    viewModel.startTimer()
                 }
             ))
             .onChange(of: viewModel.recommendCoins.count) {

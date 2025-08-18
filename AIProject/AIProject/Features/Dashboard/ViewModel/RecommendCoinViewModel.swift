@@ -168,4 +168,12 @@ final class RecommendCoinViewModel: ObservableObject {
             return results
         }
     }
+    
+    func stopTimer() {
+        timer.upstream.connect().cancel()
+    }
+    
+    func startTimer() {
+        timer = timer.upstream.autoconnect()
+    }
 }
