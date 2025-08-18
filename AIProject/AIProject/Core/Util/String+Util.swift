@@ -8,6 +8,11 @@
 import SwiftUI
 
 extension String {
+    /// 문자열의 각 글자 사이에 Zero Width Space를 삽입해 Text 뷰에서 단어 단위가 아닌 글자 단위로 줄바꿈 가능하게 하는 확장
+    var byCharWrapping: Self {
+        map(String.init).joined(separator: "\u{200B}")
+    }
+    
     /// 문자열에 마크다운 JSON 코드 블록 추출 기능을 제공하는 String 확장
     /// 마크다운 형식의 문자열에서 ```json으로 시작하고 ```로 끝나는 JSON 코드 블록의 내용을 추출하는 계산 속성
     ///

@@ -79,7 +79,7 @@ struct RecommendCardView: View {
             Spacer()
 
             VStack {
-                Text(recommendCoin.comment)
+                Text(recommendCoin.comment.byCharWrapping)
                     .font(.system(size: 14))
                     .lineSpacing(6)
                     .foregroundStyle(.aiCoLabel)
