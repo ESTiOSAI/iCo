@@ -184,6 +184,9 @@ struct ChartView: View {
         .onAppear {
             viewModel.checkBookmark()
         }
+        .onDisappear {
+            viewModel.stopUpdating()
+        }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.aiCoBackground)
