@@ -17,6 +17,25 @@ actor ImageLoader {
         config.urlCache = URLCache.shared
         return URLSession(configuration: config)
     }()
+    
+    private init() { }
+    
+    func image(for resource: CoinResource, useCacheOnly: Bool = false) async throws -> UIImage {
+        switch resource {
+        case .url(let url):
+            return try await image(for: url, useCacheOnly: useCacheOnly)
+        case .symbol(let symbol):
+            return try await image(for: symbol, useCacheOnly: useCacheOnly)
+        }
+    }
+    
+    private func image(for symbol: String, useCacheOnly: Bool = false) async throws -> UIImage {
+        
+        guard let key = loadFromDiskCache(from: symbol) else {
+            throw URLError(.fileDoesNotExist)
+        }
+        return try await image(for: key, useCacheOnly: useCacheOnly)
+    }
 
     func image(for url: URL, useCacheOnly: Bool = false) async throws -> UIImage {
         let key = url as NSURL
@@ -37,6 +56,7 @@ actor ImageLoader {
                 return img
             }
 
+            // TODO: session cancel throw되는지 체크
             // 네트워크 요청
             let (data, response) = try await session.data(for: request)
             print("네트워크에서 이미지 로드됨:", url.lastPathComponent)
@@ -55,5 +75,14 @@ actor ImageLoader {
         defer { inFlight[key] = nil }
 
         return try await task.value
+    }
+    
+    // FIXME: CoreData로 변경하기
+    private func loadFromDiskCache(from symbol: String) -> URL? {
+        let imageMap = (UserDefaults.standard.object(forKey: AppStorageKey.imageMap) as? [String: String] ?? [:])
+            .compactMapValues {
+            URL(string: $0)
+            }
+        return imageMap[symbol]
     }
 }

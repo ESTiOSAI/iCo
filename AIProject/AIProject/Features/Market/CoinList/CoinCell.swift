@@ -33,28 +33,13 @@ struct CoinListHeaderView: View {
 struct CoinCell: View {
     
     let coin: CoinListModel
-    @State var imageMap: [String: URL] = [:]
     
     var body: some View {
         VStack {
             HStack {
                 // 코인 레이블
                 HStack(spacing: 16) {
-                    Group {
-                        if let url = imageMap[coin.coinName] {
-                            CachedAsyncImage(url: url)
-                        } else {
-                            Text(String(coin.coinName.prefix(1)))
-                                .font(.caption.bold())
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        }
-                    }
-                    .frame(width: 30, height: 30)
-                    .clipShape(Circle())
-                    .contentShape(Circle())
-                    .overlay(
-                        Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
-                    )
+                    CoinView(symbol: coin.coinName, size: 30)
                     
                     VStack(alignment: .leading, spacing: 6) {
                         Text(coin.name)
@@ -76,17 +61,6 @@ struct CoinCell: View {
                 
                 CoinPriceView(change: coin.change, price: coin.currentPrice, rate: coin.changePrice, amount: coin.tradeAmount)
             }
-        }
-        .task {
-            initialMap()
-        }
-    }
-    
-    func initialMap() {
-        if let stringImageMap = UserDefaults.standard.object(forKey: AppStorageKey.imageMap) as? [String: String] {
-            imageMap = stringImageMap.compactMapValues({ string in
-                URL(string: string)
-            })
         }
     }
 }
@@ -131,6 +105,7 @@ fileprivate struct CoinPriceView: View {
                 
                 HStack(spacing: 0) {
                     Text(price, format: .number)
+                        
                     Text("원")
                 }
                 .font(.system(size: 15))
