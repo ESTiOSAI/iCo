@@ -15,7 +15,7 @@ struct RecommendHeaderView: View {
                     .font(.system(size: 30, weight: .bold))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(.aiCoBackgroundWhite)
+            .foregroundStyle(.white)
             .padding(.top, 70)
             .padding(.bottom, 20)
             .padding(.horizontal, 16)
@@ -24,8 +24,8 @@ struct RecommendHeaderView: View {
                 imageName: "sparkles",
                 subheading: "이런 코인은 어떠세요?",
                 description: "회원님의 관심 코인을 기반으로\n새로운 코인을 추천해드려요",
-                imageColor: .aiCoBackgroundWhite,
-                fontColor: .aiCoBackgroundWhite
+                imageColor: .white,
+                fontColor: .white
             )
         }
     }
