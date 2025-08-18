@@ -20,9 +20,22 @@ struct BookmarkView: View {
     @State private var sharingItems: [Any] = []
     @State private var showingExportOptions = false
     @State private var showDeleteConfirm = false
+    @State private var didCopy = false
+
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
+            animation: .default
+    )
+    private var bookmarks: FetchedResults<BookmarkEntity>
 
     private var isExportDisabled: Bool {
-        vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading
+           if bookmarks.isEmpty || vm.briefing == nil { return true }
+        switch vm.status {
+        case .success:
+            return false
+        default:
+            return true
+        }
     }
 
     // 정렬 데이터
@@ -31,17 +44,17 @@ struct BookmarkView: View {
         case .name:
             switch nameOrder {
             case .ascending:
-                return vm.bookmarks.sorted { $0.coinKoreanName < $1.coinKoreanName }
+                return Array(bookmarks).sorted { $0.coinKoreanName < $1.coinKoreanName }
             case .descending:
-                return vm.bookmarks.sorted { $0.coinKoreanName > $1.coinKoreanName }
+                return Array(bookmarks).sorted { $0.coinKoreanName > $1.coinKoreanName }
             case .none:
-                return vm.bookmarks
+                return Array(bookmarks)
             }
         case .volume:
-            return vm.bookmarks
+            return Array(bookmarks)
 
         case .none:
-            return vm.bookmarks
+            return Array(bookmarks)
         }
     }
 
@@ -50,31 +63,67 @@ struct BookmarkView: View {
             LazyVStack(alignment: .leading, spacing: 8) {
                 HeaderView(heading: "북마크 관리")
 
-                HStack {
-                    SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
-                        .padding(.leading, -16)
+                if !bookmarks.isEmpty {
+                    HStack {
+                        SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
+                            .padding(.leading, -16)
 
-                    Spacer()
+                        Spacer()
 
-                    RoundedButton(title: "내용 복사", imageName: "document.on.document") {
-                        //내용 복사
+                        RoundedButton(title: didCopy ? "복사 완료" : "내용 복사", imageName: didCopy ? "checkmark" : "document.on.document") {
+                            guard let dto = vm.briefing else { return }
+                            let text =
+                        	"""
+                        [분석 결과]
+                        \(dto.briefing)
+                        
+                        [전략 제안]
+                        \(dto.strategy)
+                        """
 
+                            UIPasteboard.general.string = text
+                            didCopy = true
+
+                            Task {
+                                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                await MainActor.run { didCopy = false }
+                            }
+                        }
+                        .disabled(isExportDisabled)
+                        .opacity(isExportDisabled ? 0.2 : 1.0)
                     }
-                    .disabled(isExportDisabled)
-                    .opacity(isExportDisabled ? 0.2 : 1.0)
-                }
-                .padding(.leading, 16)
-                .padding(.trailing, 16)
-
-                // 북마크 AI 한줄평
-                BriefingSectionView(briefing: vm.briefing, isLoading: vm.isLoading, bookmarksEmpty: vm.isBookmarkEmpty, errorMessage: vm.errorMessage)
-
-                Text(String.aiGeneratedContentNotice)
-                    .font(.system(size: 8))
-                    .foregroundColor(.aiCoNeutral)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.leading, 16)
                     .padding(.trailing, 16)
 
+                    Group {
+                        switch vm.status {
+                        case .loading:
+                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                                vm.cancelTask()
+                            }
+                        case .success:
+                            if let briefing = vm.briefing {
+                                BriefingSectionView(briefing: briefing)
+                            }
+                        case .failure(let networkError):
+                            DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                                Task { await vm.loadBriefing(character: .longTerm) }
+                            }
+                        case .cancel(let networkError):
+                            DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                                Task { await vm.loadBriefing(character: .longTerm) }
+                            }
+                        }
+                    }
+
+                    Text(String.aiGeneratedContentNotice)
+                        .font(.system(size: 8))
+                        .foregroundColor(.aiCoNeutral)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.trailing, 16)
+                } else {
+                    SubheaderView(imageName: "face.smiling", subheading: "북마크를 등록해주세요!")
+                }
 
                 Spacer()
 
@@ -101,7 +150,7 @@ struct BookmarkView: View {
 						showBulkInsertSheet = true
                     }
                     RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
-                        guard !(vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading) else { return }
+                        guard !isExportDisabled else { return }
                         showingExportOptions = true
                     }
                     .disabled(isExportDisabled)
@@ -110,8 +159,6 @@ struct BookmarkView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.leading, 16)
                 .padding(.trailing, 16)
-
-                Divider()
 
                 if sortedCoins.isEmpty {
                     Text("북마크한 코인이 없습니다 🥵")
@@ -133,26 +180,23 @@ struct BookmarkView: View {
                     .padding()
                 }
             }
-            .onAppear {
-                //TODO: 북마크 갯수가 달라졌을 때만 Fetch
-                vm.fetchBookmarks()
-
-                Task { @MainActor in
-                    guard !vm.bookmarks.isEmpty else {
-                        vm.briefing = nil
-                        vm.imageMap = [:]
-                        return
-                    }
-                    async let imagesTask: () = vm.loadCoinImages()
-                    async let briefingTask: () = vm.loadBriefing(character: .longTerm)
-                    _ = await (imagesTask, briefingTask)
+            .task {
+                guard !bookmarks.isEmpty else {
+                    vm.briefing = nil
+                    vm.imageMap = [:]
+                    return
                 }
+                async let imagesTask: () = vm.loadCoinImages()
+                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                _ = await (imagesTask, briefingTask)
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
-            .onChange(of: Set(vm.bookmarks.map(\.coinSymbol)), initial: false) {
-                Task { @MainActor in
-                    await vm.loadCoinImages()
-                }
+            .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
+                Task { @MainActor in await vm.loadCoinImages() }
+            }
+            // 북마크 개수 변화 시 브리핑 갱신
+            .onChange(of: bookmarks.count, initial: false) { _,_  in
+                Task { @MainActor in await vm.loadBriefing(character: .longTerm) }
             }
         }
         .backgroundStyle(.aiCoBackground)
@@ -183,53 +227,43 @@ struct BookmarkView: View {
 }
 
 struct BriefingSectionView: View {
-    let briefing: PortfolioBriefingDTO?
-    let isLoading: Bool
-    let bookmarksEmpty: Bool
-    let errorMessage: String?
+    let briefing: PortfolioBriefingDTO
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if bookmarksEmpty {
-                Text("코인을 북마크 해보세요!")
-            } else if isLoading {
-                DefaultProgressView(status: .loading, message: "분석중...")
-            } else if let briefing {
+            Text("분석 결과")
+                .font(.system(size: 14))
+                .bold()
+                .foregroundColor(Color(.aiCoAccent))
 
-                Text("분석 결과")
-                    .font(.system(size: 14))
-                    .bold()
-                    .foregroundColor(Color(.aiCoAccent))
+            briefing.briefing
+                .highlightTextForNumbersOperator()
+                .font(.system(size: 12))
+                .lineSpacing(6)
 
-                briefing.briefing.highlightTextForNumbersOperator()
-                    .font(.system(size: 12))
-                    .lineSpacing(6)
+            Spacer(minLength: 0)
 
-                Spacer(minLength: 0)
+            Text("전략 제안")
+                .font(.system(size: 14))
+                .bold()
+                .foregroundColor(Color(.aiCoAccent))
 
-                Text("전략 제안")
-                    .font(.system(size: 14))
-                    .bold()
-                    .foregroundColor(Color(.aiCoAccent))
-
-                briefing.strategy
-                    .highlightTextForNumbersOperator()
-                    .font(.system(size: 12))
-                    .lineSpacing(6)
-            } else if let errorMessage {
-                Text("예상치 못한 에러 발생: \(errorMessage)")
-                    .foregroundColor(.red)
-            }
+            briefing.strategy
+                .highlightTextForNumbersOperator()
+                .font(.system(size: 12))
+                .lineSpacing(6)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .foregroundColor(.primary)
-        .background(RoundedRectangle(cornerRadius: 12)
-            .fill(Color.aiCoBackgroundAccent)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(.accent, lineWidth: 0.5)
-            ))
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.aiCoBackgroundAccent)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(.accent, lineWidth: 0.5)
+                )
+        )
         .cornerRadius(12)
         .padding(.horizontal, 16)
     }
@@ -268,20 +302,13 @@ struct ExportReportView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 브리핑
-            BriefingSectionView(
-                briefing: dto,
-                isLoading: false,
-                bookmarksEmpty: false,
-                errorMessage: nil
-            )
+            BriefingSectionView(briefing: dto)
 
             HStack {
                 SubheaderView(subheading: "북마크한 코인")
                 Spacer()
             }
             .padding(.horizontal, 16)
-
-            Divider().padding(.horizontal, 16)
 
             CoinListSectionView(
                 sortedCoins: coins,

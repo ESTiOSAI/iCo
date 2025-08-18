@@ -38,11 +38,20 @@ final class CoreDataService {
     }
 
     func clear<T: NSManagedObject>(type: T.Type) throws {
-        let request = NSBatchDeleteRequest(
-            fetchRequest: NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: T.self))
-        )
-        try container.persistentStoreCoordinator.execute(request, with: viewContext)
-        saveContext()
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: String(describing: T.self))
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+
+        batchDeleteRequest.resultType = .resultTypeObjectIDs
+
+        let result = try container.persistentStoreCoordinator.execute(batchDeleteRequest, with: viewContext) as? NSBatchDeleteResult
+
+        if let objectIDs = result?.result as? [NSManagedObjectID] {
+            let changes: [AnyHashable: Any] = [
+                NSDeletedObjectsKey: objectIDs
+            ]
+            // context에 merge → @FetchRequest 감지됨
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [viewContext])
+        }
     }
 
     private func saveContext() {
