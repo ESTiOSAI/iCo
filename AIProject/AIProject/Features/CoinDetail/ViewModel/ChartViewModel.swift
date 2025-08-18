@@ -145,7 +145,6 @@ extension ChartViewModel {
     /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
     func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
-        let calendar = Calendar(identifier: .gregorian)
         let lastDate = data.last?.date ?? now
         let xStart = now.addingTimeInterval(-60 * 60 * 24)
         let xEnd = lastDate.addingTimeInterval(60 * 5)

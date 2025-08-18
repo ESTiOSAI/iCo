@@ -93,9 +93,7 @@ struct ChartView: View {
                     CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
                 }
             }
-            
-            let chartRatio: CGFloat = 1.7
-            
+                        
             ZStack {
                 if data.isEmpty {
                     DefaultProgressView(
