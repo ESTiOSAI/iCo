@@ -16,8 +16,6 @@ final class BookmarkViewModel: ObservableObject {
 
     @Published var bookmarks: [BookmarkEntity] = []
     @Published var briefing: PortfolioBriefingDTO?
-    @Published var errorMessage: String?
-    @Published var isLoading: Bool = false
     @Published var imageMap: [String: URL] = [:]
     @Published var status: ResponseStatus = .loading
 
@@ -56,10 +54,7 @@ final class BookmarkViewModel: ObservableObject {
                     status = .failure(error)
                 }
             } catch {
-                await MainActor.run {
-                    // 수정 필요
-                    status = .failure(NetworkError.unknown(700))
-                }
+                print("알 수 없는 에러발생")
             }
         }
     }
@@ -83,8 +78,6 @@ final class BookmarkViewModel: ObservableObject {
                 bookmarks = []
                 imageMap = [:]       
                 briefing = nil
-                errorMessage = nil
-
         } catch {
             print(error)
         }

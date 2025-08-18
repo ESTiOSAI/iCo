@@ -60,16 +60,17 @@ struct BookmarkView: View {
             LazyVStack(alignment: .leading, spacing: 8) {
                 HeaderView(heading: "북마크 관리")
 
-                HStack {
-                    SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
-                        .padding(.leading, -16)
+                if !vm.isBookmarkEmpty {
+                    HStack {
+                        SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
+                            .padding(.leading, -16)
 
-                    Spacer()
+                        Spacer()
 
-                    RoundedButton(title: didCopy ? "복사 완료" : "내용 복사", imageName: didCopy ? "checkmark" : "document.on.document") {
-                        guard let dto = vm.briefing else { return }
-                        let text =
-                        """
+                        RoundedButton(title: didCopy ? "복사 완료" : "내용 복사", imageName: didCopy ? "checkmark" : "document.on.document") {
+                            guard let dto = vm.briefing else { return }
+                            let text =
+                        	"""
                         [분석 결과]
                         \(dto.briefing)
                         
@@ -77,47 +78,49 @@ struct BookmarkView: View {
                         \(dto.strategy)
                         """
 
-                        UIPasteboard.general.string = text
-                        didCopy = true
+                            UIPasteboard.general.string = text
+                            didCopy = true
 
-                        Task {
-                            try? await Task.sleep(nanoseconds: 2_000_000_000)
-                            await MainActor.run { didCopy = false }
+                            Task {
+                                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                await MainActor.run { didCopy = false }
+                            }
                         }
+                        .disabled(isExportDisabled)
+                        .opacity(isExportDisabled ? 0.2 : 1.0)
                     }
-                    .disabled(isExportDisabled)
-                    .opacity(isExportDisabled ? 0.2 : 1.0)
-                }
-                .padding(.leading, 16)
-                .padding(.trailing, 16)
-
-                Group {
-                    switch vm.status {
-                    case .loading:
-                        DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
-                            vm.cancelTask()
-                        }
-                    case .success:
-                        if let briefing = vm.briefing {
-                        	BriefingSectionView(briefing: briefing)
-                        }
-                    case .failure(let networkError):
-                        DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
-                            Task { await vm.loadBriefing(character: .longTerm) }
-                        }
-                    case .cancel(let networkError):
-                        DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
-                            Task { await vm.loadBriefing(character: .longTerm) }
-                        }
-                    }
-                }
-
-                Text(String.aiGeneratedContentNotice)
-                    .font(.system(size: 8))
-                    .foregroundColor(.aiCoNeutral)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.leading, 16)
                     .padding(.trailing, 16)
 
+                    Group {
+                        switch vm.status {
+                        case .loading:
+                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                                vm.cancelTask()
+                            }
+                        case .success:
+                            if let briefing = vm.briefing {
+                                BriefingSectionView(briefing: briefing)
+                            }
+                        case .failure(let networkError):
+                            DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                                Task { await vm.loadBriefing(character: .longTerm) }
+                            }
+                        case .cancel(let networkError):
+                            DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                                Task { await vm.loadBriefing(character: .longTerm) }
+                            }
+                        }
+                    }
+
+                    Text(String.aiGeneratedContentNotice)
+                        .font(.system(size: 8))
+                        .foregroundColor(.aiCoNeutral)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.trailing, 16)
+                } else {
+                    SubheaderView(imageName: "face.smiling", subheading: "북마크를 등록해주세요!")
+                }
 
                 Spacer()
 
@@ -144,7 +147,7 @@ struct BookmarkView: View {
 						showBulkInsertSheet = true
                     }
                     RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
-                        guard !(vm.isBookmarkEmpty || vm.briefing == nil || vm.isLoading) else { return }
+                        guard !isExportDisabled else { return }
                         showingExportOptions = true
                     }
                     .disabled(isExportDisabled)
@@ -153,8 +156,6 @@ struct BookmarkView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.leading, 16)
                 .padding(.trailing, 16)
-
-                Divider()
 
                 if sortedCoins.isEmpty {
                     Text("북마크한 코인이 없습니다 🥵")
@@ -225,7 +226,7 @@ struct BookmarkView: View {
     }
 }
 
-struct BriefingSectionView: View { // 수정됨
+struct BriefingSectionView: View {
     let briefing: PortfolioBriefingDTO
 
     var body: some View {
@@ -308,8 +309,6 @@ struct ExportReportView: View {
                 Spacer()
             }
             .padding(.horizontal, 16)
-
-            Divider().padding(.horizontal, 16)
 
             CoinListSectionView(
                 sortedCoins: coins,
