@@ -82,84 +82,101 @@ final class ReportViewModel: ObservableObject {
         }
         
         Task {
-            await assignResult(overviewTask, assign: { [weak self] state in
-                self?.overview = state
-            }) { data in
-                // TODO: 받아온 데이터 가공을 extension으로 빼는 것이 좋을지 고민해보기
-                var overview = AttributedString()
-                overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
-                
-                if let urlString = data.websiteURL, let url = URL(string: urlString) {
-                    let prefix = AttributedString("- 웹사이트: ")
-                    var link = AttributedString(URL(string: urlString)?.host ?? urlString)
-                    link.link = url
-                    link.foregroundColor = .aiCoAccent
-                    link.underlineStyle = .single
-                    overview.append(prefix)
-                    overview.append(link)
-                    overview.append(AttributedString("\n"))
-                } else {
-                    overview.append(AttributedString("- 웹사이트: 없음\n"))
+            await assignResult(
+                overviewTask,
+                assignOnMain: { [weak self] state in
+                    self?.overview = state
+                },
+                transform: { data in
+                    // TODO: 받아온 데이터 가공을 extension으로 빼는 것이 좋을지 고민해보기
+                    var overview = AttributedString()
+                    overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
+                    
+                    if let urlString = data.websiteURL, let url = URL(string: urlString) {
+                        let prefix = AttributedString("- 웹사이트: ")
+                        var link = AttributedString(URL(string: urlString)?.host ?? urlString)
+                        link.link = url
+                        link.foregroundColor = .aiCoAccent
+                        link.underlineStyle = .single
+                        overview.append(prefix)
+                        overview.append(link)
+                        overview.append(AttributedString("\n"))
+                    } else {
+                        overview.append(AttributedString("- 웹사이트: 없음\n"))
+                    }
+                    
+                    overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
+                    overview.append(AttributedString("- 소개: \(data.description)"))
+                    
+                    return overview
                 }
-                
-                overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
-                overview.append(AttributedString("- 소개: \(data.description)"))
-                
-                return overview
-            }
+            )
             
             try? await Task.sleep(for: .milliseconds(350))
             
-            await assignResult(weeklyTask, assign: { [weak self] state in
-                self?.weekly = state
-            }) { data in
-                let weekly = """
+            await assignResult(
+                weeklyTask,
+                assignOnMain: { [weak self] state in
+                    self?.weekly = state
+                },
+                transform: { data in
+                    let weekly = """
                     - 가격 추이: \(data.priceTrend)
                     - 거래량 변화: \(data.volumeChange)
                     - 원인: \(data.reason)
                     """
-                return weekly
-            }
+                    return weekly
+                }
+            )
             
             try? await Task.sleep(for: .milliseconds(350))
             
-            await assignResult(todayTask, assign: { [weak self] state in
-                self?.today = state
-            }) { data in
-                await MainActor.run {
-                    news = data.articles.map { CoinArticle(from: $0) }
+            await assignResult(
+                todayTask,
+                assignOnMain: { [weak self] state in
+                    self?.today = state
+                },
+                transform: { data in
+                    return data.summaryOfTodaysMarketSentiment
+                },
+                sideEffectOnMain: { [weak self] data in
+                    self?.news = data.articles.map { CoinArticle(from: $0) }
                 }
-                return data.summaryOfTodaysMarketSentiment
-            }
+            )
         }
     }
     
     // FIXME: 공통 로직으로 묶는 것을 다시 고려해보기
+    /// 주어진 네트워크 `Task`의 결과를 변환하고 상태로 반영하는 유틸리티 메서드입니다.
+    ///
+    /// - Parameters:
+    ///   - task: 실행할 네트워크 Task
+    ///   - assignOnMain: 변환된 결과 상태(`FetchState`)를 메인 스레드에서 속성에 반영하는 클로저
+    ///   - transform: Task 성공 결과(`Success`)를 출력 타입(`Output`)으로 변환하는 비동기 클로저
+    ///   - sideEffectOnMain: 선택적으로, 성공 시 원본 결과(`Success`)를 활용해 메인 스레드에서 UI를 갱신하는 클로저
     func assignResult<Success, Output>(
-        /// 주어진 네트워크 Task의 결과를 변환하여 상태로 할당하는 유틸리티 메서드입니다.
-        ///
-        /// - Parameters:
-        ///   - task: 실행할 네트워크 Task
-        ///   - assign: 변환된 결과 상태(`FetchState`)를 속성에 반영하는 클로저
-        ///   - transform: Task 성공 결과를 출력 타입으로 변환하는 비동기 클로저
         _ task: Task<Success, Error>?,
-        assign: @Sendable @escaping (FetchState<Output>) -> Void,
-        transform: @Sendable (Success) async throws -> Output
+        assignOnMain: @escaping (FetchState<Output>) -> Void,
+        transform: @Sendable (Success) async throws -> Output,
+        sideEffectOnMain: ((Success) -> Void)? = nil
     ) async {
         do {
             let value = try await task?.value
             if let value {
                 let output = try await transform(value)
-                await MainActor.run { assign(.success(output)) }
+                if let sideEffectOnMain {
+                    await MainActor.run { sideEffectOnMain(value) }
+                }
+                await MainActor.run { assignOnMain(.success(output)) }
             }
         } catch {
             if error.isTaskCancellation {
-                await MainActor.run { assign(.cancel(.taskCancelled)) }
+                await MainActor.run { assignOnMain(.cancel(.taskCancelled)) }
                 return
             }
             if let ne = error as? NetworkError {
                 print(ne.log())
-                await MainActor.run { assign(.failure(ne)) }
+                await MainActor.run { assignOnMain(.failure(ne)) }
             } else {
                 print(error)
             }
@@ -178,30 +195,35 @@ final class ReportViewModel: ObservableObject {
         overviewTask = Task { try await alanAPIService.fetchOverview(for: coin) }
         
         Task {
-            await assignResult(overviewTask, assign: { [weak self] state in
-                self?.overview = state
-            }) { data in
-                var overview = AttributedString()
-                overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
-                
-                if let urlString = data.websiteURL, let url = URL(string: urlString) {
-                    let prefix = AttributedString("- 웹사이트: ")
-                    var link = AttributedString(URL(string: urlString)?.host ?? urlString)
-                    link.link = url
-                    link.foregroundColor = .aiCoAccent
-                    link.underlineStyle = .single
-                    overview.append(prefix)
-                    overview.append(link)
-                    overview.append(AttributedString("\n"))
-                } else {
-                    overview.append(AttributedString("- 웹사이트: 없음\n"))
+            await assignResult(
+                overviewTask,
+                assignOnMain: { [weak self] state in
+                    self?.overview = state
+                },
+                transform: { data in
+                    // TODO: 받아온 데이터 가공을 extension으로 빼는 것이 좋을지 고민해보기
+                    var overview = AttributedString()
+                    overview.append(AttributedString("- 심볼: \(data.symbol)\n"))
+                    
+                    if let urlString = data.websiteURL, let url = URL(string: urlString) {
+                        let prefix = AttributedString("- 웹사이트: ")
+                        var link = AttributedString(URL(string: urlString)?.host ?? urlString)
+                        link.link = url
+                        link.foregroundColor = .aiCoAccent
+                        link.underlineStyle = .single
+                        overview.append(prefix)
+                        overview.append(link)
+                        overview.append(AttributedString("\n"))
+                    } else {
+                        overview.append(AttributedString("- 웹사이트: 없음\n"))
+                    }
+                    
+                    overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
+                    overview.append(AttributedString("- 소개: \(data.description)"))
+                    
+                    return overview
                 }
-                
-                overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
-                overview.append(AttributedString("- 소개: \(data.description)"))
-                
-                return overview
-            }
+            )
         }
     }
     
@@ -217,16 +239,20 @@ final class ReportViewModel: ObservableObject {
         weeklyTask = Task { try await alanAPIService.fetchWeeklyTrends(for: coin) }
         
         Task {
-            await assignResult(weeklyTask, assign: { [weak self] state in
-                self?.weekly = state
-            }) { data in
-                let weekly = """
-                - 가격 추이: \(data.priceTrend)
-                - 거래량 변화: \(data.volumeChange)
-                - 원인: \(data.reason)
-                """
-                return weekly
-            }
+            await assignResult(
+                weeklyTask,
+                assignOnMain: { [weak self] state in
+                    self?.weekly = state
+                },
+                transform: { data in
+                    let weekly = """
+                    - 가격 추이: \(data.priceTrend)
+                    - 거래량 변화: \(data.volumeChange)
+                    - 원인: \(data.reason)
+                    """
+                    return weekly
+                }
+            )
         }
     }
     
@@ -242,14 +268,18 @@ final class ReportViewModel: ObservableObject {
         todayTask = Task { try await alanAPIService.fetchTodayNews(for: coin) }
         
         Task {
-            await assignResult(todayTask, assign: { [weak self] state in
-                self?.today = state
-            }) { data in
-                await MainActor.run {
-                    news = data.articles.map { CoinArticle(from: $0) }
+            await assignResult(
+                todayTask,
+                assignOnMain: { [weak self] state in
+                    self?.today = state
+                },
+                transform: { data in
+                    return data.summaryOfTodaysMarketSentiment
+                },
+                sideEffectOnMain: { [weak self] data in
+                    self?.news = data.articles.map { CoinArticle(from: $0) }
                 }
-                return data.summaryOfTodaysMarketSentiment
-            }
+            )
         }
     }
     
