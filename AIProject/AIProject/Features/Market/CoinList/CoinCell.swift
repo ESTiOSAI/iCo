@@ -7,79 +7,62 @@
 
 import SwiftUI
 
-struct CoinListHeaderView: View {
-    @Binding var sortCategory: SortCategory
-    @Binding var nameSortOrder: SortOrder
-    @Binding var volumeSortOrder: SortOrder
-    
-    var body: some View {
-        HStack(spacing: 60) {
-            SortToggleButton2(title: "한글명", sortCategory: .name, sortOrder: $nameSortOrder) {
-                sortCategory = .name
-                volumeSortOrder = .none
-            }
-            
-            Spacer()
-            
-            SortToggleButton2(title: "거래대금", sortCategory: .volume, sortOrder: $volumeSortOrder) {
-                sortCategory = .volume
-                nameSortOrder = .none
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 struct CoinCell: View {
+    let coin: Coin
+    let store: TickerStore
     
-    let coin: CoinListModel
+    init(coin: Coin, store: TickerStore) {
+        self.coin = coin
+        self.store = store
+    }
     
     var body: some View {
         VStack {
             HStack {
                 // 코인 레이블
-                HStack(spacing: 16) {
-                    CoinView(symbol: coin.coinName, size: 30)
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(coin.name)
-                            .lineLimit(2)
-                            .font(.system(size: 14))
-                            .fontWeight(.bold)
-                        
-                        Text(coin.coinName)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .font(.system(size: 12))
-                .fontWeight(.medium)
-                .foregroundStyle(.aiCoLabel)
-                .frame(alignment: .leading)
+                CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
                 
                 Spacer()
                 
-                CoinPriceView(change: coin.change, price: coin.currentPrice, rate: coin.changePrice, amount: coin.tradeAmount)
+                CoinPriceView(ticker: store)
             }
         }
+        .id(coin.id)
+        .padding(.vertical, 10)
+    }
+}
+
+fileprivate struct CoinMetaView: View {
+    let symbol: String
+    let name:String
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            CoinView(symbol: symbol, size: 30)
+            
+            VStack(alignment: .leading, spacing: 6) {
+                Text(name)
+                    .lineLimit(2)
+                    .font(.system(size: 14))
+                    .fontWeight(.bold)
+                
+                Text(symbol)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .font(.system(size: 12))
+        .fontWeight(.medium)
+        .foregroundStyle(.aiCoLabel)
+        .frame(alignment: .leading)
     }
 }
 
 fileprivate struct CoinPriceView: View {
-    let change: CoinListModel.TickerChangeType
-    let price: Double
-    let rate: Double
-    let amount: Double
-    
-    init(change: CoinListModel.TickerChangeType, price: Double, rate: Double, amount: Double) {
-        self.change = change
-        self.price = price
-        self.rate = rate
-        self.amount = amount
-    }
+    let ticker: TickerStore
     
     var changeColor: Color {
-        switch change {
+        switch ticker.change {
         case .rise: return .aiCoPositive
         case .even: return .aiCoLabel
         case .fall: return .aiCoNegative
@@ -87,7 +70,7 @@ fileprivate struct CoinPriceView: View {
     }
     
     var code: String {
-        switch change {
+        switch ticker.change {
         case .rise: return "▲"
         case .even: return ""
         case .fall: return "▼"
@@ -99,21 +82,22 @@ fileprivate struct CoinPriceView: View {
             HStack {
                 HStack(spacing: 0) {
                     Text(code)
-                    Text(rate, format: .percent.precision(.fractionLength(2)))
+                    Text(ticker.rate, format: .percent.precision(.fractionLength(2)))
                 }
                 .foregroundStyle(changeColor)
                 
                 HStack(spacing: 0) {
-                    Text(price, format: .number)
+                    Text(ticker.price, format: .number)
                         
                     Text("원")
                 }
                 .font(.system(size: 15))
+                .blinkBorderOnChange(ticker.price, duration: .milliseconds(500), color: ticker.change == .rise ? .aiCoPositive: .aiCoNegative, lineWidth: 2, cornerRadius: 0)
             }
             HStack(spacing: 4) {
                 Text("거래")
                     .font(.system(size: 11))
-                Text(amount.formatMillion)
+                Text(ticker.volume.formatMillion)
             }
         }
         .font(.system(size: 12))

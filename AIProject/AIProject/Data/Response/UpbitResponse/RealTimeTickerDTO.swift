@@ -19,6 +19,8 @@ struct RealTimeTickerDTO: Decodable {
     let changePrice: Double
     /// 전일 대비 등락률
     let changeRate: Double
+    
+    let volume: Double
 
     enum CodingKeys: String, CodingKey {
         case coinID = "code"
@@ -26,6 +28,7 @@ struct RealTimeTickerDTO: Decodable {
         case change
         case changePrice = "change_price"
         case changeRate = "change_rate"
+        case volume = "acc_trade_price_24h"
     }
 }
 

@@ -18,16 +18,16 @@ final class OnboardingViewModel: ObservableObject {
         do {
             let markets = try await upbitService.fetchMarkets()
 
-				let englishNames = Array(Set(
-                markets.map { $0.englishName.lowercased() }
+            let symbols = Array(Set(
+                markets.map { $0.coinSymbol.lowercased() }
             ))
 
-            imageMap = await geckoService.fetchImageMapByEnglishNames(
-                englishNames: englishNames,
-                vsCurrency: "krw"
-            )
-
-            try CoinImageManager.shared.addDict(imageMap)
+            imageMap = await geckoService.fetchImageBy(symbols: symbols)
+            
+            let primitive = imageMap.mapValues { url in
+                url.absoluteString
+            }
+			 try CoinImageManager.shared.addDict(imageMap)
         } catch {
             print("업비트 마켓 불러오기 에러:", error.localizedDescription)
         }

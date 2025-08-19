@@ -9,61 +9,48 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    @Bindable var store: CoinListStore
-    @State private var visibleCoins: Set<CoinListModel.ID> = []
-    @Environment(\.scenePhase) private var scenePhase
-    @State var sortCategory: SortCategory = .volume
-    @State var volumeSortOrder: SortOrder = .descending
-    @State var nameSortOrder: SortOrder = .none
+    @Bindable var store: MarketStore
     
-    var sortedCoins: [CoinListModel] {
-        switch sortCategory {
-        case .name:
-            switch nameSortOrder {
-            case .none:
-                return store.coins
-            case .ascending:
-                return store.coins.sorted { $0.name < $1.name }
-            case .descending:
-                return store.coins.sorted { $0.name > $1.name }
-            }
-        case .volume:
-            switch volumeSortOrder {
-            case .none:
-                return store.coins
-            case .ascending:
-                return store.coins.sorted { $0.tradeAmount < $1.tradeAmount }
-            case .descending:
-                return store.coins.sorted { $0.tradeAmount > $1.tradeAmount }
-            }
+    @State private var visibleCoins: Set<CoinID> = []
+    @Environment(\.scenePhase) private var scenePhase
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
+            animation: .default
+    )
+    private var bookmarks: FetchedResults<BookmarkEntity>
+    
+    var filteredCoins: [CoinID] {
+        switch store.filter {
+        case .bookmark:
+            return store.sortedCoinIDs.filter { id in bookmarks.map(\.coinID).contains(where: { bookmark in id == bookmark  }) }
+        case .none:
+            return store.sortedCoinIDs
         }
     }
+    
+    @State private var selectedCoin: CoinID?
     
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView(sortCategory: $sortCategory, nameSortOrder: $nameSortOrder, volumeSortOrder: $volumeSortOrder)
+                CoinListHeaderView(sortCategory: $store.sortCategory, nameSortOrder: $store.nameSortOrder, volumeSortOrder: $store.volumeSortOrder)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                
-                ForEach(sortedCoins) { coin in
-                    
-                    // Geometry가 레이아웃이 바뀌면 rerender를 발동시켜서 소켓 명령어를 다시 실행시켜서 크래쉬 발생
-                        ZStack {
-                            CoinCell(coin: coin)
-                            NavigationLink {
-                                CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name))
-                            } label: {
-                                EmptyView()
-                            }.opacity(0)
-                        }
-                        .padding(.vertical, 14)
-                        .onAppear {
-                            visibleCoins.insert(coin.id)
-                        }
-                        .onDisappear {
-                            visibleCoins.remove(coin.id)
-                        }
+
+                ForEach(filteredCoins, id: \.self) { id in
+                    if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
+                        CoinCell(coin: meta, store: ticker)
+                            .onTapGesture {
+                                selectedCoin = id
+                            }
+                            .onAppear {
+                                visibleCoins.insert(id)
+                            }
+                            .onDisappear {
+                                visibleCoins.remove(id)
+                            }
+                    }
                 }
                 .listRowBackground(Color.clear)
             }
@@ -96,22 +83,15 @@ struct CoinListView: View {
                 await store.disconnect()
             }
         }
+        .navigationDestination(item: $selectedCoin) { coinID in
+            if let coin = store.coinMeta[coinID] {
+                CoinDetailView(coin: coin)
+            }
+        }
     }
 }
 
 extension CoinListView {
-    private func insertCoin(id: CoinListModel.ID, proxy: GeometryProxy) {
-        guard !visibleCoins.contains(id) else { return }
-        let frame = proxy.frame(in: .global)
-        let threshold: CGFloat = 80
-        
-        // cell의 상단 좌표가 프레임 + 임계값 보다 작고
-        // cell 하단 좌표가 프레임 - 임계값보다 크면
-        // 임계값 기준으로 프레임 넓이 안에 셀이 있으면
-        if frame.minY < UIScreen.main.bounds.height + threshold && frame.maxY > -threshold {
-            visibleCoins.insert(id)
-        }
-    }
     private func handleConnection(by phase: ScenePhase) async {
         print(#function, phase)
         switch phase {

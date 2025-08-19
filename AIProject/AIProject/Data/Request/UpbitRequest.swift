@@ -7,43 +7,55 @@
 
 import Foundation
 
-struct UpbitRequest: Encodable {
-    enum FormatType: String, Encodable {
-        case `default` = "DEFAULT"
-        case simple = "SIMPLE"
-        case json = "JSON_LIST"
-        case simpleList = "SIMPLE_LIST"
-    }
-    
-    struct FormatField: Encodable {
-        let format: FormatType
-    }
-    
-    struct TicketField: Encodable {
-        let ticket: String
-    }
-    
-    struct TypeField: Encodable {
-        let type: String
-        let codes: [String]
-        let isOnlySnapshot: Bool = false
-        let isOnlyRealTime: Bool = false
+public enum SubscribeRequest: Encodable {
+    enum Component: Encodable {
+        case ticket(String)
+        case format(FormatType)
+        case body(BodyType)
         
-        enum CodingKeys: String, CodingKey {
-            case type
-            case codes
-            case isOnlySnapshot = "is_only_snapshot"
-            case isOnlyRealTime = "is_only_realtime"
+        enum FormatType: String, Encodable {
+            case `default` = "DEFAULT"
+            case simple = "SIMPLE_LIST"
+        }
+        
+        struct BodyType: Encodable {
+            let method: String
+            let codes: [String]
+            
+            enum CodingKeys: String, CodingKey {
+                case method = "type"
+                case codes
+            }
+        }
+        
+        func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            
+            switch self {
+            case .ticket(let ticket):
+                try container.encode(["ticket": ticket])
+            case .format(let formatType):
+                try container.encode(["format": formatType.rawValue])
+            case .body(let bodyType):
+                try container.encode(bodyType)
+            }
         }
     }
     
-    let ticket: TicketField
-    let type: TypeField
-    let format: FormatField
+    case ticker(ticket: String, codes: [String])
     
-    init(ticket: String, type: String, codes: [String], format: FormatType) {
-        self.ticket = .init(ticket: ticket)
-        self.type = .init(type: type, codes: codes)
-        self.format = .init(format: format)
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        
+        for component in components() {
+            try container.encode(component)
+        }
+    }
+    
+    func components() -> [Component] {
+        switch self {
+        case .ticker(ticket: let ticket, codes: let codes):
+            return [.ticket(ticket), .body(.init(method: "ticker", codes: codes)), .format(.default)]
+        }
     }
 }

@@ -66,7 +66,7 @@ struct TickerDTO: Codable {
 
         case tradeVolume = "trade_volume"
         case accTradePrice = "acc_trade_price"
-        case accTradeVolume = "acc_trade_volume"
+        case accTradeVolume = "acc_trade_price_24h"
 
         case highest52WeekPrice = "highest_52_week_price"
         case highest52WeekDate = "highest_52_week_date"
@@ -77,7 +77,7 @@ struct TickerDTO: Codable {
     }
 }
 
-extension TickerDTO {
+extension TickerDTO: Sendable {
     /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(tradeTimestamp) / 1000)

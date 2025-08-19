@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    
     var body: some View {
         TabView {
             DashboardView()
@@ -17,8 +18,7 @@ struct MainTabView: View {
             
             MarketView(
                 coinService: UpBitAPIService(),
-                tickerService: UpbitTickerService(),
-                imageService: CoinGeckoAPIService()
+                tickerService: UpbitTickerService()
             )
                 .tabItem {
                     Label("마켓", systemImage: "bitcoinsign.bank.building")

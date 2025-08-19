@@ -123,7 +123,7 @@ final class CoinGeckoAPIService {
         var comps = URLComponents(string: "\(endpoint)/coins/markets")
         comps?.queryItems = [
             URLQueryItem(name: "vs_currency", value: vsCurrency.lowercased()),
-            URLQueryItem(name: "ids", value: trimmed.joined(separator: ","))
+            URLQueryItem(name: "ids", value: trimmed.joined(separator: ",")),
         ]
 
         guard let url = comps?.url else { throw NetworkError.invalidURL }
@@ -139,7 +139,21 @@ final class CoinGeckoAPIService {
     ) async -> [String: URL] {
         do {
             // 1. 메타 데이터(API로 이미지 URL 목록 가져오기)
-            let dtos = try await fetchCoinImagesByIDs(ids: englishNames, vsCurrency: vsCurrency)
+            let dtos: [CoinGeckoImageDTO]
+            
+            if englishNames.count > 100 {
+                let start = Array(englishNames[0..<100])
+                let end = Array(englishNames[100..<englishNames.count])
+                
+                async let firstBatch = try await fetchCoinImagesByIDs(ids: start, vsCurrency: vsCurrency)
+                async let secondBatch = try await fetchCoinImagesByIDs(ids: end, vsCurrency: vsCurrency)
+                let firstDTO = try await firstBatch
+                let secondDTO = try await secondBatch
+                print("batch result: \(firstDTO.count)개, \(secondDTO.count)개")
+                dtos = firstDTO + secondDTO
+            } else {
+                dtos = try await fetchCoinImagesByIDs(ids: englishNames, vsCurrency: vsCurrency)
+            }
             
             return await withTaskGroup(of: (String, URL).self) { group in
                 for dto in dtos {
@@ -148,7 +162,14 @@ final class CoinGeckoAPIService {
                     
                     group.addTask {
                         // 미리 캐싱 — 네트워크 요청이 필요해도 URLCache에 저장됨
-                        _ = try? await ImageLoader.shared.image(for: url)
+                        // main thread log남겨보기
+                        Task.detached(priority: .background) { [url] in
+                            do {
+                                try await ImageLoader.shared.image(for: url)
+                            } catch {
+                                print("이미지 로딩 에러:", error.localizedDescription)
+                            }
+                        }
                         return (symbol, url)
                     }
                 }
@@ -162,6 +183,41 @@ final class CoinGeckoAPIService {
         } catch {
             print("네트워크 에러:", error.localizedDescription)
             return [:]
+        }
+    }
+}
+
+extension CoinGeckoAPIService {
+    
+    /// 업베트와 게코의 englishName이 차이가 나서 50개 제한이있는 symbol로 검색해야함
+    /// - Parameters:
+    ///   - symbols: 소문자 - btc
+    ///   - currency: 통화 - krw
+    ///   - chunkSize: default 50개
+    /// - Returns: 이미지 맵
+    func fetchImageBy(symbols: [String], currency: String = "krw", chunkSize: Int = 50) async -> [String: URL] {
+        
+        let dtos = await fetchImageMapBatched(symbols: symbols)
+        
+        return await withTaskGroup(of: (String, URL).self) { group in
+            for (symbol, url) in dtos {
+                group.addTask {
+                    Task.detached(priority: .background) { [url] in
+                        do {
+                            try await ImageLoader.shared.image(for: url)
+                        } catch {
+                            print("이미지 로딩 에러:", error.localizedDescription)
+                        }
+                    }
+                    return (symbol, url)
+                }
+            }
+            
+            var result: [String: URL] = [:]
+            for await (symbol, url) in group {
+                result[symbol] = url
+            }
+            return result
         }
     }
 }
