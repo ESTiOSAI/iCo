@@ -41,6 +41,10 @@ struct RecommendCoinScreen: View {
     }
 }
 
+#Preview {
+    RecommendCoinView()
+}
+
 struct SuccessCoinView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
 
@@ -49,6 +53,9 @@ struct SuccessCoinView: View {
     @State var selectedCoin: RecommendCoin?
     
     var body: some View {
+        let recommendedCoins = viewModel.recommendCoins
+        var currentIndex = viewModel.currentIndex
+        
         GeometryReader { geoProxy in
             let horizonInset = geoProxy.size.width * 0.15
             
@@ -83,17 +90,17 @@ struct SuccessCoinView: View {
             }
             .onChange(of: selection) {
                 if let selection {
-                    if let index = viewModel.recommendCoins.firstIndex(where: { $0.id == selection }) {
-                        viewModel.currentIndex = index
+                    if let index = recommendedCoins.firstIndex(where: { $0.id == selection }) {
+                        currentIndex = index
                     }
                 }
             }
             .onReceive(viewModel.timer) { _ in
-                guard !isDragging, !viewModel.recommendCoins.isEmpty else { return }
-                viewModel.currentIndex = (viewModel.currentIndex + 1) % viewModel.recommendCoins.count
+                guard !isDragging, !recommendedCoins.isEmpty else { return }
+                currentIndex += 1
 
                 withAnimation(.easeInOut) {
-                    selection = viewModel.recommendCoins[viewModel.currentIndex].id
+                    selection = recommendedCoins[currentIndex].id
                 }
             }
             .navigationDestination(item: $selectedCoin) { coin in
@@ -105,7 +112,7 @@ struct SuccessCoinView: View {
             }
             .onDisappear {
                 viewModel.stopTimer()
-                viewModel.currentIndex = 0
+                currentIndex = 0
             }
         }
     }
