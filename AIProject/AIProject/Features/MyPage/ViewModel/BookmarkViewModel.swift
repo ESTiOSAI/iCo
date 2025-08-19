@@ -99,16 +99,15 @@ final class BookmarkViewModel: ObservableObject {
                 )
             )
 
-            let stored = UserDefaults.standard.dictionary(forKey: AppStorageKey.imageMap) as? [String: String] ?? [:]
             var map: [String: URL] = [:]
-
             for symbol in symbols {
-                if let urlString = stored[symbol], let url = URL(string: urlString) {
+                if let url = CoinImageManager.shared.url(for: symbol) {
                     map[symbol] = url
                 }
             }
 
             imageMap = map
+            print(imageMap)
         } catch {
             print("이미지 로드 실패:", error)
             imageMap = [:]

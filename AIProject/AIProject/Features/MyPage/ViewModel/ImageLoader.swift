@@ -76,13 +76,9 @@ actor ImageLoader {
 
         return try await task.value
     }
-    
-    // FIXME: CoreData로 변경하기
+
+    /// CoreData 조회
     private func loadFromDiskCache(from symbol: String) -> URL? {
-        let imageMap = (UserDefaults.standard.object(forKey: AppStorageKey.imageMap) as? [String: String] ?? [:])
-            .compactMapValues {
-            URL(string: $0)
-            }
-        return imageMap[symbol]
+        return CoinImageManager.shared.url(for: symbol.uppercased())
     }
 }

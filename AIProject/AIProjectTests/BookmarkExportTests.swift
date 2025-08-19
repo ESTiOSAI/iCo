@@ -16,7 +16,7 @@ final class BookmarkExportTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        sut = BookmarkViewModel(service: AlanAPIService(), geckoService: CoinGeckoAPIService())
+        sut = BookmarkViewModel(service: AlanAPIService())
 
         sut.briefing = PortfolioBriefingDTO(briefing: "투자 브리핑", strategy: "전략 제안")
     }
@@ -31,7 +31,6 @@ final class BookmarkExportTests: XCTestCase {
         fake.coinID = "KRW-BTC"
         fake.coinKoreanName = "비트코인"
         fake.timestamp = Date()
-        let coins: [BookmarkEntity] = [fake]
 
         guard let url = sut.makeFullReportPNGURL(scale: 2.0) else {
             XCTFail("PNG 생성 실패")
@@ -50,7 +49,6 @@ final class BookmarkExportTests: XCTestCase {
         fake.coinID = "KRW-BTC"
         fake.coinKoreanName = "비트코인"
         fake.timestamp = Date()
-        let coins: [BookmarkEntity] = [fake]
 
         guard let url = sut.makeFullReportPDF(scale: 1.0) else {
             XCTFail("PDF URL 생성 실패")
