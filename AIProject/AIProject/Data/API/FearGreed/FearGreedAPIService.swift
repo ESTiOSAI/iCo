@@ -8,7 +8,7 @@
 import Foundation
 
 /// 공포 탐욕 지수 API 관련 서비스를 제공합니다.
-final class FearGreedAPIService {
+final class FearGreedAPIService: FearGreedProvider {
     private let network: NetworkClient
     private let endpoint: String = "https://api.alternative.me/fng/"
 

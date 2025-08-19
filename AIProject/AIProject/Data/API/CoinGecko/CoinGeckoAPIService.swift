@@ -8,7 +8,7 @@
 import Foundation
 
 /// CoinGecko에서 코인 이미지(URL)를 조회하는 서비스를 제공합니다.
-final class CoinGeckoAPIService {
+final class CoinGeckoAPIService: CoinImageProvider {
     private let network: NetworkClient
     private let endpoint: String = "https://api.coingecko.com/api/v3"
 

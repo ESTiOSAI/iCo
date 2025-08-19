@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class UpbitTickerService {
+final class UpbitTickerService: RealTimeTickerProvider {
     private let client: any SocketEngine
     private var stateStreamTask: Task<Void, Never>?
     

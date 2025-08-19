@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-protocol AlanAPIServiceProtocol {
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO]
-}
-
-protocol UpBitApiServiceProtocol {
-    func fetchQuotes(id: String) async throws -> [TickerDTO]
-}
-
 final class RecommendCoinViewModel: ObservableObject {
     /// 현재 추천 코인 뷰의 UI 상태를 나타냅니다.
     ///

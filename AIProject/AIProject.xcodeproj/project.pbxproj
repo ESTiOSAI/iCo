@@ -54,16 +54,16 @@
 		A9E81AC42E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
-				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
+				"Data/DB/CoinImage/CoinImageEntity+CoreDataClass.swift",
+				"Data/DB/CoinImage/CoinImageEntity+CoreDataProperties.swift",
 			);
 			target = B7B040142E387FD1005DE0BA /* AIProjectTests */;
 		};
 		A9E81AC52E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
-				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
+				"Data/DB/CoinImage/CoinImageEntity+CoreDataClass.swift",
+				"Data/DB/CoinImage/CoinImageEntity+CoreDataProperties.swift",
 			);
 			target = B7B0401E2E387FD1005DE0BA /* AIProjectUITests */;
 		};
