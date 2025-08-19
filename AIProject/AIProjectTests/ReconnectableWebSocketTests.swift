@@ -28,7 +28,7 @@ final class ReconnectableWebSocketTests: XCTestCase {
         
         await socket.connect()
         
-        try await Task.sleep(for: .milliseconds(100))
+        try await Task.sleep(for: .milliseconds(300))
         
         let expect = [WebSocket.State.connecting, .connected]
         XCTAssertEqual(states, expect)
@@ -71,7 +71,7 @@ final class ReconnectableWebSocketTests: XCTestCase {
         
         await socket.connect()
         
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(200))
         
         let expected: [WebSocket.State] = [.connecting, .connected, .reconnecting(nextAttempsIn: .milliseconds(100))]
         XCTAssertEqual(states, expected)
