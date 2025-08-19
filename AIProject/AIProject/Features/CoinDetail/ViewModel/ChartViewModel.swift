@@ -73,7 +73,7 @@ final class ChartViewModel: ObservableObject {
     
     /// 타이머 종료 및 메모리 정리
     deinit {
-        print("ChartViewModel deinit")
+        print(String(describing: Self.self) + " deinit")
         updateTask?.cancel()
     }
     
