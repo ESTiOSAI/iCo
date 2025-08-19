@@ -21,14 +21,17 @@ struct CoinCell: View {
             HStack {
                 // 코인 레이블
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Spacer()
+//                Spacer()
                 
                 CoinPriceView(ticker: store)
+                    .frame(alignment: .trailing)
             }
         }
         .id(coin.id)
         .padding(.vertical, 10)
+        .contentShape(.rect)
     }
 }
 
