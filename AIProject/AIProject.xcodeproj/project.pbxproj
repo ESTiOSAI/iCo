@@ -56,7 +56,6 @@
 			membershipExceptions = (
 				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
 				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
-				Data/CoreData/CoinImage/CoinImageManager.swift,
 			);
 			target = B7B040142E387FD1005DE0BA /* AIProjectTests */;
 		};
@@ -65,7 +64,6 @@
 			membershipExceptions = (
 				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataClass.swift",
 				"Data/CoreData/CoinImage/CoinImageEntity+CoreDataProperties.swift",
-				Data/CoreData/CoinImage/CoinImageManager.swift,
 			);
 			target = B7B0401E2E387FD1005DE0BA /* AIProjectUITests */;
 		};
