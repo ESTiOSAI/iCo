@@ -105,7 +105,7 @@ final class ChartViewModel: ObservableObject {
             }
         } catch is CancellationError {
             return
-        } catch let e as URLError where e.code == .cancelled {
+        } catch NetworkError.taskCancelled {
             return
         } catch {
             print("가격 불러오기 실패: \(error.localizedDescription)")
