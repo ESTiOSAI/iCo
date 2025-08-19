@@ -15,8 +15,11 @@ private struct ChatOffSetPreferenceKey: PreferenceKey {
 struct ChatScrollView<Content: View>: View {
     @ObservedObject var viewModel: ChatBotViewModel
 
+    @GestureState var isDragging: Bool = false
+
     @State private var reachToBottom: Bool = true
-    @State private var viewportHeight: CGFloat = 0
+    @State private var viewportHeight: CGFloat = .zero
+    @State private var scrollOffSet: CGFloat = .zero
     @State private var contentHeight: CGFloat = .zero
     @Namespace private var coordinateSpaceName: Namespace.ID
     @ViewBuilder private var content: () -> Content
@@ -41,10 +44,15 @@ struct ChatScrollView<Content: View>: View {
                                     self.contentHeight = contentHeight
                                 }
                                 .onChange(of: viewModel.messages.last?.id) {
-                                    let contentHeight = geometryProxy.size.height
-                                    self.contentHeight = contentHeight
-
-                                    if reachToBottom {
+                                    self.contentHeight = geometryProxy.size.height
+                                }
+                                .onChange(of: contentHeight) {
+                                    if reachToBottom && contentHeight > viewportHeight {
+                                        scrollProxy.scrollTo(viewModel.messages.last?.id)
+                                    }
+                                }
+                                .onChange(of: viewModel.isReceived) {
+                                    if viewModel.isReceived {
                                         scrollProxy.scrollTo(viewModel.messages.last?.id)
                                     }
                                 }
@@ -59,6 +67,7 @@ struct ChatScrollView<Content: View>: View {
                     }
             }
         }
+        .scrollDismissesKeyboard(.interactively)
         .contentMargins(.vertical, 16)
         .coordinateSpace(name: coordinateSpaceName)
         .background(
@@ -67,13 +76,13 @@ struct ChatScrollView<Content: View>: View {
                     .onAppear {
                         viewportHeight = proxy.size.height
                     }
-                    .onChange(of: proxy.size.height) {
-                        viewportHeight = $0
+                    .onChange(of: proxy.size.height) { _, newValue in
+                        viewportHeight = newValue
                     }
             }
         )
         .onPreferenceChange(ChatOffSetPreferenceKey.self) { value in
-            print("Scroll")
+            scrollOffSet = value.y
             reachToBottom = contentHeight <= (value.y + viewportHeight + 50) // 50: 최소 임계값
         }
     }

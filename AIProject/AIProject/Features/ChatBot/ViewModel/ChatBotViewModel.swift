@@ -29,6 +29,8 @@ final class ChatBotViewModel: ObservableObject {
         }
     }
 
+    @Published var isReceived: Bool = false
+
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
 
@@ -46,8 +48,10 @@ final class ChatBotViewModel: ObservableObject {
 
         do {
             await addMessage(with: message)
+            Task { @MainActor in isReceived = true }
             try await chatBotClient.connect(content: message)
             try await observeStream()
+            Task { @MainActor in isReceived = false }
         } catch {
             await MainActor.run { showStreamError() }
         }
