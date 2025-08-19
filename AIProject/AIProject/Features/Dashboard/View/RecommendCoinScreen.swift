@@ -49,15 +49,14 @@ struct SuccessCoinView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
 
     @GestureState var isDragging: Bool = false
-    @State var selection: String?
     @State var selectedCoin: RecommendCoin?
+    
+    @State var cardID: Int?
     
     var body: some View {
         let recommendedCoins = viewModel.recommendCoins
         
-        var currentIndex: Int {
-            return wrappedCoins.firstIndex(where: { $0.id == selection }) ?? 1
-        }
+        var currentIndex: Int = 1
         
         var wrappedCoins: [RecommendCoin] {
             guard let first = recommendedCoins.first,
@@ -77,10 +76,9 @@ struct SuccessCoinView: View {
                         
                         VStack {
                             RecommendCardView(recommendCoin: coin)
-                                .id(coin.id)
+                                .id(index)
                                 .frame(width: cardWidth)
                                 .onTapGesture { selectedCoin = coin }
-                            Text("\(index)")
                         }
                     }
                 }
@@ -88,7 +86,7 @@ struct SuccessCoinView: View {
             }
             .contentMargins(.horizontal, horizonInset)
             .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: $selection)
+            .scrollPosition(id: $cardID)
             .simultaneousGesture(DragGesture()
                 .updating($isDragging) { _, state, _ in
                     state = true
@@ -98,30 +96,34 @@ struct SuccessCoinView: View {
                     viewModel.startTimer()
                 }
             ))
+            .onChange(of: cardID ?? 1, { _, newValue in
+                currentIndex = newValue
+            })
             .onReceive(viewModel.timer) { _ in
                 guard !isDragging, !recommendedCoins.isEmpty else { return }
                 
-                var nextIndex: Int {
-                    let possibleNextIndex = currentIndex + 1
-                    if possibleNextIndex == wrappedCoins.count { return 0 }
-                    return possibleNextIndex
-                }
+                currentIndex = (currentIndex + 1) % wrappedCoins.count
                 
-                print("current: ", currentIndex)
-                
-                withAnimation(.easeInOut) {
-                    print("next: ", nextIndex)
-                    selection = wrappedCoins[nextIndex].id
+                Task {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        cardID = currentIndex
+                    }
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    
+                    await MainActor.run {
+                        if cardID == recommendedCoins.count + 1 {
+                            cardID = 1
+                        } else if cardID == 0 {
+                            cardID = recommendedCoins.count
+                        }
+                    }
                 }
             }
             .navigationDestination(item: $selectedCoin) { coin in
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
             }
             .onAppear {
-                if !recommendedCoins.isEmpty {
-                    selection = wrappedCoins[currentIndex].id
-                    print("total: ", wrappedCoins.count)
-                }
+                cardID = 1
                 viewModel.startTimer()
             }
             .onDisappear {
