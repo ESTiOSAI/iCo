@@ -9,11 +9,8 @@ import Foundation
 import AsyncAlgorithms
 
 public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
-    public let state: AsyncStream<WebSocket.State>
-    public let incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>>
-    
-    private let stateChannel: AsyncChannel<WebSocket.State>
-    private let incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
+    private var stateChannel: AsyncChannel<WebSocket.State>
+    private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
     
     private var attempts: Int = 0
     
@@ -27,6 +24,28 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     private let policy: ReconnectPolicy
     private let makeBase: () -> Base
     
+    public nonisolated var state: AsyncStream<WebSocket.State> {
+        AsyncStream { continuation in
+            Task {
+                for await state in await stateChannel {
+                    continuation.yield(state)
+                }
+                continuation.finish()
+            }
+        }
+    }
+    
+    public nonisolated var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> {
+        AsyncStream { continuation in
+            Task {
+                for await message in await incomingChannel {
+                    continuation.yield(message)
+                }
+                continuation.finish()
+            }
+        }
+    }
+    
     public init(makeBase: @escaping () -> Base, policy: ReconnectPolicy = .defaultPolicy()) {
         self.makeBase = makeBase
         self.policy = policy
@@ -35,13 +54,13 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
         self.stateChannel = .init()
         self.incomingChannel = .init()
         
-        self.state = stateChannel.makeStream()
-        self.incoming = incomingChannel.makeStream()
+        debugPrint(String(describing: Self.self), "init")
     }
     
     public func connect() async {
         guard loopTask == nil else { return }
         isClosing = false
+        loopTask?.cancel()
         loopTask = Task { [weak self] in
             await self?.runLoop()
         }
@@ -68,6 +87,7 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     }
     
     deinit {
+        debugPrint(String(describing: Self.self), #function)
         forwardStateTask?.cancel()
         forwardIncomingTask?.cancel()
         base = nil
@@ -79,8 +99,6 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     }
     
     private func runLoop() async {
-        backoff.reset()
-        
         while !isClosing {
             
             if attempts > policy.maxAttemps {
@@ -91,6 +109,9 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
             
             let base = makeBase()
             self.base = base
+            
+            self.stateChannel = .init()
+            self.incomingChannel = .init()
             
             forwardStateTask?.cancel()
             forwardIncomingTask?.cancel()

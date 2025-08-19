@@ -173,6 +173,8 @@ extension MarketStore {
     ///  coin snapshot 채널 종료
     func disconnect() async {
         visibleCoinsChannel.finish()
+        self.ticketStreamTask?.cancel()
+        self.tickerStreamTask?.cancel()
         await tickerService.disconnect()
     }
     

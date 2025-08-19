@@ -8,13 +8,10 @@
 import Foundation
 import AsyncAlgorithms
 
-public final class BaseWebSocketClient: NSObject, SocketEngine {
+public final actor BaseWebSocketClient: NSObject, SocketEngine {
     
-    public let state: AsyncStream<WebSocket.State>
-    public let incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>>
-    
-    private let stateChannel: AsyncChannel<WebSocket.State>
-    private let incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
+    private var stateChannel: AsyncChannel<WebSocket.State>
+    private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
     
     private let url: URL
     private let session: URLSession
@@ -22,19 +19,45 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
     
     private var healthCheck: Task<Void, Error>?
     
+    public nonisolated var state: AsyncStream<WebSocket.State> {
+        AsyncStream { continuation in
+            Task {
+                for await state in await stateChannel {
+                    continuation.yield(state)
+                }
+                continuation.finish()
+            }
+        }
+    }
+    
+    public nonisolated var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> {
+        AsyncStream { continuation in
+            Task {
+                for await message in await incomingChannel {
+                    continuation.yield(message)
+                }
+                continuation.finish()
+            }
+        }
+    }
+    
     public init(url: URL, session: URLSession = .shared) {
+        
         self.url = url
         self.session = session
         
         stateChannel = AsyncChannel<WebSocket.State>()
         incomingChannel = AsyncChannel<Result<Data, WebSocket.MessageFailure>>()
         
-        state = stateChannel.makeStream()
-        
-        incoming = incomingChannel.makeStream()
+        super.init()
+        debugPrint(String(describing: Self.self), #function)
     }
     
     public func connect() async {
+        
+        stateChannel = .init()
+        incomingChannel = .init()
+        
         await stateChannel.send(.connecting)
         
         self.task = session.webSocketTask(with: url)
@@ -78,8 +101,15 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
                 @unknown default:
                     await incomingChannel.send(.failure(.frameCorrupted))
                 }
+            } catch is CancellationError {
+                await handleClose(code: .normalClosure, reason: nil)
+                return
             } catch {
-                if let urlError = error as? URLError, urlError.code == .cancelled {
+                if (error as NSError).code == 57 {
+                    debugPrint("WebSocekt is not connected Error 57")
+                    await handleClose(with: NetworkError.webSocketError)
+                    return
+                } else if let urlError = error as? URLError, urlError.code == .cancelled {
                     await handleClose(code: .normalClosure, reason: nil)
                 } else {
                     await stateChannel.send(.failed(error))
@@ -99,7 +129,6 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
     
     private func handleClose(code: URLSessionWebSocketTask.CloseCode, reason: Data?) async {
         guard task != nil else { return }
-        debugPrint("didClose")
         
         await stateChannel.send(.closed(code: code, reason: reason))
         release()
@@ -142,7 +171,6 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
     }
     
     private func handleConnect() async {
-        debugPrint("didOpen")
         await stateChannel.send(.connected)
         
         Task {
@@ -154,13 +182,15 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
 }
 
 extension BaseWebSocketClient: URLSessionWebSocketDelegate {
-    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+    public nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+        debugPrint("didOpen")
         Task {
             await handleConnect()
         }
     }
     
-    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+    public nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        debugPrint("didClose")
         Task {
             await handleClose(code: closeCode, reason: reason)
         }

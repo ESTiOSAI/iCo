@@ -9,15 +9,20 @@ import Foundation
 
 final class UpbitTickerService {
     private let client: any SocketEngine
+    private var stateStreamTask: Task<Void, Never>?
     
-    init(client: any SocketEngine = ReconnectableWebSocketClient {
+    init(
+        client: any SocketEngine =
+        ReconnectableWebSocketClient {
         BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
-    }) {
+        }
+    ) {
         self.client = client
     }
     
     func connect() async {
         await client.connect()
+        streamingState()
     }
     
     func disconnect() async {
@@ -55,7 +60,6 @@ final class UpbitTickerService {
     
     private func mapTicker(_ data: Data) -> TickerValue? {
         do {
-            // TODO: 거래대금 집언허기
             let ticker = try JSONDecoder().decode(RealTimeTickerDTO.self, from: data)
             return TickerValue(id: ticker.coinID, price: ticker.tradePrice, volume: ticker.volume, rate: ticker.changeRate, change: .init(rawValue: ticker.change))
         } catch {
@@ -65,6 +69,16 @@ final class UpbitTickerService {
                 debugPrint(error)
             }
             return nil
+        }
+    }
+    
+    private func streamingState() {
+        self.stateStreamTask?.cancel()
+        
+        self.stateStreamTask = Task {
+            for await state in client.state {
+                debugPrint("client State: \(state)")
+            }
         }
     }
 }
