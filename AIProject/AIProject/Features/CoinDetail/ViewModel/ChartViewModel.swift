@@ -51,17 +51,29 @@ final class ChartViewModel: ObservableObject {
     /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작
     /// - Note: 최초 1회 실행 후 60초마다 반복 호출
     private func startUpdating() {
-        updateTask = Task {
-            await loadPrices()
-            while true {
-                try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
-                await loadPrices()
+        updateTask?.cancel() // 중복 시작 방지
+        
+        updateTask = Task { [weak self] in
+            await self?.loadPrices() // 최초 1회
+            
+            while !Task.isCancelled {
+                _ = try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
+                
+                if Task.isCancelled { break } // 취소 시 즉시 종료
+                
+                await self?.loadPrices()
             }
         }
     }
     
+    func stopUpdating() {
+        updateTask?.cancel()
+        updateTask = nil
+    }
+    
     /// 타이머 종료 및 메모리 정리
     deinit {
+        print(String(describing: Self.self) + " deinit")
         updateTask?.cancel()
     }
     
@@ -91,6 +103,10 @@ final class ChartViewModel: ObservableObject {
                     index: idx
                 )
             }
+        } catch is CancellationError {
+            return
+        } catch NetworkError.taskCancelled {
+            return
         } catch {
             print("가격 불러오기 실패: \(error.localizedDescription)")
             self.prices = []
@@ -129,7 +145,6 @@ extension ChartViewModel {
     /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
     func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
-        let calendar = Calendar(identifier: .gregorian)
         let lastDate = data.last?.date ?? now
         let xStart = now.addingTimeInterval(-60 * 60 * 24)
         let xEnd = lastDate.addingTimeInterval(60 * 5)
