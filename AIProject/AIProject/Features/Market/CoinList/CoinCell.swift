@@ -92,7 +92,7 @@ fileprivate struct CoinPriceView: View {
                     Text("원")
                 }
                 .font(.system(size: 15))
-                .blinkBorderOnChange(ticker.price, duration: .milliseconds(300), color: ticker.change == .rise ? .aiCoPositive: .aiCoNegative, lineWidth: 1, cornerRadius: 0)
+                .blinkBorderOnChange(ticker.price, duration: .milliseconds(500), color: ticker.change == .rise ? .aiCoPositive: .aiCoNegative, lineWidth: 2, cornerRadius: 0)
             }
             HStack(spacing: 4) {
                 Text("거래")
