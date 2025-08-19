@@ -22,13 +22,17 @@ struct ReportNewsSectionView: View {
     var title: String = "주요 뉴스"
     var articles: [CoinArticle]
     
+    private var displayedArticles: [CoinArticle] {
+        articles.filter { !$0.title.isEmpty || !$0.summary.isEmpty }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.aiCoAccent)
             
-            ForEach(Array(articles.enumerated()), id: \.element.id) { index, article in
+            ForEach(displayedArticles, id: \.id) { article in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(article.title)
@@ -56,11 +60,11 @@ struct ReportNewsSectionView: View {
                 }
                 .padding(.top, 12)
                 .padding(.bottom, 16)
-                
-                if index < articles.count - 1 {
-                    Divider()
+                .overlay(alignment: .bottom) {
+                    Rectangle()
                         .frame(height: 1)
-                        .background(.aiCoBorder)
+                        .foregroundStyle(.aiCoBorderGray)
+                        .padding(.leading, 0)
                 }
             }
         }
@@ -69,7 +73,7 @@ struct ReportNewsSectionView: View {
         }
         .padding(.horizontal, 22)
         .padding(.top, 20)
-        .padding(.bottom, 8)
+        .padding(.bottom, 20)
         .background(.aiCoBackgroundBlue)
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(

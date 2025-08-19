@@ -57,7 +57,8 @@ struct ReportView: View {
                     Text(AttributedString(value))
                 }
                 
-                if case .success = viewModel.today {
+                if case .success = viewModel.today,
+                   !viewModel.news.allSatisfy({ $0.title.isEmpty && $0.summary.isEmpty }) {
                     ReportNewsSectionView(articles: viewModel.news)
                         .padding(.bottom, 30)
                 }
