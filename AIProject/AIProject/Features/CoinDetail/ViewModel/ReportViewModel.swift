@@ -60,10 +60,9 @@ final class ReportViewModel: ObservableObject {
                     return try await self.alanAPIService.fetchWeeklyTrends(for: self.coin)
                 },
                 onCancel: { [weak self] in
-                    Task { @MainActor in
-                        self?.weekly = .cancel(.taskCancelled)
-                    }
-                }
+                    self?.weekly = .cancel(.taskCancelled)
+                },
+                isolation: MainActor.shared
             )
         }
         
@@ -74,10 +73,9 @@ final class ReportViewModel: ObservableObject {
                     return try await self.alanAPIService.fetchTodayNews(for: self.coin)
                 },
                 onCancel: { [weak self] in
-                    Task { @MainActor in
-                        self?.today = .cancel(.taskCancelled)
-                    }
-                }
+                    self?.today = .cancel(.taskCancelled)
+                },
+                isolation: MainActor.shared
             )
         }
         

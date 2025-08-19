@@ -49,10 +49,9 @@ final class InsightViewModel: ObservableObject {
                     return try await self.fetchCommunityFlow()
                 },
                 onCancel: { [weak self] in
-                    Task { @MainActor in
-                        self?.community = .cancel(.taskCancelled)
-                    }
-                }
+                    self?.community = .cancel(.taskCancelled)
+                },
+                isolation: MainActor.shared
             )
         }
         
