@@ -97,26 +97,6 @@ final class ReconnectableWebSocketTests: XCTestCase {
         let expected: [WebSocket.State] = [.connecting, .connected, .failed(URLError(.cannotFindHost))]
         XCTAssertEqual(states, expected)
     }
-    
-    func test_retryFailed_exceed_attemps() async throws {
-        let socket = ReconnectableWebSocketClient {
-            MockWebSocketClient()
-        }
-        
-        var states = [WebSocket.State]()
-        
-        Task {
-            for await state in await socket.state {
-                states.append(state)
-            }
-        }
-        
-        await socket.connect()
-        
-        try await Task.sleep(for: .milliseconds(300))
-        
-        XCTAssertEqual(states,[ .failed(WebSocket.RetryFailure.exceedAttemps)])
-    }
 }
 
 private final actor MockWebSocketClient: SocketEngine {

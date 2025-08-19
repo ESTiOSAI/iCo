@@ -100,11 +100,11 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
             forwardIncomingTask = Task { [weak self] in await self?.forwardIncoming(from: base) }
             
             await base.connect()
-//
+
             let terminal = await waitTerminalEvent(from: base)
-//            
+            
             if isClosing { break }
-//            
+            
             switch classify(closeCode: terminal.closeCode, error: terminal.error) {
             case let .closed(code, reason):
                 await stateChannel.send(.closed(code: code, reason: reason))
