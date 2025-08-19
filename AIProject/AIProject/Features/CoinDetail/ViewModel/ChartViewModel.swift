@@ -21,6 +21,11 @@ final class ChartViewModel: ObservableObject {
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
+    @Published private(set) var headerLastPrice: Double = 0
+    @Published private(set) var headerChangePrice: Double = 0
+    @Published private(set) var headerChangeRate: Double = 0
+    @Published private(set) var headerAccTradePrice: Double = 0
+
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
     
@@ -82,8 +87,13 @@ final class ChartViewModel: ObservableObject {
     func loadPrices(interval: CoinInterval = .all.first!) async {
         do {
             let marketCode = coinSymbol
-            let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
             
+            async let pricesTask: [CoinPrice]  = priceService.fetchPrices(market: marketCode, interval: interval)
+            async let tickerTask: [TickerDTO]  = UpBitAPIService().fetchQuotes(id: marketCode)
+            
+            let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
+            let ticker = tickers.first
+                        
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
@@ -102,6 +112,16 @@ final class ChartViewModel: ObservableObject {
                     trade: price.trade,
                     index: idx
                 )
+            }
+            
+            if let ticker {
+                headerLastPrice = ticker.tradePrice
+                headerChangeRate = ticker.changeRate * 100
+
+                let isFall = ticker.change.uppercased() == "FALL"
+                headerChangePrice = isFall ? -ticker.changePrice : ticker.changePrice
+
+                headerAccTradePrice = ticker.accTradePrice
             }
         } catch is CancellationError {
             return

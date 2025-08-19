@@ -50,9 +50,10 @@ struct ChartView: View {
                     // 요약 데이터 유무
                     let hasSummary = (summary != nil)
                     
-                    let lastPrice = summary?.lastPrice ?? 0
-                    let changeValue = summary?.change ?? 0
-                    let changeRate  = summary?.changeRate ?? 0
+                    let lastPrice   = viewModel.headerLastPrice != 0 ? viewModel.headerLastPrice : (summary?.lastPrice ?? 0)
+                    let changeValue = viewModel.headerLastPrice != 0 ? viewModel.headerChangePrice  : (summary?.change ?? 0)
+                    let changeRate  = viewModel.headerLastPrice != 0 ? viewModel.headerChangeRate : (summary?.changeRate ?? 0)
+                    let trade = viewModel.headerAccTradePrice
                     
                     let isRising = changeValue > 0
                     let isFalling = changeValue < 0
@@ -74,7 +75,6 @@ struct ChartView: View {
                         .lineLimit(1)
                         .opacity(hasSummary ? 1 : 0)
                     
-                    let trade = viewModel.prices.last?.trade ?? 0
                     Text("거래대금 \(trade.formatMillion)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.aiCoLabelSecondary)
