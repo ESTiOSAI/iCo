@@ -54,20 +54,34 @@ struct SuccessCoinView: View {
     
     var body: some View {
         let recommendedCoins = viewModel.recommendCoins
-        var currentIndex = viewModel.currentIndex
+        
+        var currentIndex: Int {
+            return wrappedCoins.firstIndex(where: { $0.id == selection }) ?? 1
+        }
+        
+        var wrappedCoins: [RecommendCoin] {
+            guard let first = recommendedCoins.first,
+                  let last = recommendedCoins.last else { return [] }
+            return [last] + recommendedCoins + [first]
+        }
         
         GeometryReader { geoProxy in
             let horizonInset = geoProxy.size.width * 0.15
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(viewModel.recommendCoins) { coin in
-                        RecommendCardView(recommendCoin: coin)
-                            .id(coin.id)
-                            .frame(width: geoProxy.size.width * 0.7)
-                            .onTapGesture {
-                                selectedCoin = coin
-                            }
+                    let cardWidth = geoProxy.size.width * 0.7
+                    
+                    ForEach(wrappedCoins.indices, id: \.self) { index in
+                        let coin = wrappedCoins[index]
+                        
+                        VStack {
+                            RecommendCardView(recommendCoin: coin)
+                                .id(coin.id)
+                                .frame(width: cardWidth)
+                                .onTapGesture { selectedCoin = coin }
+                            Text("\(index)")
+                        }
                     }
                 }
                 .scrollTargetLayout()
@@ -84,35 +98,34 @@ struct SuccessCoinView: View {
                     viewModel.startTimer()
                 }
             ))
-            .onChange(of: viewModel.recommendCoins.count) {
-                guard !viewModel.recommendCoins.isEmpty else { return }
-                selection = viewModel.recommendCoins[0].id
-            }
-            .onChange(of: selection) {
-                if let selection {
-                    if let index = recommendedCoins.firstIndex(where: { $0.id == selection }) {
-                        currentIndex = index
-                    }
-                }
-            }
             .onReceive(viewModel.timer) { _ in
                 guard !isDragging, !recommendedCoins.isEmpty else { return }
-                currentIndex += 1
-
+                
+                var nextIndex: Int {
+                    let possibleNextIndex = currentIndex + 1
+                    if possibleNextIndex == wrappedCoins.count { return 0 }
+                    return possibleNextIndex
+                }
+                
+                print("current: ", currentIndex)
+                
                 withAnimation(.easeInOut) {
-                    selection = recommendedCoins[currentIndex].id
+                    print("next: ", nextIndex)
+                    selection = wrappedCoins[nextIndex].id
                 }
             }
             .navigationDestination(item: $selectedCoin) { coin in
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
             }
             .onAppear {
-                selection = viewModel.recommendCoins[0].id
+                if !recommendedCoins.isEmpty {
+                    selection = wrappedCoins[currentIndex].id
+                    print("total: ", wrappedCoins.count)
+                }
                 viewModel.startTimer()
             }
             .onDisappear {
                 viewModel.stopTimer()
-                currentIndex = 0
             }
         }
     }
