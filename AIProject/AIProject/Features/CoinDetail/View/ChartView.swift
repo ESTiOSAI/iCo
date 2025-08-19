@@ -154,14 +154,19 @@ struct ChartView: View {
                             }
                         }
                     }
-                    /// Y축 눈금 (20만 원 단위) + 값 포맷을 M(억) 단위로 축약
                     .chartYAxis {
-                        AxisMarks(values: .stride(by: 200_000)) { value in // 20만원 단위 눈금 표시
+                        AxisMarks { value in
                             AxisGridLine()
                             AxisTick()
-                            if let price = value.as(Double.self) {
+                            if let v = value.as(Double.self) {
                                 AxisValueLabel {
-                                    Text(String(format: "%.1fM", price / 1_000_000))
+                                    if yRange.upperBound >= 1_000_000 {
+                                        Text(String(format: "%.1fM", v / 1_000_000)) // 백만 단위
+                                    } else if yRange.upperBound >= 1_000 {
+                                        Text(String(format: "%.1fK", v / 1_000)) // 천 단위
+                                    } else {
+                                        Text(String(format: "%.0f", v)) // 원 단위 그대로
+                                    }
                                 }
                             }
                         }
