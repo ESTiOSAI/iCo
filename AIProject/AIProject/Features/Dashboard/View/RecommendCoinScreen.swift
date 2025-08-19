@@ -65,11 +65,11 @@ struct SuccessCoinView: View {
         }
         
         GeometryReader { geoProxy in
-            let horizonInset = geoProxy.size.width * 0.15
+            let horizonInset = geoProxy.size.width * 0.1
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    let cardWidth = geoProxy.size.width * 0.7
+                    let cardWidth = geoProxy.size.width * 0.8
                     
                     ForEach(wrappedCoins.indices, id: \.self) { index in
                         let coin = wrappedCoins[index]
@@ -77,7 +77,7 @@ struct SuccessCoinView: View {
                         VStack {
                             RecommendCardView(recommendCoin: coin)
                                 .id(index)
-                                .frame(width: cardWidth)
+                                .frame(width: cardWidth, height: cardID == index ? 300 : 260)
                                 .onTapGesture { selectedCoin = coin }
                         }
                     }
