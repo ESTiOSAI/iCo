@@ -116,10 +116,10 @@ public final class BaseWebSocketClient: NSObject, SocketEngine {
     private func checkingAlive(duration: Duration) {
         self.healthCheck?.cancel()
         
-        self.healthCheck = Task.detached {
-            while self.task != nil {
-                try? await Task.sleep(for: duration, clock: .suspending)
-                try? await self.sendPing()
+        self.healthCheck = Task {
+            while task != nil {
+                try await Task.sleep(for: duration, clock: .suspending)
+                try await sendPing()
             }
         }
     }
