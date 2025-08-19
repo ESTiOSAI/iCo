@@ -19,8 +19,7 @@ extension Task where Failure: Error {
     ) -> Task<Void, Never> {
         return Task<Void, Never> { @Sendable in
             let result: Result<Success, Failure> = await self.result
-            if case .failure(let failure) = result {
-                let error = failure as Error
+            if case .failure(let error) = result {
                 if error.isTaskCancellation {
                     await onCancel()
                 }
