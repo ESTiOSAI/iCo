@@ -113,9 +113,7 @@ extension MarketStore {
                 }.map(\.key)
         }
         
-        sortedCoinIDs = ids.filter {
-            filter == .bookmark ? bookmarkIDs.contains($0) : true
-        }
+        sortedCoinIDs = ids
     }
     
     private func fetchMarketCoinData() async -> ([CoinID: Coin], [CoinID: TickerStore]) {

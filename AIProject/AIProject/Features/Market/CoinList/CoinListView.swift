@@ -14,6 +14,21 @@ struct CoinListView: View {
     @State private var visibleCoins: Set<CoinID> = []
     @Environment(\.scenePhase) private var scenePhase
     
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
+            animation: .default
+    )
+    private var bookmarks: FetchedResults<BookmarkEntity>
+    
+    var filteredCoins: [CoinID] {
+        switch store.filter {
+        case .bookmark:
+            return store.sortedCoinIDs.filter { id in bookmarks.map(\.coinID).contains(where: { bookmark in id == bookmark  }) }
+        case .none:
+            return store.sortedCoinIDs
+        }
+    }
+    
     @State private var selectedCoin: CoinID?
     
     var body: some View {
@@ -23,7 +38,7 @@ struct CoinListView: View {
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
 
-                ForEach(store.sortedCoinIDs, id: \.self) { id in
+                ForEach(filteredCoins, id: \.self) { id in
                     if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
                         CoinCell(coin: meta, store: ticker)
                             .onTapGesture {

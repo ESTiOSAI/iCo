@@ -9,11 +9,6 @@ import SwiftUI
 
 struct MarketView: View {
     @State var store: MarketStore
-    
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
-        animation: .default)
-    private var bookmarks: FetchedResults<BookmarkEntity>
 
     @State private var isShowSearchView = false
     @State private var bookmarkSelected = true
@@ -54,10 +49,8 @@ struct MarketView: View {
                     }
                 }
             }
-            .onChange(of: bookmarks.map(\.coinID), { oldValue, newValue in
-                if oldValue != newValue {
-                    store.update(newValue)
-                }
+            .onChange(of: store.filter, { oldValue, newValue in
+                store.sort()
             })
             .task {
                 await store.load()

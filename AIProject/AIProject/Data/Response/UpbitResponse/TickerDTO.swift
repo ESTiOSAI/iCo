@@ -66,7 +66,7 @@ struct TickerDTO: Codable {
 
         case tradeVolume = "trade_volume"
         case accTradePrice = "acc_trade_price"
-        case accTradeVolume = "acc_trade_volume"
+        case accTradeVolume = "acc_trade_price_24h"
 
         case highest52WeekPrice = "highest_52_week_price"
         case highest52WeekDate = "highest_52_week_date"
