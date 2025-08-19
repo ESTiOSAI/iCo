@@ -35,9 +35,6 @@ final class ReportViewModel: ObservableObject {
     private var weeklyTask: Task<CoinWeeklyDTO, Error>?
     private var todayTask: Task<CoinTodayNewsDTO, Error>?
     
-    private var weeklyMonitor: Task<Void, Never>?
-    private var todayMonitor: Task<Void, Never>?
-    
     init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
@@ -56,19 +53,32 @@ final class ReportViewModel: ObservableObject {
         }
         
         overviewTask = Task { try await alanAPIService.fetchOverview(for: coin) }
-        weeklyTask = Task { try await alanAPIService.fetchWeeklyTrends(for: coin) }
-        todayTask = Task { try await alanAPIService.fetchTodayNews(for: coin) }
-        
-        if let t = weeklyTask {
-            weeklyMonitor = t.monitorCancellation { [weak self] in
-                self?.weekly = .cancel(.taskCancelled)
-            }
+        weeklyTask = Task { [weak self] in
+            try await withTaskCancellationHandler(
+                operation: {
+                    guard let self else { throw CancellationError() }
+                    return try await self.alanAPIService.fetchWeeklyTrends(for: self.coin)
+                },
+                onCancel: { [weak self] in
+                    Task { @MainActor in
+                        self?.weekly = .cancel(.taskCancelled)
+                    }
+                }
+            )
         }
         
-        if let t = todayTask {
-            todayMonitor = t.monitorCancellation { [weak self] in
-                self?.today = .cancel(.taskCancelled)
-            }
+        todayTask = Task { [weak self] in
+            try await withTaskCancellationHandler(
+                operation: {
+                    guard let self else { throw CancellationError() }
+                    return try await self.alanAPIService.fetchTodayNews(for: self.coin)
+                },
+                onCancel: { [weak self] in
+                    Task { @MainActor in
+                        self?.today = .cancel(.taskCancelled)
+                    }
+                }
+            )
         }
         
         Task {
@@ -198,7 +208,6 @@ final class ReportViewModel: ObservableObject {
     // weekly만 다시 시도
     func retryWeekly() {
         if weekly.isLoading { return }
-        weeklyMonitor?.cancel()
         weeklyTask?.cancel()
         
         Task { @MainActor in
@@ -224,7 +233,6 @@ final class ReportViewModel: ObservableObject {
     // retry만 다시 시도
     func retryToday() {
         if today.isLoading { return }
-        todayMonitor?.cancel()
         todayTask?.cancel()
         
         Task { @MainActor in
@@ -251,8 +259,6 @@ final class ReportViewModel: ObservableObject {
     
     // 전체 Task 취소
     func cancelAll() {
-        weeklyMonitor?.cancel()
-        todayMonitor?.cancel()
         overviewTask?.cancel()
         weeklyTask?.cancel()
         todayTask?.cancel()

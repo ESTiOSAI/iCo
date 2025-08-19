@@ -25,8 +25,6 @@ final class InsightViewModel: ObservableObject {
     private var overallTask: Task<InsightDTO, Error>?
     private var communityTask: Task<InsightDTO, Error>?
     
-    private var communityMonitor: Task<Void, Never>?
-    
     init() {
         load()
     }
@@ -40,15 +38,22 @@ final class InsightViewModel: ObservableObject {
             community = .loading
         }
         
-        overallTask = Task { try await alanAPIService.fetchTodayInsight() }
-        communityTask = Task { try await fetchCommunityFlow() }
+        overallTask = Task {
+            try await alanAPIService.fetchTodayInsight()
+        }
         
-        if let t = communityTask {
-            communityMonitor = t.monitorCancellation { [weak self] in
-                Task { @MainActor in
-                    self?.community = .cancel(.taskCancelled)
+        communityTask = Task { [weak self] in
+            try await withTaskCancellationHandler(
+                operation: {
+                    guard let self else { throw CancellationError() }
+                    return try await self.fetchCommunityFlow()
+                },
+                onCancel: { [weak self] in
+                    Task { @MainActor in
+                        self?.community = .cancel(.taskCancelled)
+                    }
                 }
-            }
+            )
         }
         
         Task {
@@ -134,7 +139,6 @@ final class InsightViewModel: ObservableObject {
     // community만 다시 시도
     func retryCommunity() {
         if community.isLoading { return }
-        communityMonitor?.cancel()
         communityTask?.cancel()
         
         Task { @MainActor in
@@ -154,7 +158,6 @@ final class InsightViewModel: ObservableObject {
     // TODO: 탭 전환시 자동 cancel
     // 전체 Task 취소
     func cancelAll() {
-        communityMonitor?.cancel()
         overallTask?.cancel()
         communityTask?.cancel()
     }
