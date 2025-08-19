@@ -58,15 +58,12 @@ extension String {
 
     /// 문자열 내의 숫자와 기호를 찾아 지정한 색상과 두께로 강조한 Text로 반환하는 확장
     ///  - Regex:
-    ///  - `\\d{1,3}(?:,\\d{3})*` : 1~3자리 뒤에 `,`+3자리 반복 (예: `1,234`, `12,345,678`)
-    ///  - `|\d+` : 콤마 없는 숫자 → `42`, `500`
-    ///  - `(?:\.\d+)?` : 선택적 소수부 → `.5`, `.75`, `.123`
-    ///  - %가 붙은 숫자만 매칭됨
+    ///  - 모든 숫자는 하이라이트 처리
     func highlightTextForNumbersOperator(highlightColor: Color = .blue, weight: Font.Weight = .bold) -> Text {
-        let pattern = #"((?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d+)?\s?%)"#
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            return Text(self)
-        }
+        let pattern = #"\d"#
+            guard let regex = try? NSRegularExpression(pattern: pattern) else {
+                return Text(self)
+            }
 
         let ns = self as NSString
         let full = NSRange(location: 0, length: ns.length)
