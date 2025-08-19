@@ -15,6 +15,8 @@ final class TickerStore {
     var volume: Double = 0
     var change: TickerValue.ChangeType = .even
     
+    var signedRate: Double { change == .fall ? -rate : rate }
+    
     init(coinID: CoinID) {
         self.coinID = coinID
     }

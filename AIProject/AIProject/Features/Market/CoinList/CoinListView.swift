@@ -34,7 +34,7 @@ struct CoinListView: View {
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView(sortCategory: $store.sortCategory, nameSortOrder: $store.nameSortOrder, volumeSortOrder: $store.volumeSortOrder)
+                CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
 
