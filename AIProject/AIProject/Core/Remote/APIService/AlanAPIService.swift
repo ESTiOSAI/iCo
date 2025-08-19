@@ -139,7 +139,7 @@ extension AlanAPIService {
     ///
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchTodayInsight() async throws -> TodayInsightDTO {
+    func fetchTodayInsight() async throws -> InsightDTO {
         let prompt = Prompt.generateTodayInsight
         return try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
     }
@@ -148,7 +148,7 @@ extension AlanAPIService {
     ///
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchCommunityInsight(from post: String) async throws -> CommunityInsightDTO {
+    func fetchCommunityInsight(from post: String) async throws -> InsightDTO {
         let prompt = Prompt.generateCommunityInsight(redditPost: post)
         return try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
     }

@@ -51,7 +51,7 @@ final class FearGreedViewModel: ObservableObject {
             
             await MainActor.run {
                 self.indexValue = CGFloat(doubleIndex)
-                fearGreed = FearGreed.from(fearGreedIndex.valueClassification)
+                fearGreed = FearGreed(rawValue: fearGreedIndex.valueClassification) ?? .neutral
                 self.classification = fearGreed.description
             }
         } catch {

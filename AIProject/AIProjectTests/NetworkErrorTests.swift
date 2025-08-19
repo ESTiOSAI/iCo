@@ -35,7 +35,7 @@ final class NetworkErrorTests: XCTestCase {
             .remoteError(400, "에러"),
             .unknown(999),
             .webSocketError,
-            .networkError(NSError(domain: "Test", code: 1))
+            .networkError(URLError(.badURL))
         ]
 
         let cancelledMessage = cancelled.errorDescription

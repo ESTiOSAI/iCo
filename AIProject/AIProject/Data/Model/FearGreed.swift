@@ -50,26 +50,3 @@ enum FearGreed: String {
         }
     }
 }
-
-extension FearGreed {
-    /// 문자열로부터 `FearGreed` 열거형 값을 생성합니다.
-    ///
-    /// - Parameter classification: "Extreme Fear", "Fear" 등과 같은 문자열 값
-    /// - Returns: 해당 문자열에 대응하는 `FearGreed` 값. 알 수 없는 문자열은 `.neutral`을 반환합니다.
-    static func from(_ classification: String) -> FearGreed {
-        switch classification {
-        case "Extreme Fear":
-            return .extremeFear
-        case "Fear":
-            return .fear
-        case "Neutral":
-            return .neutral
-        case "Greed":
-            return .greed
-        case "Extreme Greed":
-            return .extremeGreed
-        default:
-            return .neutral
-        }
-    }
-}
