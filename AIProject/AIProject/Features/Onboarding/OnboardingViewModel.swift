@@ -24,10 +24,7 @@ final class OnboardingViewModel: ObservableObject {
 
             imageMap = await geckoService.fetchImageBy(symbols: symbols)
             
-            let primitive = imageMap.mapValues { url in
-                url.absoluteString
-            }
-			 try CoinImageManager.shared.addDict(imageMap)
+            try CoinImageManager.shared.addDict(imageMap)
         } catch {
             print("업비트 마켓 불러오기 에러:", error.localizedDescription)
         }
