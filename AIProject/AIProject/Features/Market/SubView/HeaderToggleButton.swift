@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 struct HeaderToggleButton: View {
     let title: String
     
@@ -46,8 +47,3 @@ struct HeaderToggleButton: View {
     }
 }
 
-#Preview {
-    HeaderToggleButton(title: "등락폭", sortOrder: .constant(.ascending)) {
-        
-    }
-}
