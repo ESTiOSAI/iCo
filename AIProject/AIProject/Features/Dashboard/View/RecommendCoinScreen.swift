@@ -108,14 +108,13 @@ struct SuccessCoinView: View {
                     withAnimation(.easeInOut(duration: 0.5)) {
                         cardID = currentIndex
                     }
+                    
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     
-                    await MainActor.run {
-                        if cardID == recommendedCoins.count + 1 {
-                            cardID = 1
-                        } else if cardID == 0 {
-                            cardID = recommendedCoins.count
-                        }
+                    if cardID == recommendedCoins.count + 1 {
+                        cardID = 1
+                    } else if cardID == 0 {
+                        cardID = recommendedCoins.count
                     }
                 }
             }
