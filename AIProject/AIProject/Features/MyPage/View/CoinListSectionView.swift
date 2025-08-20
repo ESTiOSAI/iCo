@@ -21,7 +21,7 @@ struct CoinListSectionView: View {
         VStack {
             HStack {
                 SortToggleButton(
-                    title: "코인명",
+                    title: "한글명",
                     sortCategory: .name,
                     currentCategory: $selectedCategory,
                     sortOrder: $nameOrder
@@ -52,7 +52,7 @@ struct CoinListSectionView: View {
                 .fill(Color.aiCoBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(.gray, lineWidth: 0.5)
+                        .stroke(.default, lineWidth: 0.5)
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
