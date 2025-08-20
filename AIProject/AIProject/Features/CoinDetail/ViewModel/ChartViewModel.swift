@@ -26,6 +26,8 @@ final class ChartViewModel: ObservableObject {
     @Published private(set) var headerChangeRate: Double = 0
     @Published private(set) var headerAccTradePrice: Double = 0
 
+    @Published private(set) var status: ResponseStatus = .loading
+    
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
     
@@ -76,6 +78,14 @@ final class ChartViewModel: ObservableObject {
         updateTask = nil
     }
     
+    func cancelLoading() {
+        stopUpdating()
+        status = .cancel(.taskCancelled)
+    }
+    func retry() {
+        startUpdating()
+    }
+    
     /// 타이머 종료 및 메모리 정리
     deinit {
         print(String(describing: Self.self) + " deinit")
@@ -85,6 +95,8 @@ final class ChartViewModel: ObservableObject {
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
     func loadPrices(interval: CoinInterval = .all.first!) async {
+        status = .loading
+        
         do {
             let marketCode = coinSymbol
             
@@ -123,13 +135,19 @@ final class ChartViewModel: ObservableObject {
 
                 headerAccTradePrice = ticker.accTradePrice
             }
+            status = .success
         } catch is CancellationError {
+            status = .cancel(.taskCancelled)
             return
         } catch NetworkError.taskCancelled {
+            status = .cancel(.taskCancelled)
             return
         } catch {
-            print("가격 불러오기 실패: \(error.localizedDescription)")
-            self.prices = []
+            let err = (error as? NetworkError) ?? .networkError(error)
+#if DEBUG
+            print("가격 불러오기 실패: \(err.log())")
+#endif
+            status = .failure(err)
         }
     }
     
