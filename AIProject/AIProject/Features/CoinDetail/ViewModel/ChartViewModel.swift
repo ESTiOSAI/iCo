@@ -161,10 +161,12 @@ final class ChartViewModel: ObservableObject {
             status = .cancel(.taskCancelled)
             return
         } catch {
-            let err = (error as? NetworkError) ?? .networkError(error)
-#if DEBUG
+            let err = (error as? NetworkError)
+                ?? (error as? URLError).map(NetworkError.networkError)
+                ?? .networkError(URLError(.unknown))
+            #if DEBUG
             print("가격 불러오기 실패: \(err.log())")
-#endif
+            #endif
             status = .failure(err)
         }
     }
