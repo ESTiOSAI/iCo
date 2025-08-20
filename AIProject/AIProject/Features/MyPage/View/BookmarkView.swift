@@ -99,23 +99,42 @@ struct BookmarkView: View {
                     Group {
                         switch vm.status {
                         case .loading:
-                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
-                                vm.cancelTask()
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                                    vm.cancelTask()
+                                }
                             }
                         case .success:
                             if let briefing = vm.briefing {
                                 BriefingSectionView(briefing: briefing)
                             }
                         case .failure(let networkError):
-                            DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                                    Task { await vm.loadBriefing(character: .longTerm) }
+                                }
                             }
                         case .cancel(let networkError):
-                            DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                                    Task { await vm.loadBriefing(character: .longTerm) }
+                                }
                             }
                         }
                     }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.aiCoLabel)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.aiCoBackgroundAccent)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(.accent, lineWidth: 0.5)
+                            )
+                    )
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
 
                     Text(String.aiGeneratedContentNotice)
                         .font(.system(size: 11))
@@ -259,19 +278,6 @@ struct BriefingSectionView: View {
                 .fontWeight(.regular)
                 .lineSpacing(6)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundColor(.primary)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.aiCoBackgroundAccent)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(.accentGradient, lineWidth: 0.5)
-                )
-        )
-        .cornerRadius(12)
-        .padding(.horizontal, 16)
     }
 }
 
