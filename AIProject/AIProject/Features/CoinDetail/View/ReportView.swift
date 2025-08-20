@@ -14,6 +14,8 @@ import SwiftUI
 /// - Parameters:
 ///   - coin: 리포트를 보여줄 대상 코인
 struct ReportView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject var viewModel: ReportViewModel
     
     init(coin: Coin) {
@@ -21,7 +23,7 @@ struct ReportView: View {
     }
     
     var body: some View {
-        ScrollView {
+        let content =
             VStack(spacing: 16) {
                 Text(String.aiGeneratedContentNotice)
                     .font(.system(size: 11))
@@ -65,8 +67,21 @@ struct ReportView: View {
                         .padding(.bottom, 30)
                 }
             }
+        
+        if hSizeClass == .regular && vSizeClass == .regular {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("AI 리포트")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+                
+                content
+            }
+        } else {
+            ScrollView(.vertical) {
+                content
+            }
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
     }
 }
 
