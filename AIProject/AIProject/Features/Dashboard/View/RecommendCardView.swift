@@ -13,25 +13,7 @@ struct RecommendCardView: View {
     var body: some View {
         VStack {
             VStack(alignment: .leading) {
-                AsyncImage(url: recommendCoin.imageURL) { image in
-                    image
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(.default, lineWidth: 0.5)
-                        }
-                } placeholder: {
-                    Text(String(recommendCoin.id.prefix(1)))
-                        .font(.system(size: 14))
-                        .foregroundStyle(.aiCoAccent)
-                        .frame(width: 40, height: 40)
-                        .overlay {
-                            Circle()
-                                .stroke(.default, lineWidth: 0.5)
-                        }
-                }
+                CoinView(symbol: recommendCoin.id, size: 50)
 
                 HStack(spacing: 10) {
                     Text(recommendCoin.name)
@@ -86,12 +68,11 @@ struct RecommendCardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(20)
-        .frame(height: 280)
+        .padding(24)
         .background(.aiCoBackgroundWhite)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: 24))
         .overlay {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 24)
                 .stroke(.accent, lineWidth: 0.5)
         }
     }

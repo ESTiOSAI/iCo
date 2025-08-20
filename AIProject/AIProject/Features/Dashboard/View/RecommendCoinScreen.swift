@@ -41,71 +41,101 @@ struct RecommendCoinScreen: View {
     }
 }
 
+#Preview {
+    RecommendCoinView()
+}
+
 struct SuccessCoinView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
 
     @GestureState var isDragging: Bool = false
-    @State var selection: String?
     @State var selectedCoin: RecommendCoin?
     
+    /// 현재 추천 코인 카드의 인덱스를 저장하며,
+    /// 선택된 카드의 위치를 추적하고 스크롤 포지션을 관리하는 데 사용하는 상태 변수
+    @State var cardID: Int?
+    
     var body: some View {
+        let recommendedCoins = viewModel.recommendCoins
+        
+        // TODO: cardID와 역할이 비슷하므로 추후에 합치기
+        var currentIndex: Int = 1
+        
+        /// 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 가짜 코인을 붙여주기
+        var wrappedCoins: [RecommendCoin] {
+            guard let first = recommendedCoins.first,
+                  let last = recommendedCoins.last
+            else { return [] }
+            return [last] + recommendedCoins + [first]
+        }
+        
         GeometryReader { geoProxy in
-            let horizonInset = geoProxy.size.width * 0.15
+            let horizonInset = geoProxy.size.width * 0.1
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(viewModel.recommendCoins) { coin in
-                        RecommendCardView(recommendCoin: coin)
-                            .id(coin.id)
-                            .frame(width: geoProxy.size.width * 0.7)
-                            .onTapGesture {
-                                selectedCoin = coin
-                            }
+                    let cardWidth = geoProxy.size.width * 0.8
+                    
+                    ForEach(wrappedCoins.indices, id: \.self) { index in
+                        let coin = wrappedCoins[index]
+                        
+                        VStack {
+                            RecommendCardView(recommendCoin: coin)
+                                .id(index)
+                                .frame(width: cardWidth, height: cardID == index ? 300 : 260) // 활성화된 코인은 크게 보이게 하기
+                                .onTapGesture { selectedCoin = coin }
+                        }
                     }
                 }
                 .scrollTargetLayout()
             }
             .contentMargins(.horizontal, horizonInset)
             .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: $selection)
+            .scrollPosition(id: $cardID)
             .simultaneousGesture(DragGesture()
                 .updating($isDragging) { _, state, _ in
                     state = true
                 }
                 .onEnded({ _ in
+                    // 사용자가 스크롤링 한 후에는 타이머를 초기화하기
                     viewModel.stopTimer()
                     viewModel.startTimer()
                 }
             ))
-            .onChange(of: viewModel.recommendCoins.count) {
-                guard !viewModel.recommendCoins.isEmpty else { return }
-                selection = viewModel.recommendCoins[0].id
-            }
-            .onChange(of: selection) {
-                if let selection {
-                    if let index = viewModel.recommendCoins.firstIndex(where: { $0.id == selection }) {
-                        viewModel.currentIndex = index
+            .onChange(of: cardID ?? 1, { _, newValue in
+                currentIndex = newValue
+            })
+            .onReceive(viewModel.timer) { _ in // 타이머를 구독해 UI 업데이트하기
+                guard !isDragging, !recommendedCoins.isEmpty else { return }
+                
+                // 카드 인덱스가 증가하면서 카드의 전체 값을 넘지 못하게 모듈러 연산 적용하기
+                currentIndex = (currentIndex + 1) % wrappedCoins.count
+                
+                Task {
+                    withAnimation(.easeInOut(duration: 0.5)) { // 애니메이션 지속 시간 지정하기
+                        cardID = currentIndex
                     }
-                }
-            }
-            .onReceive(viewModel.timer) { _ in
-                guard !isDragging, !viewModel.recommendCoins.isEmpty else { return }
-                viewModel.currentIndex = (viewModel.currentIndex + 1) % viewModel.recommendCoins.count
-
-                withAnimation(.easeInOut) {
-                    selection = viewModel.recommendCoins[viewModel.currentIndex].id
+                    
+                    // 가짜 코인 바꿔치기하기
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    
+                    // 스크롤 애니메이션이 끝난 후에 바꿔치기
+                    if cardID == recommendedCoins.count + 1 { // 마지막 카드라면 첫 번째 카드로 바꿔치기
+                        cardID = 1
+                    } else if cardID == 0 { // 0번째 카드라면 마지막 카드로 바꿔치기: 실제 적용되는 경우는 없는 듯
+                        cardID = recommendedCoins.count
+                    }
                 }
             }
             .navigationDestination(item: $selectedCoin) { coin in
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
             }
             .onAppear {
-                selection = viewModel.recommendCoins[0].id
+                cardID = 1
                 viewModel.startTimer()
             }
             .onDisappear {
                 viewModel.stopTimer()
-                viewModel.currentIndex = 0
             }
         }
     }
