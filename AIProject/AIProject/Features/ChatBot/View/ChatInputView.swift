@@ -26,6 +26,7 @@ struct ChatInputView: View {
                 Image(systemName: "arrow.up")
                     .padding(10)
             }
+            .frame(width: 30, height: 30)
             .background {
                 Circle()
                     .fill(viewModel.isEditable ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
