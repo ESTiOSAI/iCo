@@ -92,7 +92,6 @@ class MarketStore {
     
     @ObservationIgnored
     private var subscriptionSnapshot = Set<CoinID>()
-    
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService

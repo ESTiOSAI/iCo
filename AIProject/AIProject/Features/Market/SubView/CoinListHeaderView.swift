@@ -43,7 +43,6 @@ struct CoinListHeaderView: View {
         .background {
                 UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16, style: .continuous)
                 .stroke(.defaultGradient, lineWidth: 0.5)
-                    .fill(Color.aiCoBackground)
         }
     }
 }
