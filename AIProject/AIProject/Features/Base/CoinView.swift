@@ -23,7 +23,7 @@ struct CoinView: View {
         .clipShape(Circle())
         .contentShape(Circle())
         .overlay(
-            Circle().strokeBorder(.default, lineWidth: 0.5)
+            Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
     }
 }

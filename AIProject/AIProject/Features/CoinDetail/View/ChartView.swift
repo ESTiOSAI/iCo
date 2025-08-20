@@ -191,7 +191,7 @@ struct ChartView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.default, lineWidth: 0.5)
+                .stroke(.defaultGradient, lineWidth: 0.5)
         )
     }
 }

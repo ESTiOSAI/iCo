@@ -107,7 +107,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(.default, lineWidth: 0.5)
+                .stroke(.defaultGradient, lineWidth: 0.5)
         )
     }
 }

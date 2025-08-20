@@ -263,7 +263,7 @@ struct BriefingSectionView: View {
                 .fill(Color.aiCoBackgroundAccent)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(.accent, lineWidth: 0.5)
+                        .stroke(.accentGradient, lineWidth: 0.5)
                 )
         )
         .cornerRadius(12)

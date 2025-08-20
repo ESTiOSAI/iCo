@@ -73,7 +73,7 @@ struct RecommendCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 24))
         .overlay {
             RoundedRectangle(cornerRadius: 24)
-                .stroke(.accent, lineWidth: 0.5)
+                .stroke(.accentGradient, lineWidth: 0.5)
         }
     }
 }
