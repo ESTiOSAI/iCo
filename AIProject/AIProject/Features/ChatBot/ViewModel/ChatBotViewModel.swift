@@ -30,6 +30,7 @@ final class ChatBotViewModel: ObservableObject {
     }
 
     @Published var isReceived: Bool = false
+    @Published var isTapped: Bool = false
 
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient

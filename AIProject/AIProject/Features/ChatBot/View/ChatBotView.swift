@@ -11,7 +11,6 @@ struct ChatBotView: View {
     @StateObject private var viewModel = ChatBotViewModel()
 
     @State private var searchText: String = ""
-    @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,14 +33,11 @@ struct ChatBotView: View {
             }
             .background(.aiCoBackground)
 
-            ChatInputView(viewModel: viewModel, isFocused: $isFocused)
+            ChatInputView(viewModel: viewModel)
                 .background(.aiCoBackground)
         }
-        .onAppear {
-            isFocused = true
-        }
         .onTapGesture {
-            isFocused = false
+            viewModel.isTapped.toggle()
         }
     }
 }
