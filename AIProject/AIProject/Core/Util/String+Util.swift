@@ -61,9 +61,9 @@ extension String {
     ///  - 모든 숫자는 하이라이트 처리
     func highlightTextForNumbersOperator(highlightColor: Color = .blue, weight: Font.Weight = .bold) -> Text {
         let pattern = #"\d"#
-            guard let regex = try? NSRegularExpression(pattern: pattern) else {
-                return Text(self)
-            }
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return Text(self)
+        }
 
         let ns = self as NSString
         let full = NSRange(location: 0, length: ns.length)
