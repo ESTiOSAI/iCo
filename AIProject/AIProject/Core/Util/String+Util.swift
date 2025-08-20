@@ -1,5 +1,5 @@
 //
-//  String+ExtractJSON.swift
+//  String+Util.swift
 //  AIProject
 //
 //  Created by 장지현 on 8/4/25.
@@ -54,7 +54,7 @@ extension String {
     }
     
     /// AI 생성 답변 컨텐츠 안내 문구를 전역에서 재사용할 수 있도록 String 타입에 정적 프로퍼티로 추가하는 확장
-    static var aiGeneratedContentNotice = "ⓘ 해당 컨텐츠는 생성형 AI가 생성한 응답으로 내용에 오류가 있을 수 있습니다. 투자 결정 시 유의하세요."
+    static var aiGeneratedContentNotice = "ⓘ 해당 컨텐츠는 생성형 AI가 생성한 응답으로 내용에 오류가 있을 수 있습니다. 투자 결정 시 유의하세요.".byCharWrapping
 
     /// 문자열 내의 숫자와 기호를 찾아 지정한 색상과 두께로 강조한 Text로 반환하는 확장
     ///  - Regex:

@@ -26,6 +26,8 @@ struct ReportView: View {
                 Text(String.aiGeneratedContentNotice)
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoNeutral)
+                    .lineSpacing(5)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
                 ReportSectionView(
                     icon: "text.page.badge.magnifyingglass",
