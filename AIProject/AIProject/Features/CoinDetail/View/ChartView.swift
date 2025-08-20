@@ -239,22 +239,22 @@ struct ChartView: View {
 //}
 
 /// PR용 테스트 (머지 전 삭제)
-#Preview("성공(5초 지연)") {
-    ChartView(
-        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-        priceService: FakePriceService(mode: .success(delaySec: 5, points: 200))
-    )
-    .environmentObject(ThemeManager())
-}
-
-//#Preview("취소 동작 확인") {
+//#Preview("성공(5초 지연)") {
 //    ChartView(
 //        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-//        priceService: FakePriceService(mode: .success(delaySec: 10))
+//        priceService: FakePriceService(mode: .success(delaySec: 5, points: 200))
 //    )
 //    .environmentObject(ThemeManager())
-//    // 프리뷰 실행 후 2~3초 내 ‘작업 취소’ 버튼 눌러 상태 전환 확인
 //}
+
+#Preview("취소 동작 확인") {
+    ChartView(
+        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
+        priceService: FakePriceService(mode: .success(delaySec: 10))
+    )
+    .environmentObject(ThemeManager())
+    // 프리뷰 실행 후 2~3초 내 ‘작업 취소’ 버튼 눌러 상태 전환 확인
+}
 
 //#Preview("실패 동작 확인") {
 //    ChartView(

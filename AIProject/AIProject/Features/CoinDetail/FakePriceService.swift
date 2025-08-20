@@ -26,6 +26,8 @@ struct FakePriceService: CoinPriceProvider {
         }()
         try? await Task.sleep(nanoseconds: ns)
 
+        try Task.checkCancellation()
+        
         // 모드 분기
         switch mode {
         case .success(_, let points):

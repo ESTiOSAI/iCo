@@ -118,6 +118,7 @@ final class ChartViewModel: ObservableObject {
             let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
             let ticker = tickers.first
                         
+            try Task.checkCancellation()  
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
@@ -153,6 +154,10 @@ final class ChartViewModel: ObservableObject {
             }
             
             /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
+            guard !Task.isCancelled else {
+                status = .cancel(.taskCancelled)
+                return
+            }
             status = .success
         } catch is CancellationError {
             status = .cancel(.taskCancelled)
