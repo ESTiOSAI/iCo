@@ -11,7 +11,13 @@ import SwiftUI
 ///
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject private var viewModel: FearGreedViewModel
+    
+    private var isRegularRegular: Bool {
+        hSizeClass == .regular && vSizeClass == .regular
+    }
     
     private static let cornerRadius: CGFloat = 10
     
@@ -20,22 +26,23 @@ struct FearGreedView: View {
     }
     
     var body: some View {
-        VStack(spacing: 8) {
-            Text("공포 & 탐욕 지수")
-                .font(.system(size: 19, weight: .bold))
-                .foregroundStyle(.aiCoLabel)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            HStack(spacing: 16) {
+        HStack(alignment: .top, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("공포 & 탐욕 지수")
+                    .font(.system(size: 19, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+                
                 Text("ⓘ Fear & Greed 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoLabelSecondary)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                
-                ChartView(viewModel: viewModel)
-                    .frame(width: 80, height: 80)
             }
+            
+            Spacer()
+            
+            ChartView(viewModel: viewModel)
+                .chartLayout(isRegularRegular, regularSize: 110, compactSize: 90)
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
@@ -104,5 +111,20 @@ extension FearGreedView {
 
 #Preview {
     FearGreedView()
+}
+
+
+private extension View {
+    @ViewBuilder
+    func chartLayout(_ isRegularRegular: Bool, regularSize: CGFloat, compactSize: CGFloat) -> some View {
+        let size = isRegularRegular ? regularSize : compactSize
+        self
+            .frame(width: size, height: size)
+            .padding(
+                isRegularRegular
+                ? EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20)
+                : EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0)
+            )
+    }
 }
 
