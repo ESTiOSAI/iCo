@@ -57,7 +57,7 @@ struct ChartView: View {
                         .lineLimit(1)
                     
                     // 요약 데이터 유무
-                    let hasSummary = (summary != nil)
+                    let hasHeader = (viewModel.headerLastPrice != 0) || (summary != nil)
                     
                     let lastPrice   = viewModel.headerLastPrice != 0 ? viewModel.headerLastPrice : (summary?.lastPrice ?? 0)
                     let changeValue = viewModel.headerLastPrice != 0 ? viewModel.headerChangePrice  : (summary?.change ?? 0)
@@ -76,19 +76,19 @@ struct ChartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(.aiCoLabel)
                         .lineLimit(1)
-                        .opacity(hasSummary ? 1 : 0)
+                        .opacity(hasHeader ? 1 : 0)
                     
                     Text("\(sign)\(abs(changeValue).formatKRW) (\(arrow)\(abs(changeRate).formatRate))")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(color)
                         .lineLimit(1)
-                        .opacity(hasSummary ? 1 : 0)
+                        .opacity(hasHeader ? 1 : 0)
                     
                     Text("거래대금 \(trade.formatMillion)")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(.aiCoLabelSecondary)
                         .lineLimit(1)
-                        .opacity(hasSummary ? 1 : 0)
+                        .opacity(hasHeader ? 1 : 0)
                 }
                 
                 Spacer()
