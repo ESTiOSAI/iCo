@@ -104,7 +104,7 @@ final class ReportViewModel: ObservableObject {
                     }
                     
                     overview.append(AttributedString("- 최초발행: \(data.launchDate)\n"))
-                    overview.append(AttributedString("- 소개: \(data.description)"))
+                    overview.append(AttributedString("- 소개: \(data.description.byCharWrapping)"))
                     
                     return overview
                 }

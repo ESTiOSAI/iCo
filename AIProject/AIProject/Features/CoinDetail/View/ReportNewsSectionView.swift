@@ -52,8 +52,8 @@ struct ReportNewsSectionView: View {
                         }
                     }
                     
-                    Text(article.summary)
-                        .font(.system(size: 15))
+                    Text(article.summary.byCharWrapping)
+                        .font(.system(size: 14))
                         .foregroundStyle(.aiCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
