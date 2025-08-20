@@ -88,7 +88,7 @@ final class RecommendCoinViewModel: ObservableObject {
             for dto in dtos {
                 group.addTask {
                     do {
-                        guard let data = try await self.upbitService.fetchQuotes(id: dto.symbol).first else {
+                        guard let data = try await self.upbitService.fetchQuotes(id: "KRW-\(dto.symbol)").first else {
                             return nil
                         }
 
@@ -119,7 +119,8 @@ final class RecommendCoinViewModel: ObservableObject {
                     }
                 }
             }
-
+            
+            print(results.count)
             return results
         }
     }
