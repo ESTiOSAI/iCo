@@ -56,9 +56,13 @@ struct ChartView: View {
                         .foregroundStyle(.aiCoLabel)
                         .lineLimit(1)
                     
-                    // 요약 데이터 유무
+                    // 헤더 표시 조건:
+                    // - Ticker 기반 값이 도착했으면(summary 유무와 무관하게) 헤더를 보여줌
+                    // - Ticker도 실패하고 summary도 없으면 숨김(초기 로딩/취소/실패 시 깜빡임 방지)
                     let hasHeader = (viewModel.headerLastPrice != 0) || (summary != nil)
                     
+                    /// 헤더 표기는 목록 화면과 동일 정의를 위해 Ticker 기반 값을 우선 사용
+                    /// (Ticker 실패 시 summary)
                     let lastPrice   = viewModel.headerLastPrice != 0 ? viewModel.headerLastPrice : (summary?.lastPrice ?? 0)
                     let changeValue = viewModel.headerLastPrice != 0 ? viewModel.headerChangePrice  : (summary?.change ?? 0)
                     let changeRate  = viewModel.headerLastPrice != 0 ? viewModel.headerChangeRate : (summary?.changeRate ?? 0)

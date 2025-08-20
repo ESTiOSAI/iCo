@@ -21,11 +21,17 @@ final class ChartViewModel: ObservableObject {
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
+    /// Header 데이터 (Ticker 기반 지표)
+    /// 현재가
     @Published private(set) var headerLastPrice: Double = 0
+    /// 전일 대비 절대 변화량 (부호 포함)
     @Published private(set) var headerChangePrice: Double = 0
+    /// 전일 대비 등락률(%)
     @Published private(set) var headerChangeRate: Double = 0
+    /// 당일 누적 거래대금
     @Published private(set) var headerAccTradePrice: Double = 0
 
+    /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
     
     /// 가격 데이터를 가져오는 서비스
@@ -37,7 +43,6 @@ final class ChartViewModel: ObservableObject {
     init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
         self.coinName = coin.koreanName
         self.coinSymbol = coin.id
-        // id: "KRW-BTC" → currency: "KRW"
         self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
         startUpdating()
@@ -73,15 +78,19 @@ final class ChartViewModel: ObservableObject {
         }
     }
     
+    /// 네트워크/루프 중단
     func stopUpdating() {
         updateTask?.cancel()
         updateTask = nil
     }
     
+    /// 사용자 취소에 의해 화면 상태를 `.cancel(.taskCancelled)`로 갱신
     func cancelLoading() {
         stopUpdating()
         status = .cancel(.taskCancelled)
     }
+
+    /// 사용자의 '다시 시도' 선택에 재시도 (루프 재가동)
     func retry() {
         startUpdating()
     }
@@ -95,11 +104,14 @@ final class ChartViewModel: ObservableObject {
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
     func loadPrices(interval: CoinInterval = .all.first!) async {
+        /// 로딩 상태 진입 (초기/재시도 시 ProgressView와 동기화)
         status = .loading
         
         do {
             let marketCode = coinSymbol
             
+            /// - 분봉(차트용): 캔들 렌더링에 사용
+            /// - Ticker(헤더용): 전일 대비/누적 거래대금 등 헤더 지표(목록 화면과 동일 정의)에 사용
             async let pricesTask: [CoinPrice]  = priceService.fetchPrices(market: marketCode, interval: interval)
             async let tickerTask: [TickerDTO]  = UpBitAPIService().fetchQuotes(id: marketCode)
             
@@ -127,14 +139,20 @@ final class ChartViewModel: ObservableObject {
             }
             
             if let ticker {
+                /// 현재가
                 headerLastPrice = ticker.tradePrice
+                /// 등락률: 서버는 비율(0.2042)로 주므로 % 표기 위해 *100
                 headerChangeRate = ticker.changeRate * 100
 
+                /// 등락가(부호 포함): change(FALL/RISE/EVEN)으로 부호 적용
                 let isFall = ticker.change.uppercased() == "FALL"
                 headerChangePrice = isFall ? -ticker.changePrice : ticker.changePrice
 
+                /// 거래대금: 당일 누적을 사용 (코인 목록 화면과 동일).
                 headerAccTradePrice = ticker.accTradePrice
             }
+            
+            /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
             status = .success
         } catch is CancellationError {
             status = .cancel(.taskCancelled)
