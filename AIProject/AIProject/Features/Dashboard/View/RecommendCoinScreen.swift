@@ -11,7 +11,7 @@ struct RecommendCoinScreen: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
 
     var body: some View {
-        VStack(spacing: 60) {
+        VStack(alignment: .center, spacing: .headerContentSpacing) {
             RecommendHeaderView()
 
             Group {
@@ -35,7 +35,7 @@ struct RecommendCoinScreen: View {
                     }
                 }
             }
-            .frame(minHeight: 300)
+            .frame(height: .cardHeightActive)
             .padding(.bottom, 40)
         }
     }
@@ -70,11 +70,11 @@ struct SuccessCoinView: View {
         }
         
         GeometryReader { geoProxy in
-            let horizonInset = geoProxy.size.width * 0.1
+            let horizonInset = geoProxy.size.width * 0.09
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    let cardWidth = geoProxy.size.width * 0.8
+                HStack(alignment: .bottom, spacing: 16) {
+                    let cardWidth = geoProxy.size.width * 0.82
                     
                     ForEach(wrappedCoins.indices, id: \.self) { index in
                         let coin = wrappedCoins[index]
@@ -82,7 +82,10 @@ struct SuccessCoinView: View {
                         VStack {
                             RecommendCardView(recommendCoin: coin)
                                 .id(index)
-                                .frame(width: cardWidth, height: cardID == index ? 300 : 260) // 활성화된 코인은 크게 보이게 하기
+                                .frame(
+                                    width: cardWidth,
+                                    height: cardID == index ? .cardHeightActive : .cardHeightDefault // 활성화된 코인은 크게 보이게 하기
+                                )
                                 .onTapGesture { selectedCoin = coin }
                         }
                     }
