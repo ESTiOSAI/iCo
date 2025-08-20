@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct UserMessageView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
+
     let content: String
 
     var body: some View {
         HStack {
             Spacer()
             Text(content)
-                .font(.system(size: 13))
+                .font(.system(size: 14))
+                .lineSpacing(6)
                 .foregroundStyle(.aiCoLabel)
                 .padding(.vertical, 15)
                 .padding(.horizontal, 18)

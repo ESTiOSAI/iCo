@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct BotMessageView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
+
     @State private var bounce = false
 
     let message: ChatMessage
@@ -40,7 +43,8 @@ struct BotMessageView: View {
                 }
             }
             .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
-            .font(.system(size: 13))
+            .font(.system(size: 14))
+            .lineSpacing(6)
             .padding(.vertical, 15)
             .padding(.horizontal, 18)
             .background {
