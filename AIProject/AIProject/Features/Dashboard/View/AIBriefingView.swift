@@ -27,7 +27,6 @@ struct AIBriefingView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(.aiCoNeutral)
                 .lineSpacing(5)
-                .frame(maxWidth: .infinity, alignment: .leading)
             
             VStack(spacing: 16) {
                 // FIXME: ViewType enum + struct -> 프로퍼티를 enum 값에 따라 전달
