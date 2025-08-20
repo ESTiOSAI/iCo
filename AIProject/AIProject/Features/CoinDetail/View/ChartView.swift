@@ -39,10 +39,22 @@ struct ChartView: View {
     private static let headerDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy.MM.dd HH:mm"
+//        f.locale = Locale(identifier: "ko_KR")
         return f
     }()
+    
+    /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
-        Self.headerDateFormatter.string(from: Date()) + " 기준"
+        guard let time = viewModel.lastUpdated else { return "" }
+        return Self.headerDateFormatter.string(from: time) + " 기준"
+    }
+    
+    /// 헤더는 성공 상태이면서 기준 시각이 있을 때만 보이도록 (깜빡임/오표시 방지)
+    private var headerOpacity: Double {
+        if case .success = viewModel.status, viewModel.lastUpdated != nil {
+            return 1
+        }
+        return 0
     }
     
     var body: some View {
@@ -55,6 +67,7 @@ struct ChartView: View {
                         .font(.system(size: 10, weight: .regular))
                         .foregroundStyle(.aiCoLabel)
                         .lineLimit(1)
+                        .opacity(headerOpacity)
                     
                     // 헤더 표시 조건:
                     // - Ticker 기반 값이 도착했으면(summary 유무와 무관하게) 헤더를 보여줌
@@ -239,22 +252,22 @@ struct ChartView: View {
 //}
 
 /// PR용 테스트 (머지 전 삭제)
-//#Preview("성공(5초 지연)") {
-//    ChartView(
-//        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-//        priceService: FakePriceService(mode: .success(delaySec: 5, points: 200))
-//    )
-//    .environmentObject(ThemeManager())
-//}
-
-#Preview("취소 동작 확인") {
+#Preview("성공(5초 지연)") {
     ChartView(
         coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-        priceService: FakePriceService(mode: .success(delaySec: 10))
+        priceService: FakePriceService(mode: .success(delaySec: 5, points: 200))
     )
     .environmentObject(ThemeManager())
-    // 프리뷰 실행 후 2~3초 내 ‘작업 취소’ 버튼 눌러 상태 전환 확인
 }
+
+//#Preview("취소 동작 확인") {
+//    ChartView(
+//        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
+//        priceService: FakePriceService(mode: .success(delaySec: 10))
+//    )
+//    .environmentObject(ThemeManager())
+//    // 프리뷰 실행 후 2~3초 내 ‘작업 취소’ 버튼 눌러 상태 전환 확인
+//}
 
 //#Preview("실패 동작 확인") {
 //    ChartView(

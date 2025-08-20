@@ -30,6 +30,9 @@ final class ChartViewModel: ObservableObject {
     @Published private(set) var headerChangeRate: Double = 0
     /// 당일 누적 거래대금
     @Published private(set) var headerAccTradePrice: Double = 0
+    
+    /// 최근 데이터 기준 시각 (헤더 'yyyy.MM.dd HH:mm 기준'에 사용)
+    @Published private(set) var lastUpdated: Date? = nil
 
     /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
@@ -142,7 +145,7 @@ final class ChartViewModel: ObservableObject {
             if let ticker = ticker {
                 /// 현재가
                 headerLastPrice = ticker.price
-                /// 등락률: 서버는 비율(0.2042)로 주므로 % 표기 위해 *100
+                /// 등락률: 서버는 비율로 주므로 % 표기 위해 *100
                 let signedRate = (ticker.change == .fall) ? -ticker.rate : ticker.rate
                 headerChangeRate = signedRate * 100
                 
@@ -157,6 +160,9 @@ final class ChartViewModel: ObservableObject {
                 /// 거래대금: 당일 누적을 사용 (코인 목록 화면과 동일).
                 headerAccTradePrice = ticker.volume
             }
+            
+            /// 기준 시각 세팅: 우선 순위 (캔들 마지막 시각 사용)
+            self.lastUpdated = filteredPrices.last?.date
             
             /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
             guard !Task.isCancelled else {
@@ -178,6 +184,9 @@ final class ChartViewModel: ObservableObject {
             print("가격 불러오기 실패: \(err.log())")
             #endif
             status = .failure(err)
+            
+            /// 실패 시 기준 시각 초기화
+            lastUpdated = nil
         }
     }
     
