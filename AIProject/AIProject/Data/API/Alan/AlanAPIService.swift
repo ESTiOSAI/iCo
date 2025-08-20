@@ -167,8 +167,14 @@ extension AlanAPIService {
         }
 
         // 캐시 키 구성
-        let bookmarkHash = coins.map { $0.coinID }.sorted().joined(separator: ",").hashValue
-        let cacheURL = URL(string: "https://cache.local/bookmarkBriefing/\(bookmarkHash)")!
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+        let today = formatter.string(from: Date())
+
+        let bookmarkKey = coins.map { $0.coinID }.sorted().joined(separator: ",")
+        let key = "\(today)_\(bookmarkKey)"
+
+        let cacheURL = URL(string: "https://cache.local/bookmarkBriefing/\(key)")!
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
 
         // 캐시가 있다면 즉시 반환
