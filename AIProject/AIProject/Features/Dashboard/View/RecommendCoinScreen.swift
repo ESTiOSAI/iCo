@@ -17,20 +17,17 @@ struct RecommendCoinScreen: View {
             Group {
                 switch viewModel.status {
                 case .loading:
-                    DefaultProgressView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
-                        Task {
-                            await viewModel.cancelTask()
-                        }
+                    RecomendationPlaceholderCardView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
+                        Task { await viewModel.cancelTask() }
                     }
-                    .padding(.horizontal, 16)
                 case .success:
                     SuccessCoinView(viewModel: viewModel)
                 case .failure(let networkError):
-                    DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                    RecomendationPlaceholderCardView(status: .failure, message: networkError.localizedDescription) {
                         viewModel.loadRecommendCoin()
                     }
                 case .cancel(let networkError):
-                    DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                    RecomendationPlaceholderCardView(status: .cancel, message: networkError.localizedDescription) {
                         viewModel.loadRecommendCoin()
                     }
                 }
