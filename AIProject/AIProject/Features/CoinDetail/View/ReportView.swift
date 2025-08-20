@@ -24,49 +24,48 @@ struct ReportView: View {
     
     var body: some View {
         let content =
-            VStack(spacing: 16) {
-                Text(String.aiGeneratedContentNotice)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.aiCoNeutral)
-                    .lineSpacing(5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                ReportSectionView(
-                    icon: "text.page.badge.magnifyingglass",
-                    title: "한눈에 보는 \(viewModel.koreanName)",
-                    state: viewModel.overview,
-                    onCancel: { viewModel.cancelOverview() },
-                    onRetry: { viewModel.retryOverview() }
-                ) { value in
-                    Text(value)
-                }
-                
-                ReportSectionView(
-                    icon: "calendar",
-                    title: "주간 동향",
-                    state: viewModel.weekly,
-                    onCancel: { viewModel.cancelWeekly() },
-                    onRetry: { viewModel.retryWeekly() }
-                ) { value in
-                    Text(AttributedString(value.byCharWrapping))
-                }
-                
-                ReportSectionView(
-                    icon: "shareplay",
-                    title: "오늘 시장의 분위기",
-                    state: viewModel.today,
-                    onCancel: { viewModel.cancelToday() },
-                    onRetry: { viewModel.retryToday() }
-                ) { value in
-                    Text(AttributedString(value.byCharWrapping))
-                }
-                
-                if case .success = viewModel.today,
-                   !viewModel.news.allSatisfy({ $0.title.isEmpty && $0.summary.isEmpty }) {
-                    ReportNewsSectionView(articles: viewModel.news)
-                        .padding(.bottom, 30)
-                }
+        VStack(alignment: .leading, spacing: 16) {
+            Text(String.aiGeneratedContentNotice)
+                .font(.system(size: 11))
+                .foregroundStyle(.aiCoNeutral)
+                .lineSpacing(5)
+            
+            ReportSectionView(
+                icon: "text.page.badge.magnifyingglass",
+                title: "한눈에 보는 \(viewModel.koreanName)",
+                state: viewModel.overview,
+                onCancel: { viewModel.cancelOverview() },
+                onRetry: { viewModel.retryOverview() }
+            ) { value in
+                Text(value)
             }
+            
+            ReportSectionView(
+                icon: "calendar",
+                title: "주간 동향",
+                state: viewModel.weekly,
+                onCancel: { viewModel.cancelWeekly() },
+                onRetry: { viewModel.retryWeekly() }
+            ) { value in
+                Text(AttributedString(value.byCharWrapping))
+            }
+            
+            ReportSectionView(
+                icon: "shareplay",
+                title: "오늘 시장의 분위기",
+                state: viewModel.today,
+                onCancel: { viewModel.cancelToday() },
+                onRetry: { viewModel.retryToday() }
+            ) { value in
+                Text(AttributedString(value.byCharWrapping))
+            }
+            
+            if case .success = viewModel.today,
+               !viewModel.news.allSatisfy({ $0.title.isEmpty && $0.summary.isEmpty }) {
+                ReportNewsSectionView(articles: viewModel.news)
+                    .padding(.bottom, 30)
+            }
+        }
         
         if hSizeClass == .regular && vSizeClass == .regular {
             VStack(alignment: .leading, spacing: 16) {
