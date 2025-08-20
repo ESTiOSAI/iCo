@@ -24,8 +24,7 @@ struct FakePriceService: CoinPriceProvider {
             case .success(let d, _), .empty(let d), .failure(let d): return UInt64(d * 1_000_000_000)
             }
         }()
-        try? await Task.sleep(nanoseconds: ns)
-
+        try await Task.sleep(nanoseconds: ns)
         try Task.checkCancellation()
         
         // 모드 분기

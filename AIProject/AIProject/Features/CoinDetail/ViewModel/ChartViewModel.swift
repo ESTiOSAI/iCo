@@ -112,13 +112,13 @@ final class ChartViewModel: ObservableObject {
             
             /// - 분봉(차트용): 캔들 렌더링에 사용
             /// - Ticker(헤더용): 전일 대비/누적 거래대금 등 헤더 지표(목록 화면과 동일 정의)에 사용
-            async let pricesTask: [CoinPrice]  = priceService.fetchPrices(market: marketCode, interval: interval)
-            async let tickerTask: [TickerDTO]  = UpBitAPIService().fetchQuotes(id: marketCode)
-            
+            async let pricesTask: [CoinPrice] = priceService.fetchPrices(market: marketCode, interval: interval)
+            async let tickerTask = UpBitAPIService().fetchTicker(by: currency)
+
             let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
-            let ticker = tickers.first
-                        
             try Task.checkCancellation()  
+            let ticker = tickers.first { $0.id == marketCode }
+                                    
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
@@ -139,18 +139,23 @@ final class ChartViewModel: ObservableObject {
                 )
             }
             
-            if let ticker {
+            if let ticker = ticker {
                 /// 현재가
-                headerLastPrice = ticker.tradePrice
+                headerLastPrice = ticker.price
                 /// 등락률: 서버는 비율(0.2042)로 주므로 % 표기 위해 *100
-                headerChangeRate = ticker.changeRate * 100
-
+                let signedRate = (ticker.change == .fall) ? -ticker.rate : ticker.rate
+                headerChangeRate = signedRate * 100
+                
                 /// 등락가(부호 포함): change(FALL/RISE/EVEN)으로 부호 적용
-                let isFall = ticker.change.uppercased() == "FALL"
-                headerChangePrice = isFall ? -ticker.changePrice : ticker.changePrice
-
+                if signedRate != 0 {
+                    let prevClose = ticker.price / (1 + signedRate)
+                    headerChangePrice = ticker.price - prevClose   // 부호 포함
+                } else {
+                    headerChangePrice = 0
+                }
+                
                 /// 거래대금: 당일 누적을 사용 (코인 목록 화면과 동일).
-                headerAccTradePrice = ticker.accTradePrice
+                headerAccTradePrice = ticker.volume
             }
             
             /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
