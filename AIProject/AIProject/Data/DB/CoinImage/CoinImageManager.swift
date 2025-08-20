@@ -8,7 +8,7 @@
 import Foundation
 import CoreData
 
-final class CoinImageManager {
+final class CoinImageManager: CoinImageManaging {
     static let shared = CoinImageManager()
     private let service = CoreDataService.shared
 
