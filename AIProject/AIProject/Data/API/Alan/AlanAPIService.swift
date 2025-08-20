@@ -175,7 +175,6 @@ extension AlanAPIService {
         let bookmarkHash = "\(today)_\(bookmarkKey)"
 
         let cacheURL = URL(string: "https://cache.local/bookmarkBriefing/\(bookmarkHash)")!
-        print("cacheURL: \(cacheURL)")
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
 
         // 캐시가 있다면 즉시 반환
