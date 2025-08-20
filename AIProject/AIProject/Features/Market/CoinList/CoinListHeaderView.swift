@@ -7,23 +7,32 @@
 
 import SwiftUI
 
+enum Market { }
+
+extension Market {
+    enum SortCategory {
+        case volume
+        case rate
+    }
+}
+
 struct CoinListHeaderView: View {
-    @Binding var sortCategory: SortCategory
-    @Binding var nameSortOrder: SortOrder
+    @Binding var sortCategory: Market.SortCategory
+    @Binding var rateSortOrder: SortOrder
     @Binding var volumeSortOrder: SortOrder
     
     var body: some View {
         HStack(spacing: 60) {
-            SortToggleButton2(title: "한글명", sortCategory: .name, sortOrder: $nameSortOrder) {
-                sortCategory = .name
+            HeaderToggleButton(title: "등락폭", sortOrder: $rateSortOrder) {
+                sortCategory = .rate
                 volumeSortOrder = .none
             }
             
             Spacer()
             
-            SortToggleButton2(title: "거래대금", sortCategory: .volume, sortOrder: $volumeSortOrder) {
+            HeaderToggleButton(title: "거래대금", sortOrder: $volumeSortOrder) {
                 sortCategory = .volume
-                nameSortOrder = .none
+                rateSortOrder = .none
             }
         }
         .frame(maxWidth: .infinity)

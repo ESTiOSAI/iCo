@@ -1,5 +1,5 @@
 //
-//  MarketViewModel.swift
+//  MarketStore.swift
 //  AIProject
 //
 //  Created by kangho lee on 8/7/25.
@@ -31,7 +31,10 @@ class MarketStore {
     
     private var bookmarkIDs: Set<CoinID> = []
     
-    var sortCategory: SortCategory = .volume {
+    private var ticketStreamTask: Task<Void, Never>?
+    private var tickerStreamTask: Task<Void, Never>?
+    
+    var sortCategory: Market.SortCategory = .volume {
         didSet {
             sort()
         }
@@ -41,7 +44,7 @@ class MarketStore {
             sort()
         }
     }
-    var nameSortOrder: SortOrder = .none {
+    var rateSortOrder: SortOrder = .none {
         didSet {
             sort()
         }
@@ -91,14 +94,14 @@ extension MarketStore {
     func sort() {
         let ids: [CoinID]
         switch sortCategory {
-        case .name:
-            ids = Array(coinMeta)
+        case .rate:
+            ids = Array(ticker)
                 .sorted {
-                    switch nameSortOrder {
+                    switch rateSortOrder {
                     case .ascending, .none:
-                        $0.value.koreanName < $1.value.koreanName
+                        $0.value.signedRate < $1.value.signedRate
                     case .descending:
-                        $0.value.koreanName > $1.value.koreanName
+                        $0.value.signedRate > $1.value.signedRate
                     }
                 }.map(\.key)
         case .volume:
@@ -140,6 +143,8 @@ extension MarketStore {
     }
 }
 
+// MARK: 
+
 extension MarketStore {
     
     /// 시세가 서비스에 연결합니다.
@@ -147,17 +152,19 @@ extension MarketStore {
         
         // coin snapshot 채널 개설
         visibleCoinsChannel = .init()
+        self.ticketStreamTask?.cancel()
+        self.tickerStreamTask?.cancel()
         
         // coin snapshot 전송 stream 연결
-        Task {
-            await self.ticketStream()
+        self.ticketStreamTask = Task {
+            await ticketStream()
         }
         
         // service 연결
         await tickerService.connect()
         
         // 시세가
-        Task {
+        self.tickerStreamTask = Task {
             await consume()
         }
     }
@@ -166,6 +173,8 @@ extension MarketStore {
     ///  coin snapshot 채널 종료
     func disconnect() async {
         visibleCoinsChannel.finish()
+        self.ticketStreamTask?.cancel()
+        self.tickerStreamTask?.cancel()
         await tickerService.disconnect()
     }
     

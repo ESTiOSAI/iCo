@@ -21,14 +21,17 @@ struct CoinCell: View {
             HStack {
                 // 코인 레이블
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Spacer()
+//                Spacer()
                 
                 CoinPriceView(ticker: store)
+                    .frame(alignment: .trailing)
             }
         }
         .id(coin.id)
         .padding(.vertical, 10)
+        .contentShape(.rect)
     }
 }
 
@@ -92,7 +95,7 @@ fileprivate struct CoinPriceView: View {
                     Text("원")
                 }
                 .font(.system(size: 15))
-                .blinkBorderOnChange(ticker.price, duration: .milliseconds(500), color: ticker.change == .rise ? .aiCoPositive: .aiCoNegative, lineWidth: 2, cornerRadius: 0)
+                .blinkBorderOnChange(ticker.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 1, cornerRadius: 0)
             }
             HStack(spacing: 4) {
                 Text("거래")

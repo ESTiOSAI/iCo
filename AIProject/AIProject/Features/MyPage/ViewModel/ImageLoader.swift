@@ -53,14 +53,14 @@ actor ImageLoader {
             // 디스크 캐시 확인
             if let cached = URLCache.shared.cachedResponse(for: request),
                let img = UIImage(data: cached.data) {
-                print("캐시(디스크)에서 이미지 로드됨:", url.lastPathComponent)
+//                print("캐시(디스크)에서 이미지 로드됨:", url.lastPathComponent)
                 return img
             }
 
             // TODO: session cancel throw되는지 체크
             // 네트워크 요청
             let (data, response) = try await session.data(for: request)
-            print("네트워크에서 이미지 로드됨:", url.lastPathComponent)
+//            print("네트워크에서 이미지 로드됨:", url.lastPathComponent)
             guard let img = UIImage(data: data) else {
                 throw URLError(.cannotDecodeContentData)
             }

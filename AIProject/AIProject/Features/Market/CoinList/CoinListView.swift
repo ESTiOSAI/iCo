@@ -31,28 +31,48 @@ struct CoinListView: View {
     
     @State private var selectedCoin: CoinID?
     
+    @ViewBuilder func makeCoinContents() -> some View {
+        if store.filter == .bookmark, filteredCoins.isEmpty {
+            VStack {
+                Spacer()
+                
+                Text("북마크한 코인이 없습니다 🥵")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 300)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                
+                Spacer()
+            }.frame(maxHeight: .infinity)
+        } else {
+            ForEach(filteredCoins, id: \.self) { id in
+                if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
+                    CoinCell(coin: meta, store: ticker)
+                        .onTapGesture {
+                            selectedCoin = id
+                        }
+                        .onAppear {
+                            visibleCoins.insert(id)
+                        }
+                        .onDisappear {
+                            visibleCoins.remove(id)
+                        }
+                }
+            }
+        }
+    }
+
+    
     var body: some View {
         VStack(spacing: 0) {
             List {
-                CoinListHeaderView(sortCategory: $store.sortCategory, nameSortOrder: $store.nameSortOrder, volumeSortOrder: $store.volumeSortOrder)
+                CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-
-                ForEach(filteredCoins, id: \.self) { id in
-                    if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
-                        CoinCell(coin: meta, store: ticker)
-                            .onTapGesture {
-                                selectedCoin = id
-                            }
-                            .onAppear {
-                                visibleCoins.insert(id)
-                            }
-                            .onDisappear {
-                                visibleCoins.remove(id)
-                            }
-                    }
-                }
-                .listRowBackground(Color.clear)
+                
+                makeCoinContents()
+                    .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
             .coordinateSpace(name: "scroll")

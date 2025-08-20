@@ -1,14 +1,13 @@
 //
-//  CoinSortButton.swift
+//  HeaderToggleButton.swift
 //  AIProject
 //
 //  Created by kangho lee on 8/13/25.
 //
 
 import SwiftUI
-struct SortToggleButton2: View {
+struct HeaderToggleButton: View {
     let title: String
-    let sortCategory: SortCategory
     
     @Binding var sortOrder: SortOrder
     
@@ -26,12 +25,12 @@ struct SortToggleButton2: View {
                 
                 HStack(spacing: 4) {
                     Image(systemName: sortOrder.iconName)
-                        .font(.system(size: 10))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                         .foregroundStyle(.aiCoLabelSecondary)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .frame(width: 24, height: 24)
+                .padding(.horizontal, 5)
+                .frame(width: 20, height: 20)
                 .background(
                     Capsule()
                         .fill(.ultraThinMaterial)
@@ -44,5 +43,11 @@ struct SortToggleButton2: View {
             .fontWeight(sortOrder != .none ? .bold : .regular)
         }
         .buttonStyle(.plain)
+    }
+}
+
+#Preview {
+    HeaderToggleButton(title: "등락폭", sortOrder: .constant(.ascending)) {
+        
     }
 }
