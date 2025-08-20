@@ -8,10 +8,14 @@
 import Foundation
 
 final class ChatBotViewModel: ObservableObject {
+    /// 화면이 클릭되었을 때의 상태를 기록합니다.
+    @Published var isTapped: Bool = false
     /// 사용자와 챗봇의 메세지를 담은 배열입니다.
     @Published private(set) var messages: [ChatMessage] = []
     /// 현재 유저가 메세지를 전송할 수 있는지 상태를 기록합니다.
     @Published private(set) var isEditable: Bool = false
+    /// 메세지 전송시에 변경되는 프로터입니다.
+    @Published private(set) var isReceived: Bool = false
 	/// 현재 챗봇이 데이터를 스트림하는지 상태를 기록합니다.
     @Published private(set) var isStreaming: Bool = false {
         didSet {
@@ -28,9 +32,6 @@ final class ChatBotViewModel: ObservableObject {
             }
         }
     }
-
-    @Published var isReceived: Bool = false
-    @Published var isTapped: Bool = false
 
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
