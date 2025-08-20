@@ -19,6 +19,10 @@ struct CoinCell: View {
     var body: some View {
         VStack {
             HStack {
+                
+                #if DEBUG
+                let _ = Self._printChanges()
+                #endif
                 // 코인 레이블
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -65,7 +69,7 @@ fileprivate struct CoinPriceView: View {
     let ticker: TickerStore
     
     var changeColor: Color {
-        switch ticker.change {
+        switch ticker.snapshot.change {
         case .rise: return .aiCoPositive
         case .even: return .aiCoLabel
         case .fall: return .aiCoNegative
@@ -73,7 +77,7 @@ fileprivate struct CoinPriceView: View {
     }
     
     var code: String {
-        switch ticker.change {
+        switch ticker.snapshot.change {
         case .rise: return "▲"
         case .even: return ""
         case .fall: return "▼"
@@ -82,25 +86,31 @@ fileprivate struct CoinPriceView: View {
     
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
+            
+            #if DEBUG
+            // FIXME: volume과 rate은 한 번에 변하는데 각각 rendering되고 있음
+            let _ = Self._printChanges()
+            #endif
+            
             HStack {
                 HStack(spacing: 0) {
                     Text(code)
-                    Text(ticker.rate, format: .percent.precision(.fractionLength(2)))
+                    Text(ticker.snapshot.rate, format: .percent.precision(.fractionLength(2)))
                 }
                 .foregroundStyle(changeColor)
                 
                 HStack(spacing: 0) {
-                    Text(ticker.price, format: .number)
+                    Text(ticker.snapshot.price, format: .number)
                         
                     Text("원")
                 }
                 .font(.system(size: 15))
-                .blinkBorderOnChange(ticker.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 1, cornerRadius: 0)
+                .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 1, cornerRadius: 0)
             }
             HStack(spacing: 4) {
                 Text("거래")
                     .font(.system(size: 11))
-                Text(ticker.volume.formatMillion)
+                Text(ticker.snapshot.volume.formatMillion)
             }
         }
         .font(.system(size: 12))

@@ -7,6 +7,8 @@
 
 import Foundation
 
+typealias CoinID = String
+
 /// 개별 코인 정보를 나타내는 모델입니다.
 ///
 /// - id: 코인의 고유 식별자 (예: "KRW-BTC")
