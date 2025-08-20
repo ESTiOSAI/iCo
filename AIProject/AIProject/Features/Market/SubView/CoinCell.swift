@@ -21,13 +21,11 @@ struct CoinCell: View {
             HStack {
                 
                 #if DEBUG
-                let _ = Self._printChanges()
+//                let _ = Self._printChanges()
                 #endif
                 // 코인 레이블
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                
-//                Spacer()
                 
                 CoinPriceView(ticker: store)
                     .frame(alignment: .trailing)
@@ -89,7 +87,7 @@ fileprivate struct CoinPriceView: View {
             
             #if DEBUG
             // FIXME: volume과 rate은 한 번에 변하는데 각각 rendering되고 있음
-            let _ = Self._printChanges()
+//            let _ = Self._printChanges()
             #endif
             
             HStack {

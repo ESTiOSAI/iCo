@@ -90,6 +90,7 @@ class MarketStore {
     @ObservationIgnored
     private var sortChannel = AsyncChannel<Void>()
     
+    @ObservationIgnored
     private var subscriptionSnapshot = Set<CoinID>()
     
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
@@ -276,7 +277,7 @@ extension MarketStore {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
             .removeDuplicates()
-            ._throttle(for: .milliseconds(300), latest: true)
+            .debounce(for: .milliseconds(300))
         for await visibleCoin in stream {
             self.subscriptionSnapshot = visibleCoin
             await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
