@@ -87,7 +87,7 @@ struct RecommendCardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(20)
-        .frame(height: 300)
+        .frame(height: 280)
         .background(.aiCoBackgroundWhite)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay {

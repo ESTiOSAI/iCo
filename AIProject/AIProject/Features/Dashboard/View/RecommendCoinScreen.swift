@@ -17,7 +17,7 @@ struct RecommendCoinScreen: View {
             Group {
                 switch viewModel.status {
                 case .loading:
-                    DefaultProgressView(status: .loading, message: "이용자에 맞는 코인을 분석중이에요") {
+                    DefaultProgressView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
                         Task {
                             await viewModel.cancelTask()
                         }
@@ -47,13 +47,11 @@ struct SuccessCoinView: View {
     @GestureState var isDragging: Bool = false
     @State var selection: String?
     @State var selectedCoin: RecommendCoin?
-
-    var currentIndex: Int = 0
-
+    
     var body: some View {
         GeometryReader { geoProxy in
             let horizonInset = geoProxy.size.width * 0.15
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(viewModel.recommendCoins) { coin in
@@ -70,9 +68,15 @@ struct SuccessCoinView: View {
             .contentMargins(.horizontal, horizonInset)
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $selection)
-            .simultaneousGesture(DragGesture().updating($isDragging) { _, state, _ in
-                state = true
-            })
+            .simultaneousGesture(DragGesture()
+                .updating($isDragging) { _, state, _ in
+                    state = true
+                }
+                .onEnded({ _ in
+                    viewModel.stopTimer()
+                    viewModel.startTimer()
+                }
+            ))
             .onChange(of: viewModel.recommendCoins.count) {
                 guard !viewModel.recommendCoins.isEmpty else { return }
                 selection = viewModel.recommendCoins[0].id
@@ -94,6 +98,14 @@ struct SuccessCoinView: View {
             }
             .navigationDestination(item: $selectedCoin) { coin in
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
+            }
+            .onAppear {
+                selection = viewModel.recommendCoins[0].id
+                viewModel.startTimer()
+            }
+            .onDisappear {
+                viewModel.stopTimer()
+                viewModel.currentIndex = 0
             }
         }
     }
