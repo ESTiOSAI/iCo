@@ -66,6 +66,7 @@ final class RecommendCoinViewModel: ObservableObject {
                     recommendCoins = []
                 }
             } catch let error as NetworkError {
+                print(error.log())
                 await MainActor.run {
                     status = .failure(error)
                     recommendCoins = []
