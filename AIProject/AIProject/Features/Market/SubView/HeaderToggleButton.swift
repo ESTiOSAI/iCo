@@ -29,6 +29,7 @@ struct HeaderToggleButton: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .foregroundStyle(.aiCoLabelSecondary)
+                        .animation(nil, value: sortOrder)
                 }
                 .padding(.horizontal, 5)
                 .frame(width: 20, height: 20)

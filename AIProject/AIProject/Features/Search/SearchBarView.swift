@@ -29,7 +29,6 @@ struct SearchBarView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 14)
-            .shadow(radius: isFocused ? 1 : 0)
             .background {
                 RoundedRectangle(cornerRadius: 15)
                     .fill(.aiCoBackground)
