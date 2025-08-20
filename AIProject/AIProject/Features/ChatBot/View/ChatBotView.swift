@@ -32,13 +32,17 @@ struct ChatBotView: View {
                 }
                 .padding(.horizontal, 16)
             }
+            .background(.aiCoBackground)
 
             ChatInputView(viewModel: viewModel, isFocused: $isFocused)
+                .background(.aiCoBackground)
+        }
+        .onAppear {
+            isFocused = true
         }
         .onTapGesture {
             isFocused = false
         }
-        .background(.aiCoBackground)
     }
 }
 
