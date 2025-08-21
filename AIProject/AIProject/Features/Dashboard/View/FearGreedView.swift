@@ -11,6 +11,7 @@ import SwiftUI
 ///
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: FearGreedViewModel
     
     private static let cornerRadius: CGFloat = 10
@@ -40,7 +41,7 @@ struct FearGreedView: View {
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
-        .background(viewModel.fearGreedBackgroundColor)
+        .background(viewModel.baseColor.opacity(colorScheme == .dark ? 0.15 : 0.05))
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: Self.cornerRadius)
