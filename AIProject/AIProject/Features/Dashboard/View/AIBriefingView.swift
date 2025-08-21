@@ -16,6 +16,10 @@ struct AIBriefingView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @StateObject private var viewModel: InsightViewModel
     
+    private var isPadLayout: Bool {
+        hSizeClass == .regular && vSizeClass == .regular
+    }
+    
     init() {
         _viewModel = StateObject(wrappedValue: InsightViewModel())
     }
@@ -31,9 +35,10 @@ struct AIBriefingView: View {
                 .lineSpacing(5)
             
             VStack(spacing: 16) {
-                if hSizeClass == .regular && vSizeClass == .regular {
+                if isPadLayout {
                     HStack(spacing: 16) {
                         briefingView
+                            .frame(height: 300)
                     }
                 } else {
                     briefingView
