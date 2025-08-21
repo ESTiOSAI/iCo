@@ -8,10 +8,14 @@
 import Foundation
 
 final class ChatBotViewModel: ObservableObject {
+    /// 화면이 클릭되었을 때의 상태를 기록합니다.
+    @Published var isTapped: Bool = false
     /// 사용자와 챗봇의 메세지를 담은 배열입니다.
     @Published private(set) var messages: [ChatMessage] = []
     /// 현재 유저가 메세지를 전송할 수 있는지 상태를 기록합니다.
     @Published private(set) var isEditable: Bool = false
+    /// 메세지 전송시에 변경되는 프로터입니다.
+    @Published private(set) var isReceived: Bool = false
 	/// 현재 챗봇이 데이터를 스트림하는지 상태를 기록합니다.
     @Published private(set) var isStreaming: Bool = false {
         didSet {
@@ -38,21 +42,26 @@ final class ChatBotViewModel: ObservableObject {
 
     /// 사용자가 입력한 메시지를 전송하고, 챗봇 응답 스트림을 관찰하여 UI에 반영합니다.
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
+    ///
+    /// 이 메소드는 메인 쓰레드에서 실행됩니다.
+    @MainActor
     func sendMessage() async {
         let message = searchText
 
-        Task { @MainActor in searchText = "" }
-        await MainActor.run { isStreaming = true }
+        searchText = ""
+        isStreaming = true
 
         do {
-            await addMessage(with: message)
+            addMessage(with: message)
+            isReceived = true
             try await chatBotClient.connect(content: message)
             try await observeStream()
+            isReceived = false
         } catch {
             await MainActor.run { showStreamError() }
         }
 
-        await MainActor.run { isStreaming = false }
+        isStreaming = false
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
@@ -62,10 +71,9 @@ final class ChatBotViewModel: ObservableObject {
         for try await content in stream {
             try await Task.sleep(for: .seconds(0.05))
             await MainActor.run {
-                if let message = messages.last(where: { !$0.isUser }) {
-                    if let index = messages.lastIndex(where: { !$0.isUser }) {
-                        messages[index] = ChatMessage(content: message.content + content, isUser: false)
-                    }
+                if let index = messages.lastIndex(where: { !$0.isUser }) {
+                    let message = messages[index]
+                    messages[index] = ChatMessage(content: message.content + content, isUser: false)
                 }
             }
         }

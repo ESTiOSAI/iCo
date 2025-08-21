@@ -10,14 +10,15 @@ import SwiftUI
 struct ChatInputView: View {
     @ObservedObject var viewModel: ChatBotViewModel
 
-    let isFocused: FocusState<Bool>.Binding
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         HStack {
-            TextField("무엇이든 물어보세요.", text: $viewModel.searchText)
+            TextField("무엇이든 물어보세요.", text: $viewModel.searchText, axis: .vertical)
+                .lineLimit(1...3)
                 .font(.system(size: 14))
                 .foregroundStyle(.aiCoLabel)
-                .focused(isFocused)
+                .focused($isFocused)
 
             Button {
                 Task { await viewModel.sendMessage() }
@@ -25,15 +26,22 @@ struct ChatInputView: View {
                 Image(systemName: "arrow.up")
                     .padding(10)
             }
+            .frame(width: 30, height: 30)
             .background {
                 Circle()
                     .fill(viewModel.isEditable ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
+            }
+            .onChange(of: viewModel.isTapped) {
+                isFocused = false
             }
             .overlay {
                 Circle()
                     .stroke(viewModel.isEditable ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .disabled(!viewModel.isEditable)
+        }
+        .onAppear {
+            isFocused = true
         }
         .padding(.leading, 17)
         .padding(.trailing, 14)
