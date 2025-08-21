@@ -37,11 +37,9 @@ struct MarketView: View {
                         .padding(.horizontal, 16)
 
                     if !records.isEmpty {
-                        RecentCoinSectionView(
-                            coins: records.compactMap { store.coinMeta[$0.query]
-                            }) { coin in
-                                selectedCoin = coin
-                            }
+                        RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
+                            viewModel.removeRecentSearchKeyword(coin)
+                        }) { coin in selectedCoin = coin }
                     }
                 }
 
@@ -91,7 +89,8 @@ struct MarketView: View {
 
 fileprivate struct RecentCoinSectionView: View {
     let coins: [Coin]
-    let action: (Coin) -> Void
+    let deleteAction: (Coin) -> Void
+    let tapAction: (Coin) -> Void
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -99,16 +98,24 @@ fileprivate struct RecentCoinSectionView: View {
                 ForEach(coins) { coin in
                     HStack(spacing: 8) {
                         Text(coin.koreanName)
-                            .font(.caption)
+                            .font(.system(size: 14))
+
+                        Button {
+                            deleteAction(coin)
+                        } label: {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .frame(width: 10, height: 10)
+                                .foregroundStyle(.aiCoLabelSecondary)
+                        }
                     }
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
                     .background {
                         Capsule().stroke(.defaultGradient, lineWidth: 0.5)
-
                     }
                     .onTapGesture {
-                        action(coin)
+                        tapAction(coin)
                     }
                 }
             }
