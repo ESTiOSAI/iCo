@@ -20,12 +20,12 @@ struct RecomendationPlaceholderCardView: View {
                 Group {
                     Color.aiCoBackgroundWhite.opacity(0.9)
                         .background(.ultraThinMaterial)
-                        .frame(width: 100, height: .cardHeightDefault)
+                        .frame(width: 100, height: .cardHeight * .cardHeightMultiplier)
                     
                     DefaultProgressView(status: status, message: message) {
                         action()
                     }
-                    .frame(width: geoProxy.size.width * 0.82, height: .cardHeightActive)
+                    .frame(width: geoProxy.size.width * 0.82, height: .cardHeight)
                     .background(
                         ZStack {
                             Rectangle().fill(.ultraThinMaterial)
@@ -35,7 +35,7 @@ struct RecomendationPlaceholderCardView: View {
                     
                     Color.aiCoBackgroundWhite.opacity(0.9)
                         .background(.ultraThinMaterial)
-                        .frame(width: 100, height: .cardHeightDefault)
+                        .frame(width: 100, height: .cardHeight * .cardHeightMultiplier)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .overlay {

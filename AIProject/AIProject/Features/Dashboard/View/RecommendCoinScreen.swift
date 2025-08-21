@@ -32,7 +32,7 @@ struct RecommendCoinScreen: View {
                     }
                 }
             }
-            .frame(height: .cardHeightActive)
+            .frame(height: .cardHeight)
             .padding(.bottom, 40)
         }
     }
@@ -81,9 +81,15 @@ struct SuccessCoinView: View {
                                 .id(index)
                                 .frame(
                                     width: cardWidth,
-                                    height: cardID == index ? .cardHeightActive : .cardHeightDefault // 활성화된 코인은 크게 보이게 하기
+                                    height: .cardHeight
                                 )
                                 .onTapGesture { selectedCoin = coin }
+                                .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
+                                    content.scaleEffect(
+                                        y: phase.isIdentity ? 1 : .cardHeightMultiplier,
+                                        anchor: .bottom
+                                    )
+                                }
                         }
                     }
                 }

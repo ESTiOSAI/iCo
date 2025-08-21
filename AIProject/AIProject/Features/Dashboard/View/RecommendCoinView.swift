@@ -17,7 +17,7 @@ struct RecommendCoinView: View {
                 startPoint: .topLeading,
                 endPoint: .bottom
             )
-            .frame(height: .headerHeight + .headerContentSpacing + (.cardHeightActive / 2))
+            .frame(height: .headerHeight + .headerContentSpacing + (.cardHeight / 2))
             
             RecommendCoinScreen(viewModel: viewModel)
         }
