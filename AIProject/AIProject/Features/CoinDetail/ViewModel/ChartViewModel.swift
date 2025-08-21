@@ -21,18 +21,46 @@ final class ChartViewModel: ObservableObject {
     /// 차트에 바인딩되는 시계열 가격 데이터
     @Published var prices: [CoinPrice] = []
     
+    /// Header 데이터 (Ticker 기반 지표)
+    /// 현재가
+    @Published private(set) var headerLastPrice: Double = 0
+    /// 전일 대비 절대 변화량 (부호 포함)
+    @Published private(set) var headerChangePrice: Double = 0
+    /// 전일 대비 등락률(%)
+    @Published private(set) var headerChangeRate: Double = 0
+    /// 당일 누적 거래대금
+    @Published private(set) var headerAccTradePrice: Double = 0
+    
+    /// 최근 데이터 기준 시각 (헤더 'yyyy.MM.dd HH:mm 기준'에 사용)
+    @Published private(set) var lastUpdated: Date? = nil
+
+    /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
+    @Published private(set) var status: ResponseStatus = .loading
+    
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
+    
+    /// 헤더 지표용 ticker 조회 서비스
+    private let tickerAPI: UpBitAPIService
     
     /// 주기적 업데이트 태스크 (취소를 위해 저장)
     private var updateTask: Task<Void, Never>?
     
-    init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
+    /// 차트 화면 상태를 초기화
+    /// - Parameters:
+    ///   - coin: 화면에 바인딩할 코인 정보
+    ///   - priceService: 분봉(캔들) 조회 서비스
+    ///   - tickerAPI: 헤더용 티커 조회 API
+    init(
+        coin: Coin,
+        priceService: CoinPriceProvider = UpbitPriceService(),
+        tickerAPI: UpBitAPIService = UpBitAPIService()
+    ) {
         self.coinName = coin.koreanName
         self.coinSymbol = coin.id
-        // id: "KRW-BTC" → currency: "KRW"
         self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
+        self.tickerAPI = tickerAPI
         startUpdating()
     }
     
@@ -66,9 +94,21 @@ final class ChartViewModel: ObservableObject {
         }
     }
     
+    /// 네트워크/루프 중단
     func stopUpdating() {
         updateTask?.cancel()
         updateTask = nil
+    }
+    
+    /// 사용자 취소에 의해 화면 상태를 `.cancel(.taskCancelled)`로 갱신
+    func cancelLoading() {
+        stopUpdating()
+        status = .cancel(.taskCancelled)
+    }
+
+    /// 사용자의 '다시 시도' 선택에 재시도 (루프 재가동)
+    func retry() {
+        startUpdating()
     }
     
     /// 타이머 종료 및 메모리 정리
@@ -80,10 +120,21 @@ final class ChartViewModel: ObservableObject {
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
     func loadPrices(interval: CoinInterval = .all.first!) async {
+        /// 로딩 상태 진입 (초기/재시도 시 ProgressView와 동기화)
+        status = .loading
+        
         do {
             let marketCode = coinSymbol
-            let fetchedPrices = try await priceService.fetchPrices(market: marketCode, interval: interval)
             
+            /// - 분봉(차트용): 캔들 렌더링에 사용
+            /// - Ticker(헤더용): 전일 대비/누적 거래대금 등 헤더 지표(목록 화면과 동일 정의)에 사용
+            async let pricesTask: [CoinPrice] = priceService.fetchPrices(market: marketCode, interval: interval)
+            async let tickerTask: [TickerValue] = tickerAPI.fetchTicker(by: currency)
+
+            let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
+            try Task.checkCancellation()  
+            let ticker = tickers.first { $0.id == marketCode }
+                                    
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
@@ -103,13 +154,52 @@ final class ChartViewModel: ObservableObject {
                     index: idx
                 )
             }
+            
+            if let ticker = ticker {
+                /// 현재가
+                headerLastPrice = ticker.price
+                /// 등락률: 서버는 비율로 주므로 % 표기 위해 *100
+                let signedRate = (ticker.change == .fall) ? -ticker.rate : ticker.rate
+                headerChangeRate = signedRate * 100
+                
+                /// 등락가(부호 포함): change(FALL/RISE/EVEN)으로 부호 적용
+                if signedRate != 0 {
+                    let prevClose = ticker.price / (1 + signedRate)
+                    headerChangePrice = ticker.price - prevClose   // 부호 포함
+                } else {
+                    headerChangePrice = 0
+                }
+                
+                /// 거래대금: 당일 누적을 사용 (코인 목록 화면과 동일).
+                headerAccTradePrice = ticker.volume
+            }
+            
+            /// 기준 시각 세팅: 우선 순위 (캔들 마지막 시각 사용)
+            self.lastUpdated = filteredPrices.last?.date
+            
+            /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
+            guard !Task.isCancelled else {
+                status = .cancel(.taskCancelled)
+                return
+            }
+            status = .success
         } catch is CancellationError {
+            status = .cancel(.taskCancelled)
             return
         } catch NetworkError.taskCancelled {
+            status = .cancel(.taskCancelled)
             return
         } catch {
-            print("가격 불러오기 실패: \(error.localizedDescription)")
-            self.prices = []
+            let err = (error as? NetworkError)
+                ?? (error as? URLError).map(NetworkError.networkError)
+                ?? .networkError(URLError(.unknown))
+            #if DEBUG
+            print("가격 불러오기 실패: \(err.log())")
+            #endif
+            status = .failure(err)
+            
+            /// 실패 시 기준 시각 초기화
+            lastUpdated = nil
         }
     }
     
@@ -166,5 +256,26 @@ extension ChartViewModel {
         formatter.dateFormat = "HH:mm"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
+    }
+}
+
+extension ChartViewModel {
+    /// 헤더 노출: 최근 캔들 있음(`lastUpdated != nil`) && (티커값(`headerLastPrice != 0`) 또는 `summary` 존재)
+    /// 헤더 숨김: 캔들 없음(로딩/실패/빈 데이터) → 레이아웃 밀림 방지
+    var hasHeader: Bool {
+        (lastUpdated != nil) && (headerLastPrice != 0 || summary != nil)
+    }
+    
+    /// 표시에 사용할 값들
+    /// 헤더 표기는 목록 화면과 동일 정의를 위해 Ticker 기반 값을 우선 사용
+    /// (Ticker 우선, 실패 시 summary fallback)
+    var displayLastPrice: Double {
+        headerLastPrice != 0 ? headerLastPrice : (summary?.lastPrice ?? 0)
+    }
+    var displayChangeValue: Double {
+        headerLastPrice != 0 ? headerChangePrice : (summary?.change ?? 0)
+    }
+    var displayChangeRate: Double {
+        headerLastPrice != 0 ? headerChangeRate : (summary?.changeRate ?? 0)
     }
 }

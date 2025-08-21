@@ -30,6 +30,9 @@ final class UpbitPriceService: CoinPriceProvider {
         var toDate = interval.endDate
         
         while allCandles.count < interval.minutes {
+            // 상위 Task 취소 시 여기서 즉시 CancellationError를 던져 다음 요청/반복을 막기 위함
+            try Task.checkCancellation()
+            
             let count = min(candleLimit, interval.minutes - allCandles.count)
             let newCandles = try await api.fetchCandles(id: market, count: count, to: toDate)
             
