@@ -20,24 +20,14 @@ enum Prompt {
         switch self {
         case .recommendCoin(let preference, let bookmark):
             """
-            코인 10개를 추천해줘.
-
-            너가 추천해줘야 하는 코인은 "KRW"만 추천해줘야 해.
-
-            현재 나의 코인 투자 선호도는 다음과 같아.
-            -> \(preference)
-
-            현재 내가 북마크한 코인은 다음과 같아.
-            -> \(bookmark)
-
-            JSON 형식으로 요청할거고, JSON 마크다운은 제거해줘, JSON 외에 어떤 응답도 주지마.
+            - 투자 성향이 \(preference)인 투자자를 위한 가상화폐 추천
+            - 오른쪽 코인들은 제외: \(bookmark) 
+            - 원화 시장에서 거래 가능한, 실제로 존재하는 코인 10개를 추천
+            - 응답은 아래의 JSON 형식으로 작성 (마크다운, JSON 마크다운 금지)
             struct RecommendCoinDTO: Codable {
-             /// 코인 이름을 한글로 전달해 줘
-             let name: String
-             /// 원화 코인만 주고 형식은 "KRW-XXX" 으로 전달해 줘 
-             let symbol: String
-             /// 이 코인을 왜 추천했고, 어떤 움직임이 있는지 최근 기사를 인용하여 한글로 간략히 작성해줘. 기사 출처는 주지마.
-             let comment: String
+                let name: String
+                let symbol: String
+                let comment: String // \(preference)인 투자자에게 추천하는 이유와 최근 동향을 최소 100자 이상의 대화형으로 작성
             }
             """
         case .generateOverView(let coinKName):
