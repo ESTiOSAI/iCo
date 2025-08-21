@@ -26,6 +26,7 @@ struct AIBriefingView: View {
             Text(String.aiGeneratedContentNotice)
                 .font(.system(size: 11))
                 .foregroundStyle(.aiCoNeutral)
+                .lineSpacing(5)
             
             VStack(spacing: 16) {
                 // FIXME: ViewType enum + struct -> 프로퍼티를 enum 값에 따라 전달
@@ -40,7 +41,7 @@ struct AIBriefingView: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
                 } content: { value in
-                    Text(AttributedString(value.summary.byCharWrapping))
+                    Text(value.summary.byCharWrapping)
                 }
                 
                 ReportSectionView(
@@ -54,7 +55,7 @@ struct AIBriefingView: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
                 } content: { value in
-                    Text(AttributedString(value.summary.byCharWrapping))
+                    Text(value.summary.byCharWrapping)
                 }
                 
                 FearGreedView()

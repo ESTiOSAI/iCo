@@ -14,6 +14,8 @@ import SwiftUI
 /// - Parameters:
 ///   - coin: 리포트를 보여줄 대상 코인
 struct ReportView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject var viewModel: ReportViewModel
     
     init(coin: Coin) {
@@ -21,50 +23,64 @@ struct ReportView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Text(String.aiGeneratedContentNotice)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.aiCoNeutral)
-                
-                ReportSectionView(
-                    icon: "text.page.badge.magnifyingglass",
-                    title: "한눈에 보는 \(viewModel.koreanName)",
-                    state: viewModel.overview,
-                    onCancel: { viewModel.cancelOverview() },
-                    onRetry: { viewModel.retryOverview() }
-                ) { value in
-                    Text(value)
-                }
-                
-                ReportSectionView(
-                    icon: "calendar",
-                    title: "주간 동향",
-                    state: viewModel.weekly,
-                    onCancel: { viewModel.cancelWeekly() },
-                    onRetry: { viewModel.retryWeekly() }
-                ) { value in
-                    Text(AttributedString(value.byCharWrapping))
-                }
-                
-                ReportSectionView(
-                    icon: "shareplay",
-                    title: "오늘 시장의 분위기",
-                    state: viewModel.today,
-                    onCancel: { viewModel.cancelToday() },
-                    onRetry: { viewModel.retryToday() }
-                ) { value in
-                    Text(AttributedString(value.byCharWrapping))
-                }
-                
-                if case .success = viewModel.today,
-                   !viewModel.news.allSatisfy({ $0.title.isEmpty && $0.summary.isEmpty }) {
-                    ReportNewsSectionView(articles: viewModel.news)
-                        .padding(.bottom, 30)
-                }
+        let content =
+        VStack(alignment: .leading, spacing: 16) {
+            Text(String.aiGeneratedContentNotice)
+                .font(.system(size: 11))
+                .foregroundStyle(.aiCoNeutral)
+                .lineSpacing(5)
+            
+            ReportSectionView(
+                icon: "text.page.badge.magnifyingglass",
+                title: "한눈에 보는 \(viewModel.koreanName)",
+                state: viewModel.overview,
+                onCancel: { viewModel.cancelOverview() },
+                onRetry: { viewModel.retryOverview() }
+            ) { value in
+                Text(value)
+            }
+            
+            ReportSectionView(
+                icon: "calendar",
+                title: "주간 동향",
+                state: viewModel.weekly,
+                onCancel: { viewModel.cancelWeekly() },
+                onRetry: { viewModel.retryWeekly() }
+            ) { value in
+                Text(value.byCharWrapping)
+            }
+            
+            ReportSectionView(
+                icon: "shareplay",
+                title: "오늘 시장의 분위기",
+                state: viewModel.today,
+                onCancel: { viewModel.cancelToday() },
+                onRetry: { viewModel.retryToday() }
+            ) { value in
+                Text(value.byCharWrapping)
+            }
+            
+            if case .success = viewModel.today,
+               !viewModel.news.allSatisfy({ $0.title.isEmpty && $0.summary.isEmpty }) {
+                ReportNewsSectionView(articles: viewModel.news)
+                    .padding(.bottom, 30)
             }
         }
-        .scrollIndicators(.hidden)
+        
+        if hSizeClass == .regular && vSizeClass == .regular {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("AI 리포트")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+                
+                content
+            }
+        } else {
+            ScrollView(.vertical) {
+                content
+            }
+            .scrollIndicators(.hidden)
+        }
     }
 }
 

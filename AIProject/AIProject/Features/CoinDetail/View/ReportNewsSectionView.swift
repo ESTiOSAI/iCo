@@ -35,7 +35,7 @@ struct ReportNewsSectionView: View {
             ForEach(displayedArticles, id: \.id) { article in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text(article.title)
+                        Text(article.title.byCharWrapping)
                             .font(.system(size: 15, weight: .bold))
                             .foregroundStyle(.aiCoLabel)
                             .lineLimit(1)
