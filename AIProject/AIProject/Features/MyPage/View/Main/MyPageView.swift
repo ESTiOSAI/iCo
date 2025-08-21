@@ -9,80 +9,130 @@ import SwiftUI
 import MessageUI
 
 struct MyPageView: View {
-    @State private var showMail = false
-    
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
+    @State private var selection: String? = nil
+
     var body: some View {
-        NavigationStack {
-            VStack() {
-                HeaderView(heading: "마이페이지")
-                
-                VStack(spacing: 16) {
-                    Group {
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("개인화 설정")
-                                .fontWeight(.semibold)
-                            
-                            VStack(spacing: 16) {
-                                NavigationLink {
-                                    BookmarkView()
-                                } label: {
-                                    MyPageMenuRow(title: "북마크 설정", imageName: "bookmark")
-                                }
-                                
-                                NavigationLink {
-                                    ThemeView()
-                                } label: {
-                                    MyPageMenuRow(title: "알림 설정", imageName: "bell.badge")
-                                }
-                                
-                                NavigationLink {
-                                    ThemeView()
-                                } label: {
-                                    MyPageMenuRow(title: "테마 변경", imageName: "paintpalette")
-                                }
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("기타 설정")
-                                .fontWeight(.semibold)
-                            
-                            VStack(spacing: 16) {
-                                Button {
-                                    if MFMailComposeViewController.canSendMail() {
-                                        showMail = true
-                                    }
-                                } label: {
-                                    MyPageMenuRow(title: "문의하기", imageName: "at")
-                                }
-                                
-                                NavigationLink {
-                                    PrivacyPolicyView()
-                                } label: {
-                                    MyPageMenuRow(title: "인공지능(AI) 윤리기준", imageName: "sparkles")
-                                }
-                            }
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            // iPad (세로/가로 모두)
+            NavigationSplitView(columnVisibility: .constant(.all)) {
+                sidebar
+            } detail: {
+                NavigationStack {
+                    detailView
+                }
+            }
+        } else {
+            // iPhone
+            NavigationStack {
+                sidebar
+            }
+        }
+    }
+
+    // MARK: - Sidebar
+    private var sidebar: some View {
+        VStack {
+            HeaderView(heading: "마이페이지")
+
+            VStack(spacing: 16) {
+                Group {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("개인화 설정")
+                            .fontWeight(.semibold)
+
+                        VStack(spacing: 16) {
+                            menuButton("bookmark", title: "북마크 설정", imageName: "bookmark")
+                            menuButton("notification", title: "알림 설정", imageName: "bell.badge")
+                            menuButton("theme", title: "테마 변경", imageName: "paintpalette")
                         }
                     }
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundStyle(.aiCoLabel)
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(.aiCoBackground)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(.defaultGradient, lineWidth: 0.5)
-                    )
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("기타 설정")
+                            .fontWeight(.semibold)
+
+                        VStack(spacing: 16) {
+                            menuButton("contact", title: "문의하기", imageName: "at")
+                            menuButton("privacy", title: "인공지능(AI) 윤리기준", imageName: "sparkles")
+                        }
+                    }
                 }
-                .padding(.horizontal, 16)
-                
-                Spacer()
+                .font(.system(size: 15, weight: .regular))
+                .foregroundStyle(.aiCoLabel)
+                .padding(20)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(.aiCoBackground)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(.default, lineWidth: 0.5)
+                )
             }
-            .sheet(isPresented: $showMail) {
-                MailView()
+            .padding(.horizontal, 16)
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Detail View (iPad)
+    @ViewBuilder
+    private var detailView: some View {
+        switch selection {
+        case "bookmark":
+            BookmarkView()
+        case "notification":
+            ThemeView()
+        case "theme":
+            ThemeView()
+        case "contact":
+            EmptyView()
+        case "privacy":
+            PrivacyPolicyView()
+        default:
+            Text("왼쪽에서 메뉴를 선택하세요")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - 메뉴 버튼 (iPad는 selection 변경, iPhone은 NavigationLink)
+    @ViewBuilder
+    private func menuButton(_ tag: String, title: String, imageName: String) -> some View {
+        if hSizeClass == .regular && vSizeClass == .regular {
+            // ipad
+            Button {
+                selection = tag
+            } label: {
+                MyPageMenuRow(title: title, imageName: imageName)
             }
+        } else {
+            // iPhone
+            NavigationLink {
+                destination(for: tag)
+            } label: {
+                MyPageMenuRow(title: title, imageName: imageName)
+            }
+        }
+    }
+
+    // MARK: - NavigationLink 목적지
+    @ViewBuilder
+    private func destination(for tag: String) -> some View {
+        switch tag {
+        case "bookmark":
+            BookmarkView()
+        case "notification":
+            ThemeView()
+        case "theme":
+            ThemeView()
+        case "contact":
+            EmptyView()
+        case "privacy":
+            PrivacyPolicyView()
+        default:
+            EmptyView()
         }
     }
 }
