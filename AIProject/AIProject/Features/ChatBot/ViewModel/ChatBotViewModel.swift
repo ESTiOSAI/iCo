@@ -42,23 +42,26 @@ final class ChatBotViewModel: ObservableObject {
 
     /// 사용자가 입력한 메시지를 전송하고, 챗봇 응답 스트림을 관찰하여 UI에 반영합니다.
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
+    ///
+    /// 이 메소드는 메인 쓰레드에서 실행됩니다.
+    @MainActor
     func sendMessage() async {
         let message = searchText
 
-        Task { @MainActor in searchText = "" }
-        await MainActor.run { isStreaming = true }
+        searchText = ""
+        isStreaming = true
 
         do {
-            await addMessage(with: message)
-            Task { @MainActor in isReceived = true }
+            addMessage(with: message)
+            isReceived = true
             try await chatBotClient.connect(content: message)
             try await observeStream()
-            Task { @MainActor in isReceived = false }
+            isReceived = false
         } catch {
             await MainActor.run { showStreamError() }
         }
 
-        await MainActor.run { isStreaming = false }
+        isStreaming = false
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
@@ -68,10 +71,9 @@ final class ChatBotViewModel: ObservableObject {
         for try await content in stream {
             try await Task.sleep(for: .seconds(0.05))
             await MainActor.run {
-                if let message = messages.last(where: { !$0.isUser }) {
-                    if let index = messages.lastIndex(where: { !$0.isUser }) {
-                        messages[index] = ChatMessage(content: message.content + content, isUser: false)
-                    }
+                if let index = messages.lastIndex(where: { !$0.isUser }) {
+                    let message = messages[index]
+                    messages[index] = ChatMessage(content: message.content + content, isUser: false)
                 }
             }
         }
