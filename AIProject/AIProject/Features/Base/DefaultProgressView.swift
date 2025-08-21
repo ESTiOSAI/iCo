@@ -79,6 +79,7 @@ struct DefaultProgressView: View {
                     .stroke(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .padding(15)
+            .frame(width: 80, height: 80)
             
             Text(message)
                 .font(.system(size: 14))
