@@ -44,6 +44,7 @@ struct RecommendCoinScreen: View {
 
 struct SuccessCoinView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
+    @Environment(\.horizontalSizeClass) private var hSizeClass
 
     @GestureState var isDragging: Bool = false
     @State var selectedCoin: RecommendCoin?
@@ -66,13 +67,19 @@ struct SuccessCoinView: View {
             return [last] + recommendedCoins + [first]
         }
         
+        var numberOfColumn: Int {
+            if hSizeClass == .regular {
+                return 2
+            }
+            
+            return 1
+        }
+        
         GeometryReader { geoProxy in
-            let horizonInset = geoProxy.size.width * 0.09
+            let spacing = 16.0
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .bottom, spacing: 16) {
-                    let cardWidth = geoProxy.size.width * 0.82
-                    
+                HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(wrappedCoins.indices, id: \.self) { index in
                         let coin = wrappedCoins[index]
                         
@@ -80,7 +87,7 @@ struct SuccessCoinView: View {
                             RecommendCardView(recommendCoin: coin)
                                 .id(index)
                                 .frame(
-                                    width: cardWidth,
+                                    width: .infinity,
                                     height: .cardHeight
                                 )
                                 .onTapGesture { selectedCoin = coin }
@@ -91,13 +98,19 @@ struct SuccessCoinView: View {
                                     )
                                 }
                         }
+                        .containerRelativeFrame(
+                            .horizontal,
+                            count: numberOfColumn,
+                            spacing: spacing
+                        )
                     }
                 }
                 .scrollTargetLayout()
+                .frame(height: .cardHeight + 1, alignment: .top)
             }
-            .contentMargins(.horizontal, horizonInset)
+            .contentMargins(.horizontal, 20 * 2)
             .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: $cardID)
+            .scrollPosition(id: $cardID, anchor: .leading)
             .simultaneousGesture(DragGesture()
                 .updating($isDragging) { _, state, _ in
                     state = true
