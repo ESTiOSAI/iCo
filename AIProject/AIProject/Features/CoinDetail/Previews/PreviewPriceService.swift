@@ -1,5 +1,5 @@
 //
-//  FakePriceService.swift
+//  PreviewPriceService.swift
 //  AIProject
 //
 //  Created by 강민지 on 8/20/25.
@@ -7,9 +7,8 @@
 
 import Foundation
 
-/// PR용 테스트 (머지 전 삭제)
 #if DEBUG
-struct FakePriceService: CoinPriceProvider {
+struct PreviewPriceService: CoinPriceProvider {
     enum Mode {
         case success(delaySec: Double, points: Int = 120) // 지연 후 성공
         case empty(delaySec: Double)                      // 지연 후 빈 배열

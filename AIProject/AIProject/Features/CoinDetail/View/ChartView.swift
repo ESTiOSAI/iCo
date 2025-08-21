@@ -23,18 +23,28 @@ struct ChartView: View {
     /// 헤더의 가격 요약 정보(마지막가 / 변화 / 등락률)
     private var summary: PriceSummary? { viewModel.summary }
 
-//    init(coin: Coin) {
-//        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
-//    }
-    
-    /// PR용 테스트 (머지 전 삭제)
-    init(coin: Coin, priceService: CoinPriceProvider? = nil) {
-        if let ps = priceService {
-            _viewModel = StateObject(wrappedValue: ChartViewModel(coin: coin, priceService: ps))
-        } else {
-            _viewModel = StateObject(wrappedValue: ChartViewModel(coin: coin))
-        }
+    /// 프로덕션 기본 경로
+    init(coin: Coin) {
+        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
     }
+    
+    #if DEBUG
+    /// 프리뷰/디버그 전용 주입 경로
+    init(
+        coin: Coin,
+        priceService: any CoinPriceProvider,
+        tickerAPI: UpBitAPIService = UpBitAPIService()
+    ) {
+        _viewModel = StateObject(
+            wrappedValue: ChartViewModel(
+                coin: coin,
+                priceService: priceService,
+                tickerAPI: tickerAPI
+            )
+        )
+    }
+    #endif
+
 
     private static let headerDateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -177,39 +187,7 @@ struct ChartView: View {
 //        .environmentObject(ThemeManager())
 //}
 
-/// PR용 테스트 (머지 전 삭제)
-#Preview("성공(5초 지연)") {
-    ChartView(
-        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-        priceService: FakePriceService(mode: .success(delaySec: 5, points: 200))
-    )
-    .environmentObject(ThemeManager())
-}
 
-//#Preview("취소 동작 확인") {
-//    ChartView(
-//        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-//        priceService: FakePriceService(mode: .success(delaySec: 10))
-//    )
-//    .environmentObject(ThemeManager())
-//    // 프리뷰 실행 후 2~3초 내 ‘작업 취소’ 버튼 눌러 상태 전환 확인
-//}
-
-//#Preview("실패 동작 확인") {
-//    ChartView(
-//        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-//        priceService: FakePriceService(mode: .failure(delaySec: 2))
-//    )
-//    .environmentObject(ThemeManager())
-//}
-
-//#Preview("빈 데이터 동작 확인") {
-//    ChartView(
-//        coin: Coin(id: "KRW-BTC", koreanName: "비트코인"),
-//        priceService: FakePriceService(mode: .empty(delaySec: 2))
-//    )
-//    .environmentObject(ThemeManager())
-//}
 
 struct CandleChartView: View {
     let data: [CoinPrice]
