@@ -10,22 +10,20 @@ import Foundation
 @Observable
 final class TickerStore {
     let coinID: String
-    var price: Double = 0
-    var rate: Double = 0
-    var volume: Double = 0
-    var change: TickerValue.ChangeType = .even
     
-    var signedRate: Double { change == .fall ? -rate : rate }
+    private(set) var snapshot: TickerValue
+    
+    var signedRate: Double { snapshot.signedRate }
     
     init(coinID: CoinID) {
         self.coinID = coinID
+        self.snapshot = TickerValue(id: coinID, price: 0, volume: 0, rate: 0, change: .even)
     }
     
     @MainActor
     func apply(_ value: TickerValue) {
-        if price != value.price { price = value.price }
-        if rate != value.rate { rate = value.rate }
-        if volume != value.volume { volume = value.volume }
-        if change != value.change { change = value.change }
+        if self.snapshot != value {
+            self.snapshot = value
+        }
     }
 }

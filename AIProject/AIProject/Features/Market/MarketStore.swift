@@ -8,8 +8,6 @@
 import Foundation
 import AsyncAlgorithms
 
-typealias CoinID = String
-
 enum CoinFilter: Int, Equatable {
     case bookmark
     case none
@@ -91,6 +89,9 @@ class MarketStore {
     
     @ObservationIgnored
     private var sortChannel = AsyncChannel<Void>()
+    
+    @ObservationIgnored
+    private var subscriptionSnapshot = Set<CoinID>()
     
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
@@ -189,9 +190,9 @@ extension MarketStore {
                 .sorted {
                     switch volumeSortOrder {
                     case .ascending, .none:
-                        $0.volume < $1.volume
+                        $0.snapshot.volume < $1.snapshot.volume
                     case .descending:
-                        $0.volume > $1.volume
+                        $0.snapshot.volume > $1.snapshot.volume
                     }
                 }
                 .map(\.coinID)
@@ -245,6 +246,9 @@ extension MarketStore {
         
         // service 연결
         await tickerService.connect()
+        if !subscriptionSnapshot.isEmpty {
+            await sendTicket(subscriptionSnapshot)
+        }
         
         // 시세가
         self.tickerStreamTask = Task {
@@ -273,8 +277,9 @@ extension MarketStore {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
             .removeDuplicates()
-            ._throttle(for: .milliseconds(300), latest: true)
+            .debounce(for: .milliseconds(300))
         for await visibleCoin in stream {
+            self.subscriptionSnapshot = visibleCoin
             await tickerService.sendTicket(ticket: ticket, coins: Array(visibleCoin))
         }
     }
@@ -294,18 +299,5 @@ extension MarketStore {
 extension MarketStore {
     func addRecord(_ id: CoinID) {
         try? searchRecordManager.save(query: id)
-    }
-}
-
-struct TickerValue: Sendable, Identifiable, CoinSymbolConvertible {
-    typealias ChangeType = CoinListModel.TickerChangeType
-    let id: String
-    let price: Double
-    let volume: Double
-    let rate: Double
-    let change: ChangeType
-    
-    var coinSymbol: String {
-        id.components(separatedBy: "-").last ?? ""
     }
 }
