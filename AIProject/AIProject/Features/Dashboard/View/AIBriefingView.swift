@@ -41,7 +41,7 @@ struct AIBriefingView: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
                 } content: { value in
-                    Text(AttributedString(value.summary.byCharWrapping))
+                    Text(value.summary.byCharWrapping)
                 }
                 
                 ReportSectionView(
@@ -55,9 +55,7 @@ struct AIBriefingView: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(value.sentiment.color(for: themeManager.selectedTheme))
                 } content: { value in
-                    value.summary
-                        .byCharWrapping
-                        .highlightTextForNumbersOperator()
+                    Text(value.summary.byCharWrapping)
                 }
                 
                 FearGreedView()

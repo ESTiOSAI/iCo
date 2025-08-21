@@ -47,9 +47,7 @@ struct ReportView: View {
                 onCancel: { viewModel.cancelWeekly() },
                 onRetry: { viewModel.retryWeekly() }
             ) { value in
-                value
-                    .byCharWrapping
-                    .highlightTextForNumbersOperator()
+                Text(value.byCharWrapping)
             }
             
             ReportSectionView(
@@ -59,9 +57,7 @@ struct ReportView: View {
                 onCancel: { viewModel.cancelToday() },
                 onRetry: { viewModel.retryToday() }
             ) { value in
-                value
-                    .byCharWrapping
-                    .highlightTextForNumbersOperator()
+                Text(value.byCharWrapping)
             }
             
             if case .success = viewModel.today,
