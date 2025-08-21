@@ -11,13 +11,7 @@ import SwiftUI
 ///
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
-    @Environment(\.horizontalSizeClass) var hSizeClass
-    @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject private var viewModel: FearGreedViewModel
-    
-    private var isRegularRegular: Bool {
-        hSizeClass == .regular && vSizeClass == .regular
-    }
     
     private static let cornerRadius: CGFloat = 10
     
@@ -42,7 +36,7 @@ struct FearGreedView: View {
             Spacer()
             
             ChartView(viewModel: viewModel)
-                .chartLayout(isRegularRegular, regularSize: 110, compactSize: 90)
+                .frame(width: 90, height: 90)
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
@@ -112,19 +106,3 @@ extension FearGreedView {
 #Preview {
     FearGreedView()
 }
-
-
-private extension View {
-    @ViewBuilder
-    func chartLayout(_ isRegularRegular: Bool, regularSize: CGFloat, compactSize: CGFloat) -> some View {
-        let size = isRegularRegular ? regularSize : compactSize
-        self
-            .frame(width: size, height: size)
-            .padding(
-                isRegularRegular
-                ? EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20)
-                : EdgeInsets(top: 20, leading: 0, bottom: 0, trailing: 0)
-            )
-    }
-}
-
