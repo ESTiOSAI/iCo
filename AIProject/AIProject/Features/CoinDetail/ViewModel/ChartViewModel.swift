@@ -40,14 +40,27 @@ final class ChartViewModel: ObservableObject {
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
     
+    /// 헤더 지표용 ticker 조회 서비스
+    private let tickerAPI: UpBitAPIService
+    
     /// 주기적 업데이트 태스크 (취소를 위해 저장)
     private var updateTask: Task<Void, Never>?
     
-    init(coin: Coin, priceService: CoinPriceProvider = UpbitPriceService()) {
+    /// 차트 화면 상태를 초기화
+    /// - Parameters:
+    ///   - coin: 화면에 바인딩할 코인 정보
+    ///   - priceService: 분봉(캔들) 조회 서비스
+    ///   - tickerAPI: 헤더용 티커 조회 API
+    init(
+        coin: Coin,
+        priceService: CoinPriceProvider = UpbitPriceService(),
+        tickerAPI: UpBitAPIService = UpBitAPIService()
+    ) {
         self.coinName = coin.koreanName
         self.coinSymbol = coin.id
         self.currency = coin.id.split(separator: "-").first.map(String.init) ?? "KRW"
         self.priceService = priceService
+        self.tickerAPI = tickerAPI
         startUpdating()
     }
     
@@ -116,7 +129,7 @@ final class ChartViewModel: ObservableObject {
             /// - 분봉(차트용): 캔들 렌더링에 사용
             /// - Ticker(헤더용): 전일 대비/누적 거래대금 등 헤더 지표(목록 화면과 동일 정의)에 사용
             async let pricesTask: [CoinPrice] = priceService.fetchPrices(market: marketCode, interval: interval)
-            async let tickerTask = UpBitAPIService().fetchTicker(by: currency)
+            async let tickerTask: [TickerValue] = tickerAPI.fetchTicker(by: currency)
 
             let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
             try Task.checkCancellation()  
