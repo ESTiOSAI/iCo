@@ -20,6 +20,7 @@ struct SearchBarView: View {
                     .padding(.horizontal, 8)
                     .focused($isFocused)
                     .submitLabel(.search)
+                    .font(.system(size: 14))
 
                 if !searchText.isEmpty {
                     CircleDeleteButton(fontSize: 9) {
@@ -31,7 +32,11 @@ struct SearchBarView: View {
             .padding(.vertical, 14)
             .background {
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(.aiCoBackground)
+                    .fill(.aiCoBackgroundBlue)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(.accentGradient, lineWidth: 0.5)
             }
             .animation(.snappy(duration: 0.2), value: isFocused)
 
