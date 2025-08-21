@@ -81,7 +81,6 @@ struct ChartView: View {
             }
             chartArea
         }
-        .animation(.easeInOut(duration: 0.2), value: shouldShowHeader)
         .padding(20)
         .onAppear { viewModel.checkBookmark() }
         .onDisappear { viewModel.stopUpdating() }
