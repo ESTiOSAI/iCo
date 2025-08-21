@@ -22,4 +22,11 @@ extension SearchRecordEntity {
         self.query = query
         self.timestamp = timestamp
     }
+    
+    static func recent(limit: Int = 5) -> NSFetchRequest<SearchRecordEntity> {
+        let request: NSFetchRequest<SearchRecordEntity> = SearchRecordEntity.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \SearchRecordEntity.timestamp, ascending: false)]
+        request.fetchLimit = limit
+        return request
+    }
 }

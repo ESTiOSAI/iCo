@@ -36,5 +36,14 @@ struct CoinListHeaderView: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background {
+                UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16, style: .continuous)
+                .stroke(.defaultGradient, lineWidth: 0.5)
+                    .fill(Color.aiCoBackground)
+        }
     }
 }

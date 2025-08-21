@@ -22,36 +22,62 @@ class MarketStore {
     private let ticket = UUID().uuidString
     
     private let coinService: UpBitAPIService
-    private let tickerService: UpbitTickerService
+    private let tickerService: RealTimeTickerProvider
+    private let searchRecordManager: SearchRecordManaging = SearchRecordManager()
     
     private(set) var errorMessage: String?
     private(set) var coinMeta: [CoinID: Coin] = [:]
     
     private var ticker: [CoinID: TickerStore] = [:]
     
-    private var bookmarkIDs: Set<CoinID> = []
-    
     private var ticketStreamTask: Task<Void, Never>?
     private var tickerStreamTask: Task<Void, Never>?
     
+    private var bookmarkIDs: Set<CoinID> = [] {
+        didSet {
+            Task {
+                await sortChannel.send(())
+            }
+        }
+    }
+    
+    private var searchText: String = "" {
+        didSet {
+            Task {
+                await sortChannel.send(())
+            }
+        }
+    }
+    
     var sortCategory: Market.SortCategory = .volume {
         didSet {
-            sort()
+            Task {
+                await sortChannel.send(())
+            }
         }
     }
+    
     var volumeSortOrder: SortOrder = .descending {
         didSet {
-            sort()
+            Task {
+                await sortChannel.send(())
+            }
         }
     }
+    
     var rateSortOrder: SortOrder = .none {
         didSet {
-            sort()
+            Task {
+                await sortChannel.send(())
+            }
         }
     }
+    
     var filter: CoinFilter = .none {
         didSet {
-            sort()
+            Task {
+                await sortChannel.send(())
+            }
         }
     }
 
@@ -60,7 +86,13 @@ class MarketStore {
     @ObservationIgnored
     private var visibleCoinsChannel = AsyncChannel<Set<CoinListModel.ID>>()
     
-    init(coinService: UpBitAPIService, tickerService: UpbitTickerService) {
+    @ObservationIgnored
+    private var searchCoinsChannel = AsyncChannel<String>()
+    
+    @ObservationIgnored
+    private var sortChannel = AsyncChannel<Void>()
+    
+    init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService
     }
@@ -72,13 +104,31 @@ extension MarketStore {
         guard hasLoaded == false else { return }
         defer { hasLoaded = true }
         await setup()
+        
+        Task {
+            let stream = searchCoinsChannel
+                .debounce(for: .milliseconds(300))
+            
+            for await text in stream {
+                searchText = text
+            }
+        }
+        
+        Task {
+            let stream = sortChannel
+                ._throttle(for: .milliseconds(300), latest: false)
+            
+            for await _ in stream {
+                await sort()
+            }
+        }
     }
     
     func refresh() async {
         await setup()
     }
     
-    func update(_ items: [CoinID]) {
+    func update(_ items: [CoinID]) async {
         self.bookmarkIDs = Set(items)
     }
     
@@ -88,35 +138,68 @@ extension MarketStore {
     
     private func setup() async {
         (coinMeta, ticker) = await fetchMarketCoinData()
-        sort()
+        await sort()
     }
     
-    func sort() {
-        let ids: [CoinID]
+    func sort() async {
+        
+        let metas: [CoinID: Coin]
+        
+        switch filter {
+        case .none:
+            metas = coinMeta
+        case .bookmark:
+            metas = coinMeta.filter { bookmarkIDs.contains($0.key) }
+        }
+        
+        let text = searchText
+        
+        let filteredCoinID: Set<CoinID>
+        
+        if searchText.isEmpty {
+            filteredCoinID = Set(metas.map(\.key))
+        } else {
+            filteredCoinID = metas
+                .filter { key, value in
+                    value.koreanName.contains(text)
+                }
+                .map(\.key)
+                .reduce(into: Set<CoinID>(), { acc, e in
+                    acc.insert(e)
+                })
+        }
+        
+        let filteredTickers = ticker.map(\.value)
+            .filter { filteredCoinID.contains($0.coinID) }
+        
         switch sortCategory {
         case .rate:
-            ids = Array(ticker)
+            self.sortedCoinIDs = filteredTickers
                 .sorted {
                     switch rateSortOrder {
                     case .ascending, .none:
-                        $0.value.signedRate < $1.value.signedRate
+                        $0.signedRate < $1.signedRate
                     case .descending:
-                        $0.value.signedRate > $1.value.signedRate
+                        $0.signedRate > $1.signedRate
                     }
-                }.map(\.key)
+                }
+                .map(\.coinID)
         case .volume:
-            ids = Array(ticker)
+            self.sortedCoinIDs = filteredTickers
                 .sorted {
                     switch volumeSortOrder {
                     case .ascending, .none:
-                        $0.value.volume < $1.value.volume
+                        $0.volume < $1.volume
                     case .descending:
-                        $0.value.volume > $1.value.volume
+                        $0.volume > $1.volume
                     }
-                }.map(\.key)
+                }
+                .map(\.coinID)
         }
-        
-        sortedCoinIDs = ids
+    }
+    
+    func search(_ text: String) async {
+        await searchCoinsChannel.send(text)
     }
     
     private func fetchMarketCoinData() async -> ([CoinID: Coin], [CoinID: TickerStore]) {
@@ -205,6 +288,12 @@ extension MarketStore {
         for try await ticker in tickerService.subscribeTickerStream() {
             await performUpdate(ticker)
         }
+    }
+}
+
+extension MarketStore {
+    func addRecord(_ id: CoinID) {
+        try? searchRecordManager.save(query: id)
     }
 }
 

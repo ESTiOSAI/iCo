@@ -50,7 +50,8 @@ struct CachedAsyncImage<Content: View>: View {
         do {
             image = try await ImageLoader.shared.image(for: resource, useCacheOnly: useCacheOnly)
         } catch {
-            print("이미지 로드 실패:", error.localizedDescription)
+            image = nil
+//            print("이미지 로드 실패:", error.localizedDescription)
         }
         isLoading = false
     }

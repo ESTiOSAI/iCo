@@ -20,19 +20,10 @@ struct CoinListView: View {
     )
     private var bookmarks: FetchedResults<BookmarkEntity>
     
-    var filteredCoins: [CoinID] {
-        switch store.filter {
-        case .bookmark:
-            return store.sortedCoinIDs.filter { id in bookmarks.map(\.coinID).contains(where: { bookmark in id == bookmark  }) }
-        case .none:
-            return store.sortedCoinIDs
-        }
-    }
-    
-    @State private var selectedCoin: CoinID?
+    @Binding private var selectedCoin: Coin?
     
     @ViewBuilder func makeCoinContents() -> some View {
-        if store.filter == .bookmark, filteredCoins.isEmpty {
+        if store.filter == .bookmark, store.sortedCoinIDs.isEmpty {
             VStack {
                 Spacer()
                 
@@ -46,11 +37,12 @@ struct CoinListView: View {
                 Spacer()
             }.frame(maxHeight: .infinity)
         } else {
-            ForEach(filteredCoins, id: \.self) { id in
+            ForEach(store.sortedCoinIDs, id: \.self) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
                     CoinCell(coin: meta, store: ticker)
                         .onTapGesture {
-                            selectedCoin = id
+                            selectedCoin = meta
+                            store.addRecord(id)
                         }
                         .onAppear {
                             visibleCoins.insert(id)
@@ -62,24 +54,27 @@ struct CoinListView: View {
             }
         }
     }
-
+    
+    init(store: MarketStore, selectedCoin: Binding<Optional<Coin>>) {
+        self.store = store
+        self._selectedCoin = selectedCoin
+    }
     
     var body: some View {
         VStack(spacing: 0) {
+            CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
+            
             List {
-                CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-                
                 makeCoinContents()
-                    .listRowBackground(Color.clear)
+                    .listRowBackground(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
             }
             .listStyle(.plain)
-            .coordinateSpace(name: "scroll")
+            .scrollIndicators(.hidden)
             .scrollContentBackground(.hidden)
+            .clipShape(.rect(cornerRadius: 16))
             .background {
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.aiCoBorderGray, lineWidth: 1)
+                UnevenRoundedRectangle(topLeadingRadius: 0, bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 0, style: .continuous)
+                    .stroke(.defaultGradient, lineWidth: 0.5)
                     .fill(Color.aiCoBackground)
             }
         }
@@ -93,6 +88,11 @@ struct CoinListView: View {
                 await store.sendTicket(newValue)
             }
         })
+        .onChange(of: bookmarks.map(\.coinID), initial: true) { oldValue, newValue in
+            Task {
+                await store.update(newValue)
+            }
+        }
         .onAppear {
             Task {
                 await store.connect()
@@ -101,11 +101,6 @@ struct CoinListView: View {
         .onDisappear {
             Task {
                 await store.disconnect()
-            }
-        }
-        .navigationDestination(item: $selectedCoin) { coinID in
-            if let coin = store.coinMeta[coinID] {
-                CoinDetailView(coin: coin)
             }
         }
     }

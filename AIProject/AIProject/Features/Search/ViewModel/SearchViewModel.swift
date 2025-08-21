@@ -13,16 +13,14 @@ final class SearchViewModel: ObservableObject {
     @Published var relatedCoins: [Coin] = []
 
     private var upbitService: UpBitAPIService
-    private var imageService: CoinGeckoAPIService
 
     private var coins: [Coin] = []
 
     private var continuation: AsyncStream<String>.Continuation?
     private var task: Task<Void, Never>?
 
-    init(upbitService: UpBitAPIService = UpBitAPIService(), imageService: CoinGeckoAPIService = CoinGeckoAPIService()) {
+    init(upbitService: UpBitAPIService = UpBitAPIService()) {
         self.upbitService = upbitService
-        self.imageService = imageService
         setupCoinData()
         observeStream()
     }
@@ -102,35 +100,11 @@ final class SearchViewModel: ObservableObject {
         }
 
         let filteredCoins = coins.filter { $0.koreanName.contains(keyword) || $0.id.lowercased().contains(keyword.lowercased()) }
-
-        do {
-            let coinWithURLs = try await setImageURL(filteredCoins)
-            await MainActor.run {relatedCoins = coinWithURLs }
-        } catch {
-            // 이미지 URL을 받아오는데 실패함. (API Token 부족)
-            await MainActor.run { relatedCoins = filteredCoins }
-        }
+        await MainActor.run { relatedCoins = filteredCoins }
     }
 
     deinit {
         task?.cancel()
         task = nil
-    }
-}
-
-extension SearchViewModel {
-    /// CoinGecko API를 통해 이미지 URL을 가져옵니다.
-    /// - Parameter coins: 검색에 필터링된 Coin 배열입니다.
-    /// - Returns: imageURL 프로퍼티에 URL을 저장하고 반환합니다.
-    private func setImageURL(_ coins: [Coin]) async throws -> [Coin] {
-        var tempCoins = coins
-        let symbols = coins.map { $0.id }
-        let urls = try await imageService.fetchCoinImages(symbols: symbols).map { $0.imageURL }
-
-        for i in 0..<urls.count {
-            tempCoins[i].imageURL = urls[i]
-        }
-
-        return tempCoins
     }
 }
