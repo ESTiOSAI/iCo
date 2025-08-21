@@ -29,7 +29,6 @@ struct MarketView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-
             Group {
                 VStack(spacing: 16) {
                     HeaderView(heading: "마켓")
@@ -97,8 +96,6 @@ fileprivate struct RecentCoinSectionView: View {
             HStack {
                 ForEach(coins) { coin in
                     HStack(spacing: 8) {
-                        CoinView(symbol: coin.coinSymbol, size: 20)
-
                         Text(coin.koreanName)
                             .font(.caption)
                     }
@@ -113,8 +110,8 @@ fileprivate struct RecentCoinSectionView: View {
                     }
                 }
             }
-
         }
+        .safeAreaPadding(.horizontal, 16)
         .scrollIndicators(.hidden)
     }
 }
