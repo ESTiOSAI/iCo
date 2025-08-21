@@ -38,7 +38,7 @@ struct AIBriefingView: View {
                 if isPadLayout {
                     HStack(spacing: 16) {
                         briefingView
-                            .frame(height: 300)
+                            .frame(height: 280)
                     }
                 } else {
                     briefingView
