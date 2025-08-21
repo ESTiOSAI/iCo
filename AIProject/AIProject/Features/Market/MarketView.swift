@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct MarketView: View {
-    
+
     @State var store: MarketStore
     @StateObject private var viewModel: SearchViewModel
-    
+
     @State private var searchText: String = ""
     @State private var selectedCoin: Coin?
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
@@ -21,14 +21,15 @@ struct MarketView: View {
         animation: .default
     )
     private var records: FetchedResults<SearchRecordEntity>
-    
+
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         store = MarketStore(coinService: coinService, tickerService: tickerService)
         _viewModel = StateObject(wrappedValue: SearchViewModel(upbitService: coinService))
     }
-    
+
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
+
             Group {
                 VStack(spacing: 16) {
                     HeaderView(heading: "마켓")
@@ -74,6 +75,7 @@ struct MarketView: View {
                     await store.load()
                 }
             }
+            .navigationSplitViewColumnWidth(min: 400, ideal: 400, max: 400)
         } detail: {
             if let selectedCoin {
                 CoinDetailView(coin: selectedCoin)
@@ -89,14 +91,14 @@ struct MarketView: View {
 fileprivate struct RecentCoinSectionView: View {
     let coins: [Coin]
     let action: (Coin) -> Void
-    
+
     var body: some View {
         ScrollView(.horizontal) {
             HStack {
                 ForEach(coins) { coin in
                     HStack(spacing: 8) {
                         CoinView(symbol: coin.coinSymbol, size: 20)
-                        
+
                         Text(coin.koreanName)
                             .font(.caption)
                     }
@@ -104,14 +106,14 @@ fileprivate struct RecentCoinSectionView: View {
                     .padding(.horizontal, 12)
                     .background {
                         Capsule().stroke(.defaultGradient, lineWidth: 0.5)
-                        
+
                     }
                     .onTapGesture {
                         action(coin)
                     }
                 }
             }
-            
+
         }
         .scrollIndicators(.hidden)
     }
