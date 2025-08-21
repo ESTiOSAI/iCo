@@ -90,7 +90,7 @@ struct ChartView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.default, lineWidth: 0.5)
+                .stroke(.defaultGradient, lineWidth: 0.5)
         )
     }
     
@@ -180,24 +180,6 @@ struct ChartView: View {
                 )
             }
         }
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            headerView
-            chartArea
-        }
-        .padding(20)
-        .onAppear { viewModel.checkBookmark() }
-        .onDisappear { viewModel.stopUpdating() }
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.aiCoBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.defaultGradient, lineWidth: 0.5)
-        )
     }
 }
 
