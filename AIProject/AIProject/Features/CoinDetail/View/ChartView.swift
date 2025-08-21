@@ -49,7 +49,7 @@ struct ChartView: View {
     private static let headerDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy.MM.dd HH:mm"
-//        f.locale = Locale(identifier: "ko_KR")
+        f.locale = Locale(identifier: "ko_KR")
         return f
     }()
     
@@ -189,6 +189,7 @@ struct ChartView: View {
 
 
 
+/// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
 struct CandleChartView: View {
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
