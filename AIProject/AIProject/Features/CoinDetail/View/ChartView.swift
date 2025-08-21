@@ -57,123 +57,110 @@ struct ChartView: View {
         return 0
     }
     
+    private var headerColor: Color {
+        let v = viewModel.displayChangeValue
+        if v > 0 { return themeManager.selectedTheme.positiveColor }
+        if v < 0 { return themeManager.selectedTheme.negativeColor }
+        return .gray
+    }
+    
+    private var sign: String { viewModel.displayChangeValue > 0 ? "+" : (viewModel.displayChangeValue < 0 ? "-" : "") }
+    private var arrow: String { viewModel.displayChangeValue > 0 ? "▲" : (viewModel.displayChangeValue < 0 ? "▼" : "") }
+    
+    @ViewBuilder
+    private var headerView: some View {
+        /// 타이틀 영역
+        HStack(alignment: .top, spacing: 8) {
+            /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
+            VStack(alignment: .leading, spacing: 8) {
+                Text(lastUpdatedText)
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(.aiCoLabel)
+                    .lineLimit(1)
+                    .opacity(headerOpacity)
+                
+                Text(viewModel.displayLastPrice.formatKRW)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+                    .lineLimit(1)
+                    .opacity(viewModel.hasHeader ? 1 : 0)
+                
+                Text("\(sign)\(abs(viewModel.displayChangeValue).formatKRW).formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(headerColor)
+                    .lineLimit(1)
+                    .opacity(viewModel.hasHeader ? 1 : 0)
+                
+                Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.aiCoLabelSecondary)
+                    .lineLimit(1)
+                    .opacity(viewModel.hasHeader ? 1 : 0)
+            }
+            
+            Spacer()
+            
+            /// 코인 북마크 버튼
+            /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
+            /// - 탭 시 북마크 추가/제거 로직 호출
+            Button(action: { viewModel.toggleBookmark() }) {
+                CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var chartArea: some View {
+        switch viewModel.status {
+        case .loading:
+            DefaultProgressView(
+                status: .loading,
+                message: "차트를 불러오는 중이에요"
+            ) { viewModel.cancelLoading() }
+        case .failure(let err):
+            DefaultProgressView(
+                status: .failure,
+                message: err.localizedDescription
+            ) { viewModel.retry() }
+            
+        case .cancel(let err):
+            DefaultProgressView(
+                status: .cancel,
+                message: err.localizedDescription
+            ) { viewModel.retry() }
+            
+        case .success:
+            if data.isEmpty {
+                DefaultProgressView(
+                    status: .failure,
+                    message: "최근 24시간 체결 데이터가 없어요"
+                ) { viewModel.retry() }
+            } else {
+                let yRange = viewModel.yAxisRange(from: data)
+                let xDomain = viewModel.xAxisDomain(for: data)
+                let scrollTo = viewModel.scrollToTime(for: data)
+                
+                CandleChartView(
+                    data: data,
+                    xDomain: xDomain,
+                    yRange: yRange,
+                    scrollTo: scrollTo,
+                    timeFormatter: viewModel.timeFormatter,
+                    positiveColor: themeManager.selectedTheme.positiveColor,
+                    negativeColor: themeManager.selectedTheme.negativeColor
+                )
+            }
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
-            /// 타이틀 영역
-            HStack(alignment: .top, spacing: 8) {
-                /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(lastUpdatedText)
-                        .font(.system(size: 10, weight: .regular))
-                        .foregroundStyle(.aiCoLabel)
-                        .lineLimit(1)
-                        .opacity(headerOpacity)
-                    
-                    // 헤더 표시 조건:
-                    // - Ticker 기반 값이 도착했으면(summary 유무와 무관하게) 헤더를 보여줌
-                    // - Ticker도 실패하고 summary도 없으면 숨김(초기 로딩/취소/실패 시 깜빡임 방지)
-                    let hasHeader = (viewModel.headerLastPrice != 0) || (summary != nil)
-                    
-                    /// 헤더 표기는 목록 화면과 동일 정의를 위해 Ticker 기반 값을 우선 사용
-                    /// (Ticker 실패 시 summary)
-                    let lastPrice   = viewModel.headerLastPrice != 0 ? viewModel.headerLastPrice : (summary?.lastPrice ?? 0)
-                    let changeValue = viewModel.headerLastPrice != 0 ? viewModel.headerChangePrice  : (summary?.change ?? 0)
-                    let changeRate  = viewModel.headerLastPrice != 0 ? viewModel.headerChangeRate : (summary?.changeRate ?? 0)
-                    let trade = viewModel.headerAccTradePrice
-                    
-                    let isRising = changeValue > 0
-                    let isFalling = changeValue < 0
-                    let color: Color = isRising ? themeManager.selectedTheme.positiveColor :
-                    isFalling ? themeManager.selectedTheme.negativeColor :
-                        .gray
-                    let sign = isRising ? "+" : (isFalling ? "-" : "")
-                    let arrow = isRising ? "▲" : (isFalling ? "▼" : "")
-                    
-                    Text(lastPrice.formatKRW)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(.aiCoLabel)
-                        .lineLimit(1)
-                        .opacity(hasHeader ? 1 : 0)
-                    
-                    Text("\(sign)\(abs(changeValue).formatKRW) (\(arrow)\(abs(changeRate).formatRate))")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(color)
-                        .lineLimit(1)
-                        .opacity(hasHeader ? 1 : 0)
-                    
-                    Text("거래대금 \(trade.formatMillion)")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.aiCoLabelSecondary)
-                        .lineLimit(1)
-                        .opacity(hasHeader ? 1 : 0)
-                }
-                
-                Spacer()
-                
-                /// 코인 북마크 버튼
-                /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
-                /// - 탭 시 북마크 추가/제거 로직 호출
-                Button(action: {
-                    viewModel.toggleBookmark()
-                }) {
-                    CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
-                }
-            }
-                        
-            ZStack {
-                switch viewModel.status {
-                case .loading:
-                    DefaultProgressView(
-                        status: .loading,
-                        message: "차트를 불러오는 중이에요"
-                    ) { viewModel.cancelLoading() }
-                case .failure(let err):
-                    DefaultProgressView(
-                        status: .failure,
-                        message: err.localizedDescription
-                    ) { viewModel.retry() }
-                    
-                case .cancel(let err):
-                    DefaultProgressView(
-                        status: .cancel,
-                        message: err.localizedDescription
-                    ) { viewModel.retry() }
-                    
-                case .success:
-                    if data.isEmpty {
-                        DefaultProgressView(
-                            status: .failure,
-                            message: "최근 24시간 체결 데이터가 없어요"
-                        ) { viewModel.retry() }
-                    } else {
-                        let yRange = viewModel.yAxisRange(from: data)
-                        let xDomain = viewModel.xAxisDomain(for: data)
-                        let scrollTo = viewModel.scrollToTime(for: data)
-                        
-                        /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
-                        CandleChartView(
-                            data: data,
-                            xDomain: xDomain,
-                            yRange: yRange,
-                            scrollTo: scrollTo,
-                            timeFormatter: viewModel.timeFormatter,
-                            positiveColor: themeManager.selectedTheme.positiveColor,
-                            negativeColor: themeManager.selectedTheme.negativeColor
-                        )
-                    }
-                }
-            }
-            .padding(.top, 40)
-            .padding(.bottom, 20)
-            .frame(height: 380)
+            headerView
+            chartArea
         }
         .padding(20)
-        .onAppear {
-            viewModel.checkBookmark()
-        }
-        .onDisappear {
-            viewModel.stopUpdating()
-        }
+        .onAppear { viewModel.checkBookmark() }
+        .onDisappear { viewModel.stopUpdating() }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.aiCoBackground)
