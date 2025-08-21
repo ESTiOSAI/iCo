@@ -38,7 +38,7 @@ struct MarketView: View {
 
                     if !records.isEmpty {
                         RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
-                            viewModel.removeRecentSearchKeyword(coin)
+                            // TODO: 삭제 작업 필요
                         }) { coin in selectedCoin = coin }
                     }
                 }
