@@ -260,12 +260,10 @@ extension ChartViewModel {
 }
 
 extension ChartViewModel {
-    /// 헤더를 보여줄 수 있는지
-    /// 헤더 표시 조건:
-    /// - Ticker 기반 값이 도착했으면(summary 유무와 무관하게) 헤더를 보여줌
-    /// - Ticker도 실패하고 summary도 없으면 숨김(초기 로딩/취소/실패 시 깜빡임 방지)
+    /// 헤더 노출: 최근 캔들 있음(`lastUpdated != nil`) && (티커값(`headerLastPrice != 0`) 또는 `summary` 존재)
+    /// 헤더 숨김: 캔들 없음(로딩/실패/빈 데이터) → 레이아웃 밀림 방지
     var hasHeader: Bool {
-        headerLastPrice != 0 || summary != nil
+        (lastUpdated != nil) && (headerLastPrice != 0 || summary != nil)
     }
     
     /// 표시에 사용할 값들

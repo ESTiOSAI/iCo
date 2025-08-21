@@ -11,6 +11,7 @@ import Charts
 /// 코인 상세 화면의 가격 차트 뷰
 /// `ChartViewModel`이 제공하는 시계열 데이터를 라인 차트로 렌더링
 struct ChartView: View {
+    // MARK: - State / Env
     /// 헤더/차트에 바인딩되는 상태를 관리하는 ViewModel
     @StateObject private var viewModel: ChartViewModel
     /// 세그먼트 탭 선택 인덱스 (커스텀 SegmentedControlView와 바인딩)
@@ -18,11 +19,7 @@ struct ChartView: View {
     /// 현재 선택된 테마 정보를 가져오기 위한 전역 상태 객체
     @EnvironmentObject var themeManager: ThemeManager
 
-    /// 차트 데이터 (시계열 포인트)
-    private var data: [CoinPrice] { viewModel.prices }
-    /// 헤더의 가격 요약 정보(마지막가 / 변화 / 등락률)
-    private var summary: PriceSummary? { viewModel.summary }
-
+    // MARK: - Init
     /// 프로덕션 기본 경로
     init(coin: Coin) {
         _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
@@ -45,7 +42,8 @@ struct ChartView: View {
     }
     #endif
 
-
+    // MARK: - Computed & Helpers
+    /// 차트 데이터 (시계열 포인트)
     private static let headerDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy.MM.dd HH:mm"
@@ -53,20 +51,20 @@ struct ChartView: View {
         return f
     }()
     
+    private var data: [CoinPrice] { viewModel.prices }
+    
+    private var shouldShowHeader: Bool {
+        if case .success = viewModel.status, viewModel.hasHeader { return true }
+        return false
+    }
+    
     /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
         guard let time = viewModel.lastUpdated else { return "" }
         return Self.headerDateFormatter.string(from: time) + " 기준"
     }
     
-    /// 헤더는 성공 상태이면서 기준 시각이 있을 때만 보이도록 (깜빡임/오표시 방지)
-    private var headerOpacity: Double {
-        if case .success = viewModel.status, viewModel.lastUpdated != nil {
-            return 1
-        }
-        return 0
-    }
-    
+    /// 뷰 전용 매핑 (테마/색)
     private var headerColor: Color {
         let v = viewModel.displayChangeValue
         if v > 0 { return themeManager.selectedTheme.positiveColor }
@@ -74,11 +72,37 @@ struct ChartView: View {
         return .gray
     }
     
-    private var sign: String { viewModel.displayChangeValue > 0 ? "+" : (viewModel.displayChangeValue < 0 ? "-" : "") }
-    private var arrow: String { viewModel.displayChangeValue > 0 ? "▲" : (viewModel.displayChangeValue < 0 ? "▼" : "") }
+    // MARK: - Body
+    var body: some View {
+        VStack(alignment: .leading) {
+            if shouldShowHeader {
+                headerView
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            chartArea
+        }
+        .animation(.easeInOut(duration: 0.2), value: shouldShowHeader)
+        .padding(20)
+        .onAppear { viewModel.checkBookmark() }
+        .onDisappear { viewModel.stopUpdating() }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.aiCoBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.default, lineWidth: 0.5)
+        )
+    }
     
+    // MARK: - Subviews
     @ViewBuilder
     private var headerView: some View {
+        let change = viewModel.displayChangeValue
+        let sign   = change > 0 ? "+" : (change < 0 ? "-" : "")
+        let arrow  = change > 0 ? "▲" : (change < 0 ? "▼" : "")
+        let absChange  = abs(change)
+
         /// 타이틀 영역
         HStack(alignment: .top, spacing: 8) {
             /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
@@ -87,25 +111,21 @@ struct ChartView: View {
                     .font(.system(size: 10, weight: .regular))
                     .foregroundStyle(.aiCoLabel)
                     .lineLimit(1)
-                    .opacity(headerOpacity)
                 
                 Text(viewModel.displayLastPrice.formatKRW)
                     .font(.system(size: 20, weight: .bold))
                     .foregroundStyle(.aiCoLabel)
                     .lineLimit(1)
-                    .opacity(viewModel.hasHeader ? 1 : 0)
                 
-                Text("\(sign)\(abs(viewModel.displayChangeValue).formatKRW).formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
+                Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(headerColor)
                     .lineLimit(1)
-                    .opacity(viewModel.hasHeader ? 1 : 0)
                 
                 Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.aiCoLabelSecondary)
                     .lineLimit(1)
-                    .opacity(viewModel.hasHeader ? 1 : 0)
             }
             
             Spacer()
@@ -182,15 +202,8 @@ struct ChartView: View {
     }
 }
 
-//#Preview {
-//    ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
-//        .environmentObject(ThemeManager())
-//}
-
-
-
 /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
-struct CandleChartView: View {
+private struct CandleChartView: View {
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
     let yRange: ClosedRange<Double>
@@ -198,7 +211,6 @@ struct CandleChartView: View {
     let timeFormatter: DateFormatter
     let positiveColor: Color
     let negativeColor: Color
-    private let barWidth: CGFloat = 6
     
     var body: some View {
         Chart(data) { point in
@@ -264,4 +276,9 @@ struct CandleChartView: View {
         /// 차트 오른쪽 영역에 여백 추가
         .chartPlotStyle { $0.padding(.trailing, 10).padding(.bottom, 8) }
     }
+}
+
+#Preview {
+    ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
+        .environmentObject(ThemeManager())
 }
