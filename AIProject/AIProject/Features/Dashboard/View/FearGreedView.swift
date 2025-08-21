@@ -11,6 +11,7 @@ import SwiftUI
 ///
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: FearGreedViewModel
     
     private static let cornerRadius: CGFloat = 10
@@ -20,26 +21,27 @@ struct FearGreedView: View {
     }
     
     var body: some View {
-        VStack(spacing: 8) {
-            Text("공포 & 탐욕 지수")
-                .font(.system(size: 19, weight: .bold))
-                .foregroundStyle(.aiCoLabel)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            HStack(spacing: 16) {
+        HStack(alignment: .top, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("공포 & 탐욕 지수")
+                    .font(.system(size: 19, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+                
                 Text("ⓘ Fear & Greed 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
                     .font(.system(size: 11))
                     .foregroundStyle(.aiCoLabelSecondary)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                
-                ChartView(viewModel: viewModel)
-                    .frame(width: 80, height: 80)
             }
+            
+            Spacer()
+            
+            ChartView(viewModel: viewModel)
+                .frame(width: 90, height: 90)
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
-        .background(viewModel.fearGreedBackgroundColor)
+        .background(viewModel.baseColor.opacity(colorScheme == .dark ? 0.15 : 0.05))
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: Self.cornerRadius)
@@ -105,4 +107,3 @@ extension FearGreedView {
 #Preview {
     FearGreedView()
 }
-

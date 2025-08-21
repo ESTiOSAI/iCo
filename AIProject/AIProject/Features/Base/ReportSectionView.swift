@@ -81,23 +81,24 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                     DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요") {
                         onCancel()
                     }
-                    .padding(.vertical, 30)
+                    .padding(.vertical, 20)
                 case .success(let value):
                     content(value)
                         .font(.system(size: 14))
                         .foregroundStyle(.aiCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxHeight: .infinity, alignment: .top)
                 case .cancel(let error):
                     DefaultProgressView(status: .cancel, message: error.localizedDescription) {
                         onRetry()
                     }
-                    .padding(.vertical, 30)
+                    .padding(.vertical, 20)
                 case .failure(let error):
                     DefaultProgressView(status: .failure, message: error.localizedDescription) {
                         onRetry()
                     }
-                    .padding(.vertical, 30)
+                    .padding(.vertical, 20)
                 }
             }
         }

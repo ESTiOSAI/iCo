@@ -18,6 +18,10 @@ struct ReportView: View {
     @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject var viewModel: ReportViewModel
     
+    private var isPadLayout: Bool {
+        hSizeClass == .regular && vSizeClass == .regular
+    }
+    
     init(coin: Coin) {
         _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
@@ -67,7 +71,7 @@ struct ReportView: View {
             }
         }
         
-        if hSizeClass == .regular && vSizeClass == .regular {
+        if isPadLayout {
             VStack(alignment: .leading, spacing: 16) {
                 Text("AI 리포트")
                     .font(.system(size: 18, weight: .bold))
