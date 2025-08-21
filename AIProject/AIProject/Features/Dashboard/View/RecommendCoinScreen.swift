@@ -13,27 +13,37 @@ struct RecommendCoinScreen: View {
     var body: some View {
         VStack(alignment: .center, spacing: .headerContentSpacing) {
             RecommendHeaderView()
+            
+            coinContentView()
+                .frame(height: .cardHeight + 1) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
+                .padding(.bottom, 40)
+        }
+    }
 
-            Group {
-                switch viewModel.status {
-                case .loading:
-                    RecomendationPlaceholderCardView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
-                        Task { await viewModel.cancelTask() }
-                    }
-                case .success:
-                    SuccessCoinView(viewModel: viewModel)
-                case .failure(let networkError):
-                    RecomendationPlaceholderCardView(status: .failure, message: networkError.localizedDescription) {
-                        viewModel.loadRecommendCoin()
-                    }
-                case .cancel(let networkError):
-                    RecomendationPlaceholderCardView(status: .cancel, message: networkError.localizedDescription) {
-                        viewModel.loadRecommendCoin()
-                    }
-                }
+    @ViewBuilder
+    func coinContentView() -> some View {
+        switch viewModel.status {
+        case .loading:
+            RecomendationPlaceholderCardView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
+                Task { await viewModel.cancelTask() }
             }
-            .frame(height: .cardHeight)
-            .padding(.bottom, 40)
+        case .success:
+            if !(viewModel.recommendCoins.count > 0) {
+                // 최종적으로 반환된 코인이 1개도 없을 때
+                RecomendationPlaceholderCardView(status: .failure, message: "추천할 코인을 찾지 못했어요\n잠시 후 다시 시도해주세요") {
+                    viewModel.loadRecommendCoin()
+                }
+            } else {
+                SuccessCoinView(viewModel: viewModel)
+            }
+        case .failure(let networkError):
+            RecomendationPlaceholderCardView(status: .failure, message: networkError.localizedDescription) {
+                viewModel.loadRecommendCoin()
+            }
+        case .cancel(let networkError):
+            RecomendationPlaceholderCardView(status: .cancel, message: networkError.localizedDescription) {
+                viewModel.loadRecommendCoin()
+            }
         }
     }
 }
