@@ -73,6 +73,9 @@ struct MarketView: View {
                 .task {
                     await store.load()
                 }
+                .navigationDestination(item: $selectedCoin) { coin in
+                    CoinDetailView(coin: coin)
+                }
             }
             .navigationSplitViewColumnWidth(min: 400, ideal: 400, max: 400)
         } detail: {
@@ -83,7 +86,6 @@ struct MarketView: View {
             }
         }
         .navigationSplitViewStyle(.balanced) // 균등 분할
-        .navigationSplitViewStyle(.prominentDetail) // 디테일 뷰 강조
     }
 }
 
