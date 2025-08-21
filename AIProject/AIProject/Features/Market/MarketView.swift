@@ -14,7 +14,8 @@ struct MarketView: View {
     
     @State private var searchText: String = ""
     @State private var selectedCoin: Coin?
-    
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+
     @FetchRequest(
         fetchRequest: SearchRecordEntity.recent(),
         animation: .default
@@ -27,54 +28,61 @@ struct MarketView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                HeaderView(heading: "마켓")
-                
-                SearchBarView(searchText: $searchText)
-                    .padding(.horizontal, 16)
-                
-                if !records.isEmpty {
-                    RecentCoinSectionView(
-                        coins: records.compactMap { store.coinMeta[$0.query]
-                        }) { coin in
-                            selectedCoin = coin
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            Group {
+                VStack(spacing: 16) {
+                    HeaderView(heading: "마켓")
+
+                    SearchBarView(searchText: $searchText)
+                        .padding(.horizontal, 16)
+
+                    if !records.isEmpty {
+                        RecentCoinSectionView(
+                            coins: records.compactMap { store.coinMeta[$0.query]
+                            }) { coin in
+                                selectedCoin = coin
+                            }
+                    }
+                }
+
+                VStack(spacing: 16) {
+                    HStack(spacing: 16) {
+                        RoundedRectangleButton(title: "전체", isActive: store.filter == .none) {
+                            store.filter = .none
                         }
-                }
-            }
-            
-            VStack(spacing: 16) {
-                HStack(spacing: 16) {
-                    RoundedRectangleButton(title: "전체", isActive: store.filter == .none) {
-                        store.filter = .none
+
+                        RoundedRectangleButton(title: "북마크", isActive: store.filter == .bookmark) {
+                            store.filter = .bookmark
+                        }
                     }
-                    
-                    RoundedRectangleButton(title: "북마크", isActive: store.filter == .bookmark) {
-                        store.filter = .bookmark
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    CoinListView(store: store, selectedCoin: $selectedCoin)
+                }
+                .padding(16)
+                .refreshable {
+                    Task {
+                        await store.refresh()
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                
-                CoinListView(store: store, selectedCoin: $selectedCoin)
-            }
-            .padding(16)
-            .refreshable {
-                Task {
-                    await store.refresh()
+                .onChange(of: searchText, { oldValue, newValue in
+                    Task {
+                        await store.search(newValue)
+                    }
+                })
+                .task {
+                    await store.load()
                 }
             }
-            .onChange(of: searchText, { oldValue, newValue in
-                Task {
-                   await store.search(newValue)
-                }
-            })
-            .task {
-                await store.load()
-            }
-            .navigationDestination(item: $selectedCoin) { coin in
-                CoinDetailView(coin: coin)
+        } detail: {
+            if let selectedCoin {
+                CoinDetailView(coin: selectedCoin)
+            } else {
+                Text("Empty")
             }
         }
+        .navigationSplitViewStyle(.balanced) // 균등 분할
+        .navigationSplitViewStyle(.prominentDetail) // 디테일 뷰 강조
     }
 }
 
