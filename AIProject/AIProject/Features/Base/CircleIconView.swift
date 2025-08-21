@@ -26,7 +26,7 @@ struct CircleIconView: View {
         .frame(width: 36, height: 36)
         .background(.aiCoBackgroundAccent)
         .clipShape(Circle())
-        .overlay(Circle().stroke(.accent, lineWidth: 0.5))
+        .overlay(Circle().stroke(.accentGradient, lineWidth: 0.5))
     }
 }
 

@@ -11,12 +11,14 @@ struct RecommendCoinView: View {
     @StateObject private var viewModel = RecommendCoinViewModel()
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             LinearGradient(
-                colors: [.aiBackgroundGradientProminent, .aiBackgroundGradientLight],
+                colors: [.aiBackgroundGradientLight, .aiBackgroundGradientProminent],
                 startPoint: .topLeading,
                 endPoint: .bottom
             )
+            .frame(height: .headerHeight + .headerContentSpacing + (.cardHeightActive / 2))
+            
             RecommendCoinScreen(viewModel: viewModel)
         }
     }

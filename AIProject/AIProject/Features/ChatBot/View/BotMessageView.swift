@@ -20,7 +20,7 @@ struct BotMessageView: View {
                     .padding(8)
                     .overlay {
                         Circle()
-                            .stroke(.accent, lineWidth: 0.5)
+                            .stroke(.accentGradient, lineWidth: 0.5)
                     }
                     .background {
                         Circle()
@@ -49,7 +49,7 @@ struct BotMessageView: View {
             }
             .overlay {
                 RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
-                    .stroke(.accent, lineWidth: 0.5)
+                    .stroke(.accentGradient, lineWidth: 0.5)
             }
             .frame(maxWidth: 300, alignment: .leading)
 

@@ -47,7 +47,7 @@ struct RoundedRectangleButton: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(isActive ? .accent : .default, lineWidth: 0.5)
+                    .stroke(isActive ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             )
         }
     }

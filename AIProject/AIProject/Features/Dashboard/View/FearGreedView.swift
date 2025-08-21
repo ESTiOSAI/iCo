@@ -43,7 +43,7 @@ struct FearGreedView: View {
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: Self.cornerRadius)
-                .stroke(.default, lineWidth: 0.5)
+                .stroke(.defaultGradient, lineWidth: 0.5)
         )
     }
 }

@@ -23,10 +23,15 @@ struct RecommendHeaderView: View {
             SubheaderView(
                 imageName: "sparkles",
                 subheading: "이런 코인은 어떠세요?",
-                description: "회원님의 관심 코인을 기반으로\n새로운 코인을 추천해드려요",
+                description: "회원님의 관심 코인을 기반으로 새로운 코인을 추천해드려요",
                 imageColor: .white,
                 fontColor: .white
             )
         }
+        .frame(height: .headerHeight)
     }
+}
+
+#Preview() {
+    RecommendCoinView()
 }

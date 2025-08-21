@@ -15,8 +15,6 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 RecommendCoinView()
-                    .padding(.bottom, 50)
-
                 AIBriefingView()
             }
             .ignoresSafeArea(edges: .top)

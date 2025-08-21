@@ -14,15 +14,20 @@ struct CoinView: View {
     var body: some View {
         CachedAsyncImage(resource: .symbol(symbol)) {
             Text(String(symbol.prefix(1)))
-                .font(.caption.bold())
+                .font(.system(size: size / 2))
+                .foregroundStyle(.aiCoAccent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(.aiCoBackgroundAccent)
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
         .contentShape(Circle())
         .overlay(
-            Circle().strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
+            Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
     }
 }
 
+#Preview {
+    CoinView(symbol: "KWR-BTC", size: 40)
+}
