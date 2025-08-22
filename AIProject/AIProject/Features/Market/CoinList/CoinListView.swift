@@ -16,68 +16,28 @@ struct CoinListView: View {
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
-            animation: .default
+        animation: .default
     )
     private var bookmarks: FetchedResults<BookmarkEntity>
     
-    @Binding private var selectedCoin: Coin?
+    @Binding private var selectedCoinID: CoinID?
     
-    @ViewBuilder func makeCoinContents() -> some View {
-        if store.filter == .bookmark, store.sortedCoinIDs.isEmpty {
-            VStack {
-                Spacer()
-                
-                Text("북마크한 코인이 없습니다 🥵")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 300)
-                    .multilineTextAlignment(.center)
-                    .padding()
-                
-                Spacer()
-            }.frame(maxHeight: .infinity)
-        } else {
-            ForEach(store.sortedCoinIDs, id: \.self) { id in
-                if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
-                    CoinCell(coin: meta, store: ticker)
-                        .onTapGesture {
-                            selectedCoin = meta
-                            store.addRecord(id)
-                        }
-                        .onAppear {
-                            visibleCoins.insert(id)
-                        }
-                        .onDisappear {
-                            visibleCoins.remove(id)
-                        }
-                }
-            }
-        }
-    }
-    
-    init(store: MarketStore, selectedCoin: Binding<Optional<Coin>>) {
+    init(store: MarketStore, selectedCoinID: Binding<CoinID?>) {
         self.store = store
-        self._selectedCoin = selectedCoin
+        _selectedCoinID = selectedCoinID
     }
     
     var body: some View {
         VStack(spacing: 0) {
             CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
-            
-            List {
-                makeCoinContents()
-                    .listRowBackground(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
-            }
-            .listStyle(.plain)
-            .scrollIndicators(.hidden)
-            .scrollContentBackground(.hidden)
-            .clipShape(.rect(cornerRadius: 16))
-            .background {
-                UnevenRoundedRectangle(topLeadingRadius: 0, bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 0, style: .continuous)
-                    .stroke(.defaultGradient, lineWidth: 0.5)
-                    .fill(Color.aiCoBackground)
-            }
+            makeCoinContents()
         }
+        .background {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.defaultGradient, lineWidth: 0.5)
+                .fill(Color.aiCoBackground)
+        }
+        .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
             Task {
                 await handleConnection(by: newValue)
@@ -102,6 +62,43 @@ struct CoinListView: View {
             Task {
                 await store.disconnect()
             }
+        }
+    }
+    
+    @ViewBuilder func makeCoinContents() -> some View {
+        if store.filter == .bookmark, bookmarks.isEmpty {
+            VStack {
+                Spacer()
+                
+                Text("북마크한 코인이 없습니다 🥵")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 300)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                
+                Spacer()
+            }
+        } else {
+            List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
+                if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
+                    CoinCell(coin: meta, store: ticker)
+                        .onTapGesture {
+                            store.addRecord(id)
+                            selectedCoinID = id
+                        }
+                        .listRowBackground(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
+                        .onAppear {
+                            visibleCoins.insert(id)
+                        }
+                        .onDisappear {
+                            visibleCoins.remove(id)
+                        }
+                }
+            }
+            .listStyle(.plain)
+            .scrollIndicators(.hidden)
+            .scrollContentBackground(.hidden)
         }
     }
 }

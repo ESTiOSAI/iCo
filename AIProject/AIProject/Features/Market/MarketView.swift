@@ -13,7 +13,7 @@ struct MarketView: View {
     @StateObject private var viewModel: SearchViewModel
 
     @State private var searchText: String = ""
-    @State private var selectedCoin: Coin?
+    @State private var selectedCoinID: CoinID?
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     @FetchRequest(
@@ -28,7 +28,7 @@ struct MarketView: View {
     }
 
     var body: some View {
-        NavigationSplitView(columnVisibility: $columnVisibility) {
+        NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
             Group {
                 VStack(spacing: 16) {
                     HeaderView(heading: "마켓")
@@ -39,7 +39,7 @@ struct MarketView: View {
                     if !records.isEmpty {
                         RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
                             // TODO: 삭제 작업 필요
-                        }) { coin in selectedCoin = coin }
+                        }) { selectedCoinID = $0 }
                     }
                 }
 
@@ -55,7 +55,7 @@ struct MarketView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    CoinListView(store: store, selectedCoin: $selectedCoin)
+                    CoinListView(store: store, selectedCoinID: $selectedCoinID)
                 }
                 .padding(16)
                 .refreshable {
@@ -71,26 +71,27 @@ struct MarketView: View {
                 .task {
                     await store.load()
                 }
-                .navigationDestination(item: $selectedCoin) { coin in
-                    CoinDetailView(coin: coin)
-                }
             }
+            .toolbar(removing: .sidebarToggle)
             .navigationSplitViewColumnWidth(min: 400, ideal: 400, max: 400)
+            
         } detail: {
-            if let selectedCoin {
-                CoinDetailView(coin: selectedCoin)
+            if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
+                CoinDetailView(coin: coin)
+                
             } else {
                 Text("Empty")
             }
         }
-        .navigationSplitViewStyle(.balanced) // 균등 분할
+        .navigationSplitViewStyle(.balanced)
+        
     }
 }
 
 fileprivate struct RecentCoinSectionView: View {
     let coins: [Coin]
     let deleteAction: (Coin) -> Void
-    let tapAction: (Coin) -> Void
+    let tapAction: (CoinID) -> Void
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -115,7 +116,7 @@ fileprivate struct RecentCoinSectionView: View {
                         Capsule().stroke(.defaultGradient, lineWidth: 0.5)
                     }
                     .onTapGesture {
-                        tapAction(coin)
+//                        tapAction(coin.id)
                     }
                 }
             }
