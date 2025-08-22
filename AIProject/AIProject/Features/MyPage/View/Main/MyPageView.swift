@@ -10,14 +10,13 @@ import MessageUI
 
 struct MyPageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
-    @Environment(\.verticalSizeClass) var vSizeClass
     @State private var selection: String? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showMail = false
 
     var body: some View {
         Group {
-            if hSizeClass == .regular && vSizeClass == .regular {
+            if hSizeClass == .regular {
                 // iPad
                 NavigationSplitView(columnVisibility: $columnVisibility) {
                     sidebar
@@ -62,20 +61,16 @@ struct MyPageView: View {
                             .fontWeight(.semibold)
 
                         VStack(spacing: 16) {
-                            if hSizeClass == .regular && vSizeClass == .regular {
-                                Button {
-                                    selection = "contact"
-                                } label: {
-                                    MyPageMenuRow(title: "문의하기", imageName: "at")
-                                }
-                            } else {
-                                Button {
-                                    if MFMailComposeViewController.canSendMail() {
-                                        showMail = true
+                            Button {
+                                if MFMailComposeViewController.canSendMail() {
+                                    showMail = true
+                                } else {
+                                    if hSizeClass == .regular {
+                                        selection = "contact"
                                     }
-                                } label: {
-                                    MyPageMenuRow(title: "문의하기", imageName: "at")
                                 }
+                            } label: {
+                                MyPageMenuRow(title: "문의하기", imageName: "at")
                             }
 
                             menuButton("privacy", title: "인공지능(AI) 윤리기준", imageName: "sparkles")
@@ -110,6 +105,16 @@ struct MyPageView: View {
             ThemeView()
         case "theme":
             ThemeView()
+        case "contact":
+            VStack(alignment: .center, spacing: 12) {
+                Text("메일 계정을 설정해야 메일을 보낼 수 있습니다.")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.aiCoLabelSecondary)
+                Text("설정 > Mail 앱에서 계정을 추가하세요.")
+                    .font(.system(size: 17))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding()
         case "privacy":
             PrivacyPolicyView()
         default:
@@ -121,7 +126,7 @@ struct MyPageView: View {
     // MARK: - 메뉴 버튼 (iPad는 selection 변경, iPhone은 NavigationLink)
     @ViewBuilder
     private func menuButton(_ tag: String, title: String, imageName: String) -> some View {
-        if hSizeClass == .regular && vSizeClass == .regular {
+        if hSizeClass == .regular {
             // ipad
             Button {
                 selection = tag
