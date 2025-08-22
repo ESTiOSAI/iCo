@@ -117,7 +117,7 @@ fileprivate struct RecentCoinSectionView: View {
                         Capsule().stroke(.defaultGradient, lineWidth: 0.5)
                     }
                     .onTapGesture {
-//                        tapAction(coin.id)
+                        tapAction(coin.id)
                     }
                 }
             }
