@@ -103,6 +103,9 @@ final class ChartViewModel: ObservableObject {
     
     /// 네트워크/루프 중단
     func stopUpdating() {
+        #if DEBUG
+        print("[ChartVM] stopUpdating() — cancel loop for \(coinSymbol)")
+        #endif
         updateTask?.cancel()
         updateTask = nil
     }
@@ -194,8 +197,14 @@ final class ChartViewModel: ObservableObject {
             
             if showLoading { status = .success }
         } catch is CancellationError {
+            #if DEBUG
+            print("[ChartVM] loadPrices cancelled — market=\(coinSymbol), last=\(String(describing: prices.last?.date)), count=\(prices.count)")
+            #endif
             return
         } catch NetworkError.taskCancelled {
+            #if DEBUG
+            print("[ChartVM] loadPrices taskCancelled — market=\(coinSymbol)")
+            #endif
             return
         } catch {
             let err = (error as? NetworkError)
