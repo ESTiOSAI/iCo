@@ -82,8 +82,10 @@ final class ChartViewModel: ObservableObject {
         updateTask?.cancel() // 중복 시작 방지
         
         updateTask = Task { [weak self] in
-            await self?.loadPrices() // 최초 1회
+            /// 1) 최초 1회: 전체 로드 + 로딩 표시
+            await self?.loadPrices(showLoading: true)
             
+            /// 2) 이후: 60초마다 증분 갱신 (스피너 없음)
             while !Task.isCancelled {
                 _ = try? await Task.sleep(nanoseconds: 60 * 1_000_000_000)
                 
@@ -119,9 +121,12 @@ final class ChartViewModel: ObservableObject {
     
     /// API로부터 실시간 가격 데이터를 불러와 시계열 배열로 갱신함
     /// - Parameter interval: 차트 간격 (기본: 1일)
-    func loadPrices(interval: CoinInterval = .all.first!) async {
+    func loadPrices(
+        interval: CoinInterval = .all.first!,
+        showLoading: Bool = true
+    ) async {
         /// 로딩 상태 진입 (초기/재시도 시 ProgressView와 동기화)
-        status = .loading
+        if showLoading { status = .loading }
         
         do {
             let marketCode = coinSymbol
@@ -179,15 +184,15 @@ final class ChartViewModel: ObservableObject {
             
             /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
             guard !Task.isCancelled else {
-                status = .cancel(.taskCancelled)
+                if showLoading { status = .cancel(.taskCancelled) }
                 return
             }
-            status = .success
+            if showLoading { status = .success }
         } catch is CancellationError {
-            status = .cancel(.taskCancelled)
+            if showLoading { status = .cancel(.taskCancelled) }
             return
         } catch NetworkError.taskCancelled {
-            status = .cancel(.taskCancelled)
+            if showLoading { status = .cancel(.taskCancelled) }
             return
         } catch {
             let err = (error as? NetworkError)
@@ -196,10 +201,12 @@ final class ChartViewModel: ObservableObject {
             #if DEBUG
             print("가격 불러오기 실패: \(err.log())")
             #endif
-            status = .failure(err)
-            
-            /// 실패 시 기준 시각 초기화
-            lastUpdated = nil
+            if showLoading {
+                status = .failure((error as? NetworkError) ?? .networkError(URLError(.unknown)))
+                lastUpdated = nil
+            }
+        }
+    }
         }
     }
     
