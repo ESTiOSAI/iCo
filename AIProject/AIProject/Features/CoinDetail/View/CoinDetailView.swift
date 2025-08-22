@@ -8,65 +8,92 @@
 import SwiftUI
 
 struct CoinDetailView: View {
-    @State private var selectedTab = 0
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    @State private var selectedTab: Tab = .chart
     
     let coin: Coin
     
-    private let tabs = ["차트", "AI 리포트"]
-    
     var body: some View {
-        VStack(spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(coin.koreanName)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
-
-                Text(coin.id)                        
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.aiCoLabelSecondary)
-
-                Spacer()
-            }
-            .padding(.bottom, 5)
-            
-            HStack(spacing: 8) {
-                ForEach(tabs.indices, id: \.self) { index in
-                    RoundedRectangleButton(
-                        title: tabs[index],
-                        isActive: selectedTab == index
-                    ) {
-                        selectedTab = index
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    // 헤더
+                    if hSizeClass == .regular {
+                        HStack(alignment: .lastTextBaseline) {
+                            HeaderView(heading: coin.koreanName) // FIXME: 코인 심볼
+                        }
+                    } else {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text(coin.koreanName)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(.aiCoLabel)
+                            
+                            Text(coin.coinSymbol)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.aiCoLabelSecondary)
+                            
+                            Spacer()
+                        }
+                        .padding(EdgeInsets(top: 20, leading: 16, bottom: 16, trailing: 16))
                     }
-                    .frame(height: 36)
+                    
+                    
+                    VStack(spacing: 16) {
+                        // 버튼
+                        if hSizeClass == .compact {
+                            HStack(spacing: 16) {
+                                ForEach(Tab.allCases) { tab in
+                                    RoundedRectangleButton(
+                                        title: tab.title,
+                                        isActive: selectedTab == tab
+                                    ) {
+                                        withAnimation(.easeInOut(duration: 0.22)) {
+                                            selectedTab = tab
+                                        }
+                                    }
+                                }
+                                Spacer(minLength: 0)
+                            }
+                        }
+                        
+                        // 콘텐츠
+                        if hSizeClass == .regular {
+                            ChartView(coin: coin)
+                                .frame(height: proxy.size.height * 0.55)
+                            
+                            ReportView(coin: coin)
+                                .padding(.top, 20)
+                        } else {
+                            switch selectedTab {
+                            case .chart:
+                                ChartView(coin: coin)
+                                    .frame(height: proxy.size.height * 0.8)
+                            case .report:
+                                ReportView(coin: coin)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
                 }
-                Spacer(minLength: 0)
             }
-            .padding(.bottom, 10)
-            
-            ZStack(alignment: .topLeading) {
-                /// 차트 탭
-                ChartView(coin: coin)
-                    .opacity(selectedTab == 0 ? 1 : 0)
-                    .allowsHitTesting(selectedTab == 0)
-                    .accessibilityHidden(selectedTab != 0)
+            .scrollIndicators(.hidden)
+        }
+        //        .toolbar(.hidden, for: .navigationBar)
+    }
+}
 
-                /// AI 리포트 탭
-                ReportView(coin: coin)
-                    .opacity(selectedTab == 1 ? 1 : 0)
-                    .allowsHitTesting(selectedTab == 1)
-                    .accessibilityHidden(selectedTab != 1)
+extension CoinDetailView {
+    private enum Tab: Int, CaseIterable, Identifiable {
+        case chart
+        case report
+        
+        var id: Int { rawValue }
+        
+        var title: String {
+            switch self {
+            case .chart: return "차트"
+            case .report: return "AI 리포트"
             }
-            .animation(.easeInOut(duration: 0.15), value: selectedTab)
-
-             Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 20) 
-        .background(.aiCoBackground)
-        .safeAreaInset(edge: .top) {
-            Color.clear.frame(height: 80)
-        }
-        .safeAreaInset(edge: .bottom) {
-            Color.clear.frame(height: 40)
         }
     }
 }

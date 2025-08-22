@@ -15,20 +15,20 @@ import SwiftUI
 ///   - coin: 리포트를 보여줄 대상 코인
 struct ReportView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
-    @Environment(\.verticalSizeClass) var vSizeClass
     @StateObject var viewModel: ReportViewModel
-    
-    private var isPadLayout: Bool {
-        hSizeClass == .regular && vSizeClass == .regular
-    }
     
     init(coin: Coin) {
         _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
     var body: some View {
-        let content =
         VStack(alignment: .leading, spacing: 16) {
+            if hSizeClass == .regular {
+                Text("AI 리포트")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+            }
+            
             Text(String.aiGeneratedContentNotice)
                 .font(.system(size: 11))
                 .foregroundStyle(.aiCoNeutral)
@@ -70,25 +70,10 @@ struct ReportView: View {
                     .padding(.bottom, 30)
             }
         }
-        
-        if isPadLayout {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("AI 리포트")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
-                
-                content
-            }
-        } else {
-            ScrollView(.vertical) {
-                content
-            }
-            .scrollIndicators(.hidden)
-        }
     }
 }
 
 #Preview {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
-    return ReportView(coin: sampleCoin).padding(.horizontal, 16)
+    return ScrollView { ReportView(coin: sampleCoin).padding(.horizontal, 16) }
 }
