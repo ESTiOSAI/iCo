@@ -136,31 +136,27 @@ struct SuccessCoinView: View {
 
                 switch (position, indexInGroup) {
                 case (0, totalCoinCount - 1):
-                    print("첫 번째 배열의 마지막 코인에 도달: 맨 뒤의 배열 삭제 + 앞에 새로운 배열 추가")
-                    
-                    Task {
-                        try? await Task.sleep(nanoseconds: 500_000_000)
-                        wrappedCoins.removeLast()
-                        wrappedCoins.insert(recommendedCoins, at: 0)
-                        self.cardID = cardID + totalCoinCount
-                    }
-                    
+                    wrappedCoins.removeLast()
+                    wrappedCoins.insert(recommendedCoins, at: 0)
+                    self.cardID = cardID + totalCoinCount
                     return
                 case (2, 0):
-                    print("마지막 배열의 첫 번째 코인에 도달: 맨 앞의 배열 삭제 + 뒤에 새로운 배열 추가")
-                    
-                    Task {
-                        try? await Task.sleep(nanoseconds: 500_000_000)
-                        wrappedCoins.removeFirst()
-                        wrappedCoins.append(recommendedCoins)
+                    wrappedCoins.removeFirst()
+                    wrappedCoins.append(recommendedCoins)
                         self.cardID = cardID - totalCoinCount
+                        
+                        Task {
+                            try? await Task.sleep(nanoseconds: 50_000_000)
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                if let cardID = self.cardID {
+                                    self.cardID = (cardID + 1) % (totalCoinCount * 3)
+                                }
+                            }
                     }
                     return
                 default:
-                    Task {
-                        withAnimation(.easeInOut(duration: 0.5)) {
-                            self.cardID = (cardID + 1) % (totalCoinCount * 3)
-                        }
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        self.cardID = (cardID + 1) % (totalCoinCount * 3)
                     }
                 }
             }
