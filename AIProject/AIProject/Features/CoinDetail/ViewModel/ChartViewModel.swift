@@ -300,11 +300,11 @@ final class ChartViewModel: ObservableObject {
             lastUpdated = prices.last?.date
         } catch is CancellationError {
             #if DEBUG
-            print("증분 갱신 취소 - market=\(coinSymbol), last=\(String(describing: prices.last?.date)), count=\(prices.count)")
+            print("[ChartVM] refreshLatestCandles cancelled - market=\(coinSymbol), last=\(String(describing: prices.last?.date)), count=\(prices.count)")
             #endif
         } catch {
             #if DEBUG
-            print("증분 갱신 실패 - \(error)")
+            print("refreshLatestCandles failed - \(error)")
             #endif
         }
     }
