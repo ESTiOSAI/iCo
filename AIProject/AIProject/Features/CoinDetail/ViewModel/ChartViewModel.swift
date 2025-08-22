@@ -82,8 +82,13 @@ final class ChartViewModel: ObservableObject {
         updateTask?.cancel() // 중복 시작 방지
         
         updateTask = Task { [weak self] in
+            guard let self else { return }
+
+            /// 이미 데이터가 있으면 스피너 없이 로드 (재진입 UX 안정)
+            let shouldShowSpinner = self.prices.isEmpty
+            
             /// 1) 최초 1회: 전체 로드 + 로딩 표시
-            await self?.loadPrices(showLoading: true)
+            await self.loadPrices(showLoading: true)
             
             /// 2) 이후: 60초마다 증분 갱신 (스피너 없음)
             while !Task.isCancelled {
@@ -91,7 +96,7 @@ final class ChartViewModel: ObservableObject {
                 
                 if Task.isCancelled { break } // 취소 시 즉시 종료
                 
-                await self?.refreshLatestCandles()
+                await self.refreshLatestCandles()
             }
         }
     }
@@ -184,15 +189,13 @@ final class ChartViewModel: ObservableObject {
             
             /// 성공 상태로 마무리 (데이터 유무는 뷰에서 처리)
             guard !Task.isCancelled else {
-                if showLoading { status = .cancel(.taskCancelled) }
                 return
             }
+            
             if showLoading { status = .success }
         } catch is CancellationError {
-            if showLoading { status = .cancel(.taskCancelled) }
             return
         } catch NetworkError.taskCancelled {
-            if showLoading { status = .cancel(.taskCancelled) }
             return
         } catch {
             let err = (error as? NetworkError)

@@ -82,8 +82,13 @@ struct ChartView: View {
             chartArea
         }
         .padding(20)
-        .onAppear { viewModel.checkBookmark() }
-        .onDisappear { viewModel.stopUpdating() }
+        .onAppear {
+            viewModel.checkBookmark()
+            viewModel.retry()
+        }
+        .onDisappear {
+            viewModel.stopUpdating()
+        }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.aiCoBackground)
