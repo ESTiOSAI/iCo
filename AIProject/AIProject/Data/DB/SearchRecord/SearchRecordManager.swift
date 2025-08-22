@@ -11,6 +11,8 @@ import CoreData
 final class SearchRecordManager: SearchRecordManaging {
 
     private let service: CoreDataService
+    /// 검색 기록 최대 저장 수
+    private let maxCount = 10
 
     init(service: CoreDataService = .shared) {
         self.service = service
@@ -19,30 +21,47 @@ final class SearchRecordManager: SearchRecordManaging {
     func save(query: String) throws {
         let context = service.viewContext
 
-        // 같은 쿼리 있는지 비교 (대소문자 구분 하지 않귀)
+        // 같은 쿼리 있는지 비교 (대소문자 구분 하지 않기)
         let request: NSFetchRequest<SearchRecordEntity> = SearchRecordEntity.fetchRequest()
         request.predicate = NSPredicate(format: "query = [c] %@", query)
         request.fetchLimit = 1
 
-        // 존재하면 timestamp만, 존재하지 않으면 새로 추가
         let existing = try context.fetch(request)
         if let record = existing.first {
+            // 이미 있으면 timeStamp만 수정
             record.timestamp = Date()
             try context.save()
         } else {
+            // 중복 없으면 저장
             let record = SearchRecordEntity(context: service.viewContext, query: query)
             service.insert(record)
         }
-    }
 
-    func fetchRecent(limit: Int = 10) throws -> [SearchRecordEntity] {
-        let sort = NSSortDescriptor(key: "timestamp", ascending: false)
-        let all: [SearchRecordEntity] = try service.fetch(nil, sortDescriptors: [sort])
-        return Array(all.prefix(limit))
+        let fetchAll: NSFetchRequest<SearchRecordEntity> = SearchRecordEntity.fetchRequest()
+        fetchAll.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        let all = try context.fetch(fetchAll)
+
+        // 초과된 기록(maxCount기준) 삭제
+        if all.count > maxCount {
+            let excess = all.suffix(from: maxCount)
+            for oldRecord in excess {
+                service.delete(oldRecord)
+            }
+        }
     }
 
     func delete(record: SearchRecordEntity) throws {
         service.delete(record)
+    }
+
+    func delete(query: String) throws {
+        let request: NSFetchRequest<SearchRecordEntity> = SearchRecordEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "query = [c] %@", query)
+        request.fetchLimit = 1
+
+        if let record = try service.viewContext.fetch(request).first {
+            try delete(record: record)
+        }
     }
 
     func deleteAll() throws {
