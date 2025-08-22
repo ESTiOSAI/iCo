@@ -52,7 +52,7 @@ struct CoinListSectionView: View {
                 .fill(Color.aiCoBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(.default, lineWidth: 0.5)
+                        .stroke(.defaultGradient, lineWidth: 0.5)
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
