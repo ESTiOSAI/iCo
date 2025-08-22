@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct MyPageView: View {
-
+    @State private var showMail = false
+    
     var body: some View {
         NavigationStack {
             VStack() {
@@ -46,8 +47,10 @@ struct MyPageView: View {
                                 .fontWeight(.semibold)
                             
                             VStack(spacing: 16) {
-                                NavigationLink {
-                                    EmptyView()
+                                Button {
+                                    if MFMailComposeViewController.canSendMail() {
+                                        showMail = true
+                                    }
                                 } label: {
                                     MyPageMenuRow(title: "문의하기", imageName: "at")
                                 }
@@ -75,6 +78,9 @@ struct MyPageView: View {
                 .padding(.horizontal, 16)
                 
                 Spacer()
+            }
+            .sheet(isPresented: $showMail) {
+                MailView()
             }
         }
     }
