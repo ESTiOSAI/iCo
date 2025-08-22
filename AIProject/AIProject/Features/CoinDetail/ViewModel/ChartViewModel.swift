@@ -263,9 +263,9 @@ final class ChartViewModel: ObservableObject {
                 } else if d > (prices.last?.date ?? .distantPast) {
                     prices.append(newPrice) // 더 뒤 시각이면 추가
                 } else {
-                    // 과거 데이터면 무시
+                    /// 과거 데이터면 무시
                     #if DEBUG
-                    print("과거 캔들 무시:", d)
+                    print("과거 캔들 무시 - ", d)
                     #endif
                 }
             }
@@ -287,11 +287,12 @@ final class ChartViewModel: ObservableObject {
             /// 마지막 갱신 시각 설정
             lastUpdated = prices.last?.date
         } catch is CancellationError {
-            // 조용히 무시
-        } catch {
-            // 주기 갱신 실패는 UI를 실패 상태로 바꾸지 않음 (스피너/깜빡임 방지)
             #if DEBUG
-            print("증분 갱신 실패: \(error)")
+            print("증분 갱신 취소 - market=\(coinSymbol), last=\(String(describing: prices.last?.date)), count=\(prices.count)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("증분 갱신 실패 - \(error)")
             #endif
         }
     }
