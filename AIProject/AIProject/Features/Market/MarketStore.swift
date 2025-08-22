@@ -300,4 +300,8 @@ extension MarketStore {
     func addRecord(_ id: CoinID) {
         try? searchRecordManager.save(query: id)
     }
+
+    func deleteRecord(_ id: CoinID) {
+        try? searchRecordManager.delete(query: id)
+    }
 }
