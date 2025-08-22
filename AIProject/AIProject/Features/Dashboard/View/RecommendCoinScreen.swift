@@ -11,11 +11,11 @@ struct RecommendCoinScreen: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
     
     var body: some View {
-        VStack(alignment: .center, spacing: .headerContentSpacing) {
+        VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
             RecommendHeaderView()
             
             coinContentView()
-                .frame(minHeight: .cardHeight)
+                .frame(minHeight: CardConst.cardHeight)
                 .padding(.bottom, 40)
         }
     }
@@ -96,12 +96,12 @@ struct SuccessCoinView: View {
                         RecommendCardView(recommendCoin: coin)
                             .frame(
                                 width: .infinity,
-                                height: .cardHeight
+                                height: CardConst.cardHeight
                             )
                             .onTapGesture { selectedCoin = coin }
                             .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
                                 content.scaleEffect(
-                                    y: phase.isIdentity ? 1 : .cardHeightMultiplier,
+                                    y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
                                     anchor: .bottom
                                 )
                             }
@@ -114,9 +114,9 @@ struct SuccessCoinView: View {
                 }
             }
             .scrollTargetLayout()
-            .frame(height: .cardHeight + 1, alignment: .top) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
+            .frame(height: CardConst.cardHeight + 1, alignment: .top) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
         }
-        .contentMargins(.horizontal, .cardInnerPadding + .spacing) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
+        .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacing) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(
             id: $cardID,
@@ -138,40 +138,7 @@ struct SuccessCoinView: View {
                   let cardID
             else { return }
             
-            let totalCoinCount = recommendedCoins.count
-            
-            /// 코인 리스트의 배열의 index
-            ///
-            /// 0: 첫번째
-            /// 1: 중간 ( 자동 스크롤이 순환하는 실제 코인 리스트 )
-            /// 2: 마지막
-            let position = cardID / totalCoinCount
-            let indexInGroup = cardID % totalCoinCount
-            
-            switch (position, indexInGroup) {
-            case (2, 0):
-                /// 중간 배열을 모두 순환해 10에 도달했을 시
-                /// - 기존 0번 배열 삭제 + 맨 마지막에 새로운 배열 추가
-                /// - 10 -> 5으로 순간 이동 + 5 -> 6으로 자연스럽게 순환
-                wrappedCoins.removeFirst()
-                wrappedCoins.append(recommendedCoins)
-                self.cardID = cardID - totalCoinCount // 10 -> 5로 빛보다 빠르게 바꿔치기
-                
-                Task {
-                    try? await Task.sleep(nanoseconds: 50_000_000) // 5 -> 6으로 애니메이션과 함께 순환하기
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        if let cardID = self.cardID {
-                            self.cardID = (cardID + 1) % (totalCoinCount * 3)
-                        }
-                    }
-                }
-                return
-            default:
-                /// 기본적인 자동 스크롤 처리
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    self.cardID = (cardID + 1) % (totalCoinCount * 3)
-                }
-            }
+            handleInfiniteScrolling(cardID: cardID)
         }
         .navigationDestination(item: $selectedCoin) { coin in
             CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
@@ -195,6 +162,45 @@ struct SuccessCoinView: View {
             cardID = nil
             viewModel.stopTimer()
             wrappedCoins.removeAll()
+        }
+    }
+}
+
+extension SuccessCoinView {
+    func handleInfiniteScrolling(cardID: Int) {
+        let totalCoinCount = recommendedCoins.count
+        
+        /// 코인 리스트의 배열의 index
+        ///
+        /// 0: 첫번째
+        /// 1: 중간 ( 자동 스크롤이 순환하는 실제 코인 리스트 )
+        /// 2: 마지막
+        let position = cardID / totalCoinCount
+        let indexInGroup = cardID % totalCoinCount
+        
+        switch (position, indexInGroup) {
+        case (2, 0):
+            /// 중간 배열을 모두 순환해 10에 도달했을 시
+            /// - 기존 0번 배열 삭제 + 맨 마지막에 새로운 배열 추가
+            /// - 10 -> 5으로 순간 이동 + 5 -> 6으로 자연스럽게 순환
+            wrappedCoins.removeFirst()
+            wrappedCoins.append(recommendedCoins)
+            self.cardID = cardID - totalCoinCount // 10 -> 5로 빛보다 빠르게 바꿔치기
+            
+            Task {
+                try? await Task.sleep(nanoseconds: 50_000_000) // 5 -> 6으로 애니메이션과 함께 순환하기
+                withAnimation(.easeInOut(duration: 0.5)) {
+                    if let cardID = self.cardID {
+                        self.cardID = (cardID + 1) % (totalCoinCount * 3)
+                    }
+                }
+            }
+            return
+        default:
+            /// 기본적인 자동 스크롤 처리
+            withAnimation(.easeInOut(duration: 0.5)) {
+                self.cardID = (cardID + 1) % (totalCoinCount * 3)
+            }
         }
     }
 }

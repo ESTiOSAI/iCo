@@ -28,7 +28,7 @@ struct RecommendHeaderView: View {
                 fontColor: .white
             )
         }
-        .frame(height: .headerHeight)
+        .frame(height: CardConst.headerHeight)
     }
 }
 

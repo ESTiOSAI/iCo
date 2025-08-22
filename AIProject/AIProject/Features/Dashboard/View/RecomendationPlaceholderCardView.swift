@@ -24,18 +24,18 @@ struct RecomendationPlaceholderCardView: View {
                         Group {
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
-                                .frame(width: 100, height: .cardHeight * .cardHeightMultiplier)
+                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
                             
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
                                 .frame(
-                                    width: geoProxy.size.width - (20 * 2) - (16 * 2) - 8,
-                                    height: .cardHeight
+                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacing * 2) - 8,
+                                    height: CardConst.cardHeight
                                 )
                             
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
-                                .frame(width: 100, height: .cardHeight * .cardHeightMultiplier)
+                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
                         }
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         .overlay {
@@ -43,7 +43,7 @@ struct RecomendationPlaceholderCardView: View {
                                 .stroke(.defaultGradient, lineWidth: 0.5)
                         }
                     }
-                    .frame(maxWidth: geoProxy.size.width - (40 * 2))
+                    .frame(maxWidth: geoProxy.size.width - (CardConst.cardInnerPadding * 2))
                 }
                 
                 VStack {
@@ -58,7 +58,7 @@ struct RecomendationPlaceholderCardView: View {
                             : nil
                 )
                 .frame(maxWidth: hSizeClass == .regular ? 400 : .infinity)
-                .frame(height: .cardHeight)
+                .frame(height: CardConst.cardHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(
                     hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).stroke(.defaultGradient, lineWidth: 0.5) : nil)
