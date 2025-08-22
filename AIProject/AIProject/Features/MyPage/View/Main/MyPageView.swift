@@ -109,7 +109,20 @@ struct MyPageView: View {
         case "theme":
             ThemeView()
         case "contact":
-            MailView()
+            if MFMailComposeViewController.canSendMail() {
+                MailView()
+            } else {
+                VStack(spacing: 12) {
+                    Text("메일 계정을 설정해야 메일을 보낼 수 있습니다.")
+                        .font(.system(size: 20))
+                        .bold()
+                        .foregroundStyle(.aiCoLabelSecondary)
+                    Text("설정 > Mail 앱에서 계정을 추가하세요.")
+                        .font(.system(size: 18))
+                        .foregroundStyle(.aiCoNeutral)
+                }
+                .padding()
+            }
         case "privacy":
             PrivacyPolicyView()
         default:
