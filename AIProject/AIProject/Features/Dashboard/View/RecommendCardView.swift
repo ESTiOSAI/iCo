@@ -11,7 +11,7 @@ struct RecommendCardView: View {
     let recommendCoin: RecommendCoin
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             VStack(alignment: .leading) {
                 CoinView(symbol: recommendCoin.id, size: 50)
 
@@ -57,8 +57,7 @@ struct RecommendCardView: View {
                 .padding(.top, 0.2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            Spacer()
+            .background(.red.opacity(0.1))
 
             VStack {
                 Text(recommendCoin.comment.byCharWrapping)
@@ -66,7 +65,9 @@ struct RecommendCardView: View {
                     .lineSpacing(6)
                     .foregroundStyle(.aiCoLabel)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .padding(.top, .spacing)
+            .background(.blue.opacity(0.1))
         }
         .padding(24)
         .background(
