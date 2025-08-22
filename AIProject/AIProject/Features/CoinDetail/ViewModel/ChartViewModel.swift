@@ -225,6 +225,12 @@ final class ChartViewModel: ObservableObject {
                 guard let last = lastDate else { return 2 }
                 return max(2, min(200, Int(Date().timeIntervalSince(last) / 60) + 1))
             }()
+            
+            /// 갭이 200분보다 크면 전체 24h 리로드
+            if gapMinutes > 200 {
+                await loadPrices(showLoading: false)
+                return
+            }
 
             /// 최신 분봉들 N개
             let latestDTOs = try await tickerAPI.fetchCandles(id: market, count: gapMinutes)
