@@ -13,6 +13,7 @@ struct MyPageView: View {
     @Environment(\.verticalSizeClass) var vSizeClass
     @State private var selection: String? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var showMail = false
 
     var body: some View {
         if hSizeClass == .regular && vSizeClass == .regular {
@@ -29,6 +30,9 @@ struct MyPageView: View {
             // iPhone
             NavigationStack {
                 sidebar
+            }
+            .sheet(isPresented: $showMail) {
+                MailView()
             }
         }
     }
@@ -56,7 +60,22 @@ struct MyPageView: View {
                             .fontWeight(.semibold)
 
                         VStack(spacing: 16) {
-                            menuButton("contact", title: "문의하기", imageName: "at")
+                            if hSizeClass == .regular && vSizeClass == .regular {
+                                Button {
+                                    selection = "contact"
+                                } label: {
+                                    MyPageMenuRow(title: "문의하기", imageName: "at")
+                                }
+                            } else {
+                                Button {
+                                    if MFMailComposeViewController.canSendMail() {
+                                        showMail = true
+                                    }
+                                } label: {
+                                    MyPageMenuRow(title: "문의하기", imageName: "at")
+                                }
+                            }
+
                             menuButton("privacy", title: "인공지능(AI) 윤리기준", imageName: "sparkles")
                         }
                     }
@@ -90,7 +109,7 @@ struct MyPageView: View {
         case "theme":
             ThemeView()
         case "contact":
-            EmptyView()
+            MailView()
         case "privacy":
             PrivacyPolicyView()
         default:
@@ -129,8 +148,6 @@ struct MyPageView: View {
             ThemeView()
         case "theme":
             ThemeView()
-        case "contact":
-            EmptyView()
         case "privacy":
             PrivacyPolicyView()
         default:
