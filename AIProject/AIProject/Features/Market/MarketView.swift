@@ -73,11 +73,12 @@ struct MarketView: View {
                 }
             }
             .toolbar(removing: .sidebarToggle)
-            .navigationSplitViewColumnWidth(min: 400, ideal: 400, max: 400)
+            .navigationSplitViewColumnWidth(min: 330, ideal: 350, max: 400)
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
                 CoinDetailView(coin: coin)
+                    .id(coin.id)
                 
             } else {
                 Text("Empty")
