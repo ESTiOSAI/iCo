@@ -14,4 +14,6 @@ extension CGFloat {
     static let cardHeightMultiplier: CGFloat = 0.9
     static let headerHeight: CGFloat = 200
     static let headerContentSpacing: CGFloat = 30
+    static let cardInnerPadding: CGFloat = 24
+    static let spacing: CGFloat = 16.0
 }
