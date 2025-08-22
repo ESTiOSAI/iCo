@@ -210,6 +210,12 @@ final class ChartViewModel: ObservableObject {
     
     private func refreshLatestCandles() async {
         do {
+            /// 초기에 로딩 실패 후(네트워크 등) prices가 비어있는 상태면 전체 24h 로드
+            if prices.isEmpty {
+                await loadPrices(showLoading: false)
+                return
+            }
+            
             let market = coinSymbol
             let lastDate = prices.last?.date // 마지막 봉 시각
 
