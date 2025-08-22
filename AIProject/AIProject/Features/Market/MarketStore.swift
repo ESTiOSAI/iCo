@@ -208,17 +208,18 @@ extension MarketStore {
                 .reduce(into: [CoinID: Coin]()) { acc, dto in
                     acc[dto.coinID] = Coin(id: dto.coinID, koreanName: dto.koreanName)
                 }
-            async let tickers: [CoinID: TickerStore] = {
-                var acc = [CoinID: TickerStore]()
-                for dto in try await coinService.fetchTicker(by: "KRW") {
-                    let store = TickerStore(coinID: dto.id)
-                    await store.apply(dto)
-                    acc[dto.id] = store
-                }
-                return acc
-            }()
+            async let tickers = (try? await coinService.fetchTicker(by: "KRW")) ?? []
             
-            return (try await meta, try await tickers)
+            var acc = [CoinID: TickerStore]()
+            for coin in try await meta {
+                let store = TickerStore(coinID: coin.key)
+                if let ticker = await tickers.first(where: { $0.id == coin.key }) {
+                    store.apply(ticker)
+                }
+                acc[coin.key] = store
+            }
+            
+            return (try await meta, acc)
         } catch {
             errorMessage = error.localizedDescription
             return ([:], [:])

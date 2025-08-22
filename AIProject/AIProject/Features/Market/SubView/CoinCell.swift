@@ -25,10 +25,10 @@ struct CoinCell: View {
                 #endif
                 // 코인 레이블
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(alignment: .leading)
                 
                 CoinPriceView(ticker: store)
-                    .frame(alignment: .trailing)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
         .id(coin.id)
