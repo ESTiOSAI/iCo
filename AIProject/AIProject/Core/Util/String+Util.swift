@@ -59,7 +59,7 @@ extension String {
     /// 문자열 내의 숫자와 기호를 찾아 지정한 색상과 두께로 강조한 Text로 반환하는 확장
     ///  - Regex:
     ///  - 모든 숫자는 하이라이트 처리
-    func highlightTextForNumbersOperator(highlightColor: Color = .blue, weight: Font.Weight = .bold) -> Text {
+    func highlightTextForNumbersOperator(highlightColor: Color = .aiCoLabel, weight: Font.Weight = .bold) -> Text {
         let pattern = #"\d"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else {
             return Text(self)

@@ -30,7 +30,7 @@ struct CoinRowView: View {
 
             Spacer()
 
-            RoundedButton(imageName: "bookmark.fill") {
+            RoundedButton(imageName: "xmark") {
                 onDelete(coin)
             }
         }

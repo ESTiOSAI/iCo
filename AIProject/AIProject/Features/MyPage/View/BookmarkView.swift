@@ -60,7 +60,7 @@ struct BookmarkView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 8) {
+            LazyVStack(alignment: .leading, spacing: 0) {
                 HeaderView(heading: "북마크 관리")
 
                 if !bookmarks.isEmpty {
@@ -94,45 +94,64 @@ struct BookmarkView: View {
                     }
                     .padding(.leading, 16)
                     .padding(.trailing, 16)
+                    .padding(.bottom, 16)
 
                     Group {
                         switch vm.status {
                         case .loading:
-                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
-                                vm.cancelTask()
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                                    vm.cancelTask()
+                                }
                             }
                         case .success:
                             if let briefing = vm.briefing {
                                 BriefingSectionView(briefing: briefing)
                             }
                         case .failure(let networkError):
-                            DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
+                                    Task { await vm.loadBriefing(character: .longTerm) }
+                                }
                             }
                         case .cancel(let networkError):
-                            DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                            VStack(alignment: .center) {
+                                DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
+                                    Task { await vm.loadBriefing(character: .longTerm) }
+                                }
                             }
                         }
                     }
+                    .padding(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.aiCoLabel)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.aiCoBackgroundAccent)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(.accent, lineWidth: 0.5)
+                            )
+                    )
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
 
                     Text(String.aiGeneratedContentNotice)
-                        .font(.system(size: 8))
+                        .font(.system(size: 11))
                         .foregroundColor(.aiCoNeutral)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 16)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 10)
+                        .padding(.leading, 16)
                 } else {
                     SubheaderView(imageName: "face.smiling", subheading: "북마크를 등록해주세요!")
                 }
-
-                Spacer()
 
                 HStack {
                     SubheaderView(subheading: "북마크한 코인")
  
                     Spacer()
 
-                    RoundedButton(title: "전체 삭제", imageName: "chevron.right") {
+                    RoundedButton(title: "전체 삭제", imageName: "trash") {
                         showDeleteConfirm = true
                     }.alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                         Button("삭제", role: .destructive) {
@@ -143,7 +162,9 @@ struct BookmarkView: View {
                         Text("모든 북마크를 삭제하시겠습니까?")
                     }
                 }
+                .padding(.top, 20)
                 .padding(.trailing, 16)
+                .padding(.bottom, 16)
 
                 HStack(spacing: 16) {
                     RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) {
@@ -166,7 +187,7 @@ struct BookmarkView: View {
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, minHeight: 100)
                         .multilineTextAlignment(.center)
-                        .padding()
+                        .padding(16)
                 } else {
                     CoinListSectionView(
                         sortedCoins: sortedCoins,
@@ -177,7 +198,7 @@ struct BookmarkView: View {
                         imageURLProvider: { vm.imageURL(for: $0) },
                         onDelete: { vm.deleteBookmark($0) }
                     )
-                    .padding()
+                    .padding(16)
                 }
             }
             .task {
@@ -233,41 +254,30 @@ struct BriefingSectionView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("분석 결과")
                 .font(.system(size: 14))
-                .bold()
+                .fontWeight(.semibold)
                 .foregroundColor(Color(.aiCoAccent))
 
             briefing.briefing
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.system(size: 12))
+                .font(.system(size: 14))
+                .fontWeight(.regular)
                 .lineSpacing(6)
 
-            Spacer(minLength: 0)
+            Spacer(minLength: 20)
 
             Text("전략 제안")
                 .font(.system(size: 14))
-                .bold()
+                .fontWeight(.semibold)
                 .foregroundColor(Color(.aiCoAccent))
 
             briefing.strategy
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.system(size: 12))
+                .font(.system(size: 14))
+                .fontWeight(.regular)
                 .lineSpacing(6)
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .foregroundColor(.primary)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.aiCoBackgroundAccent)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(.accentGradient, lineWidth: 0.5)
-                )
-        )
-        .cornerRadius(12)
-        .padding(.horizontal, 16)
     }
 }
 
