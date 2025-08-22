@@ -18,13 +18,17 @@ struct ReportView: View {
     @StateObject var viewModel: ReportViewModel
     
     init(coin: Coin) {
-        print("reportViewinit")
         _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
     var body: some View {
-        let content =
         VStack(alignment: .leading, spacing: 16) {
+            if hSizeClass == .regular {
+                Text("AI 리포트")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(.aiCoLabel)
+            }
+            
             Text(String.aiGeneratedContentNotice)
                 .font(.system(size: 11))
                 .foregroundStyle(.aiCoNeutral)
@@ -66,27 +70,10 @@ struct ReportView: View {
                     .padding(.bottom, 30)
             }
         }
-        
-        if hSizeClass == .regular {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("AI 리포트")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
-                
-                content
-            }
-            .padding(.horizontal, 16)
-        } else {
-            ScrollView(.vertical) {
-                content
-                    .padding(.horizontal, 16)
-            }
-            .scrollIndicators(.hidden)
-        }
     }
 }
 
 #Preview {
     let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
-    return ReportView(coin: sampleCoin)
+    return ScrollView { ReportView(coin: sampleCoin).padding(.horizontal, 16) }
 }

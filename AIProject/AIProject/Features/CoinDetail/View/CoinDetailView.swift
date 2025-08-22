@@ -16,66 +16,69 @@ struct CoinDetailView: View {
     var body: some View {
         GeometryReader { proxy in
             ScrollView {
-                VStack(spacing: 12) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        if hSizeClass == .regular {
-                            // FIXME: HeaderView로 교체 필요
-                            Text(coin.koreanName)
-                                .font(.system(size: 24, weight: .black))
-                                .foregroundStyle(.aiCoLabel)
-                        } else {
+                VStack(spacing: 0) {
+                    // 헤더
+                    if hSizeClass == .regular {
+                        HStack(alignment: .lastTextBaseline) {
+                            HeaderView(heading: coin.koreanName) // FIXME: 코인 심볼
+                        }
+                    } else {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
                             Text(coin.koreanName)
                                 .font(.system(size: 18, weight: .bold))
                                 .foregroundStyle(.aiCoLabel)
+                            
+                            Text(coin.coinSymbol)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.aiCoLabelSecondary)
+                            
+                            Spacer()
                         }
-                        
-                        Text(coin.coinSymbol)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.aiCoLabelSecondary)
-                        
-                        Spacer()
+                        .padding(EdgeInsets(top: 20, leading: 16, bottom: 16, trailing: 16))
                     }
-                    .padding(.bottom, 5)
-                    .padding(.horizontal, 16)
                     
-                    if hSizeClass == .compact {
-                        HStack(spacing: 8) {
-                            ForEach(Tab.allCases) { tab in
-                                RoundedRectangleButton(
-                                    title: tab.title,
-                                    isActive: selectedTab == tab
-                                ) {
-                                    withAnimation(.easeInOut(duration: 0.22)) {
-                                        selectedTab = tab
+                    
+                    VStack(spacing: 16) {
+                        // 버튼
+                        if hSizeClass == .compact {
+                            HStack(spacing: 16) {
+                                ForEach(Tab.allCases) { tab in
+                                    RoundedRectangleButton(
+                                        title: tab.title,
+                                        isActive: selectedTab == tab
+                                    ) {
+                                        withAnimation(.easeInOut(duration: 0.22)) {
+                                            selectedTab = tab
+                                        }
                                     }
                                 }
-                                .frame(height: 36)
+                                Spacer(minLength: 0)
                             }
-                            Spacer(minLength: 0)
                         }
-                        .padding(.bottom, 10)
-                        .padding(.horizontal, 16)
-                    }
-                    
-                    if hSizeClass == .regular {
-                        ChartView(coin: coin)
-                            .frame(height: proxy.size.height * 0.55)
                         
-                        ReportView(coin: coin)
-                            .padding(.top, 20)
-                    } else {
-                        switch selectedTab {
-                        case .chart:
+                        // 콘텐츠
+                        if hSizeClass == .regular {
                             ChartView(coin: coin)
-                                .frame(height: proxy.size.height * 0.8)
-                        case .report:
+                                .frame(height: proxy.size.height * 0.55)
+                            
                             ReportView(coin: coin)
+                                .padding(.top, 20)
+                        } else {
+                            switch selectedTab {
+                            case .chart:
+                                ChartView(coin: coin)
+                                    .frame(height: proxy.size.height * 0.8)
+                            case .report:
+                                ReportView(coin: coin)
+                            }
                         }
                     }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.top, 20)
             }
+            .scrollIndicators(.hidden)
         }
+        //        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -83,9 +86,9 @@ extension CoinDetailView {
     private enum Tab: Int, CaseIterable, Identifiable {
         case chart
         case report
-
+        
         var id: Int { rawValue }
-
+        
         var title: String {
             switch self {
             case .chart: return "차트"
