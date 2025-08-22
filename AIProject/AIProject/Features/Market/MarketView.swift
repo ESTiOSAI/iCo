@@ -38,7 +38,7 @@ struct MarketView: View {
 
                     if !records.isEmpty {
                         RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
-                            // TODO: 삭제 작업 필요
+                            store.deleteRecord(coin.id)
                         }) { selectedCoinID = $0 }
                     }
                 }
@@ -117,7 +117,7 @@ fileprivate struct RecentCoinSectionView: View {
                         Capsule().stroke(.defaultGradient, lineWidth: 0.5)
                     }
                     .onTapGesture {
-//                        tapAction(coin.id)
+                        tapAction(coin.id)
                     }
                 }
             }
