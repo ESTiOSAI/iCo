@@ -16,24 +16,26 @@ struct MyPageView: View {
     @State private var showMail = false
 
     var body: some View {
-        if hSizeClass == .regular && vSizeClass == .regular {
-            // iPad
-            NavigationSplitView(columnVisibility: $columnVisibility) {
-                sidebar
-            } detail: {
+        Group {
+            if hSizeClass == .regular && vSizeClass == .regular {
+                // iPad
+                NavigationSplitView(columnVisibility: $columnVisibility) {
+                    sidebar
+                } detail: {
+                    NavigationStack {
+                        detailView
+                    }
+                }
+                .navigationSplitViewStyle(.balanced)
+            } else {
+                // iPhone
                 NavigationStack {
-                    detailView
+                    sidebar
                 }
             }
-            .navigationSplitViewStyle(.balanced)
-        } else {
-            // iPhone
-            NavigationStack {
-                sidebar
-            }
-            .sheet(isPresented: $showMail) {
-                MailView()
-            }
+        }
+        .sheet(isPresented: $showMail) {
+            MailView()
         }
     }
 
@@ -108,21 +110,6 @@ struct MyPageView: View {
             ThemeView()
         case "theme":
             ThemeView()
-        case "contact":
-            if MFMailComposeViewController.canSendMail() {
-                MailView()
-            } else {
-                VStack(spacing: 12) {
-                    Text("메일 계정을 설정해야 메일을 보낼 수 있습니다.")
-                        .font(.system(size: 20))
-                        .bold()
-                        .foregroundStyle(.aiCoLabelSecondary)
-                    Text("설정 > Mail 앱에서 계정을 추가하세요.")
-                        .font(.system(size: 18))
-                        .foregroundStyle(.aiCoNeutral)
-                }
-                .padding()
-            }
         case "privacy":
             PrivacyPolicyView()
         default:
