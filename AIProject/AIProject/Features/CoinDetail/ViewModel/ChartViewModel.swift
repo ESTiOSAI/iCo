@@ -91,7 +91,7 @@ final class ChartViewModel: ObservableObject {
                 
                 if Task.isCancelled { break } // 취소 시 즉시 종료
                 
-                await self?.loadPrices()
+                await self?.refreshLatestCandles()
             }
         }
     }
@@ -207,6 +207,80 @@ final class ChartViewModel: ObservableObject {
             }
         }
     }
+    
+    private func refreshLatestCandles() async {
+        do {
+            let market = coinSymbol
+            let lastDate = prices.last?.date // 마지막 봉 시각
+
+            /// 마지막 봉 시각과 현재 시각 차이로 빈 분 수를 추정하여
+            /// 최소 2개 (현재 진행중 분 교체 + 새 분 추가 대비), 최대 200개 리턴
+            let gapMinutes: Int = {
+                guard let last = lastDate else { return 2 }
+                return max(2, min(200, Int(Date().timeIntervalSince(last) / 60) + 1))
+            }()
+
+            /// 최신 분봉들 N개
+            let latestDTOs = try await tickerAPI.fetchCandles(id: market, count: gapMinutes)
+            guard !latestDTOs.isEmpty else { return }
+
+            let ordered = latestDTOs.reversed()
+
+            /// 배열 병합
+            /// 같은 timestamp: 교체
+            /// 더 뒤 timestamp: append
+            /// 과거 timestamp: 무시
+            /// -> 맨 오른쪽 봉만 바뀌거나 하나 추가
+            for dto in ordered {
+                let d = dto.tradeDateTime
+                let existingIndex = prices.lastIndex(where: { $0.date == d })
+                let newIndex = existingIndex.map { prices[$0].index } ?? prices.count
+                
+                let newPrice = CoinPrice(
+                    date: d,
+                    open: dto.openingPrice,
+                    high: dto.highPrice,
+                    low: dto.lowPrice,
+                    close: dto.tradePrice,
+                    trade: dto.candleAccTradePrice,
+                    index: newIndex
+                )
+                
+                if let i = existingIndex {
+                    prices[i] = newPrice // 동일 시각이면 교체
+                } else if d > (prices.last?.date ?? .distantPast) {
+                    prices.append(newPrice) // 더 뒤 시각이면 추가
+                } else {
+                    // 과거 데이터면 무시
+                    #if DEBUG
+                    print("과거 캔들 무시:", d)
+                    #endif
+                }
+            }
+
+            /// 24시간 초과분 정리 (메모리/도메인 관리)
+            let cutoff = Date().addingTimeInterval(-24 * 60 * 60)
+            prices.removeAll(where: { $0.date < cutoff })
+
+            /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
+            async let tickerTask: [TickerValue] = tickerAPI.fetchTicker(by: currency)
+            if let t = try await tickerTask.first(where: { $0.id == market }) {
+                let signedRate = (t.change == .fall) ? -t.rate : t.rate
+                headerLastPrice  = t.price
+                headerChangeRate = signedRate * 100
+                headerChangePrice = signedRate != 0 ? (t.price - (t.price / (1 + signedRate))) : 0
+                headerAccTradePrice = t.volume
+            }
+
+            /// 마지막 갱신 시각 설정
+            lastUpdated = prices.last?.date
+        } catch is CancellationError {
+            // 조용히 무시
+        } catch {
+            // 주기 갱신 실패는 UI를 실패 상태로 바꾸지 않음 (스피너/깜빡임 방지)
+            #if DEBUG
+            print("증분 갱신 실패: \(error)")
+            #endif
         }
     }
     
