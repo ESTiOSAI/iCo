@@ -15,7 +15,7 @@ struct RecommendCoinScreen: View {
             RecommendHeaderView()
             
             coinContentView()
-                .frame(height: .cardHeight + 1) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
+                .frame(minHeight: .cardHeight)
                 .padding(.bottom, 40)
         }
     }
@@ -63,19 +63,10 @@ struct SuccessCoinView: View {
     /// 선택된 카드의 위치를 추적하고 스크롤 포지션을 관리하는 데 사용하는 상태 변수
     @State var cardID: Int?
     
+    @State var wrappedCoins = [[RecommendCoin]]()
+    
     var body: some View {
         let recommendedCoins = viewModel.recommendCoins
-        
-        // TODO: cardID와 역할이 비슷하므로 추후에 합치기
-        var currentIndex: Int = 1
-        
-        /// 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 가짜 코인을 붙여주기
-        var wrappedCoins: [RecommendCoin] {
-            guard let first = recommendedCoins.first,
-                  let last = recommendedCoins.last
-            else { return [] }
-            return [last] + recommendedCoins + [first]
-        }
         
         var numberOfColumn: Int {
             if hSizeClass == .regular {
@@ -85,17 +76,18 @@ struct SuccessCoinView: View {
             return 1
         }
         
+        let tempCoinArray = wrappedCoins.flatMap { $0.map { $0 } }
+        
         GeometryReader { geoProxy in
             let spacing = 16.0
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .bottom, spacing: spacing) {
-                    ForEach(wrappedCoins.indices, id: \.self) { index in
-                        let coin = wrappedCoins[index]
+                    ForEach(tempCoinArray.indices, id: \.self) { index in
+                        let coin = tempCoinArray[index]
                         
                         VStack {
                             RecommendCardView(recommendCoin: coin)
-                                .id(index)
                                 .frame(
                                     width: .infinity,
                                     height: .cardHeight
@@ -116,7 +108,7 @@ struct SuccessCoinView: View {
                     }
                 }
                 .scrollTargetLayout()
-                .frame(height: .cardHeight + 1, alignment: .top)
+                .frame(height: .cardHeight + 1, alignment: .top) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
             }
             .contentMargins(.horizontal, 20 * 2)
             .scrollTargetBehavior(.viewAligned)
@@ -131,28 +123,44 @@ struct SuccessCoinView: View {
                     viewModel.startTimer()
                 }
             ))
-            .onChange(of: cardID ?? 1, { _, newValue in
-                currentIndex = newValue
-            })
             .onReceive(viewModel.timer) { _ in // 타이머를 구독해 UI 업데이트하기
-                guard !isDragging, !recommendedCoins.isEmpty else { return }
+                guard !isDragging,
+                      !recommendedCoins.isEmpty,
+                      let cardID
+                else { return }
+
+                let totalCoinCount = recommendedCoins.count
                 
-                // 카드 인덱스가 증가하면서 카드의 전체 값을 넘지 못하게 모듈러 연산 적용하기
-                currentIndex = (currentIndex + 1) % wrappedCoins.count
-                
-                Task {
-                    withAnimation(.easeInOut(duration: 0.5)) { // 애니메이션 지속 시간 지정하기
-                        cardID = currentIndex
+                let position = cardID / totalCoinCount // 0: 첫 배열, 1: 중간, 2: 마지막
+                let indexInGroup = cardID % totalCoinCount
+
+                switch (position, indexInGroup) {
+                case (0, totalCoinCount - 1):
+                    print("첫 번째 배열의 마지막 코인에 도달: 맨 뒤의 배열 삭제 + 앞에 새로운 배열 추가")
+                    
+                    Task {
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                        wrappedCoins.removeLast()
+                        wrappedCoins.insert(recommendedCoins, at: 0)
+                        self.cardID = cardID + totalCoinCount
                     }
                     
-                    // 가짜 코인 바꿔치기하기
-                    try? await Task.sleep(nanoseconds: 500_000_000)
+                    return
+                case (2, 0):
+                    print("마지막 배열의 첫 번째 코인에 도달: 맨 앞의 배열 삭제 + 뒤에 새로운 배열 추가")
                     
-                    // 스크롤 애니메이션이 끝난 후에 바꿔치기
-                    if cardID == recommendedCoins.count + 1 { // 마지막 카드라면 첫 번째 카드로 바꿔치기
-                        cardID = 1
-                    } else if cardID == 0 { // 0번째 카드라면 마지막 카드로 바꿔치기: 실제 적용되는 경우는 없는 듯
-                        cardID = recommendedCoins.count
+                    Task {
+                        try? await Task.sleep(nanoseconds: 500_000_000)
+                        wrappedCoins.removeFirst()
+                        wrappedCoins.append(recommendedCoins)
+                        self.cardID = cardID - totalCoinCount
+                    }
+                    return
+                default:
+                    Task {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            self.cardID = (cardID + 1) % (totalCoinCount * 3)
+                        }
                     }
                 }
             }
@@ -160,11 +168,14 @@ struct SuccessCoinView: View {
                 CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
             }
             .onAppear {
-                cardID = 1
+                /// 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 가짜 코인을 붙여주기
+                wrappedCoins = [recommendedCoins, recommendedCoins, recommendedCoins]
+                cardID = recommendedCoins.count
                 viewModel.startTimer()
             }
             .onDisappear {
                 viewModel.stopTimer()
+                wrappedCoins.removeAll()
             }
         }
     }
