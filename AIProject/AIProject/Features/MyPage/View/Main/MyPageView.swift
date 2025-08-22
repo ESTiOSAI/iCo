@@ -12,17 +12,19 @@ struct MyPageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
     @State private var selection: String? = nil
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
 
     var body: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            // iPad (세로/가로 모두)
-            NavigationSplitView(columnVisibility: .constant(.all)) {
+        if hSizeClass == .regular && vSizeClass == .regular {
+            // iPad
+            NavigationSplitView(columnVisibility: $columnVisibility) {
                 sidebar
             } detail: {
                 NavigationStack {
                     detailView
                 }
             }
+            .navigationSplitViewStyle(.balanced)
         } else {
             // iPhone
             NavigationStack {
@@ -68,7 +70,7 @@ struct MyPageView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(.default, lineWidth: 0.5)
+                        .stroke(.defaultGradient, lineWidth: 0.5)
                 )
             }
             .padding(.horizontal, 16)
@@ -93,7 +95,7 @@ struct MyPageView: View {
             PrivacyPolicyView()
         default:
             Text("왼쪽에서 메뉴를 선택하세요")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.aiCoLabelSecondary)
         }
     }
 
