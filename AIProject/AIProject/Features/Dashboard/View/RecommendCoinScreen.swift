@@ -141,7 +141,7 @@ struct SuccessCoinView: View {
             handleInfiniteScrolling(cardID: cardID)
         }
         .navigationDestination(item: $selectedCoin) { coin in
-            CoinDetailView(coin: Coin(id: coin.id, koreanName: coin.name, imageURL: coin.imageURL))
+            CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
         }
         .onAppear {
             // 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 안전 코인을 붙이기
