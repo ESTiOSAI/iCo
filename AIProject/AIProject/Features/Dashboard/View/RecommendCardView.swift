@@ -57,7 +57,6 @@ struct RecommendCardView: View {
                 .padding(.top, 0.2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.red.opacity(0.1))
 
             VStack {
                 Text(recommendCoin.comment.byCharWrapping)
@@ -66,8 +65,7 @@ struct RecommendCardView: View {
                     .foregroundStyle(.aiCoLabel)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, .spacing)
-            .background(.blue.opacity(0.1))
+            .padding(.top, 32)
         }
         .padding(24)
         .background(
