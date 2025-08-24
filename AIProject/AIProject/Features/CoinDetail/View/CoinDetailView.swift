@@ -91,7 +91,7 @@ extension CoinDetailView {
         
         var title: String {
             switch self {
-            case .chart: return "차트"
+            case .chart: return "시세"
             case .report: return "AI 리포트"
             }
         }

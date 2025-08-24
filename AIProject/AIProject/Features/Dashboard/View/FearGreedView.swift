@@ -14,7 +14,7 @@ struct FearGreedView: View {
     @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: FearGreedViewModel
     
-    private static let cornerRadius: CGFloat = 10
+    private static let cornerRadius: CGFloat = 20
     
     init(viewModel: FearGreedViewModel = FearGreedViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
