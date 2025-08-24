@@ -23,14 +23,6 @@ struct RecommendCoin: Identifiable, Hashable {
             }
         }
 
-        var changeColor: Color {
-            switch self {
-            case .rise: return .aiCoPositive
-            case .even: return .aiCoLabel
-            case .fall: return .aiCoNegative
-            }
-        }
-
         var code: String {
             switch self {
             case .rise: return "▲"

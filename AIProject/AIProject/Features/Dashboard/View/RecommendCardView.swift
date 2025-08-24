@@ -8,7 +8,20 @@
 import SwiftUI
 
 struct RecommendCardView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    
     let recommendCoin: RecommendCoin
+    
+    private func dynamicStatusColor(for type: RecommendCoin.TickerChangeType) -> Color {
+        switch type {
+        case .rise:
+            return themeManager.selectedTheme.positiveColor
+        case .even:
+            return themeManager.selectedTheme.neutral
+        case .fall:
+            return themeManager.selectedTheme.negativeColor
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -36,7 +49,7 @@ struct RecommendCardView: View {
                     Text(recommendCoin.tradePrice.formatKRW)
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeType.changeColor)
+                        .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                 }
                 .padding(.top, 1)
 
@@ -51,7 +64,7 @@ struct RecommendCardView: View {
                         }
                         .font(.system(size: 14))
                         .bold()
-                        .foregroundStyle(recommendCoin.changeType.changeColor)
+                        .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                     }
                 }
                 .padding(.top, 0.2)

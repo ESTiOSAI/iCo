@@ -17,8 +17,8 @@ enum Theme: String, CaseIterable {
     var positiveColor: Color {
         switch self {
         case .basic: return .aiCoPositive
-        case .pop: return .red
-        case .classic: return Color(UIColor.systemPink)
+        case .pop: return .aiCoPositivePop
+        case .classic: return .aiCoPositiveClassic
         }
     }
     
@@ -26,10 +26,12 @@ enum Theme: String, CaseIterable {
     var negativeColor: Color {
         switch self {
         case .basic: return .aiCoNegative
-        case .pop: return Color(UIColor.systemMint)
-        case .classic: return .green
+        case .pop: return .aiCoNegativePop
+        case .classic: return .aiCoNegativeClassic
         }
     }
+    
+    var neutral: Color { .aiCoNeutral }
 }
 
 extension Theme {
