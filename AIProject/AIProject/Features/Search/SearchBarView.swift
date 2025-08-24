@@ -10,6 +10,7 @@ import SwiftUI
 struct SearchBarView: View {
     @Binding var searchText: String
     @FocusState private var isFocused: Bool
+    @State private var showCancel: Bool = false
 
     var body: some View {
         HStack(spacing: 10) {
@@ -21,6 +22,14 @@ struct SearchBarView: View {
                     .focused($isFocused)
                     .submitLabel(.search)
                     .font(.system(size: 14))
+                    .onChange(of: isFocused) {
+                        if isFocused {
+                            Task {
+                                try await Task.sleep(for: .seconds(0.1))
+                                await MainActor.run { showCancel = true }
+                            }
+                        }
+                    }
 
                 if !searchText.isEmpty {
                     CircleDeleteButton(fontSize: 9) {
@@ -32,18 +41,18 @@ struct SearchBarView: View {
             .padding(.vertical, 14)
             .background {
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(.aiCoBackgroundBlue)
+                    .fill(showCancel ? .aiCoBackgroundBlue : .aiCoBackground)
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 15)
-                    .stroke(.accentGradient, lineWidth: 0.5)
+                    .stroke(showCancel ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
-            .animation(.snappy(duration: 0.2), value: isFocused)
+            .animation(.snappy(duration: 0.1), value: showCancel)
 
-            if isFocused {
+            if showCancel {
                 Button {
-					// TODO: 취소 시에 검색 View 내리는 동작
                     withAnimation(.snappy) {
+                        showCancel = false
                         isFocused = false
                         searchText = ""
                     }
