@@ -12,6 +12,8 @@ struct CoinListView: View {
     @Bindable var store: MarketStore
     
     @State private var visibleCoins: Set<CoinID> = []
+    @State private var isOnList: Bool = true
+    
     @Environment(\.scenePhase) private var scenePhase
     
     @FetchRequest(
@@ -40,6 +42,7 @@ struct CoinListView: View {
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
             Task {
+                guard isOnList else { return }
                 await handleConnection(by: newValue)
             }
         })
@@ -55,11 +58,13 @@ struct CoinListView: View {
         }
         .onAppear {
             Task {
+                isOnList = true
                 await store.connect()
             }
         }
         .onDisappear {
             Task {
+                isOnList = false
                 await store.disconnect()
             }
         }
