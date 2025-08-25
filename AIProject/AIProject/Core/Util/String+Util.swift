@@ -86,4 +86,26 @@ extension String {
         }
         return out
     }
+    
+    /// 문자열에서 검색도니 특정 문자열을 변경
+    /// - Parameters:
+    ///   - searchTerm: 검색어
+    func highlighted(_ searchTerm: String,
+                     color: Color = .aiCoAccent,
+                     font: Font = Font.system(size: 14, weight: .bold)) -> AttributedString {
+        var attributed = AttributedString(self)
+        let lowercasedText = self.lowercased()
+        let lowercasedSearch = searchTerm.lowercased()
+        var searchRange = lowercasedText.startIndex..<lowercasedText.endIndex
+        
+        while let range = lowercasedText.range(of: lowercasedSearch, range: searchRange) {
+            if let attributedRange = Range(NSRange(range, in: self), in: attributed) {
+                attributed[attributedRange].foregroundColor = color
+                attributed[attributedRange].font = font
+            }
+            searchRange = range.upperBound..<lowercasedText.endIndex
+        }
+        
+        return attributed
+    }
 }

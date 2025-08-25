@@ -55,7 +55,7 @@ struct MarketView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    CoinListView(store: store, selectedCoinID: $selectedCoinID)
+                    CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                 }
                 .padding(16)
                 .refreshable {

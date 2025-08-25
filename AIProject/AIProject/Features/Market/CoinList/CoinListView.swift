@@ -23,10 +23,11 @@ struct CoinListView: View {
     private var bookmarks: FetchedResults<BookmarkEntity>
     
     @Binding private var selectedCoinID: CoinID?
-    
-    init(store: MarketStore, selectedCoinID: Binding<CoinID?>) {
+    @Binding private var searchText: String
+    init(store: MarketStore, selectedCoinID: Binding<CoinID?>, searchText: Binding<String>) {
         self.store = store
         _selectedCoinID = selectedCoinID
+        _searchText = searchText
     }
     
     var body: some View {
@@ -87,7 +88,7 @@ struct CoinListView: View {
         } else {
             List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
-                    CoinCell(coin: meta, store: ticker)
+                    CoinCell(coin: meta, store: ticker, searchTerm: searchText)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
