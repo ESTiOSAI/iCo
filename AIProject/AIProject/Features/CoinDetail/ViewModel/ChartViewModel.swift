@@ -88,7 +88,7 @@ final class ChartViewModel: ObservableObject {
             let shouldShowSpinner = self.prices.isEmpty
             
             /// 1) 최초 1회: 전체 로드 + 로딩 표시
-            await self.loadPrices(showLoading: true)
+            await self.loadPrices(showLoading: shouldShowSpinner)
             
             /// 2) 이후: 60초마다 증분 갱신 (스피너 없음)
             while !Task.isCancelled {
