@@ -29,4 +29,15 @@ extension Date {
     var dateAndTime: String {
         Date.dateAndTimeFormatter.string(from: self)
     }
+    
+    static let numbersOnlyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMddHHmm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }()
+    
+    var numbersOnly: String {
+        Date.numbersOnlyFormatter.string(from: self)
+    }
 }
