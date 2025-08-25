@@ -10,21 +10,18 @@ import SwiftUI
 struct CoinCell: View {
     let coin: Coin
     let store: TickerStore
+    let searchTerm: String
     
-    init(coin: Coin, store: TickerStore) {
+    init(coin: Coin, store: TickerStore, searchTerm: String) {
         self.coin = coin
         self.store = store
+        self.searchTerm = searchTerm
     }
     
     var body: some View {
         VStack {
             HStack {
-                
-                #if DEBUG
-//                let _ = Self._printChanges()
-                #endif
-                // 코인 레이블
-                CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
+                CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName, searchTerm: searchTerm)
                     .frame(alignment: .leading)
                 
                 CoinPriceView(ticker: store)
@@ -41,13 +38,14 @@ struct CoinCell: View {
 fileprivate struct CoinMetaView: View {
     let symbol: String
     let name:String
+    let searchTerm: String
     
     var body: some View {
         HStack(spacing: 16) {
             CoinView(symbol: symbol, size: 30)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(name)
+                Text(name.highlighted(searchTerm))
                     .lineLimit(2)
                     .font(.system(size: 14))
                     .fontWeight(.bold)
@@ -65,13 +63,15 @@ fileprivate struct CoinMetaView: View {
 }
 
 fileprivate struct CoinPriceView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    
     let ticker: TickerStore
     
     var changeColor: Color {
         switch ticker.snapshot.change {
-        case .rise: return .aiCoPositive
+        case .rise: return themeManager.selectedTheme.positiveColor
         case .even: return .aiCoLabel
-        case .fall: return .aiCoNegative
+        case .fall: return themeManager.selectedTheme.negativeColor
         }
     }
     
@@ -85,12 +85,6 @@ fileprivate struct CoinPriceView: View {
     
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
-            
-            #if DEBUG
-            // FIXME: volume과 rate은 한 번에 변하는데 각각 rendering되고 있음
-//            let _ = Self._printChanges()
-            #endif
-            
             HStack {
                 HStack(spacing: 0) {
                     Text(code)
