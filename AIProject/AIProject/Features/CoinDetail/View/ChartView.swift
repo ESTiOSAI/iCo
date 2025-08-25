@@ -18,6 +18,8 @@ struct ChartView: View {
     @State private var selectedTab = 0
     /// 현재 선택된 테마 정보를 가져오기 위한 전역 상태 객체
     @EnvironmentObject var themeManager: ThemeManager
+    /// 시스템 앱 상태(active/inactive/background) 변화를 View에 전달하는 환경값
+    @Environment(\.scenePhase) private var scenePhase
 
     // MARK: - Init
     /// 프로덕션 기본 경로
@@ -88,6 +90,18 @@ struct ChartView: View {
         }
         .onDisappear {
             viewModel.stopUpdating()
+        }
+        .onChange(of: scenePhase, initial: false) { _, newPhase in
+            switch newPhase {
+            case .active:
+                viewModel.retry()
+            case .background:
+                viewModel.stopUpdating()
+            case .inactive:
+                break
+            @unknown default:
+                break
+            }
         }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
