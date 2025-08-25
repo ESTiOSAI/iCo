@@ -67,7 +67,7 @@ fileprivate struct CoinPriceView: View {
     
     let ticker: TickerStore
     
-    var changeColor: Color {
+    private var changeColor: Color {
         switch ticker.snapshot.change {
         case .rise: return themeManager.selectedTheme.positiveColor
         case .even: return .aiCoLabel
@@ -75,7 +75,15 @@ fileprivate struct CoinPriceView: View {
         }
     }
     
-    var code: String {
+    private var animationColor: Color {
+        switch ticker.snapshot.change {
+        case .rise: return themeManager.selectedTheme.positiveColor
+        case .even: return .clear
+        case .fall: return themeManager.selectedTheme.negativeColor
+        }
+    }
+    
+    private var code: String {
         switch ticker.snapshot.change {
         case .rise: return "▲"
         case .even: return ""
@@ -94,12 +102,23 @@ fileprivate struct CoinPriceView: View {
                 
                 HStack(spacing: 0) {
                     Text(ticker.snapshot.price, format: .number)
-                        
+                    
+                    
                     Text("원")
                 }
                 .font(.system(size: 15))
-                .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 1, cornerRadius: 0)
+                .background {
+                    GeometryReader { proxy in
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(width: proxy.size.width, height: 1)
+                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 2, cornerRadius:1)
+                            .offset(y: proxy.size.height + 1)
+                    }
+                }
             }
+            .frame(alignment: .trailing)
+            
             HStack(spacing: 4) {
                 Text("거래")
                     .font(.system(size: 11))
@@ -110,5 +129,14 @@ fileprivate struct CoinPriceView: View {
         .fontWeight(.medium)
         .foregroundStyle(.aiCoLabel)
         .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+}
+
+#Preview {
+    VStack {
+        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
+            .frame(height: 100)
+        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
+            .frame(height: 100)
     }
 }
