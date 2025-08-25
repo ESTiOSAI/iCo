@@ -32,7 +32,8 @@ struct CoinCell: View {
             }
         }
         .id(coin.id)
-        .padding(.vertical, 10)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
         .contentShape(.rect)
     }
 }

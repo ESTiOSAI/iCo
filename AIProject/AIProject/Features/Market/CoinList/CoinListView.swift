@@ -83,11 +83,14 @@ struct CoinListView: View {
             List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
                     CoinCell(coin: meta, store: ticker)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoNeutral : Color.clear)
+                        .background(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
                         .onTapGesture {
                             store.addRecord(id)
                             selectedCoinID = id
                         }
-                        .listRowBackground(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
                         .onAppear {
                             visibleCoins.insert(id)
                         }
@@ -104,6 +107,10 @@ struct CoinListView: View {
 }
 
 extension CoinListView {
+    private var isIpad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
     private func handleConnection(by phase: ScenePhase) async {
         print(#function, phase)
         switch phase {
