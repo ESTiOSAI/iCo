@@ -10,21 +10,18 @@ import SwiftUI
 struct CoinCell: View {
     let coin: Coin
     let store: TickerStore
+    let searchTerm: String
     
-    init(coin: Coin, store: TickerStore) {
+    init(coin: Coin, store: TickerStore, searchTerm: String) {
         self.coin = coin
         self.store = store
+        self.searchTerm = searchTerm
     }
     
     var body: some View {
         VStack {
             HStack {
-                
-                #if DEBUG
-//                let _ = Self._printChanges()
-                #endif
-                // 코인 레이블
-                CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName)
+                CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName, searchTerm: searchTerm)
                     .frame(alignment: .leading)
                 
                 CoinPriceView(ticker: store)
@@ -32,7 +29,8 @@ struct CoinCell: View {
             }
         }
         .id(coin.id)
-        .padding(.vertical, 10)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
         .contentShape(.rect)
     }
 }
@@ -40,13 +38,14 @@ struct CoinCell: View {
 fileprivate struct CoinMetaView: View {
     let symbol: String
     let name:String
+    let searchTerm: String
     
     var body: some View {
         HStack(spacing: 16) {
             CoinView(symbol: symbol, size: 30)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(name)
+                Text(name.highlighted(searchTerm))
                     .lineLimit(2)
                     .font(.system(size: 14))
                     .fontWeight(.bold)
@@ -64,17 +63,27 @@ fileprivate struct CoinMetaView: View {
 }
 
 fileprivate struct CoinPriceView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    
     let ticker: TickerStore
     
-    var changeColor: Color {
+    private var changeColor: Color {
         switch ticker.snapshot.change {
-        case .rise: return .aiCoPositive
+        case .rise: return themeManager.selectedTheme.positiveColor
         case .even: return .aiCoLabel
-        case .fall: return .aiCoNegative
+        case .fall: return themeManager.selectedTheme.negativeColor
         }
     }
     
-    var code: String {
+    private var animationColor: Color {
+        switch ticker.snapshot.change {
+        case .rise: return themeManager.selectedTheme.positiveColor
+        case .even: return .clear
+        case .fall: return themeManager.selectedTheme.negativeColor
+        }
+    }
+    
+    private var code: String {
         switch ticker.snapshot.change {
         case .rise: return "▲"
         case .even: return ""
@@ -84,12 +93,6 @@ fileprivate struct CoinPriceView: View {
     
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
-            
-            #if DEBUG
-            // FIXME: volume과 rate은 한 번에 변하는데 각각 rendering되고 있음
-//            let _ = Self._printChanges()
-            #endif
-            
             HStack {
                 HStack(spacing: 0) {
                     Text(code)
@@ -99,12 +102,23 @@ fileprivate struct CoinPriceView: View {
                 
                 HStack(spacing: 0) {
                     Text(ticker.snapshot.price, format: .number)
-                        
+                    
+                    
                     Text("원")
                 }
                 .font(.system(size: 15))
-                .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 1, cornerRadius: 0)
+                .background {
+                    GeometryReader { proxy in
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(width: proxy.size.width, height: 1)
+                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 2, cornerRadius:1)
+                            .offset(y: proxy.size.height + 1)
+                    }
+                }
             }
+            .frame(alignment: .trailing)
+            
             HStack(spacing: 4) {
                 Text("거래")
                     .font(.system(size: 11))
@@ -115,5 +129,14 @@ fileprivate struct CoinPriceView: View {
         .fontWeight(.medium)
         .foregroundStyle(.aiCoLabel)
         .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+}
+
+#Preview {
+    VStack {
+        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
+            .frame(height: 100)
+        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
+            .frame(height: 100)
     }
 }

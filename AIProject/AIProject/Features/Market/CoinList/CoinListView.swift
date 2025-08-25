@@ -12,6 +12,8 @@ struct CoinListView: View {
     @Bindable var store: MarketStore
     
     @State private var visibleCoins: Set<CoinID> = []
+    @State private var isOnList: Bool = true
+    
     @Environment(\.scenePhase) private var scenePhase
     
     @FetchRequest(
@@ -21,10 +23,11 @@ struct CoinListView: View {
     private var bookmarks: FetchedResults<BookmarkEntity>
     
     @Binding private var selectedCoinID: CoinID?
-    
-    init(store: MarketStore, selectedCoinID: Binding<CoinID?>) {
+    @Binding private var searchText: String
+    init(store: MarketStore, selectedCoinID: Binding<CoinID?>, searchText: Binding<String>) {
         self.store = store
         _selectedCoinID = selectedCoinID
+        _searchText = searchText
     }
     
     var body: some View {
@@ -40,6 +43,7 @@ struct CoinListView: View {
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
             Task {
+                guard isOnList else { return }
                 await handleConnection(by: newValue)
             }
         })
@@ -55,11 +59,13 @@ struct CoinListView: View {
         }
         .onAppear {
             Task {
+                isOnList = true
                 await store.connect()
             }
         }
         .onDisappear {
             Task {
+                isOnList = false
                 await store.disconnect()
             }
         }
@@ -82,12 +88,15 @@ struct CoinListView: View {
         } else {
             List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
-                    CoinCell(coin: meta, store: ticker)
+                    CoinCell(coin: meta, store: ticker, searchTerm: searchText)
+                        .listRowSeparator(.hidden)
+                        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
+                        .background(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
                         .onTapGesture {
                             store.addRecord(id)
                             selectedCoinID = id
                         }
-                        .listRowBackground(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
                         .onAppear {
                             visibleCoins.insert(id)
                         }
@@ -104,6 +113,10 @@ struct CoinListView: View {
 }
 
 extension CoinListView {
+    private var isIpad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+    
     private func handleConnection(by phase: ScenePhase) async {
         print(#function, phase)
         switch phase {
