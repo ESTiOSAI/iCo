@@ -37,14 +37,6 @@ struct ChartView: View {
     }
 
     // MARK: - Computed & Helpers
-    /// 차트 데이터 (시계열 포인트)
-    private static let headerDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy.MM.dd HH:mm"
-        f.locale = Locale(identifier: "ko_KR")
-        return f
-    }()
-    
     private var data: [CoinPrice] { viewModel.prices }
     
     private var shouldShowHeader: Bool {
