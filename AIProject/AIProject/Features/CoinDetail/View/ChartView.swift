@@ -18,18 +18,13 @@ struct ChartView: View {
     @State private var selectedTab = 0
     /// 현재 선택된 테마 정보를 가져오기 위한 전역 상태 객체
     @EnvironmentObject var themeManager: ThemeManager
+    /// 시스템 앱 상태(active/inactive/background) 변화를 View에 전달하는 환경값
+    @Environment(\.scenePhase) private var scenePhase
 
     // MARK: - Init
-    /// 프로덕션 기본 경로
-    init(coin: Coin) {
-        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
-    }
-    
-    #if DEBUG
-    /// 프리뷰/디버그 전용 주입 경로
     init(
         coin: Coin,
-        priceService: any CoinPriceProvider,
+        priceService: any CoinPriceProvider = UpbitPriceService(),
         tickerAPI: UpBitAPIService = UpBitAPIService()
     ) {
         _viewModel = StateObject(
@@ -40,28 +35,14 @@ struct ChartView: View {
             )
         )
     }
-    #endif
 
     // MARK: - Computed & Helpers
-    /// 차트 데이터 (시계열 포인트)
-    private static let headerDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy.MM.dd HH:mm"
-        f.locale = Locale(identifier: "ko_KR")
-        return f
-    }()
-    
     private var data: [CoinPrice] { viewModel.prices }
-    
-    private var shouldShowHeader: Bool {
-        if case .success = viewModel.status, viewModel.hasHeader { return true }
-        return false
-    }
     
     /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
         guard let time = viewModel.lastUpdated else { return "" }
-        return Self.headerDateFormatter.string(from: time) + " 기준"
+        return DateFormatter.stampYMdHmKST.string(from: time) + " 기준"
     }
     
     /// 뷰 전용 매핑 (테마/색)
@@ -75,15 +56,10 @@ struct ChartView: View {
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading) {
-            if shouldShowHeader {
-                headerView
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            headerView
             chartArea
         }
         .padding(20)
-        .onAppear { viewModel.checkBookmark() }
-        .onDisappear { viewModel.stopUpdating() }
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.aiCoBackground)
@@ -92,49 +68,71 @@ struct ChartView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(.defaultGradient, lineWidth: 0.5)
         )
+        .onAppear {
+            viewModel.checkBookmark()
+            viewModel.retry()
+        }
+        .onDisappear {
+            viewModel.stopUpdating()
+        }
+        .onChange(of: scenePhase, initial: false) { _, newPhase in
+            switch newPhase {
+            case .active:
+                viewModel.retry()
+            case .background:
+                viewModel.stopUpdating()
+            case .inactive:
+                break
+            @unknown default:
+                break
+            }
+        }
     }
     
     // MARK: - Subviews
     @ViewBuilder
     private var headerView: some View {
-        let change = viewModel.displayChangeValue
-        let sign   = change > 0 ? "+" : (change < 0 ? "-" : "")
-        let arrow  = change > 0 ? "▲" : (change < 0 ? "▼" : "")
-        let absChange  = abs(change)
-
-        /// 타이틀 영역
-        HStack(alignment: .top, spacing: 8) {
-            /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
-            VStack(alignment: .leading, spacing: 8) {
-                Text(lastUpdatedText)
-                    .font(.system(size: 10, weight: .regular))
-                    .foregroundStyle(.aiCoLabel)
-                    .lineLimit(1)
-                
-                Text(viewModel.displayLastPrice.formatKRW)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
-                    .lineLimit(1)
-                
-                Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(headerColor)
-                    .lineLimit(1)
-                
-                Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.aiCoLabelSecondary)
-                    .lineLimit(1)
-            }
+        if viewModel.shouldShowHeader {
+            let change = viewModel.displayChangeValue
+            let sign   = change > 0 ? "+" : (change < 0 ? "-" : "")
+            let arrow  = change > 0 ? "▲" : (change < 0 ? "▼" : "")
+            let absChange  = abs(change)
             
-            Spacer()
-            
-            /// 코인 북마크 버튼
-            /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
-            /// - 탭 시 북마크 추가/제거 로직 호출
-            Button(action: { viewModel.toggleBookmark() }) {
-                CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+            /// 타이틀 영역
+            HStack(alignment: .top, spacing: 8) {
+                /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(lastUpdatedText)
+                        .font(.system(size: 10, weight: .regular))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
+                    
+                    Text(viewModel.displayLastPrice.formatKRW)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
+                    
+                    Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(headerColor)
+                        .lineLimit(1)
+                    
+                    Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.aiCoLabelSecondary)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+                
+                /// 코인 북마크 버튼
+                /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
+                /// - 탭 시 북마크 추가/제거 로직 호출
+                Button(action: { viewModel.toggleBookmark() }) {
+                    CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+                }
             }
+            .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
     
@@ -183,83 +181,16 @@ struct ChartView: View {
     }
 }
 
-/// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
-private struct CandleChartView: View {
-    let data: [CoinPrice]
-    let xDomain: ClosedRange<Date>
-    let yRange: ClosedRange<Double>
-    let scrollTo: Date
-    let timeFormatter: DateFormatter
-    let positiveColor: Color
-    let negativeColor: Color
-    
-    var body: some View {
-        Chart(data) { point in
-            /// 고가/저가 수직선 표시 (위꼬리/아래꼬리 역할)
-            RuleMark(
-                x: .value("Date", point.date),
-                yStart: .value("Low", point.low),
-                yEnd: .value("High", point.high)
-            )
-            .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
-            
-            /// 시가/종가 직사각형 (실체 바)
-            RectangleMark(
-                x: .value("Date", point.date),
-                yStart: .value("Open", point.open),
-                yEnd: .value("Close", point.close),
-                width: 6
-            )
-            .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
-        }
-        /// X축 도메인 설정 및 스크롤 위치 초기화
-        .chartXScale(domain: xDomain)
-        .chartScrollPosition(initialX: scrollTo)
-        .chartScrollableAxes(.horizontal)
-        /// Y축 도메인 설정 (동적 범위)
-        .chartYScale(domain: yRange)
-        /// 한 화면에서 보이는 X축 범위 (2880초 = 48분)
-        .chartXVisibleDomain(length: 2880)
-        /// X축 눈금 (15분 간격) + 1시간마다 세로선 표시
-        .chartXAxis {
-            AxisMarks(values: .stride(by: .minute, count: 15)) { value in
-                AxisTick()
-                AxisValueLabel {
-                    if let date = value.as(Date.self) {
-                        Text(timeFormatter.string(from: date))
-                    }
-                }
-                
-                /// 세로선은 1시간 단위(분 == 0)일 때만 표시
-                if let date = value.as(Date.self),
-                   Calendar.current.component(.minute, from: date) == 0 {
-                    AxisGridLine()
-                }
-            }
-        }
-        .chartYAxis {
-            AxisMarks { value in
-                AxisGridLine()
-                AxisTick()
-                if let v = value.as(Double.self) {
-                    AxisValueLabel {
-                        if yRange.upperBound >= 1_000_000 {
-                            Text(String(format: "%.1fM", v / 1_000_000)) // 백만 단위
-                        } else if yRange.upperBound >= 1_000 {
-                            Text(String(format: "%.1fK", v / 1_000)) // 천 단위
-                        } else {
-                            Text(String(format: "%.0f", v)) // 원 단위 그대로
-                        }
-                    }
-                }
-            }
-        }
-        /// 차트 오른쪽 영역에 여백 추가
-        .chartPlotStyle { $0.padding(.trailing, 10).padding(.bottom, 8) }
-    }
-}
-
 #Preview {
     ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
         .environmentObject(ThemeManager())
+}
+
+private extension DateFormatter {
+    static let stampYMdHmKST: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd HH:mm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }()
 }
