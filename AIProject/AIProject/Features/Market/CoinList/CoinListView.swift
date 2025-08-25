@@ -90,7 +90,7 @@ struct CoinListView: View {
                     CoinCell(coin: meta, store: ticker)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                        .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoNeutral : Color.clear)
+                        .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
                         .background(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
                         .onTapGesture {
                             store.addRecord(id)
