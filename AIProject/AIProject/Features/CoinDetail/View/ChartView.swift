@@ -39,11 +39,6 @@ struct ChartView: View {
     // MARK: - Computed & Helpers
     private var data: [CoinPrice] { viewModel.prices }
     
-    private var shouldShowHeader: Bool {
-        if case .success = viewModel.status, viewModel.hasHeader { return true }
-        return false
-    }
-    
     /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
         guard let time = viewModel.lastUpdated else { return "" }
