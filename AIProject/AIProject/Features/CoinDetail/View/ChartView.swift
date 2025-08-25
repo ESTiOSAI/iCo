@@ -73,6 +73,14 @@ struct ChartView: View {
             chartArea
         }
         .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.aiCoBackground)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(.defaultGradient, lineWidth: 0.5)
+        )
         .onAppear {
             viewModel.checkBookmark()
             viewModel.retry()
@@ -92,14 +100,6 @@ struct ChartView: View {
                 break
             }
         }
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.aiCoBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.defaultGradient, lineWidth: 0.5)
-        )
     }
     
     // MARK: - Subviews
