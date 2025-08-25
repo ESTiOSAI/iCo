@@ -385,3 +385,11 @@ extension ChartViewModel {
         headerLastPrice != 0 ? headerChangeRate : (summary?.changeRate ?? 0)
     }
 }
+
+extension ChartViewModel {
+    /// 헤더 노출 조건: 로딩 성공 + (티커 또는 summary 존재) + 최근 캔들 있음
+    var shouldShowHeader: Bool {
+        if case .success = status { return hasHeader }
+        return false
+    }
+}

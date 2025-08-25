@@ -63,7 +63,7 @@ struct ChartView: View {
     /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
         guard let time = viewModel.lastUpdated else { return "" }
-        return Self.headerDateFormatter.string(from: time) + " 기준"
+        return DateFormatter.stampYMdHmKST.string(from: time) + " 기준"
     }
     
     /// 뷰 전용 매핑 (테마/색)
@@ -77,10 +77,7 @@ struct ChartView: View {
     // MARK: - Body
     var body: some View {
         VStack(alignment: .leading) {
-            if shouldShowHeader {
-                headerView
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-            }
+            headerView
             chartArea
         }
         .padding(20)
@@ -116,44 +113,47 @@ struct ChartView: View {
     // MARK: - Subviews
     @ViewBuilder
     private var headerView: some View {
-        let change = viewModel.displayChangeValue
-        let sign   = change > 0 ? "+" : (change < 0 ? "-" : "")
-        let arrow  = change > 0 ? "▲" : (change < 0 ? "▼" : "")
-        let absChange  = abs(change)
-
-        /// 타이틀 영역
-        HStack(alignment: .top, spacing: 8) {
-            /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
-            VStack(alignment: .leading, spacing: 8) {
-                Text(lastUpdatedText)
-                    .font(.system(size: 10, weight: .regular))
-                    .foregroundStyle(.aiCoLabel)
-                    .lineLimit(1)
-                
-                Text(viewModel.displayLastPrice.formatKRW)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
-                    .lineLimit(1)
-                
-                Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(headerColor)
-                    .lineLimit(1)
-                
-                Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.aiCoLabelSecondary)
-                    .lineLimit(1)
-            }
+        if viewModel.shouldShowHeader {
+            let change = viewModel.displayChangeValue
+            let sign   = change > 0 ? "+" : (change < 0 ? "-" : "")
+            let arrow  = change > 0 ? "▲" : (change < 0 ? "▼" : "")
+            let absChange  = abs(change)
             
-            Spacer()
-            
-            /// 코인 북마크 버튼
-            /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
-            /// - 탭 시 북마크 추가/제거 로직 호출
-            Button(action: { viewModel.toggleBookmark() }) {
-                CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+            /// 타이틀 영역
+            HStack(alignment: .top, spacing: 8) {
+                /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(lastUpdatedText)
+                        .font(.system(size: 10, weight: .regular))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
+                    
+                    Text(viewModel.displayLastPrice.formatKRW)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineLimit(1)
+                    
+                    Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(headerColor)
+                        .lineLimit(1)
+                    
+                    Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.aiCoLabelSecondary)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+                
+                /// 코인 북마크 버튼
+                /// - 현재 코인이 북마크되어 있는지 여부에 따라 아이콘 표시 변경
+                /// - 탭 시 북마크 추가/제거 로직 호출
+                Button(action: { viewModel.toggleBookmark() }) {
+                    CircleIconView(imageName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+                }
             }
+            .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
     
@@ -283,4 +283,13 @@ private struct CandleChartView: View {
 #Preview {
     ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
         .environmentObject(ThemeManager())
+}
+
+private extension DateFormatter {
+    static let stampYMdHmKST: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd HH:mm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }()
 }
