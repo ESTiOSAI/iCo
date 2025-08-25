@@ -22,16 +22,9 @@ struct ChartView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     // MARK: - Init
-    /// 프로덕션 기본 경로
-    init(coin: Coin) {
-        _viewModel = StateObject(wrappedValue:  ChartViewModel(coin: coin))
-    }
-    
-    #if DEBUG
-    /// 프리뷰/디버그 전용 주입 경로
     init(
         coin: Coin,
-        priceService: any CoinPriceProvider,
+        priceService: any CoinPriceProvider = UpbitPriceService(),
         tickerAPI: UpBitAPIService = UpBitAPIService()
     ) {
         _viewModel = StateObject(
@@ -42,7 +35,6 @@ struct ChartView: View {
             )
         )
     }
-    #endif
 
     // MARK: - Computed & Helpers
     /// 차트 데이터 (시계열 포인트)
