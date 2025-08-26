@@ -42,7 +42,7 @@ struct RoundedButton: View {
             )
             .overlay {
                 Capsule()
-                    .stroke(.defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(.defaultGradient, lineWidth: 0.5)
             }
         }
     }

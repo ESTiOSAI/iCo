@@ -66,7 +66,7 @@ struct ChartView: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.defaultGradient, lineWidth: 0.5)
+                .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
         .onAppear {
             viewModel.checkBookmark()

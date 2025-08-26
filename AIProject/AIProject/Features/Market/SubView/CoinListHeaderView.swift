@@ -40,9 +40,10 @@ struct CoinListHeaderView: View {
         .listRowSeparator(.hidden)
         .padding(.horizontal)
         .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
 //        .background {
 //                UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16, style: .continuous)
-//                .stroke(.defaultGradient, lineWidth: 0.5)
+//                .strokeBorder(.defaultGradient, lineWidth: 0.5)
 //        }
     }
 }

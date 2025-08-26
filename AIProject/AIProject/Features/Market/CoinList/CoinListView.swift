@@ -35,10 +35,13 @@ struct CoinListView: View {
             CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
             makeCoinContents()
         }
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(.defaultGradient, lineWidth: 0.5)
+        }
         .background {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.defaultGradient, lineWidth: 0.5)
-                .fill(Color.aiCoBackground)
+                .fill(.aiCoBackground)
         }
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
@@ -92,7 +95,10 @@ struct CoinListView: View {
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
-                        .background(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
+                        .overlay(
+                            LinearGradient.defaultGradient.frame(height: 0.5),
+                            alignment: .bottom
+                        )
                         .onTapGesture {
                             store.addRecord(id)
                             selectedCoinID = id

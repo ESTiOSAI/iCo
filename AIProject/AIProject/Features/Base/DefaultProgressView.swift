@@ -64,19 +64,19 @@ struct DefaultProgressView: View {
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackground)
+                        .background(.aiCoBackgroundWhite)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackground)
+                        .background(.aiCoBackgroundWhite)
                 }
             }
             .clipShape(.circle)
             .overlay {
                 Circle()
-                    .stroke(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .padding(15)
             .frame(width: 80, height: 80)

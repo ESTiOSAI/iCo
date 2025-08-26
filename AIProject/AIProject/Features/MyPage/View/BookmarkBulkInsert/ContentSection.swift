@@ -31,7 +31,7 @@ struct ContentSection: View {
                             .clipShape(.circle)
                             .overlay {
                                 Circle()
-                                    .stroke(.defaultGradient, lineWidth: 0.5)
+                                    .strokeBorder(.defaultGradient, lineWidth: 0.5)
                             }
                             .padding(.bottom, 16)
                         

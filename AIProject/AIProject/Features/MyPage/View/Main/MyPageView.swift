@@ -86,7 +86,7 @@ struct MyPageView: View {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(.defaultGradient, lineWidth: 0.5)
+                        .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
             }
             .padding(.horizontal, 16)

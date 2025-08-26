@@ -23,7 +23,7 @@ struct BotMessageView: View {
                     .padding(8)
                     .overlay {
                         Circle()
-                            .stroke(.accentGradient, lineWidth: 0.5)
+                            .strokeBorder(.accentGradient, lineWidth: 0.5)
                     }
                     .background {
                         Circle()
@@ -48,12 +48,12 @@ struct BotMessageView: View {
             .padding(.vertical, 15)
             .padding(.horizontal, 18)
             .background {
-                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
+                UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
                     .fill(.aiCoBackgroundAccent)
             }
             .overlay {
-                RoundedCorner(radius: 16, corners: [.topRight, .bottomLeft, .bottomRight])
-                    .stroke(.accentGradient, lineWidth: 0.5)
+                UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
+                    .strokeBorder(.defaultGradient, lineWidth: 0.5)
             }
             .frame(maxWidth: 300, alignment: .leading)
 

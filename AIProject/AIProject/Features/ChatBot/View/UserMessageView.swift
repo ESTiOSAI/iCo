@@ -23,12 +23,12 @@ struct UserMessageView: View {
                 .padding(.vertical, 15)
                 .padding(.horizontal, 18)
                 .background {
-                    RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight])
+                    UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 16, bottomTrailingRadius: 16)
                         .fill(Color.aiCoBackgroundWhite)
                 }
                 .overlay {
-                    RoundedCorner(radius: 16, corners: [.topLeft, .bottomLeft, .bottomRight])
-                        .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+                    UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 16, bottomTrailingRadius: 16)
+                        .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 }
                 .frame(maxWidth: 300, alignment: .trailing)
         }
