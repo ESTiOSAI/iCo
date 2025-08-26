@@ -24,13 +24,14 @@ struct RoundedButton: View {
                 if let title {
                     Text(title)
                         .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(foregroundColor ?? .aiCoLabel)
+                        .tint(foregroundColor ?? .aiCoLabel)
                 }
                 
                 if let imageName {
                     Image(systemName: imageName)
                         .font(.system(size: 10))
-                        .foregroundStyle(.aiCoLabelSecondary)
+                        .tint(foregroundColor ?? .aiCoLabel)
+                        
                 }
             }
             .padding(.horizontal, 10)
@@ -50,7 +51,8 @@ struct RoundedButton: View {
 
 #Preview {
     VStack {
-        RoundedButton(title: "With Image", action: { dummyAction() })
+        RoundedButton(title: "With Image", imageName: "xmark", action: { dummyAction() })
+            .disabled(true)
         RoundedButton(title: "Text Only", imageName: nil, action: { dummyAction() })
         RoundedButton(title: nil, imageName: "xmark", action: { dummyAction() })
     }
