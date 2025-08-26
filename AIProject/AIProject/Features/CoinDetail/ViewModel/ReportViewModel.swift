@@ -200,24 +200,24 @@ extension ReportViewModel {
                 icon: "text.page.badge.magnifyingglass",
                 title: "한눈에 보는 \(koreanName)",
                 state: overview,
-                onCancel: { self.cancelOverview() },
-                onRetry: { self.retryOverview() }
+                onCancel: { [weak self] in self?.cancelOverview() },
+                onRetry: { [weak self] in self?.retryOverview() }
             ),
             ReportSectionData(
                 id: "weekly",
                 icon: "calendar",
                 title: "주간 동향",
                 state: weekly,
-                onCancel: { self.cancelWeekly() },
-                onRetry: { self.retryWeekly() }
+                onCancel: { [weak self] in self?.cancelWeekly() },
+                onRetry: { [weak self] in self?.retryWeekly() }
             ),
             ReportSectionData(
                 id: "today",
                 icon: "shareplay",
                 title: "오늘 시장의 분위기",
                 state: today,
-                onCancel: { self.cancelToday() },
-                onRetry: { self.retryToday() }
+                onCancel: { [weak self] in self?.cancelToday() },
+                onRetry: { [weak self] in self?.retryToday() }
             ),
         ]
     }

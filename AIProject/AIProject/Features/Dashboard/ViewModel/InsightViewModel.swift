@@ -162,16 +162,16 @@ extension InsightViewModel {
                 icon: "bitcoinsign.bank.building",
                 title: "전반적인 시장의 분위기",
                 state: overall,
-                onCancel: { self.cancelOverall() },
-                onRetry: { self.retryOverall() }
+                onCancel: { [weak self] in self?.cancelOverall() },
+                onRetry: { [weak self] in self?.retryOverall() }
             ),
             ReportSectionData(
                 id: "community",
                 icon: "shareplay",
                 title: "주요 커뮤니티의 분위기",
                 state: community,
-                onCancel: { self.cancelCommunity() },
-                onRetry: { self.retryCommunity() }
+                onCancel: { [weak self] in self?.cancelCommunity() },
+                onRetry: { [weak self] in self?.retryCommunity() }
             ),
         ]
     }
