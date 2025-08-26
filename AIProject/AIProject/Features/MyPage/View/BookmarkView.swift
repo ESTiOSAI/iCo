@@ -160,8 +160,14 @@ struct BookmarkView: View {
                 .padding(.trailing, 16)
                 .padding(.bottom, 16)
                 
+                // 북마크한 코인이 없을 시 플레이스홀더 뷰 보여주기
+                if sortedCoins.isEmpty {
+                    CommonPlaceholderView(imageName: "placeholder-no-coin", text: "아직 북마크한 코인이 없어요\n북마크를 등록해 아이코의 AI리포트를 받아보세요")
+                        .padding(.vertical, 100)
+                }
+                
                 HStack(spacing: 16) {
-                    RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) {
+                    RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(sortedCoins.isEmpty)) {
                         showBulkInsertSheet = true
                     }
                     

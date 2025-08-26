@@ -21,24 +21,7 @@ struct ContentSection: View {
             VStack {
                 if selectedImage == nil {
                     // 이미지 등록 전
-                    ContentUnavailableView {
-                        Image("placeholder-no-image")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 120)
-                            .padding(50)
-                            .background(.aiCoBackground)
-                            .clipShape(.circle)
-                            .overlay {
-                                Circle()
-                                    .strokeBorder(.defaultGradient, lineWidth: 0.5)
-                            }
-                            .padding(.bottom, 16)
-                        
-                        Text("선택된 이미지가 없어요")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.aiCoLabelSecondary)
-                    }
+                    CommonPlaceholderView(imageName: "placeholder-no-image", text: "선택된 이미지가 없어요")
                 } else {
                     // 이미지 등록 후
                     ZStack {
