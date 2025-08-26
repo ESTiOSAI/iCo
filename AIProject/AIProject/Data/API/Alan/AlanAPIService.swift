@@ -261,16 +261,18 @@ extension AlanAPIService {
     /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchTodayInsight(now: Date = .now) async throws -> Insight {
-        let insightTTL: TimeInterval = 60 * 60
+    func fetchTodayInsight(ignoreCache: Bool = false) async throws -> Insight {
+        let now = Date.now
+        let interval: TimeInterval = 60 * 60
         
-        if !cacheBriefTodayTimestamp.isEmpty,
+        if !ignoreCache,
+           !cacheBriefTodayTimestamp.isEmpty,
            let savedDate = Date.dateAndTimeFormatter.date(from: cacheBriefTodayTimestamp) {
             let cacheURL = URL(string: "https://cache.local/dashboard/today/\(cacheBriefTodayTimestamp)")!
             let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
             
             if let cachedResponse = URLCache.shared.cachedResponse(for: request),
-                now.timeIntervalSince(savedDate) < insightTTL {
+               now.timeIntervalSince(savedDate) < interval {
                 do {
                     let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
                     return dto.toDomain()
@@ -306,7 +308,7 @@ extension AlanAPIService {
             let oldRequest = URLRequest(url: oldCacheURL, cachePolicy: .returnCacheDataElseLoad)
             URLCache.shared.removeCachedResponse(for: oldRequest)
         }
-
+        
         cacheBriefTodayTimestamp = now.dateAndTime
         
         return dto.toDomain()
@@ -317,16 +319,18 @@ extension AlanAPIService {
     /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchCommunityInsight(from post: String, now: Date = .now) async throws -> Insight {
-        let insightTTL: TimeInterval = 60 * 60
+    func fetchCommunityInsight(from post: String, now: Date = .now, ignoreCache: Bool = false) async throws -> Insight {
+        let now = Date.now
+        let interval: TimeInterval = 60 * 60
         
-        if !cacheBriefCommunityTimestamp.isEmpty,
+        if !ignoreCache,
+           !cacheBriefCommunityTimestamp.isEmpty,
            let savedDate = Date.dateAndTimeFormatter.date(from: cacheBriefCommunityTimestamp) {
             let cacheURL = URL(string: "https://cache.local/dashboard/community/\(cacheBriefCommunityTimestamp)")!
             let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
             
             if let cachedResponse = URLCache.shared.cachedResponse(for: request),
-                now.timeIntervalSince(savedDate) < insightTTL {
+               now.timeIntervalSince(savedDate) < interval {
                 do {
                     let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
                     return dto.toDomain()
@@ -362,7 +366,7 @@ extension AlanAPIService {
             let oldRequest = URLRequest(url: oldCacheURL, cachePolicy: .returnCacheDataElseLoad)
             URLCache.shared.removeCachedResponse(for: oldRequest)
         }
-
+        
         cacheBriefCommunityTimestamp = Date.dateAndTimeFormatter.string(from: now)
         
         return dto.toDomain()

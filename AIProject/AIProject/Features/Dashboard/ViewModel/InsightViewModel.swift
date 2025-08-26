@@ -66,10 +66,10 @@ final class InsightViewModel: ObservableObject {
     }
     
     // Reddit 데이터를 가져와 요약 후 인사이트 생성
-    private func fetchCommunityFlow() async throws -> Insight {
+    private func fetchCommunityFlow(ignoreCache: Bool = false) async throws -> Insight {
         let communityData = try await redditAPIService.fetchData()
         
-        return try await alanAPIService.fetchCommunityInsight(from: communityData.communitySummary)
+        return try await alanAPIService.fetchCommunityInsight(from: communityData.communitySummary, ignoreCache: ignoreCache)
     }
     
     // overall만 다시 시도
@@ -81,7 +81,7 @@ final class InsightViewModel: ObservableObject {
         Task {
             await MainActor.run { self.overall = .loading }
             try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
-            overallTask = Task { try await alanAPIService.fetchTodayInsight() }
+            overallTask = Task { try await alanAPIService.fetchTodayInsight(ignoreCache: true) }
             await updateOverallUI()
         }
     }
@@ -96,7 +96,7 @@ final class InsightViewModel: ObservableObject {
         Task {
             await MainActor.run { community = .loading }
             try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
-            communityTask = Task { try await fetchCommunityFlow() }
+            communityTask = Task { try await fetchCommunityFlow(ignoreCache: true) }
             await updateCommunityUI()
         }
     }
