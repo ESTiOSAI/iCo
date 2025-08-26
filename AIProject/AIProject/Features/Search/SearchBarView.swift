@@ -45,7 +45,7 @@ struct SearchBarView: View {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 15)
-                    .stroke(showCancel ? .accentGradient : .defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(showCancel ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .animation(.snappy(duration: 0.1), value: showCancel)
 

@@ -46,7 +46,7 @@ struct ThemeRow: View {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(!isSelected ? .defaultGradient : .accentGradient, lineWidth: 0.5)
+                    .strokeBorder(!isSelected ? .defaultGradient : .accentGradient, lineWidth: 0.5)
             )
         }
     }

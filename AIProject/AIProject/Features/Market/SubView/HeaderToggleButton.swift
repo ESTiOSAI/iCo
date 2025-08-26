@@ -39,7 +39,7 @@ struct HeaderToggleButton: View {
                 )
                 .overlay {
                     Capsule()
-                        .stroke(.defaultGradient, lineWidth: 0.5)
+                        .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 }
             }
             .fontWeight(sortOrder != .none ? .bold : .regular)

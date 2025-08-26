@@ -28,7 +28,7 @@ struct CircleDeleteButton: View {
                 }
                 .overlay {
                     Circle()
-                        .stroke(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
+                        .strokeBorder(Gradient.aiCoGradientStyle(.default), lineWidth: 0.5)
                 }
         }
     }

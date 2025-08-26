@@ -130,7 +130,7 @@ struct BookmarkView: View {
                             .fill(Color.aiCoBackgroundAccent)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(.accent, lineWidth: 0.5)
+                                    .strokeBorder(.accent, lineWidth: 0.5)
                             )
                     )
                     .cornerRadius(20)

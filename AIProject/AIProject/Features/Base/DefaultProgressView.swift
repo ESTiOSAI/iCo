@@ -76,7 +76,7 @@ struct DefaultProgressView: View {
             .clipShape(.circle)
             .overlay {
                 Circle()
-                    .stroke(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .padding(15)
             .frame(width: 80, height: 80)

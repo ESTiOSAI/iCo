@@ -57,7 +57,7 @@ struct SegmentedControlView: View {
         .background(.aiCoBackgroundAccent)
         .frame(width: width)
         .clipShape(Capsule())
-        .overlay { Capsule().stroke(.defaultGradient, lineWidth: 0.5) }
+        .overlay { Capsule().strokeBorder(.defaultGradient, lineWidth: 0.5) }
     }
 }
 

@@ -40,7 +40,7 @@ struct RecomendationPlaceholderCardView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 24))
                         .overlay {
                             RoundedRectangle(cornerRadius: 24)
-                                .stroke(.defaultGradient, lineWidth: 0.5)
+                                .strokeBorder(.defaultGradient, lineWidth: 0.5)
                         }
                     }
                     .frame(maxWidth: geoProxy.size.width - (CardConst.cardInnerPadding * 2))
@@ -61,7 +61,7 @@ struct RecomendationPlaceholderCardView: View {
                 .frame(height: CardConst.cardHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(
-                    hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).stroke(.defaultGradient, lineWidth: 0.5) : nil)
+                    hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5) : nil)
             }
             .frame(width: geoProxy.size.width)
         }

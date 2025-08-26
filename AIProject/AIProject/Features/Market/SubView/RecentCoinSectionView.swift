@@ -32,7 +32,7 @@ struct RecentCoinSectionView: View {
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
                     .background {
-                        Capsule().stroke(.defaultGradient, lineWidth: 0.5)
+                        Capsule().strokeBorder(.defaultGradient, lineWidth: 0.5)
                     }
                     .onTapGesture {
                         tapAction(coin.id)

@@ -37,7 +37,7 @@ struct CoinListView: View {
         }
         .background {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(.defaultGradient, lineWidth: 0.5)
+                .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 .fill(Color.aiCoBackground)
         }
         .clipShape(.rect(cornerRadius: 16))
@@ -92,7 +92,7 @@ struct CoinListView: View {
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
-                        .background(Rectangle().stroke(.defaultGradient, lineWidth: 0.5))
+                        .background(Rectangle().strokeBorder(.defaultGradient, lineWidth: 0.5))
                         .onTapGesture {
                             store.addRecord(id)
                             selectedCoinID = id
