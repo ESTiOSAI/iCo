@@ -80,8 +80,6 @@ struct MarketView: View {
                 CoinDetailView(coin: coin)
                     .id(coin.id)
                 
-            } else {
-                Text("Empty")
             }
         }
         .navigationSplitViewStyle(.balanced)
