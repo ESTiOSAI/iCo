@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-
 struct MainTabView: View {
     @State private var router = TabRouter()
-    private let tickerService: RealTimeTickerProvider = UpbitTickerService()
-    private let upbitService: UpBitAPIService = UpBitAPIService()
+    @State private var tickerService: RealTimeTickerProvider = UpbitTickerService()
+    @State private var upbitService: UpBitAPIService = UpBitAPIService()
     
     var body: some View {
         TabView(selection: $router.selected) {

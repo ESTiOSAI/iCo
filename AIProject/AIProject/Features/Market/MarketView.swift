@@ -92,7 +92,7 @@ struct MarketView: View {
 #Preview {
     MarketView(
         coinService: UpBitAPIService(),
-        tickerService: UpbitTickerService(client: 
+        tickerService: UpbitTickerService(client:
                                           ReconnectableWebSocketClient {
                                           BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
                                           })
