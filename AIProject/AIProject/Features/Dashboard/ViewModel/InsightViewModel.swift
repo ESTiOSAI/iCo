@@ -60,7 +60,7 @@ final class InsightViewModel: ObservableObject {
         
         Task {
             await updateOverallUI()
-            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 바뀌는 효과를 주기 위한 의도적 딜레이
+            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
             await updateCommunityUI()
         }
     }
@@ -76,14 +76,12 @@ final class InsightViewModel: ObservableObject {
     func retryOverall() {
         if overall.isLoading { return }
         overallTask?.cancel()
+        overallTask = nil
         
-        Task { @MainActor in
-            overall = .loading
-        }
-        
-        overallTask = Task { try await alanAPIService.fetchTodayInsight() }
-        
-        Task { // FIXME: 메인액터 명시...
+        Task {
+            await MainActor.run { self.overall = .loading }
+            try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
+            overallTask = Task { try await alanAPIService.fetchTodayInsight() }
             await updateOverallUI()
         }
     }
@@ -93,13 +91,12 @@ final class InsightViewModel: ObservableObject {
         if community.isLoading { return }
         communityTask?.cancel()
         
-        Task { @MainActor in
-            community = .loading
-        }
-        
-        communityTask = Task { try await fetchCommunityFlow() }
+        communityTask = nil
         
         Task {
+            await MainActor.run { community = .loading }
+            try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
+            communityTask = Task { try await fetchCommunityFlow() }
             await updateCommunityUI()
         }
     }

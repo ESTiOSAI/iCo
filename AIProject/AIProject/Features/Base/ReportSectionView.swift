@@ -71,7 +71,6 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                     DefaultProgressView(status: .loading, message: "아이코가 리포트를 작성하고 있어요") {
                         data.onCancel()
                     }
-                    .padding(.vertical, 20)
                 case .success(let value):
                     content(value)
                         .font(.system(size: 14))
@@ -89,12 +88,10 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                     DefaultProgressView(status: .cancel, message: error.localizedDescription) {
                         data.onRetry()
                     }
-                    .padding(.vertical, 20)
                 case .failure(let error):
                     DefaultProgressView(status: .failure, message: error.localizedDescription) {
                         data.onRetry()
                     }
-                    .padding(.vertical, 20)
                 }
             }
         }

@@ -42,6 +42,7 @@ struct AIBriefingView: View {
                     }
                 } else {
                     briefingView
+                        .frame(height: 260)
                 }
                 
                 FearGreedView()
