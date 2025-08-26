@@ -60,7 +60,7 @@ final class InsightViewModel: ObservableObject {
         
         Task {
             await updateOverallUI()
-            try? await Task.sleep(for: .milliseconds(350))
+            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 바뀌는 효과를 주기 위한 의도적 딜레이
             await updateCommunityUI()
         }
     }
