@@ -47,9 +47,9 @@ struct ChartView: View {
     
     /// 뷰 전용 매핑 (테마/색)
     private var headerColor: Color {
-        let v = viewModel.displayChangeValue
-        if v > 0 { return themeManager.selectedTheme.positiveColor }
-        if v < 0 { return themeManager.selectedTheme.negativeColor }
+        let value = viewModel.displayChangeValue
+        if value > 0 { return themeManager.selectedTheme.positiveColor }
+        if value < 0 { return themeManager.selectedTheme.negativeColor }
         return .gray
     }
     
