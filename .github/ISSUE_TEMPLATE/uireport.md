@@ -3,7 +3,7 @@ name: UIReport
 about: 통합테스트 중 UI관련 리포트
 title: "[UIReport]"
 labels: Design, Fix
-assignees: aldalddl, HyeonjinBack, ibcylon, jihyeonjjang, kanghun1121, kitcat-s, leekangho0
+assignees: ''
 
 ---
 
