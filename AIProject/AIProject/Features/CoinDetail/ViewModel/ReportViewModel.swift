@@ -38,14 +38,12 @@ final class ReportViewModel: ObservableObject {
     init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
-        
-        load()
     }
     
-    private func load() {
+    func load() async {
         cancelAll()
         
-        Task { @MainActor in
+        await MainActor.run {
             overview = .loading
             weekly = .loading
             today = .loading
@@ -79,13 +77,11 @@ final class ReportViewModel: ObservableObject {
             )
         }
         
-        Task {
-            await updateOverviewUI()
-            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
-            await updateWeeklyUI()
-            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
-            await updateTodayUI()
-        }
+        await updateOverviewUI()
+        try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
+        await updateWeeklyUI()
+        try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
+        await updateTodayUI()
     }
     
     // overview만 다시 시도

@@ -15,11 +15,7 @@ import SwiftUI
 ///   - coin: 리포트를 보여줄 대상 코인
 struct ReportView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
-    @StateObject var viewModel: ReportViewModel
-    
-    init(coin: Coin) {
-        _viewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
-    }
+    @ObservedObject var viewModel: ReportViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -47,10 +43,11 @@ struct ReportView: View {
             }
         }
         .padding(.bottom, 30)
+        .task {
+            await viewModel.load()
+        }
+        .onDisappear {
+            viewModel.cancelAll()
+        }
     }
-}
-
-#Preview {
-    let sampleCoin = Coin(id: "KRW-BTC", koreanName: "비트코인")
-    return ScrollView { ReportView(coin: sampleCoin).padding(.horizontal, 16) }
 }

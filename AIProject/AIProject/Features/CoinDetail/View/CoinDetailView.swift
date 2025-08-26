@@ -10,8 +10,14 @@ import SwiftUI
 struct CoinDetailView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @State private var selectedTab: Tab = .chart
+    @StateObject var reportViewModel: ReportViewModel
     
     let coin: Coin
+    
+    init(coin: Coin) {
+        self.coin = coin
+        _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
+    }
     
     var body: some View {
         GeometryReader { proxy in
@@ -20,7 +26,13 @@ struct CoinDetailView: View {
                     // 헤더
                     if hSizeClass == .regular {
                         HStack(alignment: .lastTextBaseline) {
-                            HeaderView(heading: coin.koreanName) // FIXME: 코인 심볼
+                            Text(coin.koreanName)
+                                .font(.system(size: 24, weight: .black))
+                                .foregroundStyle(.aiCoLabel)
+                            
+                            Text(coin.coinSymbol)
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(.aiCoLabelSecondary)
                         }
                     } else {
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -61,7 +73,7 @@ struct CoinDetailView: View {
                             ChartView(coin: coin)
                                 .frame(height: proxy.size.height * 0.55)
                             
-                            ReportView(coin: coin)
+                            ReportView(viewModel: reportViewModel)
                                 .padding(.top, 20)
                         } else {
                             switch selectedTab {
@@ -69,7 +81,7 @@ struct CoinDetailView: View {
                                 ChartView(coin: coin)
                                     .frame(height: proxy.size.height * 0.8)
                             case .report:
-                                ReportView(coin: coin)
+                                ReportView(viewModel: reportViewModel)
                             }
                         }
                     }
