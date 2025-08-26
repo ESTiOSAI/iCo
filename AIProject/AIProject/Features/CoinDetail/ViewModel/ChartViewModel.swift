@@ -354,15 +354,6 @@ extension ChartViewModel {
     func scrollToTime(for data: [CoinPrice]) -> Date {
         data.last?.date.addingTimeInterval(60 * 5) ?? Date()
     }
-    
-    /// 차트 X축 라벨에 사용할 시간 포맷터 (24시간제 HH:mm 형식)
-    /// - Returns: "HH:mm" 포맷을 사용하는 DateFormatter (ko_KR 로케일)
-    var timeFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter
-    }
 }
 
 extension ChartViewModel {

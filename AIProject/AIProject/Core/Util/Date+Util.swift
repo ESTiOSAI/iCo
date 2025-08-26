@@ -25,9 +25,32 @@ extension Date {
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
     }()
-    
+
     var dateAndTime: String {
         Date.dateAndTimeFormatter.string(from: self)
+    }}
+
+/// `Date` 타입에 시간을 지정된 형식으로 포맷팅하는 기능을 추가하는 확장.
+///
+/// - Static Property:
+///   - hhmmTimeFormatter: `"HH:mm"` 형식(24시간제)의 `DateFormatter`.
+///
+/// - Computed Property:
+///   - hhmmTime: `Date` 인스턴스를 지정된 형식의 문자열로 변환.
+///
+/// 사용 예시:
+/// let now = Date()
+/// print(now.hhmmTime) // "13:05"
+extension Date {
+    static let hhmmTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
+    }()
+ 
+    var hhmmTime: String {
+        Date.hhmmTimeFormatter.string(from: self)
     }
     
     static let numbersOnlyFormatter: DateFormatter = {
@@ -41,3 +64,4 @@ extension Date {
         Date.numbersOnlyFormatter.string(from: self)
     }
 }
+
