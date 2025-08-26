@@ -51,7 +51,10 @@ final class RecommendCoinViewModel: ObservableObject {
                     status = .loading
                 }
 
-                let bookmarkCoins = try BookmarkManager.shared.fetchAll().map { $0.coinKoreanName }.joined(separator: ", ")
+                let bookmarkCoins = try BookmarkManager.shared.fetchAll()
+                    .map { $0.coinKoreanName }
+                    .sorted()
+                    .joined(separator: ",")
                 let recommendCoinDTOs = try await alanService.fetchRecommendCoins(
                     preference: selectedPreference ?? userInvestmentType,
                     bookmarkCoins: bookmarkCoins

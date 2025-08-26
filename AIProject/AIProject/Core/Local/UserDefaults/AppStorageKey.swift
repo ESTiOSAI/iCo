@@ -11,6 +11,8 @@ enum AppStorageKey {
     static let investmentType = "investmentType"
     static let theme = "selectedTheme"
     static let imageMap = "imageMap"
+    static let cacheCoinRecomURL = "cacheCoinRecomURL"
+    static let cacheCoinRecomTimestamp = "cacheCoinRecomTimestamp"
     static let cacheBriefTodayTimestamp = "cacheBriefTodayTimestamp"
     static let cacheBriefCommunityTimestamp = "cacheBriefCommunityTimestamp"
 }

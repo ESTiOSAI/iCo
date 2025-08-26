@@ -27,4 +27,5 @@ struct DashboardView: View {
 #Preview {
     DashboardView()
         .environmentObject(ThemeManager())
+        .environmentObject(RecommendCoinViewModel())
 }
