@@ -7,32 +7,38 @@
 
 import SwiftUI
 
+
 struct MainTabView: View {
+    @State private var router = TabRouter()
+    private let tickerService: RealTimeTickerProvider = UpbitTickerService()
+    private let upbitService: UpBitAPIService = UpBitAPIService()
     
     var body: some View {
-        TabView {
+        TabView(selection: $router.selected) {
+            ForEach(TabFeature.allCases) { tab in
+                makeTab(tab)
+                    .tabItem {
+                        Label(tab.rawValue, systemImage: tab.icon)
+                    }
+                    .tag(tab)
+            }
+        }
+        .environment(router)
+    }
+    
+    @ViewBuilder func makeTab(_ tab: TabFeature) -> some View {
+        switch tab {
+        case .dashboard:
             DashboardView()
-                .tabItem {
-                    Label("대시보드", systemImage: "square.grid.2x2")
-                }
-            
+        case .market:
             MarketView(
-                coinService: UpBitAPIService(),
-                tickerService: UpbitTickerService()
+                coinService: upbitService,
+                tickerService: tickerService
             )
-                .tabItem {
-                    Label("마켓", systemImage: "bitcoinsign.bank.building")
-                }
-            
+        case .chatbot:
             ChatBotView()
-                .tabItem {
-                    Label("챗봇", systemImage: "bubble.left.and.text.bubble.right")
-                }
-            
+        case .myPage:
             MyPageView()
-                .tabItem {
-                    Label("마이페이지", systemImage: "person.crop.circle")
-                }
         }
     }
 }
