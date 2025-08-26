@@ -1,55 +1,11 @@
 //
-//  RecommendCoinScreen.swift
+//  CoinCarouselView.swift
 //  AIProject
 //
 //  Created by 강대훈 on 8/15/25.
 //
 
 import SwiftUI
-
-struct RecommendCoinScreen: View {
-    @EnvironmentObject var viewModel: RecommendCoinViewModel
-    
-    var body: some View {
-        VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
-            RecommendHeaderView()
-            
-            coinContentView()
-                .frame(minHeight: CardConst.cardHeight)
-        }
-    }
-    
-    @ViewBuilder
-    func coinContentView() -> some View {
-        switch viewModel.status {
-        case .loading:
-            RecomendationPlaceholderCardView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
-                Task { await viewModel.cancelTask() }
-            }
-        case .success:
-            if !(viewModel.recommendCoins.count > 0) {
-                // 최종적으로 반환된 코인이 1개도 없을 때
-                RecomendationPlaceholderCardView(status: .failure, message: "추천할 코인을 찾지 못했어요\n잠시 후 다시 시도해주세요") {
-                    viewModel.loadRecommendCoin()
-                }
-            } else {
-                SuccessCoinView(viewModel: viewModel)
-            }
-        case .failure(let networkError):
-            RecomendationPlaceholderCardView(status: .failure, message: networkError.localizedDescription) {
-                viewModel.loadRecommendCoin()
-            }
-        case .cancel(let networkError):
-            RecomendationPlaceholderCardView(status: .cancel, message: networkError.localizedDescription) {
-                viewModel.loadRecommendCoin()
-            }
-        }
-    }
-}
-
-#Preview {
-    RecommendCoinView()
-}
 
 /// 무한 스크롤이 적용된 코인 추천 뷰
 ///
@@ -63,7 +19,7 @@ struct RecommendCoinScreen: View {
 /// 무한 스크롤은 뷰모델에서 제공해주는 타이머에 맞춰
 /// 5 ~ 9까지 순환 -> 10에 도달 시 5로 순간 이동한 후 6으로 순환하는
 /// 로직으로 작동합니다.
-struct SuccessCoinView: View {
+struct CoinCarouselView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
     @Environment(\.horizontalSizeClass) private var hSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -73,6 +29,8 @@ struct SuccessCoinView: View {
     /// 현재 추천 코인 카드의 인덱스를 저장하며,
     /// 선택된 카드의 위치를 추적하고 스크롤 포지션을 관리하는 데 사용하는 상태 변수
     @State var cardID: Int?
+    /// 수동 스크롤 방식으로 cardID를 변경 중인지 추적
+    @State private var isManualScrolling = false
     /// viewModel에서 받아온 코인의 배열
     private var recommendedCoins: [RecommendCoin] { viewModel.recommendCoins }
     /// 코인의 배열을 무한 스크롤시키기 위해 3번 반복해 저장하는 상태 변수
@@ -113,7 +71,7 @@ struct SuccessCoinView: View {
                 }
             }
             .scrollTargetLayout()
-            .frame(height: CardConst.cardHeight + 1, alignment: .top) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
+            .frame(height: CardConst.cardHeight, alignment: .top)
         }
         .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacing) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
@@ -131,13 +89,40 @@ struct SuccessCoinView: View {
                 viewModel.startTimer()
             })
         )
-        .onReceive(viewModel.timer) { _ in // 타이머를 구독해 UI 업데이트하기
+        .onReceive(viewModel.timer) { _ in
+            // 자동 스크롤일 경우 - 타이머를 구독해 UI 업데이트하기
             guard !isDragging,
                   !recommendedCoins.isEmpty,
                   let cardID
             else { return }
             
             handleInfiniteScrolling(cardID: cardID)
+        }
+        .onChange(of: cardID ?? recommendedCoins.count) { _, newValue in
+            // 수동 스크롤일 경우
+            guard !isManualScrolling else { return }
+            let totalCoins = recommendedCoins.count
+            
+            // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
+            if newValue > totalCoins * 2 {
+                print("▶️ 10 이상: ", newValue)
+                isManualScrolling = true
+                Task {
+                    try await Task.sleep(nanoseconds: 50_000_000)
+                    cardID! -= totalCoins
+                }
+                isManualScrolling = false
+            } else if newValue < totalCoins {
+                print("▶️ 4 이하: ", newValue)
+                isManualScrolling = true
+                Task {
+                    try await Task.sleep(nanoseconds: 50_000_000)
+                    cardID! += totalCoins
+                }
+                isManualScrolling = false
+            } else {
+                print("▶️ ", newValue)
+            }
         }
         .navigationDestination(item: $selectedCoin) { coin in
             CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
@@ -165,7 +150,7 @@ struct SuccessCoinView: View {
     }
 }
 
-extension SuccessCoinView {
+extension CoinCarouselView {
     func handleInfiniteScrolling(cardID: Int) {
         let totalCoinCount = recommendedCoins.count
         
@@ -202,4 +187,9 @@ extension SuccessCoinView {
             }
         }
     }
+}
+
+#Preview {
+    RecommendCoinView()
+        .environmentObject(RecommendCoinViewModel())
 }
