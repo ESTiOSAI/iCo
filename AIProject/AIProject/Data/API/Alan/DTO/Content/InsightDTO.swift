@@ -14,3 +14,12 @@ struct InsightDTO: Codable {
     /// 평가 이유
     let summary: String
 }
+
+extension InsightDTO {
+    func toDomain() -> Insight {
+        Insight(
+            sentiment: Sentiment(rawValue: todaysSentiment) ?? .neutral,
+            summary: summary
+        )
+    }
+}

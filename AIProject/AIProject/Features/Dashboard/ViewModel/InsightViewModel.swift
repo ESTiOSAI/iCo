@@ -25,8 +25,8 @@ final class InsightViewModel: ObservableObject {
     private let alanAPIService = AlanAPIService()
     private let redditAPIService = RedditAPIService()
     
-    private var overallTask: Task<InsightDTO, Error>?
-    private var communityTask: Task<InsightDTO, Error>?
+    private var overallTask: Task<Insight, Error>?
+    private var communityTask: Task<Insight, Error>?
     
     init() {
         load()
@@ -66,7 +66,7 @@ final class InsightViewModel: ObservableObject {
     }
     
     // Reddit 데이터를 가져와 요약 후 인사이트 생성
-    private func fetchCommunityFlow() async throws -> InsightDTO {
+    private func fetchCommunityFlow() async throws -> Insight {
         let communityData = try await redditAPIService.fetchData()
         
         return try await alanAPIService.fetchCommunityInsight(from: communityData.communitySummary)
@@ -124,12 +124,6 @@ extension InsightViewModel {
     private func updateOverallUI() async {
         await TaskResultHandler.apply(
             of: overallTask,
-            using: { data in
-                Insight(
-                    sentiment: Sentiment(rawValue: data.todaysSentiment) ?? .neutral,
-                    summary: data.summary
-                )
-            },
             update: { [weak self] state in
                 self?.overall = state
             }
@@ -139,12 +133,6 @@ extension InsightViewModel {
     private func updateCommunityUI() async {
         await TaskResultHandler.apply(
             of: communityTask,
-            using: { data in
-                Insight(
-                    sentiment: Sentiment(rawValue: data.todaysSentiment) ?? .neutral,
-                    summary: data.summary
-                )
-            },
             update: { [weak self] state in
                 self?.community = state
             }

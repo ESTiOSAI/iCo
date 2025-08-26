@@ -38,18 +38,16 @@ struct AIBriefingView: View {
                 if isPadLayout {
                     HStack(spacing: 16) {
                         briefingView
-                            .frame(height: 280)
                     }
                 } else {
                     briefingView
-                        .frame(height: 260)
                 }
                 
                 FearGreedView()
-                    .padding(.bottom, 30)
             }
         }
         .padding(.horizontal, 16)
+        .padding(.bottom, 30)
     }
     
     @ViewBuilder
@@ -64,10 +62,12 @@ struct AIBriefingView: View {
                 },
                 content: { Text($0.summary.byCharWrapping) }
             )
+            .frame(height: 280)
         }
     }
 }
 
 #Preview {
     AIBriefingView()
+        .environmentObject(ThemeManager())
 }

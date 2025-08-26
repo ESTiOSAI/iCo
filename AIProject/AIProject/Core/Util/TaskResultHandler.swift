@@ -44,3 +44,18 @@ enum TaskResultHandler {
         }
     }
 }
+
+extension TaskResultHandler {
+    static func apply<Output>(
+        of task: Task<Output, Error>?,
+        update: @escaping (FetchState<Output>) -> Void,
+        sideEffect: ((Output) -> Void)? = nil
+    ) async {
+        await apply(
+            of: task,
+            using: { $0 },
+            update: update,
+            sideEffect: sideEffect
+        )
+    }
+}
