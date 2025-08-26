@@ -337,7 +337,6 @@ extension MarketStore {
 
         // UserDefaults 저장
         let defaults = UserDefaults(suiteName: "group.com.est.ai.AIProject.CoinWidget")
-        print("위젯 UserDault에 저장됨 ------", summaries)
         if let data = try? JSONEncoder().encode(summaries) {
             defaults?.set(data, forKey: "widgetSummary")
         }
