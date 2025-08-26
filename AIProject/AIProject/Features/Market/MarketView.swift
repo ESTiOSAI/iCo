@@ -40,6 +40,7 @@ struct MarketView: View {
                     RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
                         store.deleteRecord(coin.id)
                     }) { selectedCoinID = $0 }
+                        .padding(.bottom, 16)
                 }
 
                 VStack(spacing: 16) {
@@ -57,7 +58,8 @@ struct MarketView: View {
 
                     CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                 }
-                .padding(16)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
                 .refreshable {
                     Task {
                         await store.refresh()
@@ -90,6 +92,9 @@ struct MarketView: View {
 #Preview {
     MarketView(
         coinService: UpBitAPIService(),
-        tickerService: UpbitTickerService()
+        tickerService: UpbitTickerService(client: 
+                                          ReconnectableWebSocketClient {
+                                          BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
+                                          })
     )
 }
