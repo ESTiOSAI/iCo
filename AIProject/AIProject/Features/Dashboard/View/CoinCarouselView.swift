@@ -1,55 +1,11 @@
 //
-//  RecommendCoinScreen.swift
+//  CoinCarouselView.swift
 //  AIProject
 //
 //  Created by 강대훈 on 8/15/25.
 //
 
 import SwiftUI
-
-struct RecommendCoinScreen: View {
-    @EnvironmentObject var viewModel: RecommendCoinViewModel
-    
-    var body: some View {
-        VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
-            RecommendHeaderView()
-            
-            coinContentView()
-                .frame(minHeight: CardConst.cardHeight)
-        }
-    }
-    
-    @ViewBuilder
-    func coinContentView() -> some View {
-        switch viewModel.status {
-        case .loading:
-            RecomendationPlaceholderCardView(status: .loading, message: "아이코가 추천할 코인을\n고르는 중이에요") {
-                Task { await viewModel.cancelTask() }
-            }
-        case .success:
-            if !(viewModel.recommendCoins.count > 0) {
-                // 최종적으로 반환된 코인이 1개도 없을 때
-                RecomendationPlaceholderCardView(status: .failure, message: "추천할 코인을 찾지 못했어요\n잠시 후 다시 시도해주세요") {
-                    viewModel.loadRecommendCoin()
-                }
-            } else {
-                SuccessCoinView(viewModel: viewModel)
-            }
-        case .failure(let networkError):
-            RecomendationPlaceholderCardView(status: .failure, message: networkError.localizedDescription) {
-                viewModel.loadRecommendCoin()
-            }
-        case .cancel(let networkError):
-            RecomendationPlaceholderCardView(status: .cancel, message: networkError.localizedDescription) {
-                viewModel.loadRecommendCoin()
-            }
-        }
-    }
-}
-
-#Preview {
-    RecommendCoinView()
-}
 
 /// 무한 스크롤이 적용된 코인 추천 뷰
 ///
@@ -63,7 +19,7 @@ struct RecommendCoinScreen: View {
 /// 무한 스크롤은 뷰모델에서 제공해주는 타이머에 맞춰
 /// 5 ~ 9까지 순환 -> 10에 도달 시 5로 순간 이동한 후 6으로 순환하는
 /// 로직으로 작동합니다.
-struct SuccessCoinView: View {
+struct CoinCarouselView: View {
     @ObservedObject var viewModel: RecommendCoinViewModel
     @Environment(\.horizontalSizeClass) private var hSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -113,7 +69,7 @@ struct SuccessCoinView: View {
                 }
             }
             .scrollTargetLayout()
-            .frame(height: CardConst.cardHeight + 1, alignment: .top) // stroke가 잘려보이는 듯 해서 1 포인트 추가하기
+            .frame(height: CardConst.cardHeight, alignment: .top)
         }
         .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacing) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
@@ -165,7 +121,7 @@ struct SuccessCoinView: View {
     }
 }
 
-extension SuccessCoinView {
+extension CoinCarouselView {
     func handleInfiniteScrolling(cardID: Int) {
         let totalCoinCount = recommendedCoins.count
         
@@ -202,4 +158,9 @@ extension SuccessCoinView {
             }
         }
     }
+}
+
+#Preview {
+    RecommendCoinView()
+        .environmentObject(RecommendCoinViewModel())
 }
