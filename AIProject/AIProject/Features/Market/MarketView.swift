@@ -82,6 +82,8 @@ struct MarketView: View {
                 CoinDetailView(coin: coin)
                     .id(coin.id)
                 
+            } else {
+                CommonPlaceholderView(imageName: "logo", text: "조회할 코인을 선택하세요")
             }
         }
         .navigationSplitViewStyle(.balanced)
