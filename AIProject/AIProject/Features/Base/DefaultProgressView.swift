@@ -64,13 +64,13 @@ struct DefaultProgressView: View {
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackground)
+                        .background(.aiCoBackgroundWhite)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
                         .font(.system(size: 35))
                         .foregroundStyle(.aiCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackground)
+                        .background(.aiCoBackgroundWhite)
                 }
             }
             .clipShape(.circle)
