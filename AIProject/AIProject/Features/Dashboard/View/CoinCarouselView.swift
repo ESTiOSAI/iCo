@@ -96,33 +96,13 @@ struct CoinCarouselView: View {
                   let cardID
             else { return }
             
-            handleInfiniteScrolling(cardID: cardID)
+            handleAutoScrolling(cardID: cardID)
         }
         .onChange(of: cardID ?? recommendedCoins.count) { _, newValue in
-            // 수동 스크롤일 경우
-            guard !isManualScrolling else { return }
-            let totalCoins = recommendedCoins.count
+            guard !recommendedCoins.isEmpty else { return }
             
-            // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
-            if newValue > totalCoins * 2 {
-                print("▶️ 10 이상: ", newValue)
-                isManualScrolling = true
-                Task {
-                    try await Task.sleep(nanoseconds: 50_000_000)
-                    cardID! -= totalCoins
-                }
-                isManualScrolling = false
-            } else if newValue < totalCoins {
-                print("▶️ 4 이하: ", newValue)
-                isManualScrolling = true
-                Task {
-                    try await Task.sleep(nanoseconds: 50_000_000)
-                    cardID! += totalCoins
-                }
-                isManualScrolling = false
-            } else {
-                print("▶️ ", newValue)
-            }
+            // 수동 스크롤일 경우
+            handleManualScrolling(cardID: newValue)
         }
         .navigationDestination(item: $selectedCoin) { coin in
             CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
@@ -151,7 +131,7 @@ struct CoinCarouselView: View {
 }
 
 extension CoinCarouselView {
-    func handleInfiniteScrolling(cardID: Int) {
+    func handleAutoScrolling(cardID: Int) {
         let totalCoinCount = recommendedCoins.count
         
         /// 코인 리스트의 배열의 index
@@ -184,6 +164,27 @@ extension CoinCarouselView {
             /// 기본적인 자동 스크롤 처리
             withAnimation(.easeInOut(duration: 0.5)) {
                 self.cardID = (cardID + 1) % (totalCoinCount * 3)
+            }
+        }
+    }
+    
+    func handleManualScrolling(cardID: Int) {
+        let totalCoins = recommendedCoins.count
+        
+        // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
+        if cardID > totalCoins * 2 {
+            isManualScrolling = true
+            Task {
+                try await Task.sleep(nanoseconds: 50_000_000)
+                self.cardID = cardID - totalCoins
+                isManualScrolling = false
+            }
+        } else if cardID > 0 && cardID < totalCoins {
+            isManualScrolling = true
+            Task {
+                try await Task.sleep(nanoseconds: 50_000_000)
+                self.cardID = cardID + totalCoins
+                isManualScrolling = false
             }
         }
     }
