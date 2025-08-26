@@ -21,7 +21,7 @@ struct FearGreedView: View {
     }
     
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
+        HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("공포 & 탐욕 지수")
                     .font(.system(size: 19, weight: .bold))

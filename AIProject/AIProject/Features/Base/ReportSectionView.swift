@@ -46,7 +46,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             // Header
             HStack {
                 Image(systemName: data.icon)

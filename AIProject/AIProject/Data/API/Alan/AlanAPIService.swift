@@ -261,7 +261,7 @@ extension AlanAPIService {
     /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchTodayInsight(now: Date = .now) async throws -> InsightDTO {
+    func fetchTodayInsight(now: Date = .now) async throws -> Insight {
         let insightTTL: TimeInterval = 60 * 60
         
         if !cacheBriefTodayTimestamp.isEmpty,
@@ -272,7 +272,8 @@ extension AlanAPIService {
             if let cachedResponse = URLCache.shared.cachedResponse(for: request),
                 now.timeIntervalSince(savedDate) < insightTTL {
                 do {
-                    return try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                    let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                    return dto.toDomain()
                 } catch let decodingError as DecodingError {
                     throw NetworkError.decodingError(decodingError)
                 }
@@ -308,7 +309,7 @@ extension AlanAPIService {
 
         cacheBriefTodayTimestamp = now.dateAndTime
         
-        return dto
+        return dto.toDomain()
     }
     
     /// 주어진 코인에 대해 커뮤니티 기반 인사이트 데이터를 가져옵니다.
@@ -316,7 +317,7 @@ extension AlanAPIService {
     /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
     /// - Parameter coin: 대상 코인
     /// - Returns: 디코딩된 DTO
-    func fetchCommunityInsight(from post: String, now: Date = .now) async throws -> InsightDTO {
+    func fetchCommunityInsight(from post: String, now: Date = .now) async throws -> Insight {
         let insightTTL: TimeInterval = 60 * 60
         
         if !cacheBriefCommunityTimestamp.isEmpty,
@@ -327,7 +328,8 @@ extension AlanAPIService {
             if let cachedResponse = URLCache.shared.cachedResponse(for: request),
                 now.timeIntervalSince(savedDate) < insightTTL {
                 do {
-                    return try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                    let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                    return dto.toDomain()
                 } catch let decodingError as DecodingError {
                     throw NetworkError.decodingError(decodingError)
                 }
@@ -363,7 +365,7 @@ extension AlanAPIService {
 
         cacheBriefCommunityTimestamp = Date.dateAndTimeFormatter.string(from: now)
         
-        return dto
+        return dto.toDomain()
     }
     
     /// 북마크된 코인 전체에 대한 투자 브리핑과 전략 제안을 JSON 형식으로 가져옵니다.
