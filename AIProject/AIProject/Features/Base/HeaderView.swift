@@ -10,70 +10,74 @@ import SwiftUI
 /// 헤더에 표시할 제목을 필수로 전달해주세요.
 /// 마켓이나 북마크 메뉴일 경우 각 파라메터에 true 값을 넣어주세요.
 struct HeaderView: View {
-    @State private var showBulkInsertSheet = false
+    @Environment(\.horizontalSizeClass) var hSizeClass
     
     let heading: String
+    let coinSymbol: String?
     
     var showSearchButton = false
-    var isBookmarkView = false
+    var showBackButton = false
     
     let onSearchTap: () -> Void
+    let onBackButtonTap: () -> Void
 
-    init(showBulkInsertSheet: Bool = false, heading: String, showSearchButton: Bool = false, isBookmarkView: Bool = false, onSearchTap: @escaping () -> Void = { }) {
-        self.showBulkInsertSheet = showBulkInsertSheet
+    init(heading: String, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: @escaping () -> Void = { }) {
         self.heading = heading
+        self.coinSymbol = coinSymbol
         self.showSearchButton = showSearchButton
-        self.isBookmarkView = isBookmarkView
         self.onSearchTap = onSearchTap
+        self.showBackButton = showBackButton
+        self.onBackButtonTap = onBackButtonTap
     }
     
     var body: some View {
-        HStack {
-            Text(heading)
-                .font(.system(size: 24, weight: .black))
-                .foregroundStyle(.aiCoLabel)
-            
-            Spacer()
-            
-            if showSearchButton {
+        var isBigScreen = hSizeClass == .regular
+        
+        ZStack(alignment: .leading) {
+            if !isBigScreen && showBackButton {
                 Button {
-                    onSearchTap()
+                    onBackButtonTap()
                 } label: {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "chevron.backward")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 24)
+                        .frame(height: 20)
                         .fontWeight(.medium)
+                        .tint(.aiCoLabelSecondary)
+                }
+                .padding(.trailing, .spacing)
+            }
+            
+            HStack {
+                HStack(alignment: .center, spacing: 8) {
+                    Text(heading)
+                        .font(.system(size: 24, weight: .black))
                         .foregroundStyle(.aiCoLabel)
-                }
-            } else if isBookmarkView {
-                // 북마크 메뉴라면 북마크 관리 버튼 보여주기
-                HStack(spacing: 8) {
-                    Group {
-                        Button {
-                            showBulkInsertSheet = true
-                        } label: {
-                            Text("가져오기")
-                        }
-                        
-                        Button {
-
-                        } label: {
-                            Text("내보내기")
-                        }
+                        .multilineTextAlignment(isBigScreen || showBackButton ? .center : .leading)
+                    
+                    if let coinSymbol {
+                        Text(coinSymbol)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundStyle(.aiCoLabelSecondary)
                     }
-                    .font(.system(size: 12))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .foregroundStyle(.aiCoLabel)
-                    .background(.aiCoBackground)
-                    .clipShape(
-                        RoundedRectangle(cornerRadius: 8)
-                    )
                 }
-                .sheet(isPresented: $showBulkInsertSheet) {
-                    BookmarkBulkInsertView()
+                .frame(maxWidth: hSizeClass == .regular || showBackButton ? .infinity : nil)
+                
+                Spacer()
+                
+                if showSearchButton {
+                    Button {
+                        onSearchTap()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.aiCoLabel)
+                    }
                 }
+                    
             }
         }
         .padding(.horizontal, 16)
@@ -83,9 +87,11 @@ struct HeaderView: View {
 }
 
 #Preview {
-    HeaderView(heading: "북마크 관리", isBookmarkView: true) {
-                
-    }
+    HeaderView(heading: "북마크 관리")
+        .padding(.bottom, 16)
+    HeaderView(heading: "북마크 관리", showBackButton: true)
+        .padding(.bottom, 16)
+    HeaderView(heading: "비트코인", coinSymbol: "BTC", showBackButton: true)
         .padding(.bottom, 16)
     SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
 }
