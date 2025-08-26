@@ -95,7 +95,10 @@ struct CoinListView: View {
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
-                        .background(Rectangle().strokeBorder(.defaultGradient, lineWidth: 0.5))
+                        .overlay(
+                            LinearGradient.defaultGradient.frame(height: 0.5),
+                            alignment: .bottom
+                        )
                         .onTapGesture {
                             store.addRecord(id)
                             selectedCoinID = id
