@@ -29,18 +29,17 @@ struct MarketView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
-            Group {
-                VStack(spacing: 16) {
-                    HeaderView(heading: "마켓")
-
-                    SearchBarView(searchText: $searchText)
-                        .padding(.horizontal, 16)
-
-                    if !records.isEmpty {
-                        RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
-                            store.deleteRecord(coin.id)
-                        }) { selectedCoinID = $0 }
-                    }
+            VStack(spacing: 0) {
+                HeaderView(heading: "마켓")
+                
+                SearchBarView(searchText: $searchText)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 20)
+                
+                if !records.isEmpty {
+                    RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
+                        store.deleteRecord(coin.id)
+                    }) { selectedCoinID = $0 }
                 }
 
                 VStack(spacing: 16) {
@@ -54,6 +53,7 @@ struct MarketView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 4)
 
                     CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                 }
