@@ -29,6 +29,8 @@ struct CoinCarouselView: View {
     /// 현재 추천 코인 카드의 인덱스를 저장하며,
     /// 선택된 카드의 위치를 추적하고 스크롤 포지션을 관리하는 데 사용하는 상태 변수
     @State var cardID: Int?
+    /// 수동 스크롤 방식으로 cardID를 변경 중인지 추적
+    @State private var isManualScrolling = false
     /// viewModel에서 받아온 코인의 배열
     private var recommendedCoins: [RecommendCoin] { viewModel.recommendCoins }
     /// 코인의 배열을 무한 스크롤시키기 위해 3번 반복해 저장하는 상태 변수
@@ -87,13 +89,40 @@ struct CoinCarouselView: View {
                 viewModel.startTimer()
             })
         )
-        .onReceive(viewModel.timer) { _ in // 타이머를 구독해 UI 업데이트하기
+        .onReceive(viewModel.timer) { _ in
+            // 자동 스크롤일 경우 - 타이머를 구독해 UI 업데이트하기
             guard !isDragging,
                   !recommendedCoins.isEmpty,
                   let cardID
             else { return }
             
             handleInfiniteScrolling(cardID: cardID)
+        }
+        .onChange(of: cardID ?? recommendedCoins.count) { _, newValue in
+            // 수동 스크롤일 경우
+            guard !isManualScrolling else { return }
+            let totalCoins = recommendedCoins.count
+            
+            // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
+            if newValue > totalCoins * 2 {
+                print("▶️ 10 이상: ", newValue)
+                isManualScrolling = true
+                Task {
+                    try await Task.sleep(nanoseconds: 50_000_000)
+                    cardID! -= totalCoins
+                }
+                isManualScrolling = false
+            } else if newValue < totalCoins {
+                print("▶️ 4 이하: ", newValue)
+                isManualScrolling = true
+                Task {
+                    try await Task.sleep(nanoseconds: 50_000_000)
+                    cardID! += totalCoins
+                }
+                isManualScrolling = false
+            } else {
+                print("▶️ ", newValue)
+            }
         }
         .navigationDestination(item: $selectedCoin) { coin in
             CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
