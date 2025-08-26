@@ -153,7 +153,7 @@ final class ReportViewModel: ObservableObject {
 
 extension ReportViewModel {
     private func updateOverviewUI() async {
-        await TaskResultHandler.applyResult(
+        await TaskResultHandler.apply(
             of: overviewTask,
             using: { data in
                 data.overview
@@ -165,7 +165,7 @@ extension ReportViewModel {
     }
     
     private func updateWeeklyUI() async {
-        await TaskResultHandler.applyResult(
+        await TaskResultHandler.apply(
             of: weeklyTask,
             using: { data in
                 data.weekly
@@ -177,7 +177,7 @@ extension ReportViewModel {
     }
     
     private func updateTodayUI() async {
-        await TaskResultHandler.applyResult(
+        await TaskResultHandler.apply(
             of: todayTask,
             using: { data in
                 data.today

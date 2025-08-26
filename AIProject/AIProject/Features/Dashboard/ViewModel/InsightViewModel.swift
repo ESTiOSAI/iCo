@@ -124,7 +124,7 @@ final class InsightViewModel: ObservableObject {
 
 extension InsightViewModel {
     private func updateOverallUI() async {
-        await TaskResultHandler.applyResult(
+        await TaskResultHandler.apply(
             of: overallTask,
             using: { data in
                 Insight(
@@ -139,7 +139,7 @@ extension InsightViewModel {
     }
     
     private func updateCommunityUI() async {
-        await TaskResultHandler.applyResult(
+        await TaskResultHandler.apply(
             of: communityTask,
             using: { data in
                 Insight(

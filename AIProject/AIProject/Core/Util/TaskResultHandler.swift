@@ -15,7 +15,7 @@ enum TaskResultHandler {
     ///   - transform: Task 성공 결과(`Success`)를 출력 타입(`Output`)으로 변환하는 비동기 클로저
     ///   - update: 변환된 결과 상태(`FetchState`)를 메인 스레드에서 속성에 반영하는 클로저
     ///   - sideEffect: 선택적으로, 성공 시 원본 결과(`Success`)를 활용해 메인 스레드에서 UI를 갱신하는 클로저
-    static func applyResult<Success, Output>(
+    static func apply<Success, Output>(
         of task: Task<Success, Error>?,
         using transform: @Sendable (Success) async throws -> Output,
         update: @escaping (FetchState<Output>) -> Void,
