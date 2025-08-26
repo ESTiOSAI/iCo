@@ -35,10 +35,13 @@ struct CoinListView: View {
             CoinListHeaderView(sortCategory: $store.sortCategory, rateSortOrder: $store.rateSortOrder, volumeSortOrder: $store.volumeSortOrder)
             makeCoinContents()
         }
-        .background {
+        .overlay {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
-                .fill(Color.aiCoBackground)
+        }
+        .background {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.aiCoBackground)
         }
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
