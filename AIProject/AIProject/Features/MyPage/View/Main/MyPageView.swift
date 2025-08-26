@@ -20,6 +20,7 @@ struct MyPageView: View {
                 // iPad
                 NavigationSplitView(columnVisibility: $columnVisibility) {
                     sidebar
+                        .toolbar(removing: .sidebarToggle)
                 } detail: {
                     NavigationStack {
                         detailView
