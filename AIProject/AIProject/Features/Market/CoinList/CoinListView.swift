@@ -85,6 +85,7 @@ struct CoinListView: View {
                     .multilineTextAlignment(.center)
                     .padding()
             }
+            .frame(maxHeight: .infinity)
         } else {
             List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {
