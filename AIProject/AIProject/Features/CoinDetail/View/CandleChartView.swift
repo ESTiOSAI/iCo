@@ -53,7 +53,7 @@ struct CandleChartView: View {
                     x: .value("Date", point.date),
                     yStart: .value("Open", point.open),
                     yEnd: .value("Close", point.close),
-                    width: 6
+                    width: 4
                 )
                 .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
             }
