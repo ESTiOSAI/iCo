@@ -5,7 +5,7 @@
 //  Created by 장지현 on 8/6/25.
 //
 
-import Foundation
+import SwiftUI
 
 /// 오늘의 코인 시장/커뮤니티 분위기를 제공하는 뷰 모델입니다.
 ///
@@ -16,6 +16,9 @@ import Foundation
 ///   - overall: 오늘의 전체 시장 분위기(`FetchState<Insight>`)
 ///   - community: 커뮤니티 기반 분위기(`FetchState<Insight>`)
 final class InsightViewModel: ObservableObject {
+    @AppStorage(AppStorageKey.cacheBriefTodayTimestamp) private var cacheBriefTodayTimestamp: String = ""
+    @AppStorage(AppStorageKey.cacheBriefCommunityTimestamp) private var cacheBriefCommunityTimestamp: String = ""
+    
     @Published var overall: FetchState<Insight> = .loading
     @Published var community: FetchState<Insight> = .loading
     
@@ -41,10 +44,7 @@ final class InsightViewModel: ObservableObject {
             try await alanAPIService.fetchTodayInsight()
         }
         
-        communityTask = Task {
-            try await fetchCommunityFlow()
-        }
-        
+        // FIXME: 통일감이 없어보이는
         communityTask = Task { [weak self] in
             try await withTaskCancellationHandler(
                 operation: {
@@ -60,7 +60,7 @@ final class InsightViewModel: ObservableObject {
         
         Task {
             await updateOverallUI()
-            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 바뀌는 효과를 주기 위한 의도적 딜레이
+            try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
             await updateCommunityUI()
         }
     }
@@ -76,14 +76,12 @@ final class InsightViewModel: ObservableObject {
     func retryOverall() {
         if overall.isLoading { return }
         overallTask?.cancel()
-        
-        Task { @MainActor in
-            overall = .loading
-        }
-        
-        overallTask = Task { try await alanAPIService.fetchTodayInsight() }
+        overallTask = nil
         
         Task {
+            await MainActor.run { self.overall = .loading }
+            try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
+            overallTask = Task { try await alanAPIService.fetchTodayInsight() }
             await updateOverallUI()
         }
     }
@@ -93,19 +91,19 @@ final class InsightViewModel: ObservableObject {
         if community.isLoading { return }
         communityTask?.cancel()
         
-        Task { @MainActor in
-            community = .loading
-        }
-        
-        communityTask = Task { try await fetchCommunityFlow() }
+        communityTask = nil
         
         Task {
+            await MainActor.run { community = .loading }
+            try? await Task.sleep(for: .milliseconds(350)) // 새로고침 효과를 주기 위한 딜레이
+            communityTask = Task { try await fetchCommunityFlow() }
             await updateCommunityUI()
         }
     }
     
     func cancelOverall() {
         overallTask?.cancel()
+        // FIXME: 취소 작업을 여기서 구현한다면
     }
     
     func cancelCommunity() {
@@ -162,6 +160,7 @@ extension InsightViewModel {
                 icon: "bitcoinsign.bank.building",
                 title: "전반적인 시장의 분위기",
                 state: overall,
+                timestamp: Date.dateAndTimeFormatter.date(from: cacheBriefTodayTimestamp),
                 onCancel: { [weak self] in self?.cancelOverall() },
                 onRetry: { [weak self] in self?.retryOverall() }
             ),
@@ -170,6 +169,7 @@ extension InsightViewModel {
                 icon: "shareplay",
                 title: "주요 커뮤니티의 분위기",
                 state: community,
+                timestamp: Date.dateAndTimeFormatter.date(from: cacheBriefCommunityTimestamp),
                 onCancel: { [weak self] in self?.cancelCommunity() },
                 onRetry: { [weak self] in self?.retryCommunity() }
             ),
