@@ -30,25 +30,32 @@ struct AIProjectApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if isLoading {
-                SplashScreenView()
-                    .onAppear {
-                        if hasSeenOnboarding { recommendCoinViewModel.loadRecommendCoin() }
-                        
-                        Task {
-                            try await Task.sleep(nanoseconds: 3000_000_000)
-                            isLoading = false
+            ZStack {
+                if isLoading {
+                    SplashScreenView()
+                        .transition(.asymmetric(
+                          insertion: .identity,
+                          removal: .opacity.animation(.easeOut(duration: 0.3))
+                        ))
+                        .zIndex(1)
+                        .task {
+                            if hasSeenOnboarding { recommendCoinViewModel.loadRecommendCoin() }
+                            
+                            try? await Task.sleep(nanoseconds: 3000_000_000)
+                            await MainActor.run {
+                                isLoading = false
+                            }
                         }
-                    }
-            } else {
-                if hasSeenOnboarding {
-                    MainTabView()
-                        .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                        .environmentObject(themeManager)
-                        .environmentObject(recommendCoinViewModel)
                 } else {
-                    OnboardingView()
-                        .environmentObject(recommendCoinViewModel)
+                    if hasSeenOnboarding {
+                        MainTabView()
+                            .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                            .environmentObject(themeManager)
+                            .environmentObject(recommendCoinViewModel)
+                    } else {
+                        OnboardingView()
+                            .environmentObject(recommendCoinViewModel)
+                    }
                 }
             }
         }
@@ -56,22 +63,15 @@ struct AIProjectApp: App {
 }
 
 struct SplashScreenView: View {
-    @State private var opacity: Double = 0.0
-
     var body: some View {
         ZStack {
             Color.accentColor
                 .edgesIgnoringSafeArea(.all)
+            
             Image("logo")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200)
-                .opacity(opacity)
-                .onAppear {
-                    withAnimation(.easeIn(duration: 1.5)) {
-                        opacity = 1.0
-                    }
-                }
         }
     }
 }
