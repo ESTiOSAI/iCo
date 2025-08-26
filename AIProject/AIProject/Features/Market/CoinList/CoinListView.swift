@@ -12,9 +12,10 @@ struct CoinListView: View {
     @Bindable var store: MarketStore
     
     @State private var visibleCoins: Set<CoinID> = []
-    @State private var isOnList: Bool = true
+    @State private var isActive: Bool = false
     
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(TabRouter.self) private var router
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
@@ -24,6 +25,7 @@ struct CoinListView: View {
     
     @Binding private var selectedCoinID: CoinID?
     @Binding private var searchText: String
+    
     init(store: MarketStore, selectedCoinID: Binding<CoinID?>, searchText: Binding<String>) {
         self.store = store
         _selectedCoinID = selectedCoinID
@@ -46,7 +48,7 @@ struct CoinListView: View {
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
             Task {
-                guard isOnList else { return }
+                guard router.selected == .market && isActive else { return }
                 await handleConnection(by: newValue)
             }
         })
@@ -60,15 +62,14 @@ struct CoinListView: View {
                 await store.update(newValue)
             }
         }
-        .onAppear {
-            Task {
-                isOnList = true
-                await store.connect()
-            }
+        .task {
+            isActive = true
+            guard router.selected == .market else { return }
+            await store.connect()
         }
         .onDisappear {
             Task {
-                isOnList = false
+                isActive = false
                 await store.disconnect()
             }
         }
@@ -77,17 +78,14 @@ struct CoinListView: View {
     @ViewBuilder func makeCoinContents() -> some View {
         if store.filter == .bookmark, bookmarks.isEmpty {
             VStack {
-                Spacer()
-                
                 Text("북마크한 코인이 없습니다 🥵")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, minHeight: 300)
                     .multilineTextAlignment(.center)
                     .padding()
-                
-                Spacer()
             }
+            .frame(maxHeight: .infinity)
         } else {
             List(store.sortedCoinIDs, id: \.self, selection: $selectedCoinID) { id in
                 if let meta = store.coinMeta[id], let ticker = store.ticker(for: id) {

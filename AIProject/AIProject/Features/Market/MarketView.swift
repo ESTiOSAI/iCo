@@ -29,18 +29,18 @@ struct MarketView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
-            Group {
-                VStack(spacing: 16) {
-                    HeaderView(heading: "마켓")
-
-                    SearchBarView(searchText: $searchText)
-                        .padding(.horizontal, 16)
-
-                    if !records.isEmpty {
-                        RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
-                            store.deleteRecord(coin.id)
-                        }) { selectedCoinID = $0 }
-                    }
+            VStack(spacing: 0) {
+                HeaderView(heading: "마켓")
+                
+                SearchBarView(searchText: $searchText)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 20)
+                
+                if !records.isEmpty {
+                    RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
+                        store.deleteRecord(coin.id)
+                    }) { selectedCoinID = $0 }
+                        .padding(.bottom, 16)
                 }
 
                 VStack(spacing: 16) {
@@ -54,10 +54,12 @@ struct MarketView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 4)
 
                     CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                 }
-                .padding(16)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
                 .refreshable {
                     Task {
                         await store.refresh()
@@ -80,8 +82,6 @@ struct MarketView: View {
                 CoinDetailView(coin: coin)
                     .id(coin.id)
                 
-            } else {
-                Text("Empty")
             }
         }
         .navigationSplitViewStyle(.balanced)
@@ -92,6 +92,9 @@ struct MarketView: View {
 #Preview {
     MarketView(
         coinService: UpBitAPIService(),
-        tickerService: UpbitTickerService()
+        tickerService: UpbitTickerService(client:
+                                          ReconnectableWebSocketClient {
+                                          BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
+                                          })
     )
 }

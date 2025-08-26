@@ -14,7 +14,7 @@ struct RecentCoinSectionView: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack {
+            HStack(spacing: 8) {
                 ForEach(coins) { coin in
                     HStack(spacing: 8) {
                         Text(coin.koreanName)

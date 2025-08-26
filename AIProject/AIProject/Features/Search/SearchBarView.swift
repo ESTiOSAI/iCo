@@ -16,6 +16,7 @@ struct SearchBarView: View {
         HStack(spacing: 10) {
             HStack {
                 Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.aiCoLabel)
 
                 TextField("코인 이름으로 검색하세요", text: $searchText)
                     .padding(.horizontal, 8)

@@ -112,7 +112,7 @@ fileprivate struct CoinPriceView: View {
                         Rectangle()
                             .fill(.clear)
                             .frame(width: proxy.size.width, height: 1)
-                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(500), color: .aiCoLabel, lineWidth: 2, cornerRadius:1)
+                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 1, cornerRadius:0.5)
                             .offset(y: proxy.size.height + 1)
                     }
                 }
