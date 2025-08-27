@@ -23,9 +23,11 @@ struct MyPageView: View {
                 NavigationSplitView(columnVisibility: $columnVisibility) {
                     sidebar
                         .toolbar(removing: .sidebarToggle)
+                        .toolbar(.hidden, for: .navigationBar)
                 } detail: {
                     NavigationStack {
                         detailView
+                            .toolbar(.hidden, for: .navigationBar)
                     }
                 }
                 .navigationSplitViewStyle(.balanced)

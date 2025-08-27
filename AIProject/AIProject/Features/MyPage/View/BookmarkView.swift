@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct BookmarkView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @StateObject var vm = BookmarkViewModel()
 
     @State private var selectedCategory: SortCategory? = nil
@@ -61,7 +63,9 @@ struct BookmarkView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                HeaderView(heading: "북마크 관리")
+                HeaderView(heading: "북마크 관리", showBackButton: true) {
+                    dismiss()
+                }
                 
                 // 북마크한 코인이 없을 시 브리핑 섹션 숨기기
                 if !bookmarks.isEmpty {
@@ -242,6 +246,7 @@ struct BookmarkView: View {
         .sheet(isPresented: $showBulkInsertSheet) {
             BookmarkBulkInsertView()
         }
+        .navigationBarBackButtonHidden()
     }
 }
 

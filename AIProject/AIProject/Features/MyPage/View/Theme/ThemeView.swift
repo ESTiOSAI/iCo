@@ -10,10 +10,14 @@ import SwiftUI
 /// 사용자가 테마를 선택할 수 있는 설정 뷰
 struct ThemeView: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView(heading: "테마 변경")
+            HeaderView(heading: "테마 변경", showBackButton: true) {
+                dismiss()
+            }
+            
             SubheaderView(subheading: "차트 색상 변경")
                 .padding(.bottom, 20)
             
@@ -54,6 +58,7 @@ struct ThemeView: View {
             
             Spacer(minLength: 0)
         }
+        .navigationBarBackButtonHidden()
     }
 }
 
