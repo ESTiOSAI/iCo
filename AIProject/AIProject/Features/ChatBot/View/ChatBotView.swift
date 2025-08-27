@@ -43,7 +43,7 @@ struct ChatBotView: View {
                 .background(.aiCoBackground)
 
                 ChatInputView(viewModel: viewModel)
-                    .background(.aiCoBackgroundWhite)
+                    .background(.aiCoBackground)
             }
             .frame(maxWidth: .infinity)
             .background(

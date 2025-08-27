@@ -46,6 +46,10 @@ struct ChatInputView: View {
         .padding(.leading, 17)
         .padding(.trailing, 14)
         .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 30)
+                .fill(Color.aiCoBackgroundWhite)
+        )
         .overlay {
             RoundedRectangle(cornerRadius: 30)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
