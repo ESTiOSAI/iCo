@@ -17,7 +17,7 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
     private let session: URLSession
     private var task: URLSessionWebSocketTask?
     
-    private var healthCheck: Task<Void, Error>?
+    private var healthCheck: Task<Void, Never>?
     
     public nonisolated var state: AsyncStream<WebSocket.State> {
         AsyncStream { continuation in
@@ -68,7 +68,11 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
     }
     
     public func send(_ data: Data) async throws {
-        try await task?.send(.data(data))
+        do {
+            try await task?.send(.data(data))
+        } catch {
+            await handleClose(with: error)
+        }
     }
     
     public func close() async {
@@ -112,7 +116,6 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
                 } else if let urlError = error as? URLError, urlError.code == .cancelled {
                     await handleClose(code: .normalClosure, reason: nil)
                 } else {
-                    await stateChannel.send(.failed(error))
                     await handleClose(with: error)
                     return
                 }
@@ -123,7 +126,7 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
     private func handleClose(with error: Error) async {
         guard task != nil else { return }
         
-        await stateChannel.send(.closed(code: .abnormalClosure, reason: nil))
+        await stateChannel.send(.failed(error))
         release()
     }
     
@@ -131,12 +134,17 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         guard task != nil else { return }
         
         await stateChannel.send(.closed(code: code, reason: reason))
-        release()
+        
+        Task.detached { [weak self] in
+            await self?.release()
+        }
     }
     
     func release() {
         task = nil
         
+        healthCheck?.cancel()
+        healthCheck = nil
         stateChannel.finish()
         incomingChannel.finish()
     }
@@ -146,10 +154,15 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         self.healthCheck?.cancel()
         
         self.healthCheck = Task {
-            while task != nil {
-                try await Task.sleep(for: duration, clock: .suspending)
-                try await sendPing()
-            }
+                while task != nil {
+                    do {
+                        try await Task.sleep(for: duration, clock: .suspending)
+                        try await sendPing()
+                    } catch {
+                        await handleClose(with: error)
+                        break
+                    }
+                }
         }
     }
     
@@ -177,7 +190,7 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
             await receiveLoop()
         }
         
-        checkingAlive(duration: .seconds(120))
+        checkingAlive(duration: .seconds(10))
     }
 }
 

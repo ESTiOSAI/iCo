@@ -26,8 +26,7 @@ struct HeaderToggleButton: View {
                 
                 HStack(spacing: 4) {
                     Image(systemName: sortOrder.iconName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(.aiCoLabelSecondary)
                         .animation(nil, value: sortOrder)
                 }
@@ -48,3 +47,6 @@ struct HeaderToggleButton: View {
     }
 }
 
+#Preview {
+    HeaderToggleButton(title: "Sort", sortOrder: .constant(.none), action: {})
+}

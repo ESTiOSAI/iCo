@@ -19,17 +19,25 @@ struct SearchBarView: View {
                     .foregroundStyle(.aiCoLabel)
 
                 TextField("코인 이름으로 검색하세요", text: $searchText)
+                    .autocorrectionDisabled()
                     .padding(.horizontal, 8)
-                    .focused($isFocused)
                     .submitLabel(.search)
                     .font(.system(size: 14))
+                    .focused($isFocused)
                     .onChange(of: isFocused) {
-                        if isFocused {
-                            Task {
-                                try await Task.sleep(for: .seconds(0.1))
-                                await MainActor.run { showCancel = true }
-                            }
-                        }
+                        showCancel = isFocused
+//                        Task {
+//                            if isFocused {
+//                                try? await Task.sleep(for: .milliseconds(50))
+//                                withAnimation {
+//                                    showCancel = true
+//                                }
+//                            } else {
+//                                withAnimation(.snappy(duration: 0.2)) {
+//                                    showCancel = false
+//                                }
+//                            }
+//                        }
                     }
 
                 if !searchText.isEmpty {
@@ -48,23 +56,21 @@ struct SearchBarView: View {
                 RoundedRectangle(cornerRadius: 15)
                     .strokeBorder(showCancel ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
-            .animation(.snappy(duration: 0.1), value: showCancel)
-
-            if showCancel {
-                Button {
-                    withAnimation(.snappy) {
-                        showCancel = false
-                        isFocused = false
-                        searchText = ""
-                    }
-                } label: {
-                    Text("취소")
-                        .foregroundStyle(.aiCoNegative)
-                        .font(.system(size: 13))
-                        .padding(8)
-                }
-                .transition(.move(edge: .trailing).combined(with: .opacity))
+            
+            Button {
+                    isFocused = false
+                    searchText = ""
+            } label: {
+                Text("취소")
+                    .foregroundStyle(.aiCoNegative)
+                    .font(.system(size: 13))
+                    .padding(8)
             }
+            .opacity(showCancel ? 1 : 0)
+            .frame(width: showCancel ? 40 : 0, alignment: .trailing)
+        }
+        .onTapGesture {
+            isFocused = true
         }
     }
 }

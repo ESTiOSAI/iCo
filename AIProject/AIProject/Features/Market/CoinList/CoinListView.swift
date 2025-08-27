@@ -81,12 +81,6 @@ struct CoinListView: View {
                 Spacer()
                 
                 CommonPlaceholderView(imageName: "placeholder-no-coin", text: "북마크한 코인이 없어요")
-//                Text("북마크한 코인이 없습니다 🥵")
-//                    .font(.subheadline)
-//                    .foregroundColor(.secondary)
-//                    .frame(maxWidth: .infinity, minHeight: 300)
-//                    .multilineTextAlignment(.center)
-//                    .padding()
                 
                 Spacer()
             }
@@ -117,6 +111,7 @@ struct CoinListView: View {
             .listStyle(.plain)
             .scrollIndicators(.hidden)
             .scrollContentBackground(.hidden)
+            .scrollDismissesKeyboard(.immediately)
         }
     }
 }
