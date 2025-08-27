@@ -8,5 +8,5 @@
 import Foundation
 
 protocol AlanAPIServiceProtocol {
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO]
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
 }
