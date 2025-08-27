@@ -14,10 +14,10 @@ final class SearchViewModel: ObservableObject {
 
     private var upbitService: UpBitAPIService
 
-    private var coins: [Coin] = []
-
     private var continuation: AsyncStream<String>.Continuation?
     private var task: Task<Void, Never>?
+    
+    private var coins = [Coin]()
 
     init(upbitService: UpBitAPIService = UpBitAPIService()) {
         self.upbitService = upbitService
