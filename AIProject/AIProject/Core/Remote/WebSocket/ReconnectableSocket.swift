@@ -19,6 +19,8 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     private var forwardIncomingTask: Task<Void, Never>?
     private var loopTask: Task<Void, Never>?
     
+    private var isClosed = true
+    
     private var backoff: ExponentialBackoff
     private let policy: ReconnectPolicy
     private let makeBase: () -> Base
@@ -58,6 +60,7 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     
     public func connect() async {
         guard loopTask == nil else { return }
+        isClosed = false
         loopTask?.cancel()
         loopTask = Task { [weak self] in
             do {
@@ -70,10 +73,13 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     }
     
     public func close() async {
+        isClosed = true
         forwardStateTask?.cancel()
         forwardIncomingTask?.cancel()
         await base?.close()
         base = nil
+        
+        release()
     }
     
     public func send(_ data: Data) async throws {
@@ -94,14 +100,7 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     }
     
     private func runLoop() async throws {
-        while true {
-            
-            if attempts > policy.maxAttemps {
-                await stateChannel.send(.failed(WebSocket.RetryFailure.exceedAttemps))
-                release()
-                return
-            }
-            
+        while !isClosed {
             let base = makeBase()
             self.base = base
             
@@ -116,8 +115,10 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
             forwardIncomingTask = Task { [weak self] in await self?.forwardIncoming(from: base) }
             
             await base.connect()
-
+            
             let terminal = await waitTerminalEvent(from: base)
+            
+            if isClosed { break }
             
             switch classify(closeCode: terminal.closeCode, error: terminal.error) {
             case let .closed(code, reason):
@@ -132,7 +133,7 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
                 let delay = backoff.next()
                 print(backoff.attempt)
                 attempts += 1
-                print("object's attemps: \(attempts)")
+                print("object's attemps: \(attempts) after \(delay) sec.")
                 await stateChannel.send(.reconnecting(nextAttempsIn: delay))
                 try await Task.sleep(for: delay)
             }
@@ -141,9 +142,9 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     
     private func classify(closeCode: URLSessionWebSocketTask.CloseCode?,
                           error: Error?) -> WebSocket.Failure {
-        if closeCode == nil, error == nil {
-            return .closed(code: .normalClosure, reason: nil)
-        }
+//        if closeCode == nil, error == nil {
+//            return .closed(code: .normalClosure, reason: nil)
+//        }
         if let code = closeCode {
             switch code {
                 // 일시적 - 재시도
