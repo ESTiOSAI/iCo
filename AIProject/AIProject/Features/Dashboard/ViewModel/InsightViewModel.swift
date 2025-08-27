@@ -29,6 +29,7 @@ final class InsightViewModel: ObservableObject {
     private var communityTask: Task<Insight, Error>?
     
     init() {
+        print(#function, String(describing: Self.self))
         load()
     }
     
@@ -116,6 +117,7 @@ final class InsightViewModel: ObservableObject {
     }
     
     deinit {
+        print(#function, String(describing: Self.self))
         cancelAll()
     }
 }

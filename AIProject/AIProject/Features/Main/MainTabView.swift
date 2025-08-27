@@ -9,8 +9,16 @@ import SwiftUI
 
 struct MainTabView: View {
     @State private var router = TabRouter()
-    @State private var tickerService: RealTimeTickerProvider = UpbitTickerService()
-    @State private var upbitService: UpBitAPIService = UpBitAPIService()
+    private let tickerService: RealTimeTickerProvider
+    private let coinService: UpBitAPIService
+    
+    init(
+        tickerService: RealTimeTickerProvider,
+        coinService: UpBitAPIService
+    ) {
+        self.tickerService = tickerService
+        self.coinService = coinService
+    }
     
     var body: some View {
         TabView(selection: $router.selected) {
@@ -31,7 +39,7 @@ struct MainTabView: View {
             DashboardView()
         case .market:
             MarketView(
-                coinService: upbitService,
+                coinService: coinService,
                 tickerService: tickerService
             )
         case .chatbot:
@@ -43,5 +51,8 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView()
+    MainTabView(
+        tickerService: UpbitTickerService(),
+        coinService: UpBitAPIService()
+    )
 }

@@ -26,6 +26,9 @@ struct AIProjectApp: App {
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var recommendCoinViewModel = RecommendCoinViewModel()
     
+    private let coinService: UpBitAPIService = UpBitAPIService()
+    private let tickerService: RealTimeTickerProvider = UpbitTickerService()
+    
     @State private var isLoading = true
     
     var body: some Scene {
@@ -48,7 +51,10 @@ struct AIProjectApp: App {
                         }
                 } else {
                     if hasSeenOnboarding {
-                        MainTabView()
+                        MainTabView(
+                            tickerService: tickerService,
+                            coinService: coinService
+                        )
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environmentObject(themeManager)
                             .environmentObject(recommendCoinViewModel)
