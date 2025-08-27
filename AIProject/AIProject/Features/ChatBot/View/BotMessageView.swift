@@ -53,7 +53,7 @@ struct BotMessageView: View {
             }
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
-                    .strokeBorder(.defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(.accentGradient, lineWidth: 0.5)
             }
             .frame(maxWidth: 300, alignment: .leading)
 
