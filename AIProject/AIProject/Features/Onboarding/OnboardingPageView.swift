@@ -1,5 +1,5 @@
 //
-//  OnboardingPageVIew.swift
+//  OnboardingPageView.swift
 //  AIProject
 //
 //  Created by kangho lee on 7/29/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct OnboardingPageVIew: View {
+struct OnboardingPageView: View {
     
     var body: some View {
         VStack {
@@ -19,5 +19,5 @@ struct OnboardingPageVIew: View {
     }
 }
 #Preview {
-    OnboardingPageVIew()
+    OnboardingPageView()
 }
