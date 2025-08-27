@@ -59,7 +59,6 @@ struct MyPageView: View {
 
                         VStack(spacing: 16) {
                             menuButton("bookmark", title: "북마크 설정", imageName: "bookmark")
-                            menuButton("notification", title: "알림 설정", imageName: "bell.badge")
                             menuButton("theme", title: "테마 변경", imageName: "paintpalette")
                         }
                     }
@@ -82,8 +81,6 @@ struct MyPageView: View {
                             } label: {
                                 MyPageMenuRow(title: "문의하기", imageName: "at")
                             }
-
-                            menuButton("privacy", title: "인공지능(AI) 윤리기준", imageName: "sparkles")
                         }
                     }
                 }
@@ -111,14 +108,10 @@ struct MyPageView: View {
         switch selection {
         case "bookmark":
             BookmarkView()
-        case "notification":
-            ThemeView()
         case "theme":
             ThemeView()
         case "contact":
             NoEmailGuideView()
-        case "privacy":
-            PrivacyPolicyView()
         default:
             CommonPlaceholderView(imageName: "logo", text: "메뉴를 선택하세요")
         }
@@ -150,12 +143,8 @@ struct MyPageView: View {
         switch tag {
         case "bookmark":
             BookmarkView()
-        case "notification":
-            ThemeView()
         case "theme":
             ThemeView()
-        case "privacy":
-            PrivacyPolicyView()
         default:
             EmptyView()
         }
