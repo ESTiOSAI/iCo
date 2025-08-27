@@ -58,6 +58,12 @@ struct MarketView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
+                .background {
+                    Color.clear
+                        .onTapGesture {
+                            UIApplication.shared.endEditing()
+                        }
+                }
                 .refreshable {
                     Task {
                         await store.refresh()
