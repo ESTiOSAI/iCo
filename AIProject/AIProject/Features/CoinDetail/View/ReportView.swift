@@ -44,10 +44,7 @@ struct ReportView: View {
         }
         .padding(.bottom, 30)
         .task {
-            await viewModel.load()
-        }
-        .onDisappear {
-            viewModel.cancelAll()
+            await viewModel.startIfNeeded()
         }
     }
 }

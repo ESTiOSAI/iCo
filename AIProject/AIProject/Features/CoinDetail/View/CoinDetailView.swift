@@ -90,6 +90,9 @@ struct CoinDetailView: View {
             }
             .scrollIndicators(.hidden)
         }
+        .onDisappear {
+            reportViewModel.cancelAll()
+        }
         //        .toolbar(.hidden, for: .navigationBar)
     }
 }

@@ -35,6 +35,8 @@ final class ReportViewModel: ObservableObject {
     private var weeklyTask: Task<CoinWeeklyDTO, Error>?
     private var todayTask: Task<CoinTodayNewsDTO, Error>?
     
+    private var hasStarted = false
+    
     init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
@@ -82,6 +84,14 @@ final class ReportViewModel: ObservableObject {
         await updateWeeklyUI()
         try? await Task.sleep(for: .milliseconds(350)) // UI가 순차적으로 적용되는 효과를 주기 위한 딜레이
         await updateTodayUI()
+    }
+    
+    /// 탭에서 Report가 처음 표시될 때 한 번만 로드합니다.
+    @MainActor
+    func startIfNeeded() async {
+        guard !hasStarted else { return }
+        hasStarted = true
+        await load()
     }
     
     // overview만 다시 시도
