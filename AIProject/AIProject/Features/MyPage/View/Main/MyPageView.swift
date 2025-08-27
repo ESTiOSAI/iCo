@@ -108,7 +108,7 @@ struct MyPageView: View {
             ThemeView()
         case "contact":
             VStack(alignment: .center, spacing: 12) {
-                CommonPlaceholderView(imageName: "placeholder-no-mail", text: "문의하기 기능을 사용을 위해 메일 계정을 설정해주세요\n설정 → Mail 앱에서 계정 추가")
+                CommonPlaceholderView(imageName: "placeholder-no-mail", text: "문의하기 기능 사용을 위해 메일 계정을 설정해주세요\n설정 → Mail 앱에서 계정 추가")
                 
                 RoundedRectangleFillButton(
                     title: "계정 추가",
