@@ -99,10 +99,20 @@ struct CoinCarouselView: View {
             handleAutoScrolling(cardID: cardID)
         }
         .onChange(of: cardID ?? recommendedCoins.count) { _, newValue in
-            guard !recommendedCoins.isEmpty else { return }
-            
             // 수동 스크롤일 경우
+            guard !recommendedCoins.isEmpty else { return }
             handleManualScrolling(cardID: newValue)
+        }
+        .onChange(of: hSizeClass) { _, _ in
+            // 화면 회전 시 스크롤 위치 재조정
+            if let currentID = cardID {
+                // 애니메이션 없이 즉시 위치 재설정
+                cardID = nil
+                Task {
+                    try? await Task.sleep(nanoseconds: 10_000_000)
+                    cardID = currentID
+                }
+            }
         }
         .sheet(item: $selectedCoin) { coin in
             NavigationStack {
