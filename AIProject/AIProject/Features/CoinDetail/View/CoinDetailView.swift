@@ -24,31 +24,12 @@ struct CoinDetailView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     // 헤더
-                    if hSizeClass == .regular {
-                        HStack(alignment: .lastTextBaseline) {
-                            Text(coin.koreanName)
-                                .font(.system(size: 24, weight: .black))
-                                .foregroundStyle(.aiCoLabel)
-                            
-                            Text(coin.coinSymbol)
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(.aiCoLabelSecondary)
+                    HeaderView(
+                        heading: coin.koreanName,
+                        coinSymbol: coin.coinSymbol,
+                        showBackButton: true) {
+                            // MARK: 콜백?
                         }
-                    } else {
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
-                            Text(coin.koreanName)
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundStyle(.aiCoLabel)
-                            
-                            Text(coin.coinSymbol)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.aiCoLabelSecondary)
-                            
-                            Spacer()
-                        }
-                        .padding(EdgeInsets(top: 20, leading: 16, bottom: 16, trailing: 16))
-                    }
-                    
                     
                     VStack(spacing: 16) {
                         // 버튼

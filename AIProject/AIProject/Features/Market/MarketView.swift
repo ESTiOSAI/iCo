@@ -49,19 +49,21 @@ struct MarketView: View {
                 await store.load()
             }
             .toolbar(removing: .sidebarToggle)
+            .toolbar(.hidden, for: .navigationBar)
             .navigationSplitViewColumnWidth(min: 330, ideal: 350, max: 400)
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
                 CoinDetailView(coin: coin)
                     .id(coin.id)
+                    .toolbar(.hidden, for: .navigationBar)
                 
             } else {
                 CommonPlaceholderView(imageName: "logo", text: "조회할 코인을 선택하세요")
+                    .toolbar(.hidden, for: .navigationBar)
             }
         }
         .navigationSplitViewStyle(.balanced)
-        
     }
 }
 
