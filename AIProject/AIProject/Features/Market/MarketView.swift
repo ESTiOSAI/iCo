@@ -29,10 +29,16 @@ struct MarketView: View {
         NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
             VStack(spacing: 0) {
                 HeaderView(heading: "마켓")
+                    .frame(maxWidth: .infinity)
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        UIApplication.shared.endEditing()
+                    }
                 
                 SearchBarView(searchText: $searchText)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 20)
+                
                 
                 if !records.isEmpty {
                     RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
@@ -53,17 +59,15 @@ struct MarketView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, 4)
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        UIApplication.shared.endEditing()
+                    }
 
                     CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 16)
-                .background {
-                    Color.clear
-                        .onTapGesture {
-                            UIApplication.shared.endEditing()
-                        }
-                }
                 .refreshable {
                     Task {
                         await store.refresh()
