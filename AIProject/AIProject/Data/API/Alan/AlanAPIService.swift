@@ -12,7 +12,7 @@ import SwiftUI
 final class AlanAPIService: AlanAPIServiceProtocol {
     @AppStorage(AppStorageKey.cacheBriefTodayTimestamp) private var cacheBriefTodayTimestamp: String = ""
     @AppStorage(AppStorageKey.cacheBriefCommunityTimestamp) private var cacheBriefCommunityTimestamp: String = ""
-    
+
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
     
@@ -376,16 +376,26 @@ extension AlanAPIService {
     }
     
     /// 북마크된 코인 전체에 대한 투자 브리핑과 전략 제안을 JSON 형식으로 가져옵니다.
-    func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: InvestmentCharacter) async throws -> PortfolioBriefingDTO {
+    func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: RiskTolerance) async throws -> PortfolioBriefingDTO {
         let coinNames = coins.map { $0.coinID }.joined(separator: ", ")
 
         // 온보딩 때 받을 투자 성향
         let importance: String
         switch character {
-        case .shortTerm:
-            importance = "최근 가격 흐름과 거래량 변화를 최우선으로 고려하며, 테마는 보조적으로 참고."
-        case .longTerm:
-            importance = "테마, 시가 총액의 안정성과 성장성을 최우선으로 고려하며, 최근 가격 흐름과 거래량은 보조적으로 참고."
+        case .conservative:
+            importance = "원금 보전을 최우선으로 고려하며, 최근 가격 흐름이나 테마보다는 안정적인 종목 위주로 접근."
+
+        case .moderatelyConservative:
+            importance = "안정성을 중시하되, 일부 성장 가능성이 있는 종목도 보조적으로 고려하며, 단기 변동성에는 크게 영향을 받지 않음."
+
+        case .moderate:
+            importance = "안정성과 성장을 균형 있게 추구하며, 테마·시가 총액·최근 가격 흐름을 모두 균형적으로 참고."
+
+        case .moderatelyAggressive:
+            importance = "성장성을 우선시하되, 안정성도 일정 부분 고려하며, 최근 가격 흐름과 거래량 변화에 적극적으로 반응."
+
+        case .aggressive:
+            importance = "단기간의 높은 수익을 최우선으로 고려하며, 최근 가격 흐름과 거래량 변화를 중점적으로 참고하고, 테마는 보조적으로만 반영."
         }
 
         // 캐시 키 구성
@@ -407,6 +417,8 @@ extension AlanAPIService {
 
         let prompt = Prompt.generateBookmarkBriefing(importance: importance, bookmarks: coinNames)
         let answer = try await fetchAnswer(content: prompt.content, action: .bookmarkSuggestion)
+
+        print("프롬프트---:", prompt)
 
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(

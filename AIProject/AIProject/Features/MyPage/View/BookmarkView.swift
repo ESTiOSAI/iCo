@@ -112,11 +112,11 @@ struct BookmarkView: View {
                             }
                         case .failure(let networkError):
                             DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                                Task { await vm.loadBriefing(character: vm.userInvestmentType) }
                             }
                         case .cancel(let networkError):
                             DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                                Task { await vm.loadBriefing(character: vm.userInvestmentType) }
                             }
                         }
                     }
@@ -209,7 +209,7 @@ struct BookmarkView: View {
                     return
                 }
                 async let imagesTask: () = vm.loadCoinImages()
-                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                async let briefingTask: () = vm.loadBriefing(character: vm.userInvestmentType)
                 _ = await (imagesTask, briefingTask)
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
