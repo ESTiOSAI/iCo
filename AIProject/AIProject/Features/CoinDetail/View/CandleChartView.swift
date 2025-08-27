@@ -10,6 +10,10 @@ import Charts
 
 /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
 struct CandleChartView: View {
+    /// 화면 간격에 맞춰 계산된 캔들 바 폭(pt)
+    /// `recalcWidth(_:)`에서 갱신되며 기본값 4pt는 초기 렌더용
+    @State private var candleWidth: CGFloat = 4
+    
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
     let yRange: ClosedRange<Double>
@@ -53,10 +57,18 @@ struct CandleChartView: View {
                     x: .value("Date", point.date),
                     yStart: .value("Open", point.open),
                     yEnd: .value("Close", point.close),
-                    width: 4
+                    width: .fixed(candleWidth)
                 )
                 .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
             }
+        }
+        /// 플롯 크기/스케일 변화 시 캔들 폭 재계산
+        .chartOverlay { proxy in
+          GeometryReader { _ in
+            Color.clear
+              .onAppear { recalcWidth(proxy) }
+              .onChange(of: proxy.plotSize) { _ in recalcWidth(proxy) }
+          }
         }
         /// X축 도메인 설정 및 스크롤 위치 초기화
         .chartXScale(domain: xDomain)
@@ -97,7 +109,27 @@ struct CandleChartView: View {
         .chartPlotStyle { $0.padding(.trailing, 20).padding(.bottom, 8) }
     }
     
-    // MARK: - Quarter Ticks (strict 00/15/30/45)
+    /// 현재 X축 스케일을 기반으로 캔들 바 폭을 재계산.
+    private func recalcWidth(_ proxy: ChartProxy) {
+        // 현재 축 스케일에서 "1분"이 화면상 몇 pt 인지 측정
+        guard let last = data.last?.date, // 마지막 캔들 시각
+              let prev = Calendar.current.date(byAdding: .minute, value: -1, to: last), // 마지막 캔들 - 1분 전 시각
+              let x2 = proxy.position(forX: last),
+              let x1 = proxy.position(forX: prev) else { return }
+
+      // 화면 좌표에서 두 시점의 X 위치를 얻어 1분 간격 픽셀 폭 계산
+      let spacing = abs(x2 - x1)
+      // 그 중 60%만 막대 폭으로 사용 → 막대 사이 여백 확보
+      let target  = spacing * 0.6
+        
+      // 겹침 방지 클램프: 최소 1pt, 최대 (spacing - 1pt)로 제한해 항상 여백 유지
+      let clamped = max(1, min(target, spacing - 1))
+
+      DispatchQueue.main.async {
+        candleWidth = clamped
+      }
+    }
+
     /// 정각·15·30·45 분 틱 생성 (안전 처리)
     private func quarterTicksStrict(in domain: ClosedRange<Date>, calendar: Calendar) -> [Date] {
         // 시(hour) 시작 시각 계산(실패 시 합리적 폴백)
