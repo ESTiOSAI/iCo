@@ -103,7 +103,7 @@ struct BookmarkView: View {
                     Group {
                         switch vm.status {
                         case .loading:
-                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다") {
                                 vm.cancelTask()
                             }
                         case .success:
@@ -176,7 +176,7 @@ struct BookmarkView: View {
                     }
                     
                     // 북마크한 코인이 없을 시 내보내기 버튼 숨기기
-                    if !isExportDisabled {
+                    if !bookmarks.isEmpty {
                         RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
                             guard !isExportDisabled else { return }
                             showingExportOptions = true
@@ -202,7 +202,6 @@ struct BookmarkView: View {
                     .padding(16)
                 }
             }
-            
             .task {
                 guard !bookmarks.isEmpty else {
                     vm.briefing = nil
