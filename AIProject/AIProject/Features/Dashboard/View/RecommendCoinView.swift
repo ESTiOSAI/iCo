@@ -34,6 +34,7 @@ struct RecommendCoinView: View {
                     
                     TimestampWithRefreshButtonView(timestamp: viewModel.fetchTimestamp!, action: { viewModel.loadRecommendCoin(ignoreCache: true) })
                         .padding(.horizontal, 16)
+                        .animation(.snappy, value: viewModel.fetchTimestamp)
                 }
             }
         }
