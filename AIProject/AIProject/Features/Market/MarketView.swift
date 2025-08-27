@@ -27,61 +27,29 @@ struct MarketView: View {
     
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
-            ZStack {
-                Color.aiCoBackground
+            VStack(spacing: 0) {
+                makeHeader()
                     .dissmissKeyboardOnTap()
                 
-                VStack(spacing: 0) {
-                    HeaderView(heading: "마켓")
-                    
-                    SearchBarView(searchText: $searchText)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
-                    
-                    if !records.isEmpty {
-                        RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
-                            store.deleteRecord(coin.id)
-                        }) { selectedCoinID = $0 }
-                            .padding(.bottom, 16)
-                    }
-                    
-                    HStack(spacing: 16) {
-                        RoundedRectangleButton(title: "전체", isActive: store.filter == .none) {
-                            store.filter = .none
-                        }
-                        
-                        RoundedRectangleButton(title: "북마크", isActive: store.filter == .bookmark) {
-                            store.filter = .bookmark
-                        }
-                        
-                        Spacer()
-                    }
-                    .frame(alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 20)
-                    
-                    VStack(spacing: 16) {
-                        CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
-                    }
+                CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
-                    .refreshable {
-                        Task {
-                            await store.refresh()
-                        }
-                    }
-                    .onChange(of: searchText, { oldValue, newValue in
-                        Task {
-                            await store.search(newValue)
-                        }
-                    })
-                    .task {
-                        await store.load()
-                    }
-                }
-                .toolbar(removing: .sidebarToggle)
-                .navigationSplitViewColumnWidth(min: 330, ideal: 350, max: 400)
             }
+            .refreshable {
+                Task {
+                    await store.refresh()
+                }
+            }
+            .onChange(of: searchText, { oldValue, newValue in
+                Task {
+                    await store.search(newValue)
+                }
+            })
+            .task {
+                await store.load()
+            }
+            .toolbar(removing: .sidebarToggle)
+            .navigationSplitViewColumnWidth(min: 330, ideal: 350, max: 400)
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
@@ -94,6 +62,42 @@ struct MarketView: View {
         }
         .navigationSplitViewStyle(.balanced)
         
+    }
+}
+
+extension MarketView {
+    @ViewBuilder func makeHeader() -> some View {
+        VStack(spacing: 0) {
+            HeaderView(heading: "마켓")
+            
+            SearchBarView(searchText: $searchText)
+                .padding(.horizontal, 16)
+            
+            VStack(spacing: 0) {
+                if !records.isEmpty {
+                    RecentCoinSectionView(coins: records.compactMap { store.coinMeta[$0.query] }, deleteAction: { coin in
+                        store.deleteRecord(coin.id)
+                    }) { selectedCoinID = $0 }
+                        .padding(.bottom, 16)
+                }
+                
+                HStack(spacing: 16) {
+                    RoundedRectangleButton(title: "전체", isActive: store.filter == .none) {
+                        store.filter = .none
+                    }
+                    
+                    RoundedRectangleButton(title: "북마크", isActive: store.filter == .bookmark) {
+                        store.filter = .bookmark
+                    }
+                    
+                    Spacer()
+                }
+                .frame(alignment: .leading)
+                .padding(.horizontal, 16)
+            }
+            .padding(.vertical, 20)
+        }
+        .background(Color.aiCoBackground)
     }
 }
 
