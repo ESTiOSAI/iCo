@@ -418,8 +418,6 @@ extension AlanAPIService {
         let prompt = Prompt.generateBookmarkBriefing(importance: importance, bookmarks: coinNames)
         let answer = try await fetchAnswer(content: prompt.content, action: .bookmarkSuggestion)
 
-        print("프롬프트---:", prompt)
-
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
