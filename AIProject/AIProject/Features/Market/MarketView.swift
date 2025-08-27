@@ -28,7 +28,7 @@ struct MarketView: View {
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility, preferredCompactColumn: .constant(.sidebar)) {
             ZStack {
-                Color.clear
+                Color.aiCoBackground
                     .dissmissKeyboardOnTap()
                 
                 VStack(spacing: 0) {
