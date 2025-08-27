@@ -117,7 +117,7 @@ extension AlanAPIService {
     ///     예: `"초보자"`, `"중수"`, `"고수"`
     ///   - bookmarkCoins: 사용자가 북마크한 코인 이름을 쉼표로 구분한 문자열입니다.
     ///     예: `"비트코인,이더리움"`
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO] {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO] {
         let interval: TimeInterval = 60 * 60
         var dto = [RecommendCoinDTO]()
         
@@ -134,15 +134,17 @@ extension AlanAPIService {
 //        URLCache.shared.removeCachedResponse(for: URLRequest(url: URL(string: AppStorageKey.cacheCoinRecomURL)!))
 #endif
         
-        // UserDefaults에 타임스탬프와 캐시 URL이 있다면
-        if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomTimestamp) as? Date,
-           let lastCacheURLString = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomURL) as? String {
-            let now = Date.now
-            
-            // 타임스탬프 비교하기
-            // 기준 시간보다 작을 경우에는 기존 URL 사용하기
-            if now.timeIntervalSince(lastTimestamp) <= interval {
-                cacheURL = URL(string: lastCacheURLString)
+        if !ignoreCache {
+            // UserDefaults에 타임스탬프와 캐시 URL이 있다면
+            if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomTimestamp) as? Date,
+               let lastCacheURLString = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomURL) as? String {
+                let now = Date.now
+                
+                // 타임스탬프 비교하기
+                // 기준 시간보다 작을 경우에는 기존 URL 사용하기
+                if now.timeIntervalSince(lastTimestamp) <= interval {
+                    cacheURL = URL(string: lastCacheURLString)
+                }
             }
         }
         
@@ -151,11 +153,12 @@ extension AlanAPIService {
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
         
         // 기존 캐시 확인하기
-        if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
-            print("▶️ 캐시 사용: ", request.url!)
+        if !ignoreCache && URLCache.shared.cachedResponse(for: request) != nil {
+            guard let cachedResponse = URLCache.shared.cachedResponse(for: request) else { return [] }
+            //print("▶️ 캐시 사용: ", request.url!)
             dto = try JSONDecoder().decode([RecommendCoinDTO].self, from: cachedResponse.data)
         } else {
-            print("▶️ 캐시 없음")
+            //print("▶️ 캐시 없음")
             let prompt = Prompt.recommendCoin(preference: preference, bookmark: bookmarkCoins)
 #if DEBUG
             dto = [
@@ -209,7 +212,7 @@ extension AlanAPIService {
             if let lastCacheURLString = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomURL) as? String,
                let lastCacheURL = URL(string: lastCacheURLString) {
                 URLCache.shared.removeCachedResponse(for: URLRequest(url: lastCacheURL))
-                print("▶️ 캐시 삭제: ", lastCacheURLString)
+                //print("▶️ 캐시 삭제: ", lastCacheURLString)
             }
             
             // 응답 캐싱하고 UserDefaults에 저장하기
@@ -226,7 +229,7 @@ extension AlanAPIService {
                 let cacheEntry = CachedURLResponse(response: response, data: jsonData)
                 URLCache.shared.storeCachedResponse(cacheEntry, for: request)
                 
-                print("▶️ 캐시 생성: ", request.url!)
+                //print("▶️ 캐시 생성: ", request.url!)
                 
                 // 새로운 timestamp, URL 저장하기
                 UserDefaults.standard.set(Date(), forKey: AppStorageKey.cacheCoinRecomTimestamp)

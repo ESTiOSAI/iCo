@@ -28,11 +28,14 @@ struct RecommendCoinView: View {
             .environmentObject(viewModel)
             .padding(.bottom, 30)
             
-            VStack {
-                Spacer()
-                
-                TimestampWithRefreshButtonView(timestamp: Date.now, action: { viewModel.loadRecommendCoin() })
-                    .padding(.horizontal, 16)
+            if viewModel.fetchTimestamp != nil {
+                VStack {
+                    Spacer()
+                    
+                    TimestampWithRefreshButtonView(timestamp: viewModel.fetchTimestamp!, action: { viewModel.loadRecommendCoin(ignoreCache: true) })
+                        .padding(.horizontal, 16)
+                        .animation(.snappy, value: viewModel.fetchTimestamp)
+                }
             }
         }
         .padding(.bottom, 40)

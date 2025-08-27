@@ -13,6 +13,7 @@ final class RecommendCoinViewModel: ObservableObject {
     /// `state`는 로딩, 성공, 실패 등의 화면 표현을 의미합니다.
     @Published var status: ResponseStatus = .loading
     @Published var recommendCoins: [RecommendCoin] = []
+    @Published var fetchTimestamp: Date?
 
     private var alanService: AlanAPIServiceProtocol
     private var upbitService: UpBitApiServiceProtocol
@@ -43,28 +44,36 @@ final class RecommendCoinViewModel: ObservableObject {
     /// 비동기로 추천 코인 목록을 가져옵니다.
     ///
     /// selectedPreference: 사용자가 선택한 투자 성향, 없을 시 UserDefaults에서 조회
-    func loadRecommendCoin(selectedPreference: String? = nil) {
+    func loadRecommendCoin(selectedPreference: String? = nil, ignoreCache: Bool = false) {
         task = Task {
             do {
                 await MainActor.run {
                     recommendCoins = []
                     status = .loading
                 }
-
+                
                 let bookmarkCoins = try BookmarkManager.shared.fetchAll()
                     .map { $0.coinKoreanName }
                     .sorted()
                     .joined(separator: ",")
+                
                 let recommendCoinDTOs = try await alanService.fetchRecommendCoins(
                     preference: selectedPreference ?? userInvestmentType,
-                    bookmarkCoins: bookmarkCoins
+                    bookmarkCoins: bookmarkCoins,
+                    ignoreCache: ignoreCache
                 )
+                
+                if ignoreCache {
+                    // ProgressView 애니메이션 표시를 위해 잠시 작업 지연
+                    try? await Task.sleep(nanoseconds: 3_000_000_000)
+                }
                 
                 let results = await fetchRecommendCoins(from: recommendCoinDTOs)
 
                 await MainActor.run {
                     recommendCoins = results
                     status = .success
+                    fetchTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomTimestamp) as? Date
                 }
 
             } catch is CancellationError {

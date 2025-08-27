@@ -29,7 +29,7 @@ struct RecomendationPlaceholderCardView: View {
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
                                 .frame(
-                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacing * 2) - 8,
+                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacing * 2),
                                     height: CardConst.cardHeight
                                 )
                             
@@ -48,7 +48,6 @@ struct RecomendationPlaceholderCardView: View {
                 
                 VStack {
                     DefaultProgressView(status: status, message: message) { action() }
-                        .offset(y: -8)
                 }
                 .background(hSizeClass == .regular ?
                     ZStack {
