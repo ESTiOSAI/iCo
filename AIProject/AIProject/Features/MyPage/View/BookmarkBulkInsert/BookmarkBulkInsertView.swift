@@ -33,6 +33,7 @@ struct BookmarkBulkInsertView: View {
                 Button {
                     vm.addToBookmark()
                     clearCoinIDArray()
+                    dismiss()
                 } label: {
                     Text("가져오기")
                 }
