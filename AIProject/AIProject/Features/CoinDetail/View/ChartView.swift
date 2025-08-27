@@ -42,14 +42,14 @@ struct ChartView: View {
     /// 뷰모델이 제공하는 기준 시각 사용 (없으면 빈 문자열)
     private var lastUpdatedText: String {
         guard let time = viewModel.lastUpdated else { return "" }
-        return DateFormatter.stampYMdHmKST.string(from: time) + " 기준"
+        return time.dateAndTime + " 기준"
     }
     
     /// 뷰 전용 매핑 (테마/색)
     private var headerColor: Color {
-        let v = viewModel.displayChangeValue
-        if v > 0 { return themeManager.selectedTheme.positiveColor }
-        if v < 0 { return themeManager.selectedTheme.negativeColor }
+        let value = viewModel.displayChangeValue
+        if value > 0 { return themeManager.selectedTheme.positiveColor }
+        if value < 0 { return themeManager.selectedTheme.negativeColor }
         return .gray
     }
     
@@ -172,7 +172,7 @@ struct ChartView: View {
                     xDomain: xDomain,
                     yRange: yRange,
                     scrollTo: scrollTo,
-                    timeFormatter: viewModel.timeFormatter,
+                    timeFormatter: Date.hhmmTimeFormatter,
                     positiveColor: themeManager.selectedTheme.positiveColor,
                     negativeColor: themeManager.selectedTheme.negativeColor
                 )
@@ -184,13 +184,4 @@ struct ChartView: View {
 #Preview {
     ChartView(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"))
         .environmentObject(ThemeManager())
-}
-
-private extension DateFormatter {
-    static let stampYMdHmKST: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd HH:mm"
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter
-    }()
 }
