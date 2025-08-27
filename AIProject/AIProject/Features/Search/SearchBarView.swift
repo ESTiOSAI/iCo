@@ -25,18 +25,19 @@ struct SearchBarView: View {
                     .font(.system(size: 14))
                     .focused($isFocused)
                     .onChange(of: isFocused) {
-                        Task {
-                            if isFocused {
-                                try? await Task.sleep(for: .milliseconds(50))
-                                withAnimation {
-                                    showCancel = true
-                                }
-                            } else {
-                                withAnimation(.snappy(duration: 0.2)) {
-                                    showCancel = false
-                                }
-                            }
-                        }
+                        showCancel = isFocused
+//                        Task {
+//                            if isFocused {
+//                                try? await Task.sleep(for: .milliseconds(50))
+//                                withAnimation {
+//                                    showCancel = true
+//                                }
+//                            } else {
+//                                withAnimation(.snappy(duration: 0.2)) {
+//                                    showCancel = false
+//                                }
+//                            }
+//                        }
                     }
 
                 if !searchText.isEmpty {
@@ -67,7 +68,6 @@ struct SearchBarView: View {
             }
             .opacity(showCancel ? 1 : 0)
             .frame(width: showCancel ? 40 : 0, alignment: .trailing)
-            .animation(.snappy(duration: 0.2), value: showCancel)
         }
         .onTapGesture {
             isFocused = true
