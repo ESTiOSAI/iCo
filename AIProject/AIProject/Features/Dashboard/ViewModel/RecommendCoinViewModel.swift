@@ -13,6 +13,7 @@ final class RecommendCoinViewModel: ObservableObject {
     /// `state`는 로딩, 성공, 실패 등의 화면 표현을 의미합니다.
     @Published var status: ResponseStatus = .loading
     @Published var recommendCoins: [RecommendCoin] = []
+    @Published var fetchTimestamp: Date?
 
     private var alanService: AlanAPIServiceProtocol
     private var upbitService: UpBitApiServiceProtocol
@@ -65,6 +66,7 @@ final class RecommendCoinViewModel: ObservableObject {
                 await MainActor.run {
                     recommendCoins = results
                     status = .success
+                    fetchTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheCoinRecomTimestamp) as? Date
                 }
 
             } catch is CancellationError {
