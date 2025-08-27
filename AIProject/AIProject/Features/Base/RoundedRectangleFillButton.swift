@@ -44,6 +44,8 @@ func dummyAction() {
         HStack(spacing: 16) {
             RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) { dummyAction() }
             RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { dummyAction() }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { dummyAction() }
+                .disabled(true)
         }
         
         VStack(spacing: 16) {
@@ -68,7 +70,7 @@ struct RoundedRectangleFillButtonView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 16)
-                    .foregroundStyle(!isHighlighted ? .aiCoLabelSecondary : .aiCoAccent)
+                    .tint(!isHighlighted ? .aiCoLabelSecondary : .aiCoAccent)
                     .fontWeight(!isHighlighted ? .light : .regular)
                     .offset(y: -1) // 아이콘 위치 조정하기
             }
@@ -76,7 +78,7 @@ struct RoundedRectangleFillButtonView: View {
             Text(title)
                 .frame(height: 36)
                 .font(.system(size: 14, weight: !isHighlighted ? .regular : .medium))
-                .foregroundStyle(!isHighlighted ? .aiCoLabel : .aiCoAccent)
+                .tint(!isHighlighted ? .aiCoLabel : .aiCoAccent)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

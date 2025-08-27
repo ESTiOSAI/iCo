@@ -78,12 +78,17 @@ struct CoinListView: View {
     @ViewBuilder func makeCoinContents() -> some View {
         if store.filter == .bookmark, bookmarks.isEmpty {
             VStack {
-                Text("북마크한 코인이 없습니다 🥵")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 300)
-                    .multilineTextAlignment(.center)
-                    .padding()
+                Spacer()
+                
+                CommonPlaceholderView(imageName: "placeholder-no-coin", text: "북마크한 코인이 없어요")
+//                Text("북마크한 코인이 없습니다 🥵")
+//                    .font(.subheadline)
+//                    .foregroundColor(.secondary)
+//                    .frame(maxWidth: .infinity, minHeight: 300)
+//                    .multilineTextAlignment(.center)
+//                    .padding()
+                
+                Spacer()
             }
             .frame(maxHeight: .infinity)
         } else {

@@ -50,7 +50,7 @@ struct DefaultProgressView: View {
     }
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 0) {
             Group {
                 switch status {
                 case .loading:
@@ -78,14 +78,14 @@ struct DefaultProgressView: View {
                 Circle()
                     .strokeBorder(status == .loading ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
-            .padding(15)
-            .frame(width: 80, height: 80)
+            .padding(.bottom, 18)
             
             Text(message)
                 .font(.system(size: 14))
                 .foregroundColor(.aiCoLabel)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
+                .padding(.bottom, 10)
             
             switch status {
             case .loading:

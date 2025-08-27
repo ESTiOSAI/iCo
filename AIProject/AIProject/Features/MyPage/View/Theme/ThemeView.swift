@@ -12,7 +12,7 @@ struct ThemeView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
             HeaderView(heading: "테마 변경")
             SubheaderView(subheading: "차트 색상 변경")
                 .padding(.bottom, 20)

@@ -20,6 +20,7 @@ struct MyPageView: View {
                 // iPad
                 NavigationSplitView(columnVisibility: $columnVisibility) {
                     sidebar
+                        .toolbar(removing: .sidebarToggle)
                 } detail: {
                     NavigationStack {
                         detailView
@@ -107,19 +108,24 @@ struct MyPageView: View {
             ThemeView()
         case "contact":
             VStack(alignment: .center, spacing: 12) {
-                Text("메일 계정을 설정해야 메일을 보낼 수 있습니다.")
-                    .font(.system(size: 20))
-                    .foregroundStyle(.aiCoLabelSecondary)
-                Text("설정 > Mail 앱에서 계정을 추가하세요.")
-                    .font(.system(size: 17))
-                    .foregroundStyle(.tertiary)
+                CommonPlaceholderView(imageName: "placeholder-no-mail", text: "문의하기 기능 사용을 위해 메일 계정을 설정해주세요\n설정 → Mail 앱에서 계정 추가")
+                
+                RoundedRectangleFillButton(
+                    title: "계정 추가",
+                    imageName: "gear",
+                    isHighlighted: .constant(true)) {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            if UIApplication.shared.canOpenURL(url) {
+                                UIApplication.shared.open(url)
+                            }
+                        }
+                    }
             }
             .padding()
         case "privacy":
             PrivacyPolicyView()
         default:
-            Text("왼쪽에서 메뉴를 선택하세요")
-                .foregroundStyle(.aiCoLabelSecondary)
+            CommonPlaceholderView(imageName: "logo", text: "메뉴를 선택하세요")
         }
     }
 
