@@ -26,7 +26,7 @@ struct HeaderToggleButton: View {
                 
                 HStack(spacing: 4) {
                     Image(systemName: sortOrder.iconName)
-                        .font(.system(size: 12))
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(.aiCoLabelSecondary)
                         .animation(nil, value: sortOrder)
                 }
