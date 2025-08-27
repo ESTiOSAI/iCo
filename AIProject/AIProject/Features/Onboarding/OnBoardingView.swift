@@ -9,13 +9,11 @@ import SwiftUI
 
 struct OnboardingView: View {
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
-
-    @StateObject private var vm = OnboardingViewModel()
-
+    
     var body: some View {
         TabView {
-            OnboardingPageView()
-            OnboardingPageView()
+            OnboardingPageVIew()
+            OnboardingPageVIew()
             LastOnboardingPage {
                 withAnimation {
                     hasSeenOnboarding = true
@@ -24,9 +22,6 @@ struct OnboardingView: View {
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
         .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
-        .task {
-            await vm.loadCoinImages()
-        }
     }
 }
 

@@ -51,6 +51,7 @@ struct MyPageView: View {
 
                         VStack(spacing: 16) {
                             menuButton("bookmark", title: "북마크 설정", imageName: "bookmark")
+                            menuButton("notification", title: "알림 설정", imageName: "bell.badge")
                             menuButton("theme", title: "테마 변경", imageName: "paintpalette")
                         }
                     }
@@ -100,6 +101,8 @@ struct MyPageView: View {
         switch selection {
         case "bookmark":
             BookmarkView()
+        case "notification":
+            ThemeView()
         case "theme":
             ThemeView()
         case "contact":
@@ -146,6 +149,8 @@ struct MyPageView: View {
         switch tag {
         case "bookmark":
             BookmarkView()
+        case "notification":
+            ThemeView()
         case "theme":
             ThemeView()
         case "privacy":

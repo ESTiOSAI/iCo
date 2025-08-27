@@ -7,7 +7,6 @@
 
 import Foundation
 import CoreData
-import WidgetKit
 
 final class BookmarkManager: BookmarkManaging {
     static let shared = BookmarkManager()
@@ -32,7 +31,6 @@ final class BookmarkManager: BookmarkManaging {
             bookmark.coinKoreanName = coinKoreanName
             bookmark.timestamp = Date()
             service.insert(bookmark)
-            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
@@ -44,7 +42,6 @@ final class BookmarkManager: BookmarkManaging {
 
         if let bookmark = try context.fetch(request).first {
             service.delete(bookmark)
-			WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
@@ -62,7 +59,6 @@ final class BookmarkManager: BookmarkManaging {
 
     func deleteAll() throws {
         try service.clear(type: BookmarkEntity.self)
-        WidgetCenter.shared.reloadAllTimelines()
     }
 
     @discardableResult
