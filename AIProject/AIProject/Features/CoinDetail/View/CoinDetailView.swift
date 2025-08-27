@@ -11,6 +11,9 @@ struct CoinDetailView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @State private var selectedTab: Tab = .chart
     @StateObject var reportViewModel: ReportViewModel
+    @State private var baseHeight: CGFloat?
+    @State private var isKeyboardVisible = false
+    @State private var keyboardObserver: NSObjectProtocol?
     
     let coin: Coin
     
@@ -21,6 +24,8 @@ struct CoinDetailView: View {
     
     var body: some View {
         GeometryReader { proxy in
+            let containerHeight = baseHeight ?? proxy.size.height
+            
             ScrollView {
                 VStack(spacing: 0) {
                     // 헤더
@@ -32,41 +37,36 @@ struct CoinDetailView: View {
                         }
                     
                     VStack(spacing: 16) {
-                        // 버튼
-                        if hSizeClass == .compact {
-                            HStack(spacing: 16) {
-                                ForEach(Tab.allCases) { tab in
-                                    RoundedRectangleButton(
-                                        title: tab.title,
-                                        isActive: selectedTab == tab
-                                    ) {
-                                        withAnimation(.easeInOut(duration: 0.22)) {
-                                            selectedTab = tab
-                                        }
-                                    }
-                                }
-                                Spacer(minLength: 0)
-                            }
-                        }
+                        tabButtons
                         
-                        // 콘텐츠
-                        if hSizeClass == .regular {
-                            ChartView(coin: coin)
-                                .frame(height: proxy.size.height * 0.55)
-                            
-                            ReportView(viewModel: reportViewModel)
-                                .padding(.top, 20)
-                        } else {
-                            switch selectedTab {
-                            case .chart:
-                                ChartView(coin: coin)
-                                    .frame(height: proxy.size.height * 0.8)
-                            case .report:
-                                ReportView(viewModel: reportViewModel)
+                        content(containerHeight: containerHeight)
+                    }
+                    .padding(.horizontal, 16)
+                    .onAppear {
+                        if baseHeight == nil { baseHeight = proxy.size.height }
+                        guard keyboardObserver == nil else { return }
+                        keyboardObserver = NotificationCenter.default.addObserver(
+                            forName: UIResponder.keyboardWillChangeFrameNotification,
+                            object: nil,
+                            queue: .main
+                        ) { note in
+                            if let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                                let h = UIScreen.main.bounds.intersection(end).height
+                                isKeyboardVisible = h > 0
                             }
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .onChange(of: proxy.size.height) { _, newValue in
+                        if !isKeyboardVisible {
+                            baseHeight = newValue
+                        }
+                    }
+                    .onDisappear {
+                        if let token = keyboardObserver {
+                            NotificationCenter.default.removeObserver(token)
+                            keyboardObserver = nil
+                        }
+                    }
                 }
             }
             .scrollIndicators(.hidden)
@@ -78,6 +78,48 @@ struct CoinDetailView: View {
     }
 }
 
+// MARK: - Subviews (Buttons, Content)
+extension CoinDetailView {
+    @ViewBuilder
+    fileprivate var tabButtons: some View {
+        if hSizeClass == .compact {
+            HStack(spacing: 16) {
+                ForEach(Tab.allCases) { tab in
+                    RoundedRectangleButton(
+                        title: tab.title,
+                        isActive: selectedTab == tab
+                    ) {
+                        withAnimation(.easeInOut(duration: 0.22)) {
+                            selectedTab = tab
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    @ViewBuilder
+    fileprivate func content(containerHeight: CGFloat) -> some View {
+        if hSizeClass == .regular {
+            ChartView(coin: coin)
+                .frame(height: containerHeight * Layout.regularChartRatio)
+            
+            ReportView(viewModel: reportViewModel)
+                .padding(.top, 20)
+        } else {
+            switch selectedTab {
+            case .chart:
+                ChartView(coin: coin)
+                    .frame(height: containerHeight * Layout.compactChartRatio)
+            case .report:
+                ReportView(viewModel: reportViewModel)
+            }
+        }
+    }
+}
+
+// MARK: - Tab
 extension CoinDetailView {
     private enum Tab: Int, CaseIterable, Identifiable {
         case chart
@@ -91,6 +133,14 @@ extension CoinDetailView {
             case .report: return "AI 리포트"
             }
         }
+    }
+}
+
+// MARK: - Layout Constants
+extension CoinDetailView {
+    private enum Layout {
+        static let regularChartRatio: CGFloat = 0.55
+        static let compactChartRatio: CGFloat = 0.8
     }
 }
 
