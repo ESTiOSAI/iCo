@@ -217,10 +217,6 @@ struct BookmarkView: View {
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
                 Task { @MainActor in await vm.loadCoinImages() }
             }
-            // 북마크 개수 변화 시 브리핑 갱신
-            .onChange(of: bookmarks.count, initial: false) { _,_  in
-                Task { @MainActor in await vm.loadBriefing(character: .longTerm) }
-            }
         }
         .backgroundStyle(.aiCoBackground)
         .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
