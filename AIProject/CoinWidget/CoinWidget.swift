@@ -119,13 +119,16 @@ struct CoinWidgetEntryView: View {
 
             case .systemLarge:
                 VStack(spacing: 0) {
-                    CoinCardView(coin: entry.coins[0], date: entry.date)
+                    if let first = entry.coins.first {
+                        CoinCardView(coin: first, date: entry.date)
+                    }
 
-                    Divider()
-                        .background(Color.aiCoBorderGray)
-                        .padding(.vertical, 8)
-
-                    CoinCardView(coin: entry.coins[1], date: entry.date)
+                    if entry.coins.count > 1 {
+                        Divider()
+                            .background(Color.aiCoBorderGray)
+                            .padding(.vertical, 8)
+                        CoinCardView(coin: entry.coins[1], date: entry.date)
+                    }
                 }
 
             default:
