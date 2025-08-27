@@ -10,9 +10,11 @@ import MessageUI
 
 struct MyPageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.dismiss) var dismiss
     @State private var selection: String? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showMail = false
+    @State private var showNoEmailView = false
 
     var body: some View {
         Group {
@@ -36,6 +38,9 @@ struct MyPageView: View {
         }
         .sheet(isPresented: $showMail) {
             MailView()
+        }
+        .sheet(isPresented: $showNoEmailView) {
+            NoEmailGuideView(showClose: true)
         }
     }
 
@@ -68,6 +73,8 @@ struct MyPageView: View {
                                 } else {
                                     if hSizeClass == .regular {
                                         selection = "contact"
+                                    } else {
+                                        showNoEmailView = true
                                     }
                                 }
                             } label: {
@@ -107,21 +114,7 @@ struct MyPageView: View {
         case "theme":
             ThemeView()
         case "contact":
-            VStack(alignment: .center, spacing: 12) {
-                CommonPlaceholderView(imageName: "placeholder-no-mail", text: "문의하기 기능 사용을 위해 메일 계정을 설정해주세요\n설정 → Mail 앱에서 계정 추가")
-                
-                RoundedRectangleFillButton(
-                    title: "계정 추가",
-                    imageName: "gear",
-                    isHighlighted: .constant(true)) {
-                        if let url = URL(string: UIApplication.openSettingsURLString) {
-                            if UIApplication.shared.canOpenURL(url) {
-                                UIApplication.shared.open(url)
-                            }
-                        }
-                    }
-            }
-            .padding()
+            NoEmailGuideView()
         case "privacy":
             PrivacyPolicyView()
         default:
