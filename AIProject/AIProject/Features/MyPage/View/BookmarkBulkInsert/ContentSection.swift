@@ -32,28 +32,38 @@ struct ContentSection: View {
                                 DefaultProgressView(status: .loading, message: "아이코가 이미지를 분석하고 있어요") {
                                     vm.cancelTask()
                                 }
+                                .background(.aiCoBackgroundWhite)
                             }
                         }
                     }
+                    .animation(.easeIn(duration: 0.3), value: vm.isLoading)
                     .frame(maxHeight: .infinity)
                 }
             }
             .frame(maxWidth: .infinity)
             
-            PhotosPicker(
-                selection: $selectedItem,
-                matching: .images,
-                photoLibrary: .shared()) {
-                    RoundedRectangleFillButtonView(title: "이미지 선택하기", isHighlighted: .constant(true))
-                }
-                .padding()
-        }
-        .onChange(of: selectedItem) { _, newValue in
-            Task {
-                if let data = try? await newValue?.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    selectedImage = uiImage
-                    vm.processImage(from: selectedImage!)
+            VStack(spacing: 10) {
+                Text("ⓘ 코인 이름을 제외한 모든 정보는 기기 내에서 안전하게 처리됩니다")
+                    .font(.footnote)
+                    .foregroundStyle(.aiCoAccent)
+                    .multilineTextAlignment(.center)
+                
+                PhotosPicker(
+                    selection: $selectedItem,
+                    matching: .images,
+                    photoLibrary: .shared()) {
+                        RoundedRectangleFillButtonView(title: "이미지 선택하기", isHighlighted: .constant(true))
+                    }
+            }
+            .padding(.bottom, 16)
+            .padding(.horizontal, 16)
+            .onChange(of: selectedItem) { _, newValue in
+                Task {
+                    if let data = try? await newValue?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        selectedImage = uiImage
+                        vm.processImage(from: selectedImage!)
+                    }
                 }
             }
         }
