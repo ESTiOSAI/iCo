@@ -43,12 +43,9 @@ struct ReportNewsSectionView: View {
                         Spacer()
                         
                         RoundedButton(title: "원문보기", imageName: "chevron.right") {
-                            // FIXME: 앨런에게서 뉴스 출처 url 받아오기
-                            // if let url = URL(string: article.newsSourceURL) {
-                            //     safariItem = IdentifiableURL(url: url)
-                            // }
-                            
-                            safariItem = IdentifiableURL(url: URL(string: "https://www.blockmedia.co.kr/archives/960242")!)
+                             if let url = URL(string: article.newsSourceURL) {
+                                 safariItem = IdentifiableURL(url: url)
+                             }
                         }
                     }
                     
