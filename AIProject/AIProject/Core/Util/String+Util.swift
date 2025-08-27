@@ -8,9 +8,33 @@
 import SwiftUI
 
 extension String {
-    /// 문자열의 각 글자 사이에 Zero Width Space를 삽입해 Text 뷰에서 단어 단위가 아닌 글자 단위로 줄바꿈 가능하게 하는 확장
-    var byCharWrapping: Self {
-        map(String.init).joined(separator: "\u{200B}")
+    /// 문자열의 각 글자 사이에 Zero Width Space를 삽입해 Text 뷰에서 단어 단위가 아닌 글자 단위로 줄바꿈 가능하게 하되,
+    /// 종결/닫힘 문장부호의 고립을 방지하기 위한 최소 규칙을 적용합니다.
+    var byCharWrapping: String {
+        let zws = "\u{200B}"   // 줄바꿈 허용 (Zero-Width Space)
+        let wj  = "\u{2060}"   // 줄바꿈 금지 결합 (Word Joiner)
+
+        // 1) 모든 글자 사이에 ZWS 삽입
+        var s = self.map(String.init).joined(separator: zws)
+
+        // 2) 개행 문자 주변의 ZWS 제거 (개행 직후에 ZWS가 오면 없앰)
+        s = s.replacingOccurrences(of: "\n" + zws, with: "\n")
+             .replacingOccurrences(of: "\r" + zws, with: "\r")
+
+        // 3) 닫힘/종결 문장부호 앞의 ZWS를 WJ로 치환하여 고립을 방지
+        //    [. , ! ? : ; … ) ] } ” ’ 〉 》 』 」 、 。 ， ！ ？ %]
+        let zwsEscaped = NSRegularExpression.escapedPattern(for: zws)
+        let punctuationClass = "[\\.,!\\?:;…\\)\\]\\}”’〉》』」、。，！？％]"
+        let pattern1 = "\(zwsEscaped)(\(punctuationClass))"
+        s = s.replacingOccurrences(of: pattern1, with: wj + "$1", options: .regularExpression)
+
+        // 4) 여는 괄호 뒤의 ZWS를 WJ로 치환하여 고립을 방지
+        //    [( [ { “ ‘ 〈 《 『 「]
+        let openersClass = "[\\(\\[\\{“‘〈《『「]"
+        let pattern2 = "(\(openersClass))\(zwsEscaped)"
+        s = s.replacingOccurrences(of: pattern2, with: "$1" + wj, options: .regularExpression)
+
+        return s
     }
     
     /// 문자열에 마크다운 JSON 코드 블록 추출 기능을 제공하는 String 확장
@@ -87,7 +111,7 @@ extension String {
         return out
     }
     
-    /// 문자열에서 검색도니 특정 문자열을 변경
+    /// 문자열에서 검색된 특정 문자열을 변경
     /// - Parameters:
     ///   - searchTerm: 검색어
     func highlighted(_ searchTerm: String,
