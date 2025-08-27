@@ -39,7 +39,7 @@ enum Prompt {
                 let description: String
             }
             
-            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지)
+            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
             """
         case .generateTodayNews(let coinKName):
             """
@@ -54,10 +54,10 @@ enum Prompt {
                 let newsSourceURL: String
             }
 
-            1. 현재 국내 시간을 기준으로 최근 24시간 뉴스 기반
-            2. 뉴스 전반을 분석해 시장 분위기를 요약
+            1. 현재 국내 시간을 기준으로 최근 24시간 뉴스를 분석해 \(coinKName)시장 분위기를 요약
+            2. 분석하는데 사용된 뉴스 중 3개를 뉴스 배열에 제목, 요약, 해당 뉴스 출처 링크를 담아 전달
 
-            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 답변에 출처 금지)
             """
         case .generateWeeklyTrends(let coinKName):
             """
@@ -69,7 +69,7 @@ enum Prompt {
 
             1. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
 
-            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
             """
         case .extractCoinID(let text):
             """
@@ -91,7 +91,7 @@ enum Prompt {
             1. 현재 국내 시간을 기준으로 최근 2시간 뉴스 기반
             2. 뉴스 전반을 분석해 시장 분위기를 요약 
             
-            위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지)
+            위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
             """
         case.generateCommunityInsight(let redditPost):
             """
@@ -105,7 +105,7 @@ enum Prompt {
                 let summary: String
             }
             
-            이 게시물들을 InsightDTO를 기반으로 JSON으로 응답해줘.
+            이 게시물들을 InsightDTO를 기반으로 JSON으로 응답해줘(마크다운 금지, 출처 제외).
             """
         case .generateBookmarkBriefing(let importance, let bookmarks):
             """
