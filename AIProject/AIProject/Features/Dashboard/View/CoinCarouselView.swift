@@ -52,7 +52,7 @@ struct CoinCarouselView: View {
                     VStack {
                         RecommendCardView(recommendCoin: coin)
                             .frame(
-                                width: .infinity,
+                                width: nil,
                                 height: CardConst.cardHeight
                             )
                             .onTapGesture { selectedCoin = coin }
