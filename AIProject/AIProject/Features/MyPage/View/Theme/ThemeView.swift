@@ -33,6 +33,26 @@ struct ThemeView: View {
             .buttonStyle(.plain)
             
             Spacer(minLength: 0)
+            
+            /// 미리보기 차트 섹션
+            VStack(alignment: .leading, spacing: 8) {
+                Label {
+                    Text("색상을 변경하면 아래 미리보기 색상이 변경됩니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "chart.xyaxis.line") // 또는 "waveform.path.ecgscope"로 골라봤습니다.
+                        .font(.caption)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 16)
+                
+                CandlestickPreviewView()
+            }
+            .transition(.opacity.combined(with: .scale))
+            
+            Spacer(minLength: 0)
         }
     }
 }
