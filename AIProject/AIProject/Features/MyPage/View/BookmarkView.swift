@@ -103,7 +103,7 @@ struct BookmarkView: View {
                     Group {
                         switch vm.status {
                         case .loading:
-                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다...") {
+                            DefaultProgressView(status: .loading, message: "아이코가 분석중입니다") {
                                 vm.cancelTask()
                             }
                         case .success:
@@ -112,11 +112,11 @@ struct BookmarkView: View {
                             }
                         case .failure(let networkError):
                             DefaultProgressView(status: .failure, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                                Task { await vm.loadBriefing(character: vm.userInvestmentType) }
                             }
                         case .cancel(let networkError):
                             DefaultProgressView(status: .cancel, message: networkError.localizedDescription) {
-                                Task { await vm.loadBriefing(character: .longTerm) }
+                                Task { await vm.loadBriefing(character: vm.userInvestmentType) }
                             }
                         }
                     }
@@ -176,7 +176,7 @@ struct BookmarkView: View {
                     }
                     
                     // 북마크한 코인이 없을 시 내보내기 버튼 숨기기
-                    if !isExportDisabled {
+                    if !bookmarks.isEmpty {
                         RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
                             guard !isExportDisabled else { return }
                             showingExportOptions = true
@@ -202,7 +202,6 @@ struct BookmarkView: View {
                     .padding(16)
                 }
             }
-            
             .task {
                 guard !bookmarks.isEmpty else {
                     vm.briefing = nil
@@ -210,16 +209,12 @@ struct BookmarkView: View {
                     return
                 }
                 async let imagesTask: () = vm.loadCoinImages()
-                async let briefingTask: () = vm.loadBriefing(character: .longTerm)
+                async let briefingTask: () = vm.loadBriefing(character: vm.userInvestmentType)
                 _ = await (imagesTask, briefingTask)
             }
             // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
                 Task { @MainActor in await vm.loadCoinImages() }
-            }
-            // 북마크 개수 변화 시 브리핑 갱신
-            .onChange(of: bookmarks.count, initial: false) { _,_  in
-                Task { @MainActor in await vm.loadBriefing(character: .longTerm) }
             }
         }
         .backgroundStyle(.aiCoBackground)
@@ -317,12 +312,15 @@ struct ExportReportView: View {
         VStack(alignment: .leading, spacing: 12) {
             // 브리핑
             BriefingSectionView(briefing: dto)
-
-            HStack {
-                SubheaderView(subheading: "북마크한 코인")
-                Spacer()
-            }
-            .padding(.horizontal, 16)
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color.aiCoBackgroundAccent)
+                        .overlay(RoundedRectangle(cornerRadius: 20)
+                            .strokeBorder(.accentGradient, lineWidth: 0.5))
+                )
+                .cornerRadius(20)
+                .padding(.horizontal, 16)
 
             CoinListSectionView(
                 sortedCoins: coins,

@@ -19,11 +19,19 @@ final class BookmarkViewModel: ObservableObject {
 
     private var task: Task<Void, Never>?
 
+    let userInvestmentType: RiskTolerance = {
+        if let raw = UserDefaults.standard.string(forKey: AppStorageKey.investmentType),
+           let tolerance = RiskTolerance(rawValue: raw) {
+            return tolerance
+        }
+        return .conservative
+    }()
+
     init(service: AlanAPIService = AlanAPIService()) {
         self.service = service
     }
 
-    func loadBriefing(character: InvestmentCharacter) async {
+    func loadBriefing(character: RiskTolerance) async {
         do {
             cancelTask()
             let bookmarks = try manager.fetchAll()
@@ -189,12 +197,6 @@ final class BookmarkViewModel: ObservableObject {
         return UIScreen.main.bounds.width
         #endif
     }
-}
-
-// 온보딩에서 받는 유저 투자 성격
-enum InvestmentCharacter {
-    case shortTerm
-    case longTerm
 }
 
 private extension View {
