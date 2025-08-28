@@ -110,7 +110,7 @@ struct CoinCarouselView: View {
                 // 애니메이션 없이 즉시 위치 재설정
                 cardID = nil
                 Task {
-                    try? await Task.sleep(nanoseconds: 10_000_000)
+                    try? await Task.sleep(nanoseconds: CardConst.animationDuration)
                     cardID = currentID
                 }
             }
@@ -179,8 +179,8 @@ extension CoinCarouselView {
             self.cardID = cardID - totalCoinCount // 10 -> 5로 빛보다 빠르게 바꿔치기
             
             Task {
-                try? await Task.sleep(nanoseconds: 50_000_000) // 5 -> 6으로 애니메이션과 함께 순환하기
-                withAnimation(.easeInOut(duration: 0.5)) {
+                try? await Task.sleep(nanoseconds: CardConst.animationDuration) // 5 -> 6으로 애니메이션과 함께 순환하기
+                withAnimation(.easeInOut(duration: CardConst.animationDurationDouble)) {
                     if let cardID = self.cardID {
                         self.cardID = (cardID + 1) % (totalCoinCount * 3)
                     }
@@ -189,7 +189,7 @@ extension CoinCarouselView {
             return
         default:
             /// 기본적인 자동 스크롤 처리
-            withAnimation(.easeInOut(duration: 0.5)) {
+            withAnimation(.easeInOut(duration: CardConst.animationDurationDouble)) {
                 self.cardID = (cardID + 1) % (totalCoinCount * 3)
             }
         }
@@ -200,14 +200,14 @@ extension CoinCarouselView {
         if cardID > totalCoinCount * 2 {
             isManualScrolling = true
             Task {
-                try await Task.sleep(nanoseconds: 50_000_000)
+                try await Task.sleep(nanoseconds: CardConst.animationDuration)
                 self.cardID = cardID - totalCoinCount
                 isManualScrolling = false
             }
-        } else if cardID > 0 && cardID < totalCoinCount {
+        } else if cardID >= 0 && cardID < totalCoinCount {
             isManualScrolling = true
             Task {
-                try await Task.sleep(nanoseconds: 50_000_000)
+                try await Task.sleep(nanoseconds: CardConst.animationDuration)
                 self.cardID = cardID + totalCoinCount
                 isManualScrolling = false
             }
