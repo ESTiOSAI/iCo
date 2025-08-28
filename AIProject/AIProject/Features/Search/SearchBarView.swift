@@ -13,7 +13,7 @@ struct SearchBarView: View {
     @State private var showCancel: Bool = false
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 0) {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.aiCoLabel)
@@ -26,18 +26,6 @@ struct SearchBarView: View {
                     .focused($isFocused)
                     .onChange(of: isFocused) {
                         showCancel = isFocused
-//                        Task {
-//                            if isFocused {
-//                                try? await Task.sleep(for: .milliseconds(50))
-//                                withAnimation {
-//                                    showCancel = true
-//                                }
-//                            } else {
-//                                withAnimation(.snappy(duration: 0.2)) {
-//                                    showCancel = false
-//                                }
-//                            }
-//                        }
                     }
 
                 if !searchText.isEmpty {
@@ -64,10 +52,10 @@ struct SearchBarView: View {
                 Text("취소")
                     .foregroundStyle(.aiCoNegative)
                     .font(.system(size: 13))
-                    .padding(8)
             }
             .opacity(showCancel ? 1 : 0)
             .frame(width: showCancel ? 40 : 0, alignment: .trailing)
+            .animation(nil, value: showCancel)
         }
         .onTapGesture {
             isFocused = true
