@@ -70,4 +70,6 @@ struct ChatBotView: View {
 }
 
 
-
+#Preview {
+    ChatBotView()
+}

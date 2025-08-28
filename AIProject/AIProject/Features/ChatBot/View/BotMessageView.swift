@@ -46,7 +46,7 @@ struct BotMessageView: View {
                     Text(message.content)
                 }
             }
-            .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
+            .foregroundStyle(.aiCoLabel)
             .font(.system(size: 14))
             .lineSpacing(6)
             .padding(.vertical, 15)
