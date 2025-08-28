@@ -35,7 +35,7 @@ struct CoinAppEntity: AppEntity, Hashable, Identifiable {
     }
 
     struct DefaultQuery: EntityQuery {
-        private let suite = "group.com.est.ai.AIProject.CoinWidget"
+        private let suite = "group.com.est.aico"
 
         func suggestedEntities() async throws -> [CoinAppEntity] {
             let defaults = UserDefaults(suiteName: suite)
