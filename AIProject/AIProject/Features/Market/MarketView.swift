@@ -54,7 +54,9 @@ struct MarketView: View {
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
-                CoinDetailView(coin: coin)
+                CoinDetailView(coin: coin) {
+                    self.selectedCoinID = nil
+                }
                     .id(coin.id)
                     .toolbar(.hidden, for: .navigationBar)
                 
