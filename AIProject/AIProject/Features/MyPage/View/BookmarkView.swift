@@ -151,8 +151,8 @@ struct BookmarkView: View {
                         RoundedButton(title: "전체 삭제", imageName: "trash") {
                             showDeleteConfirm = true
                         }
-                        .disabled(isExportDisabled)
-                        .opacity(isExportDisabled ? 0.6 : 1.0)
+                        .disabled(bookmarks.isEmpty)
+                        .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         .alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                             Button("삭제", role: .destructive) {
                                 vm.deleteAllBookmarks()
@@ -179,12 +179,12 @@ struct BookmarkView: View {
                         // 북마크한 코인이 없을 시 내보내기 버튼 숨기기
                         if !bookmarks.isEmpty {
                             RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
-                                guard !isExportDisabled else { return }
+                                guard !bookmarks.isEmpty else { return }
                                 showingExportOptions = true
                                 
                             }
-                            .disabled(isExportDisabled)
-                            .opacity(isExportDisabled ? 0.6 : 1.0)
+                            .disabled(bookmarks.isEmpty)
+                            .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         }
                     }
                     .frame(maxWidth: .infinity)
