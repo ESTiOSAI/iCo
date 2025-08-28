@@ -9,16 +9,21 @@ import SwiftUI
 
 struct CoinDetailView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
-    @State private var selectedTab: Tab = .chart
+    @Environment(\.dismiss) var dismiss
+    
     @StateObject var reportViewModel: ReportViewModel
+    
+    @State private var selectedTab: Tab = .chart
     @State private var baseHeight: CGFloat?
     @State private var isKeyboardVisible = false
     @State private var keyboardObserver: NSObjectProtocol?
     
     let coin: Coin
+    let onDismiss: (() -> Void)?
     
-    init(coin: Coin) {
+    init(coin: Coin, onDismiss: (() -> Void)? = nil) {
         self.coin = coin
+        self.onDismiss = onDismiss
         _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
@@ -33,7 +38,11 @@ struct CoinDetailView: View {
                         heading: coin.koreanName,
                         coinSymbol: coin.coinSymbol,
                         showBackButton: true) {
-                            // MARK: 콜백?
+                            if let onDismiss = onDismiss {
+                                onDismiss()
+                            } else {
+                                dismiss()
+                            }
                         }
                     
                     VStack(spacing: 16) {
@@ -74,7 +83,8 @@ struct CoinDetailView: View {
         .onDisappear {
             reportViewModel.cancelAll()
         }
-        //        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .navigationBar)
+        .interactiveSwipeBackEnabled()
     }
 }
 
