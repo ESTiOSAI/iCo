@@ -374,7 +374,7 @@ extension MarketStore {
         }
 
         // UserDefaults 저장
-        let defaults = UserDefaults(suiteName: "group.com.est.ai.AIProject.CoinWidget")
+        let defaults = UserDefaults(suiteName: "group.com.est.aico")
         if let data = try? JSONEncoder().encode(summaries) {
             defaults?.set(data, forKey: "widgetSummary")
         }

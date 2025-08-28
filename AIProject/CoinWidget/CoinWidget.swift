@@ -17,7 +17,7 @@ struct CoinEntry: TimelineEntry {
 
 //MARK: - Provider
 struct CoinProvider: AppIntentTimelineProvider {
-    private let suite = "group.com.est.ai.AIProject.CoinWidget"
+    private let suite = "group.com.est.aico"
 
     func placeholder(in context: Context) -> CoinEntry {
         CoinEntry(date: Date(), coins: sampleData)
