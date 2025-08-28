@@ -33,7 +33,6 @@ struct CachedAsyncImage<Content: View>: View {
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
-                    .background(.background)
             } else {
                 placeholder
             }
