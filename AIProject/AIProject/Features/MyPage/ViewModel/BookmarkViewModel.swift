@@ -33,7 +33,6 @@ final class BookmarkViewModel: ObservableObject {
 
     func loadBriefing(character: RiskTolerance) async {
         do {
-            cancelTask()
             let bookmarks = try manager.fetchAll()
             print("북마크된 코인: ", bookmarks)
             guard !bookmarks.isEmpty else {

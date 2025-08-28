@@ -205,6 +205,7 @@ struct BookmarkView: View {
                 }
             }
             .task {
+                vm.cancelTask()
                 guard !bookmarks.isEmpty else {
                     vm.briefing = nil
                     vm.imageMap = [:]
