@@ -62,16 +62,12 @@ struct CandlestickPreviewView: View {
         let theme = themeManager.selectedTheme
         
         VStack(spacing: 8) {
-            Text("preview")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-            
             chartView(theme: theme)
                 .frame(height: 220)
         }
         .padding(16)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(.quaternary, lineWidth: 0.5))
+        .background(.aiCoBackground)
+        .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5))
         .padding(.horizontal, 16)
     }
     
@@ -79,7 +75,7 @@ struct CandlestickPreviewView: View {
     @ViewBuilder
     private func chartView(theme: Theme) -> some View {
         // 보여지는 캔들 바 갯수
-        let visiblePrices = Array(prices.suffix(24))
+        let visiblePrices = Array(prices.suffix(36))
         
         if visiblePrices.count < 2 {
             Color.clear
@@ -90,7 +86,7 @@ struct CandlestickPreviewView: View {
             
             // 간단한 튜닝: 몸통/꼬리 두께 비율
             let candleWidthSec = interval * 0.55
-            let wickWidthSec   = max(interval * 0.24, 0.9)
+            let wickWidthSec   = max(interval * 0.15, 0.7)
             
             // X축 도메인: 양 끝에 반 간격 여유
             let domainStart = first.date.addingTimeInterval(-interval * 0.5)

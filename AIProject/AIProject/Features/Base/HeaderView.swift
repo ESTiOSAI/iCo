@@ -14,6 +14,7 @@ struct HeaderView: View {
     
     let heading: String
     let coinSymbol: String?
+    let headingColor: Color
     
     var showSearchButton = false
     var showBackButton = false
@@ -21,8 +22,9 @@ struct HeaderView: View {
     let onSearchTap: () -> Void
     let onBackButtonTap: () -> Void
 
-    init(heading: String, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: @escaping () -> Void = { }) {
+    init(heading: String, headingColor: Color = .aiCoLabel, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: @escaping () -> Void = { }) {
         self.heading = heading
+        self.headingColor = headingColor
         self.coinSymbol = coinSymbol
         self.showSearchButton = showSearchButton
         self.onSearchTap = onSearchTap
@@ -31,7 +33,7 @@ struct HeaderView: View {
     }
     
     var body: some View {
-        var isBigScreen = hSizeClass == .regular
+        let isBigScreen = hSizeClass == .regular
         
         ZStack(alignment: .leading) {
             if !isBigScreen && showBackButton {
@@ -52,8 +54,8 @@ struct HeaderView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Text(heading)
                         .font(.system(size: 24, weight: .black))
-                        .foregroundStyle(.aiCoLabel)
-                        .multilineTextAlignment(isBigScreen || showBackButton ? .center : .leading)
+                        .foregroundStyle(headingColor)
+                        .multilineTextAlignment(showBackButton ? .center : .leading)
                     
                     if let coinSymbol {
                         Text(coinSymbol)
@@ -61,7 +63,7 @@ struct HeaderView: View {
                             .foregroundStyle(.aiCoLabelSecondary)
                     }
                 }
-                .frame(maxWidth: hSizeClass == .regular || showBackButton ? .infinity : nil)
+                .frame(maxWidth: showBackButton ? .infinity : nil)
                 
                 Spacer()
                 

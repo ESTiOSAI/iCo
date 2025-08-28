@@ -11,16 +11,31 @@ import SwiftUI
 ///
 /// 관심 코인 기반 추천, AI 브리핑으로 구성합니다.
 struct DashboardView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
+    
     var body: some View {
+        let tempPadding: CGFloat = { hSizeClass == .regular ? 70 : 50 }()
+        
         NavigationStack {
             ScrollView {
-                RecommendCoinView()
-                AIBriefingView()
+                ZStack(alignment: .top) {
+                    LinearGradient(
+                        colors: [.aiBackgroundGradientLight, .aiBackgroundGradientProminent],
+                        startPoint: .topLeading,
+                        endPoint: .bottom
+                    )
+                    .frame(height: CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + tempPadding)
+                    
+                    VStack {
+                        RecommendCoinView()
+                        AIBriefingView()
+                    }
+                    .padding(.top, tempPadding)
+                }
             }
             .ignoresSafeArea(edges: .top)
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
-        .ignoresSafeArea(edges: .top)
     }
 }
 

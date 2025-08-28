@@ -18,13 +18,13 @@ struct CoinView: View {
                 .foregroundStyle(.aiCoAccent)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.aiCoBackgroundAccent)
+                .overlay(
+                    Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
+                )
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
         .contentShape(Circle())
-        .overlay(
-            Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
-        )
     }
 }
 
