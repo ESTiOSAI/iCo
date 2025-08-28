@@ -17,7 +17,7 @@ struct CoinEntry: TimelineEntry {
 
 //MARK: - Provider
 struct CoinProvider: AppIntentTimelineProvider {
-    private let suite = "group.com.est.aico"
+    private let suite = AppGroup.suite
 
     func placeholder(in context: Context) -> CoinEntry {
         CoinEntry(date: Date(), coins: sampleData)
@@ -159,8 +159,8 @@ struct CoinWidget: Widget {
                                provider: CoinProvider()) { entry in
             CoinWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("내 북마크 코인")
-        .description("Small=1개, Medium=1개(와이드), Large=최대 2개(와이드 2줄)")
+        .configurationDisplayName("북마크 코인 선택")
+        .description("Small, Medium 크기의 위젯은 코인 1개\nLarge크기는 코인 2개를 표시합니다.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }

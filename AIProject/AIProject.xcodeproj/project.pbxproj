@@ -89,6 +89,7 @@
 		A9E84AE22E5CC3E900216220 /* Exceptions for "CoinWidget" folder in "AIProject" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppGroup.swift,
 				WidgetCoinSummary.swift,
 			);
 			target = B7B040022E387FCF005DE0BA /* AIProject */;
