@@ -78,6 +78,7 @@ struct SplashScreenView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200, height: 200)
+                .shadow(radius: 10)
         }
     }
 }
