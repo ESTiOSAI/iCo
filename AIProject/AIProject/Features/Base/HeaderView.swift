@@ -31,7 +31,7 @@ struct HeaderView: View {
     }
     
     var body: some View {
-        var isBigScreen = hSizeClass == .regular
+        let isBigScreen = hSizeClass == .regular
         
         ZStack(alignment: .leading) {
             if !isBigScreen && showBackButton {
@@ -53,7 +53,7 @@ struct HeaderView: View {
                     Text(heading)
                         .font(.system(size: 24, weight: .black))
                         .foregroundStyle(.aiCoLabel)
-                        .multilineTextAlignment(isBigScreen || showBackButton ? .center : .leading)
+                        .multilineTextAlignment(showBackButton ? .center : .leading)
                     
                     if let coinSymbol {
                         Text(coinSymbol)
@@ -61,7 +61,7 @@ struct HeaderView: View {
                             .foregroundStyle(.aiCoLabelSecondary)
                     }
                 }
-                .frame(maxWidth: hSizeClass == .regular || showBackButton ? .infinity : nil)
+                .frame(maxWidth: showBackButton ? .infinity : nil)
                 
                 Spacer()
                 
