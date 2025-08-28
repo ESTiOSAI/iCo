@@ -84,7 +84,7 @@ struct SplashScreenView: View {
                 .scaledToFit()
                 .foregroundStyle(.white)
                 .frame(width: 200, height: 200)
-                .shadow(radius: 10)
+                .shadow(radius: 30)
         }
     }
 }
