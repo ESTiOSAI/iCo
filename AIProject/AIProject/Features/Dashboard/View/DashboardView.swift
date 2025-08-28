@@ -20,7 +20,7 @@ struct DashboardView: View {
             ScrollView {
                 ZStack(alignment: .top) {
                     LinearGradient(
-                        colors: [.aiBackgroundGradientLight, .aiBackgroundGradientProminent],
+                        colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
                         startPoint: .topLeading,
                         endPoint: .bottom
                     )
