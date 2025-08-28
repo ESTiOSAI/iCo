@@ -33,6 +33,7 @@ struct CoinCarouselView: View {
     @State private var isManualScrolling = false
     /// viewModel에서 받아온 코인의 배열
     private var recommendedCoins: [RecommendCoin] { viewModel.recommendCoins }
+    private var totalCoinCount: Int { viewModel.numberOfCoins }
     /// 코인의 배열을 무한 스크롤시키기 위해 3번 반복해 저장하는 상태 변수
     @State var wrappedCoins = [[RecommendCoin]]()
     /// 카드 선택 시 코인의 상세 페이지로 이동시키기 위해 사용하는 상태 변수
@@ -98,7 +99,7 @@ struct CoinCarouselView: View {
             
             handleAutoScrolling(cardID: cardID)
         }
-        .onChange(of: cardID ?? recommendedCoins.count) { _, newValue in
+        .onChange(of: cardID ?? totalCoinCount) { _, newValue in
             // 수동 스크롤일 경우
             guard !recommendedCoins.isEmpty else { return }
             handleManualScrolling(cardID: newValue)
@@ -140,7 +141,7 @@ struct CoinCarouselView: View {
         .onAppear {
             // 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 안전 코인을 붙이기
             wrappedCoins = [recommendedCoins, recommendedCoins, recommendedCoins]
-            cardID = recommendedCoins.count // 시작점을 중간 배열의 첫 번째 카드로 지정하기
+            cardID = totalCoinCount // 시작점을 중간 배열의 첫 번째 카드로 지정하기
             viewModel.startTimer()
         }
         .onChange(of: scenePhase) { _, newPhase in
@@ -162,8 +163,6 @@ struct CoinCarouselView: View {
 
 extension CoinCarouselView {
     func handleAutoScrolling(cardID: Int) {
-        let totalCoinCount = recommendedCoins.count
-        
         /// 코인 리스트의 배열의 index
         ///
         /// 0: 첫번째
@@ -199,21 +198,19 @@ extension CoinCarouselView {
     }
     
     func handleManualScrolling(cardID: Int) {
-        let totalCoins = recommendedCoins.count
-        
         // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
-        if cardID > totalCoins * 2 {
+        if cardID > totalCoinCount * 2 {
             isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: 50_000_000)
-                self.cardID = cardID - totalCoins
+                self.cardID = cardID - totalCoinCount
                 isManualScrolling = false
             }
-        } else if cardID > 0 && cardID < totalCoins {
+        } else if cardID > 0 && cardID < totalCoinCount {
             isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: 50_000_000)
-                self.cardID = cardID + totalCoins
+                self.cardID = cardID + totalCoinCount
                 isManualScrolling = false
             }
         }

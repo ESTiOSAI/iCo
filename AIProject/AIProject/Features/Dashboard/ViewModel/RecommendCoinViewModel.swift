@@ -19,6 +19,7 @@ final class RecommendCoinViewModel: ObservableObject {
     private var upbitService: UpBitApiServiceProtocol
 
     var task: Task<Void, Never>?
+    let numberOfCoins: Int = 5
 
     @Published var timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     
@@ -130,7 +131,7 @@ final class RecommendCoinViewModel: ObservableObject {
                 if let coin = coin {
                     results.append(coin)
 
-                    if results.count == 5 {
+                    if results.count == numberOfCoins {
                         group.cancelAll()
                         break
                     }
