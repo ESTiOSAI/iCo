@@ -12,13 +12,6 @@ struct RecommendCoinView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            LinearGradient(
-                colors: [.aiBackgroundGradientLight, .aiBackgroundGradientProminent],
-                startPoint: .topLeading,
-                endPoint: .bottom
-            )
-            .frame(height: CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2))
-            
             VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
                 RecommendHeaderView()
                 

@@ -14,8 +14,19 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                RecommendCoinView()
-                AIBriefingView()
+                ZStack(alignment: .top) {
+                    LinearGradient(
+                        colors: [.aiBackgroundGradientLight, .aiBackgroundGradientProminent],
+                        startPoint: .topLeading,
+                        endPoint: .bottom
+                    )
+                    .frame(height: CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2))
+                    
+                    VStack {
+                        RecommendCoinView()
+                        AIBriefingView()
+                    }
+                }
             }
             .ignoresSafeArea(edges: .top)
         }
