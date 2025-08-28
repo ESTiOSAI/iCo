@@ -24,7 +24,7 @@
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" name="AICoBackgroundAccent"/>
+                        <color key="backgroundColor" name="AICoAccent"/>
                         <constraints>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="centerX" secondItem="obG-Y5-kRd" secondAttribute="centerX" id="5cz-MP-9tL"/>
                             <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" symbolic="YES" id="SfN-ll-jLj"/>
@@ -38,8 +38,8 @@
         </scene>
     </scenes>
     <resources>
-        <namedColor name="AICoBackgroundAccent">
-            <color red="0.92199999094009399" green="0.95300000905990601" blue="1" alpha="0.80000001192092896" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="AICoAccent">
+            <color red="0.23100000619888306" green="0.51399999856948853" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>
