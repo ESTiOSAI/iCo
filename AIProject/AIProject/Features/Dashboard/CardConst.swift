@@ -13,4 +13,6 @@ enum CardConst {
     static let headerHeight: CGFloat = 160
     static let headerContentSpacing: CGFloat = 30
     static let cardInnerPadding: CGFloat = 16
+    static let animationDuration: UInt64 = 50_000_000
+    static let animationDurationDouble: Double = Double(animationDuration) / 100_000_000
 }
