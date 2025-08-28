@@ -20,7 +20,7 @@ struct RecommendHeaderView: View {
                 fontColor: .white
             )
         }
-        .frame(height: CardConst.headerHeight, alignment: .top)
+        .frame(height: CardConst.headerHeight)
     }
 }
 
