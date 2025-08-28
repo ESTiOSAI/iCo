@@ -8,45 +8,61 @@
 import Foundation
 
 /// 특정 코인의 실시간 시세, 다양한 시세 관련 정보를 포함하는 데이터 DTO
-struct TickerDTO: Codable {
+struct TickerDTO: Decodable {
     /// 코인 마켓 코드
+    ///
     let coinID: String
     /// 최근 체결 일자 및 시각
     let tradeTimestamp: Int
 
     /// 당일 시가
-    let openingPrice: Double
+    @Default<Double>
+    var openingPrice: Double
     /// 당일 고가
-    let highPrice: Double
+    @Default<Double>
+    var highPrice: Double
     /// 당일 저가
-    let lowPrice: Double
+    @Default<Double>
+    var lowPrice: Double
     /// 현재가
-    let tradePrice: Double
+    ///
+    @Default<Double>
+    var tradePrice: Double
     /// 전일 종가
-    let prevClosingPrice: Double
+    @Default<Double>
+    var prevClosingPrice: Double
 
     /// 전일 대비 가격 변화 (RISE, FALL, EVEN)
     let change: String
     /// 전일 대비 가격 변화
-    let changePrice: Double
+    @Default<Double>
+    var changePrice: Double
     /// 전일 대비 가격 변화 비율
-    let changeRate: Double
+    @Default<Double>
+    var changeRate: Double
 
     /// 최근 거래 체결량
-    let tradeVolume: Double
+    @Default<Double>
+    var tradeVolume: Double
     /// 당일 누적 거래대금
-    let accTradePrice: Double
+    @Default<Double>
+    var accTradePrice: Double
     /// 당일 누적 거래량
-    let accTradeVolume: Double
+    @Default<Double>
+    var accTradeVolume: Double
 
     /// 52주 최고가
-    let highest52WeekPrice: Double
+    @Default<Double>
+    var highest52WeekPrice: Double
     /// 52주 최고가 날짜
-    let highest52WeekDate: String
+    @Default<String>
+    var highest52WeekDate: String
     /// 52주 최저가
-    let lowest52WeekPrice: Double
+    @Default<Double>
+    var lowest52WeekPrice: Double
     /// 52주 최저가 날짜
-    let lowest52WeekDate: String
+    @Default<String>
+    var lowest52WeekDate: String
 
     let timestamp: Int
 
