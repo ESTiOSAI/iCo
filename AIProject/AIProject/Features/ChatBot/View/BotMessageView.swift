@@ -18,9 +18,12 @@ struct BotMessageView: View {
     var body: some View {
         HStack {
             VStack {
-                Image(systemName: "swift")
-                    .foregroundStyle(.aiCoAccent)
-                    .padding(8)
+                Image("logo")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 34)
+                    .padding(6)
                     .overlay {
                         Circle()
                             .strokeBorder(.accentGradient, lineWidth: 0.5)
@@ -29,6 +32,7 @@ struct BotMessageView: View {
                         Circle()
                             .fill(.aiCoBackgroundAccent)
                     }
+                    .foregroundColor(.accent)
                 Spacer()
             }
 
@@ -60,4 +64,10 @@ struct BotMessageView: View {
             Spacer()
         }
     }
+}
+
+#Preview {
+    BotMessageView(
+        message: ChatMessage(content: "ddd", isUser: true)
+    )
 }
