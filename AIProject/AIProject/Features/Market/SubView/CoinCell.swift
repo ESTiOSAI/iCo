@@ -67,6 +67,10 @@ fileprivate struct CoinPriceView: View {
     
     let ticker: TickerStore
     
+    @State private var priceWidth: CGFloat = 40
+    @State private var volumeWidth: CGFloat = 40
+    private let pricePadding: CGFloat = 8
+    
     private var changeColor: Color {
         switch ticker.snapshot.change {
         case .rise: return themeManager.selectedTheme.positiveColor
@@ -83,46 +87,53 @@ fileprivate struct CoinPriceView: View {
         }
     }
     
-    private var code: String {
-        switch ticker.snapshot.change {
-        case .rise: return "▲"
-        case .even: return ""
-        case .fall: return "▼"
-        }
-    }
-    
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
-            HStack {
-                HStack(spacing: 0) {
-                    Text(code)
-                    Text(ticker.snapshot.rate, format: .percent.precision(.fractionLength(2)))
-                }
+            HStack(spacing: 0) {
+                Text(ticker.snapshot.formatedRate)
                 .foregroundStyle(changeColor)
                 
-                HStack(spacing: 0) {
-                    Text(ticker.snapshot.price, format: .number)
+                ZStack(alignment: .trailing) {
                     
+                    Text(ticker.snapshot.formatedPrice)
+                        .font(.system(size: 15))
+                        .monospacedDigit()
+                        .opacity(0)
+                        .measureWidth { w in
+                            priceWidth = w + pricePadding
+                        }
                     
-                    Text("원")
+                    Text(ticker.snapshot.formatedPrice)
+                        .frame(minWidth: priceWidth, alignment: .trailing)
+                    .font(.system(size: 15))
                 }
-                .font(.system(size: 15))
                 .background {
                     GeometryReader { proxy in
                         Rectangle()
                             .fill(.clear)
-                            .frame(width: proxy.size.width, height: 1)
-                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 1, cornerRadius:0.5)
-                            .offset(y: proxy.size.height + 1)
+                            .frame(width: proxy.size.width - pricePadding, height: 1)
+                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 0.7, cornerRadius:0.5)
+                            .offset(x: pricePadding, y: proxy.size.height + 1)
                     }
                 }
             }
             .frame(alignment: .trailing)
             
-            HStack(spacing: 4) {
-                Text("거래")
+            ZStack(alignment: .trailing) {
+                Text(ticker.snapshot.formatedVolume)
                     .font(.system(size: 11))
-                Text(ticker.snapshot.volume.formatMillion)
+                    .monospacedDigit()
+                    .opacity(0)
+                    .measureWidth { w in
+                        volumeWidth = w + pricePadding
+                    }
+                
+                HStack(spacing: 0) {
+                    Text("거래")
+                        .font(.system(size: 11))
+                    Text(ticker.snapshot.formatedVolume)
+                        .frame(minWidth: volumeWidth, alignment: .trailing)
+                }
             }
         }
         .font(.system(size: 12))
@@ -138,5 +149,24 @@ fileprivate struct CoinPriceView: View {
             .frame(height: 100)
         CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
             .frame(height: 100)
+    }
+}
+
+private struct WidthKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+private extension View {
+    func measureWidth(_ onChange: @escaping (CGFloat) -> Void) -> some View {
+        background {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(key: WidthKey.self, value: proxy.size.width)
+            }
+        }
+        .onPreferenceChange(WidthKey.self, perform: onChange)
     }
 }
