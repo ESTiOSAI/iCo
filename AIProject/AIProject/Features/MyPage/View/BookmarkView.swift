@@ -242,6 +242,7 @@ struct BookmarkView: View {
             BookmarkBulkInsertView()
         }
         .navigationBarBackButtonHidden()
+        .interactiveSwipeBackEnabled()
     }
 }
 

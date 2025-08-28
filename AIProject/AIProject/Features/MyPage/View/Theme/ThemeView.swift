@@ -59,6 +59,7 @@ struct ThemeView: View {
             Spacer(minLength: 0)
         }
         .navigationBarBackButtonHidden()
+        .interactiveSwipeBackEnabled()
     }
 }
 
