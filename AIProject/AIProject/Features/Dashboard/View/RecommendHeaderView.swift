@@ -10,15 +10,7 @@ import SwiftUI
 struct RecommendHeaderView: View {
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text("대시보드")
-                    .font(.system(size: 30, weight: .bold))
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(.white)
-            .padding(.top, 70)
-            .padding(.bottom, 20)
-            .padding(.horizontal, 16)
+            HeaderView(heading: "대시보드", headingColor: .white)
 
             SubheaderView(
                 imageName: "sparkles",
@@ -28,10 +20,11 @@ struct RecommendHeaderView: View {
                 fontColor: .white
             )
         }
-        .frame(height: CardConst.headerHeight)
+        .frame(height: CardConst.headerHeight, alignment: .top)
     }
 }
 
 #Preview() {
     RecommendCoinView()
+        .environmentObject(RecommendCoinViewModel())
 }

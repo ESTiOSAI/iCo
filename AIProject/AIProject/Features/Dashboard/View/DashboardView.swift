@@ -21,6 +21,7 @@ struct DashboardView: View {
                         endPoint: .bottom
                     )
                     .frame(height: CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2))
+                    .ignoresSafeArea(edges: .top)
                     
                     VStack {
                         RecommendCoinView()
@@ -28,10 +29,11 @@ struct DashboardView: View {
                     }
                 }
             }
-            .ignoresSafeArea(edges: .top)
+//            .ignoresSafeArea(edges: .top)
         }
         .scrollIndicators(.hidden)
-        .ignoresSafeArea(edges: .top)
+        .safeAreaPadding(.top)
+//        .ignoresSafeArea(edges: .top)
     }
 }
 

@@ -115,7 +115,7 @@ final class RecommendCoinViewModel: ObservableObject {
                             coinID: data.coinID.replacingOccurrences(of: "KRW-", with: ""),
                             name: dto.name,
                             tradePrice: data.tradePrice,
-                            changeRate: data.changeRate,
+                            changeRate: data.changeRate * 100,
                             changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
                         )
                     } catch {
