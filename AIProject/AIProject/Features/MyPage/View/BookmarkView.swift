@@ -139,7 +139,7 @@ struct BookmarkView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 10)
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 16)
+                        .padding(.bottom, 40)
                 }
                 
                 HStack {
