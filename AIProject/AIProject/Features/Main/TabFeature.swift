@@ -18,7 +18,11 @@ enum TabFeature: String, Hashable, CaseIterable, Identifiable {
         case .dashboard:
             return "square.grid.2x2"
         case .market:
-            return "bitcoinsign.bank.building"
+            if #available(iOS 18, *) {
+                   return "bitcoinsign.bank.building"
+               } else {
+                   return "bitcoinsign.circle"
+               }
         case .chatbot:
             return "bubble.left.and.text.bubble.right"
         case .myPage:
