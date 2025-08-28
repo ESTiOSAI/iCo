@@ -93,8 +93,6 @@ PDF / 이미지 내보내기
 </tr>
 </table>
 
-
-
 ## 🛠️ Tech Stack
 
 <p align="center">
@@ -107,6 +105,7 @@ PDF / 이미지 내보내기
 
 구조도 추가하기
 <p align="center"> <img src="docs/images/architecture.png" width="500"/> </p>
+
 
 ```swift
 AICo
@@ -133,19 +132,6 @@ AICo
 
 ```
 
-
-## 🚀 Project Highlights
-
-- ✅ **쓸만한 서비스**로 구현 (실기기 테스트 및 iPad 대응)
-    
-- ✅ **실용적인 아이패드 최적화** (SplitView / NavigationSplitView)
-    
-- ✅ **도전적인 기능들** (차트 / 웹소켓 / 무한 캐로셀 / 챗봇)
-    
-- ✅ **비동기 데이터 흐름 제어** (병렬 처리, 취소, 캐싱, TaskGroup)
-    
-- ✅ **위젯 지원**
-- 
 ## 🎯 TroubleShooting
 
 <details> <summary>LLM 프롬프트 튜닝 및 파이프라인 설계</summary>
@@ -192,14 +178,6 @@ AICo
 - [Video]()
 
 - [Figma]()
-
-- [BandalArt-KMP](https://github.com/Nexters/BandalArt-KMP)
-    
-- [Keyme-iOS](https://github.com/leekangho0/keyme-iOS)
-    
-- [SOPT-iOS](https://github.com/sopt-makers/SOPT-iOS)
-    
-- [EST2nd4](https://github.com/leekangho0/EST2nd4)
     
 - [Bottles_iOS](https://github.com/Nexters/Bottles_iOS)
 
