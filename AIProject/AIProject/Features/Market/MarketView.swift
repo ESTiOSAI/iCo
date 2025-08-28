@@ -101,7 +101,7 @@ extension MarketView {
             }
             .padding(.vertical, 20)
         }
-        .background(Color.aiCoBackground)
+        .background(.background)
     }
 }
 
