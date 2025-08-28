@@ -303,7 +303,7 @@ struct ActivityView: UIViewControllerRepresentable {
 
 /// 내보내기 전용 뷰
 struct ExportReportView: View {
-    let dto: PortfolioBriefingDTO
+    let dto: PortfolioBriefingDTO?
     let coins: [BookmarkEntity]
     let imageURLProvider: (String) -> URL?
 
@@ -315,16 +315,18 @@ struct ExportReportView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 브리핑
-            BriefingSectionView(briefing: dto)
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.aiCoBackgroundAccent)
-                        .overlay(RoundedRectangle(cornerRadius: 20)
-                            .strokeBorder(.accentGradient, lineWidth: 0.5))
-                )
-                .cornerRadius(20)
-                .padding(.horizontal, 16)
+            if let dto {
+                BriefingSectionView(briefing: dto)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.aiCoBackgroundAccent)
+                            .overlay(RoundedRectangle(cornerRadius: 20)
+                                .strokeBorder(.accentGradient, lineWidth: 0.5))
+                    )
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
+            }
 
             CoinListSectionView(
                 sortedCoins: coins,

@@ -132,8 +132,6 @@ final class BookmarkViewModel: ObservableObject {
 // MARK: - 북마크 내보내기 관련
     /// scale: 해상도 (2x, 레티나 해상도)
     func makeFullReportImage(scale: CGFloat = 2.0) -> UIImage? {
-        guard let dto = briefing else { return nil }
-
         let coins: [BookmarkEntity]
             do {
                 coins = try manager.fetchAll()
@@ -145,7 +143,7 @@ final class BookmarkViewModel: ObservableObject {
         let targetWidth = currentScreenWidth()
 
         let exportView = ExportReportView(
-            dto: dto, coins: coins, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
+            dto: briefing, coins: coins, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
         )
             .frame(width: targetWidth, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
