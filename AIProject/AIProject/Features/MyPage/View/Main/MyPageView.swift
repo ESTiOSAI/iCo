@@ -58,7 +58,7 @@ struct MyPageView: View {
                             .fontWeight(.semibold)
 
                         VStack(spacing: 16) {
-                            menuButton("bookmark", title: "북마크 설정", imageName: "bookmark")
+                            menuButton("bookmark", title: "북마크 관리", imageName: "bookmark")
                             menuButton("theme", title: "테마 변경", imageName: "paintpalette")
                         }
                     }
