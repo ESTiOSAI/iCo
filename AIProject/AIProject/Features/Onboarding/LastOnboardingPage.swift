@@ -23,7 +23,7 @@ struct LastOnboardingPage: View {
             HeaderView(heading: "나의 투자 성향 고르기")
                 .padding(.bottom, 16)
             
-            SubheaderView(subheading: "아래 5가지 중 본인에게 맞는\n투자 성향을 선택해주세요.", description: "투자 성향은 추후 추천 콘텐츠와 서비스에 반영됩니다.")
+            SubheaderView(subheading: "아래에서 투자 성향을 선택해주세요", description: "앞으로 제공해드릴 추천 콘텐츠와 서비스에 반영돼요")
                 .padding(.bottom, 16)
             
             ForEach(RiskTolerance.allCases, id: \.self) { type in
@@ -58,4 +58,9 @@ struct LastOnboardingPage: View {
             Spacer()
         }
     }
+}
+
+#Preview {
+    LastOnboardingPage(onFinish: dummyAction )
+        .environmentObject(RecommendCoinViewModel())
 }
