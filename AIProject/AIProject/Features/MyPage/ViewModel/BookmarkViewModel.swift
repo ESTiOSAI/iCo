@@ -127,10 +127,17 @@ final class BookmarkViewModel: ObservableObject {
             .split(separator: "-").last.map(String.init) ?? symbol
         return imageMap[key.uppercased()]
     }
+    
+    func imageProvider(for symbol: String) -> UIImage? {
+        guard let url = imageMap[symbol] else { return nil }
+        
+        return ImageLoader.shared.decodedCache.image(for: url as NSURL)
+    }
 
 // MARK: - 북마크 내보내기 관련
     /// scale: 해상도 (2x, 레티나 해상도)
-    func makeFullReportImage(scale: CGFloat = 2.0) -> UIImage? {
+    func makeFullReportImage(scale: CGFloat = 2.0) async -> UIImage? {
+        await ImageLoader.shared.prewarm(urls: imageMap.map(\.value))
         let coins: [BookmarkEntity]
             do {
                 coins = try manager.fetchAll()
@@ -142,7 +149,7 @@ final class BookmarkViewModel: ObservableObject {
         let targetWidth = currentScreenWidth()
 
         let exportView = ExportReportView(
-            dto: briefing, coins: coins, imageURLProvider: { [weak self] in self?.imageURL(for: $0) }
+            dto: briefing, coins: coins, imageProvider: { [weak self] in self?.imageProvider(for: $0) }
         )
             .frame(width: targetWidth, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -151,8 +158,8 @@ final class BookmarkViewModel: ObservableObject {
         )
     }
 
-    func makeFullReportPNGURL(scale: CGFloat = 2.0) -> URL? {
-        guard let image = makeFullReportImage(scale: scale),
+    func makeFullReportPNGURL(scale: CGFloat = 2.0) async -> URL? {
+        guard let image = await makeFullReportImage(scale: scale),
               let data = image.pngData() else { return nil }
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("briefing_report-\(UUID().uuidString).png")
@@ -163,9 +170,8 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
-
-    func makeFullReportPDF(scale: CGFloat = 2.0) -> URL? {
-        guard let image = makeFullReportImage(scale: scale) else { return nil }
+    func makeFullReportPDF(scale: CGFloat = 2.0) async -> URL? {
+        guard let image = await makeFullReportImage(scale: scale) else { return nil }
         let bounds = CGRect(origin: .zero, size: image.size)
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("briefing_report-\(UUID().uuidString).pdf")

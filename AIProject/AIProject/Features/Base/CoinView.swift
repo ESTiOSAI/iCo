@@ -10,17 +10,26 @@ import SwiftUI
 struct CoinView: View {
     let symbol: String
     let size: CGFloat
+    var prefetched: UIImage? = nil
     
     var body: some View {
-        CachedAsyncImage(resource: .symbol(symbol)) {
-            Text(String(symbol.prefix(1)))
-                .font(.system(size: size / 2))
-                .foregroundStyle(.aiCoAccent)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.aiCoBackgroundAccent)
-                .overlay(
-                    Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
-                )
+        Group {
+            if let prefetched {
+                Image(uiImage: prefetched)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                CachedAsyncImage(resource: .symbol(symbol)) {
+                    Text(String(symbol.prefix(1)))
+                        .font(.system(size: size / 2))
+                        .foregroundStyle(.aiCoAccent)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.aiCoBackgroundAccent)
+                        .overlay(
+                            Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
+                        )
+                }
+            }
         }
         .frame(width: size, height: size)
         .clipShape(Circle())
