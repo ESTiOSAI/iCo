@@ -23,9 +23,10 @@ struct CoinCell: View {
             HStack {
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName, searchTerm: searchTerm)
                     .frame(alignment: .leading)
+                    .layoutPriority(1)
                 
                 CoinPriceView(ticker: store)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .frame(alignment: .trailing)
             }
         }
         .id(coin.id)
@@ -47,7 +48,7 @@ fileprivate struct CoinMetaView: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(name.highlighted(searchTerm))
                     .lineLimit(2)
-                    .font(.system(size: 14))
+                    .font(.system(size: name.count < 8 ? 14 : 12))
                     .fontWeight(.bold)
                 
                 Text(symbol)
@@ -79,67 +80,56 @@ fileprivate struct CoinPriceView: View {
         }
     }
     
-    private var animationColor: Color {
-        switch ticker.snapshot.change {
-        case .rise: return themeManager.selectedTheme.positiveColor
-        case .even: return .clear
-        case .fall: return themeManager.selectedTheme.negativeColor
-        }
-    }
-    
     var body: some View {
         VStack(alignment: .trailing, spacing: 6) {
             HStack(spacing: 0) {
                 Text(ticker.snapshot.formatedRate)
-                .foregroundStyle(changeColor)
+                    .foregroundStyle(changeColor)
                 
-                ZStack(alignment: .trailing) {
-                    
-                    Text(ticker.snapshot.formatedPrice)
-                        .font(.system(size: 15))
-                        .monospacedDigit()
-                        .opacity(0)
-                        .measureWidth { w in
-                            priceWidth = w + pricePadding
-                        }
-                    
-                    Text(ticker.snapshot.formatedPrice)
-                        .frame(minWidth: priceWidth, alignment: .trailing)
+                Text(ticker.snapshot.formatedPrice)
+                    .frame(minWidth: priceWidth, alignment: .trailing)
                     .font(.system(size: 15))
-                }
-                .background {
-                    GeometryReader { proxy in
-                        Rectangle()
-                            .fill(.clear)
-                            .frame(width: proxy.size.width - pricePadding, height: 1)
-                            .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 0.7, cornerRadius:0.5)
-                            .offset(x: pricePadding, y: proxy.size.height + 1)
+                    .background {
+                        GeometryReader { proxy in
+                            Rectangle()
+                                .fill(.clear)
+                                .frame(width: proxy.size.width - pricePadding, height: 1)
+                                .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 0.7, cornerRadius:0.5)
+                                .offset(x: pricePadding, y: proxy.size.height + 1)
+                        }
                     }
-                }
             }
             .frame(alignment: .trailing)
             
-            ZStack(alignment: .trailing) {
-                Text(ticker.snapshot.formatedVolume)
+            HStack(spacing: 0) {
+                Text("거래")
                     .font(.system(size: 11))
-                    .monospacedDigit()
-                    .opacity(0)
-                    .measureWidth { w in
-                        volumeWidth = w + pricePadding
-                    }
-                
-                HStack(spacing: 0) {
-                    Text("거래")
-                        .font(.system(size: 11))
-                    Text(ticker.snapshot.formatedVolume)
-                        .frame(minWidth: volumeWidth, alignment: .trailing)
-                }
+                Text(ticker.snapshot.formatedVolume)
+                    .frame(minWidth: volumeWidth, alignment: .trailing)
             }
         }
         .font(.system(size: 12))
         .fontWeight(.medium)
         .foregroundStyle(.aiCoLabel)
         .frame(maxWidth: .infinity, alignment: .trailing)
+        .background {
+            VStack {
+                ZStack {
+                    Text(ticker.snapshot.formatedPrice)
+                        .font(.system(size: 15))
+                        .measureWidth { w in
+                            priceWidth = w + pricePadding
+                        }
+                    Text(ticker.snapshot.formatedVolume)
+                        .font(.system(size: 11))
+                        .measureWidth { w in
+                            volumeWidth = w + pricePadding
+                        }
+                }
+                .monospacedDigit()
+                .opacity(0)
+            }
+        }
     }
 }
 
