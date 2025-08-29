@@ -34,11 +34,12 @@ struct MarketView: View {
                 CoinListView(store: store, selectedCoinID: $selectedCoinID, searchText: $searchText)
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
-            }
-            .refreshable {
-                Task {
-                    await store.refresh()
-                }
+                
+                    .refreshable {
+                        Task {
+                            await store.refresh()
+                        }
+                    }
             }
             .onChange(of: searchText, { oldValue, newValue in
                 Task {
