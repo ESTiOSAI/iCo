@@ -24,7 +24,9 @@ struct BotMessageView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 34)
-                    .padding(6)
+                    .foregroundColor(colorScheme == .light ? .aiCoAccent : .aiCoLabel)
+                    .opacity(0.8)
+                    .padding(12)
                     .overlay {
                         Circle()
                             .strokeBorder(.accentGradient, lineWidth: 0.5)
@@ -33,7 +35,6 @@ struct BotMessageView: View {
                         Circle()
                             .fill(.aiCoBackgroundBlue)
                     }
-                    .foregroundColor(colorScheme == .light ? .aiCoAccent : .aiCoLabel)
                 Spacer()
             }
 

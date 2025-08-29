@@ -25,6 +25,7 @@ struct CommonPlaceholderView: View {
                 .frame(width: hSizeClass == .regular ? 200 : 130)
                 .padding(50)
                 .foregroundStyle(.aiCoLabelSecondary.opacity(colorScheme == .light ? 0.1 : 0.5))
+                .opacity(showLogo && colorScheme == .dark ? 1 : 0.8)
                 .background(.aiCoBackground)
                 .clipShape(.circle)
                 .overlay {
