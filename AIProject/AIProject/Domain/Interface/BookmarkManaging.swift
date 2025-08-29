@@ -25,7 +25,7 @@ protocol BookmarkManaging {
     func deleteAll() throws
 
     /// 현재 상태를 반전시키는 토글 메서드
-    /// - Returns: 토글 후 북마크 설정 상태 (true: 설정됨, false: 해제됨)
+    /// - Returns: 토글 후 북마크 관리 상태 (true: 설정됨, false: 해제됨)
     @discardableResult
     func toggle(coinID: String, coinKoreanName: String) throws -> Bool
 

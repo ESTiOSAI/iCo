@@ -21,7 +21,11 @@ struct CachedAsyncImage<Content: View>: View {
     @State private var image: UIImage?
     @State private var isLoading = false
     
-    init(resource: CoinResource, useCacheOnly: Bool = false, @ViewBuilder placeholder: () -> Content) {
+    init(
+        resource: CoinResource,
+        useCacheOnly: Bool = false,
+        @ViewBuilder placeholder: () -> Content
+    ) {
         self.resource = resource
         self.useCacheOnly = useCacheOnly
         self.placeholder = placeholder()
@@ -42,13 +46,16 @@ struct CachedAsyncImage<Content: View>: View {
         }
     }
 
-    @MainActor
     private func loadImage() async {
         guard !isLoading else { return }
         isLoading = true
         do {
             image = try await ImageLoader.shared.image(for: resource, useCacheOnly: useCacheOnly)
         } catch {
+            if let error = error as? URLError, error.code == .fileDoesNotExist {
+                // TODO: Retry fallback
+                print(error)
+            }
             image = nil
 //            print("이미지 로드 실패:", error.localizedDescription)
         }

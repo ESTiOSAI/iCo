@@ -196,7 +196,7 @@ struct BookmarkView: View {
                             nameOrder: $nameOrder,
                             priceOrder: $priceOrder,
                             volumeOrder: $volumeOrder,
-                            imageURLProvider: { vm.imageURL(for: $0) },
+                            imageProvider: { vm.imageProvider(for: $0) },
                             onDelete: { vm.deleteBookmark($0) }
                         )
                         .padding(16)
@@ -223,16 +223,20 @@ struct BookmarkView: View {
         }
         .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
             Button("이미지로 내보내기") {
-                if let url = vm.makeFullReportPNGURL(scale: 2.0) {
-                    sharingItems = [url]
-                    isShowingShareSheet = true
+                Task {
+                    if let url = await vm.makeFullReportPNGURL(scale: 2.0) {
+                        sharingItems = [url]
+                        isShowingShareSheet = true
+                    }
                 }
             }
 
             Button("PDF 내보내기") {
-                if let url = vm.makeFullReportPDF(scale: 2.0) {
-                    sharingItems = [url]
-                    isShowingShareSheet = true
+                Task {
+                    if let url = await vm.makeFullReportPDF(scale: 2.0) {
+                        sharingItems = [url]
+                        isShowingShareSheet = true
+                    }
                 }
             }
 
@@ -305,7 +309,7 @@ struct ActivityView: UIViewControllerRepresentable {
 struct ExportReportView: View {
     let dto: PortfolioBriefingDTO?
     let coins: [BookmarkEntity]
-    let imageURLProvider: (String) -> URL?
+    let imageProvider: (String) -> UIImage?
 
     @State private var selectedCategory: SortCategory? = .name
     @State private var nameOrder: SortOrder = .none
@@ -334,7 +338,7 @@ struct ExportReportView: View {
                 nameOrder: $nameOrder,
                 priceOrder: $priceOrder,
                 volumeOrder: $volumeOrder,
-                imageURLProvider: { _ in nil },
+                imageProvider: imageProvider,
                 onDelete: { _ in }
             )
             .padding(.horizontal, 16)
@@ -342,4 +346,14 @@ struct ExportReportView: View {
         }
         .padding(.top, 16)
     }
+}
+
+extension BookmarkView {
+    typealias CoinCache = NSCache<NSString, UIImage>
+    func exportBookmarkPNG(vm: BookmarkViewModel) async -> UIImage? {
+        let cache = CoinCache()
+        let symbols = vm.imageMap
+            return nil
+    }
+
 }

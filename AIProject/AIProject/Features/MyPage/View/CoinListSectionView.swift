@@ -14,7 +14,7 @@ struct CoinListSectionView: View {
     @Binding var priceOrder: SortOrder
     @Binding var volumeOrder: SortOrder
 
-    let imageURLProvider: (String) -> URL?
+    let imageProvider: (String) -> UIImage?
     let onDelete: (BookmarkEntity) -> Void
 
     var body: some View {
@@ -40,7 +40,7 @@ struct CoinListSectionView: View {
                 NavigationLink {
                     CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
                 } label: {
-                    CoinRowView(coin: coin, imageURL: imageURLProvider(coin.coinSymbol), onDelete: onDelete)
+                    CoinRowView(coin: coin, prefetched: imageProvider(coin.coinSymbol), onDelete: onDelete)
                 }
             }
         }
