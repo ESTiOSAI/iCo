@@ -54,7 +54,6 @@ struct ChatInputView: View {
             RoundedRectangle(cornerRadius: 30)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         }
-        .padding(.horizontal)
         .padding(.bottom, 10)
     }
 }

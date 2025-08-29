@@ -22,28 +22,31 @@ struct ChatBotView: View {
             VStack(spacing: 0) {
                 HeaderView(heading: "챗봇")
 
-                ChatScrollView(viewModel: viewModel) {
-                    LazyVStack(spacing: 20) {
-                        ForEach(viewModel.messages) { message in
-                            Group {
-                                if message.isUser {
-                                    UserMessageView(content: message.content)
-                                } else {
-                                    BotMessageView(message: message)
+                VStack(spacing: 0) {
+                    ChatScrollView(viewModel: viewModel) {
+                        LazyVStack(spacing: 20) {
+                            ForEach(viewModel.messages) { message in
+                                Group {
+                                    if message.isUser {
+                                        UserMessageView(content: message.content)
+                                    } else {
+                                        BotMessageView(message: message)
+                                    }
                                 }
+                                .id(message.id)
                             }
-                            .id(message.id)
                         }
+                        .frame(maxWidth: isPortrait && isPad ? proxy.size.width * 0.6 : .infinity)
+                        .padding(.horizontal, isPortrait && isPad ? 0 : 16)
                     }
-                    .frame(maxWidth: isPortrait && isPad ? proxy.size.width * 0.6 : .infinity)
-                    .padding(.horizontal, isPortrait && isPad ? 0 : 16)
-                }
-                .scrollIndicators(.hidden)
-                .frame(maxWidth: .infinity)
-                .background(.aiCoBackground)
+                    .scrollIndicators(.hidden)
+                    .frame(maxWidth: .infinity)
 
-                ChatInputView(viewModel: viewModel)
-                    .background(.aiCoBackground)
+                    ChatInputView(viewModel: viewModel)
+                        .frame(maxWidth: isPortrait && isPad ? proxy.size.width * 0.6 : .infinity)
+                        .padding(.horizontal, isPortrait && isPad ? 0 : 16)
+                }
+                .background(.aiCoBackground)
             }
             .frame(maxWidth: .infinity)
             .background(
