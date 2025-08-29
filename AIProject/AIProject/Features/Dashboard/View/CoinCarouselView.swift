@@ -104,7 +104,7 @@ struct CoinCarouselView: View {
             // 수동 스크롤일 경우
             handleManualScrolling(cardID: newValue)
         }
-        .navigationDestination(item: $selectedCoin) { coin in
+        .sheet(item: $selectedCoin) { coin in
             CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
         }
         .onAppear {
