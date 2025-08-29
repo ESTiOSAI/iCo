@@ -105,7 +105,18 @@ struct CoinCarouselView: View {
             handleManualScrolling(cardID: newValue)
         }
         .sheet(item: $selectedCoin) { coin in
-            CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
+            NavigationStack {
+                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL), isDashboard: true)
+                    .navigationTitle(coin.name)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            RoundedButton(imageName: "xmark") {
+                                selectedCoin = nil
+                            }
+                        }
+                    }
+            }
         }
         .onAppear {
             // 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 안전 코인을 붙이기
