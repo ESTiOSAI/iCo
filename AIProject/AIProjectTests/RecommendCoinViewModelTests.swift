@@ -25,7 +25,7 @@ struct AlanServiceStub: AlanAPIServiceProtocol {
     var delay: Duration = .zero
     var isError: Bool = false
 
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String) async throws -> [RecommendCoinDTO] {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [AIProject.RecommendCoinDTO] {
         if delay > .zero {
             try await Task.sleep(for: delay)
         }
