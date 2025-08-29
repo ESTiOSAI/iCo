@@ -107,9 +107,18 @@ struct CoinCarouselView: View {
         .sheet(item: $selectedCoin) { coin in
             NavigationStack {
                 CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL), isDashboard: true)
-                    .navigationTitle(coin.name)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
+                        ToolbarItem(placement: .principal) {
+                            HStack(spacing: 8) {
+                                Text(coin.name)
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(.aiCoLabel)
+                                Text(coin.id)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.aiCoLabelSecondary)
+                            }
+                        }
                         ToolbarItem(placement: .topBarTrailing) {
                             RoundedButton(imageName: "xmark") {
                                 selectedCoin = nil
