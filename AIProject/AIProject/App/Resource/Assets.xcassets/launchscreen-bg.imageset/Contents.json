@@ -15,7 +15,7 @@
       "scale" : "1x"
     },
     {
-      "filename" : "logo-light@2x.png",
+      "filename" : "background-image-light.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
@@ -26,7 +26,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "logo-dark@2x.png",
+      "filename" : "background-image-dark.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

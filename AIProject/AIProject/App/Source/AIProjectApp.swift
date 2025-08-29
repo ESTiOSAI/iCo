@@ -71,20 +71,15 @@ struct AIProjectApp: App {
 struct SplashScreenView: View {    
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [.aiCoBackgroundGradientProminent, .aiCoBackgroundGradientLight],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .edgesIgnoringSafeArea(.all)
+            Image("launchscreen-bg")
+                .resizable()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
             
             Image("logo")
-                .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundStyle(.white)
-                .frame(width: 200, height: 200)
-                .shadow(radius: 10)
+                .frame(height: 100)
         }
     }
 }
