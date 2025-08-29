@@ -8,16 +8,21 @@
 import SwiftUI
 
 struct OnboardingPageView: View {
+    var imageName: String
+    @Binding var isLandscape: Bool
     
     var body: some View {
         VStack {
-            Text("시작해볼까요?")
-                .font(.title)
-            
-            
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(
+                    maxWidth: OnboardingConst.maxWidth,
+                    maxHeight: isLandscape ? OnboardingConst.maxHeight : .infinity
+                )
         }
     }
 }
 #Preview {
-    OnboardingPageView()
+    OnboardingPageView(imageName: "onboarding-1", isLandscape: .constant(true))
 }
