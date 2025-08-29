@@ -151,8 +151,8 @@ struct BookmarkView: View {
                         RoundedButton(title: "전체 삭제", imageName: "trash") {
                             showDeleteConfirm = true
                         }
-                        .disabled(isExportDisabled)
-                        .opacity(isExportDisabled ? 0.6 : 1.0)
+                        .disabled(bookmarks.isEmpty)
+                        .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         .alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                             Button("삭제", role: .destructive) {
                                 vm.deleteAllBookmarks()
@@ -179,12 +179,12 @@ struct BookmarkView: View {
                         // 북마크한 코인이 없을 시 내보내기 버튼 숨기기
                         if !bookmarks.isEmpty {
                             RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
-                                guard !isExportDisabled else { return }
+                                guard !bookmarks.isEmpty else { return }
                                 showingExportOptions = true
                                 
                             }
-                            .disabled(isExportDisabled)
-                            .opacity(isExportDisabled ? 0.6 : 1.0)
+                            .disabled(bookmarks.isEmpty)
+                            .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -205,6 +205,7 @@ struct BookmarkView: View {
                 }
             }
             .task {
+                vm.cancelTask()
                 guard !bookmarks.isEmpty else {
                     vm.briefing = nil
                     vm.imageMap = [:]
@@ -303,7 +304,7 @@ struct ActivityView: UIViewControllerRepresentable {
 
 /// 내보내기 전용 뷰
 struct ExportReportView: View {
-    let dto: PortfolioBriefingDTO
+    let dto: PortfolioBriefingDTO?
     let coins: [BookmarkEntity]
     let imageURLProvider: (String) -> URL?
 
@@ -315,16 +316,18 @@ struct ExportReportView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // 브리핑
-            BriefingSectionView(briefing: dto)
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.aiCoBackgroundAccent)
-                        .overlay(RoundedRectangle(cornerRadius: 20)
-                            .strokeBorder(.accentGradient, lineWidth: 0.5))
-                )
-                .cornerRadius(20)
-                .padding(.horizontal, 16)
+            if let dto {
+                BriefingSectionView(briefing: dto)
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.aiCoBackgroundAccent)
+                            .overlay(RoundedRectangle(cornerRadius: 20)
+                                .strokeBorder(.accentGradient, lineWidth: 0.5))
+                    )
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
+            }
 
             CoinListSectionView(
                 sortedCoins: coins,
