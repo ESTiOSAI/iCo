@@ -168,7 +168,7 @@ struct BookmarkView: View {
                     // 북마크한 코인이 없을 시 플레이스홀더 뷰 보여주기
                     if sortedCoins.isEmpty {
                         CommonPlaceholderView(imageName: "placeholder-no-coin", text: "아직 북마크한 코인이 없어요\n북마크를 등록해 아이코의 AI리포트를 받아보세요")
-                            .padding(.vertical, 100)
+                            .padding(.vertical, 50)
                     }
                     
                     HStack(spacing: 16) {
@@ -187,7 +187,6 @@ struct BookmarkView: View {
                             .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         }
                     }
-                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 16)
                     
                     if !sortedCoins.isEmpty {

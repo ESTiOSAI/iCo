@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CommonPlaceholderView: View {
+    @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.colorScheme) var colorScheme
     
     var imageName: String
@@ -21,7 +22,7 @@ struct CommonPlaceholderView: View {
                 .renderingMode(showLogo ? .template : nil)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 200)
+                .frame(width: hSizeClass == .regular ? 200 : 130)
                 .padding(50)
                 .foregroundStyle(.aiCoLabelSecondary.opacity(colorScheme == .light ? 0.1 : 0.5))
                 .background(.aiCoBackground)
