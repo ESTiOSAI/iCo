@@ -8,16 +8,22 @@
 import SwiftUI
 
 struct CommonPlaceholderView: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     var imageName: String
     var text: String
     
     var body: some View {
+        var showLogo: Bool { imageName == "logo" }
+        
         ContentUnavailableView {
             Image(imageName)
+                .renderingMode(showLogo ? .template : nil)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 120)
+                .frame(width: 200)
                 .padding(50)
+                .foregroundStyle(.aiCoLabelSecondary.opacity(colorScheme == .light ? 0.1 : 0.5))
                 .background(.aiCoBackground)
                 .clipShape(.circle)
                 .overlay {

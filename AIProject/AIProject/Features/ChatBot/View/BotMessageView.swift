@@ -10,6 +10,7 @@ import SwiftUI
 struct BotMessageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var bounce = false
 
@@ -18,17 +19,21 @@ struct BotMessageView: View {
     var body: some View {
         HStack {
             VStack {
-                Image(systemName: "swift")
-                    .foregroundStyle(.aiCoAccent)
-                    .padding(8)
+                Image("logo")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 34)
+                    .padding(6)
                     .overlay {
                         Circle()
                             .strokeBorder(.accentGradient, lineWidth: 0.5)
                     }
                     .background {
                         Circle()
-                            .fill(.aiCoBackgroundAccent)
+                            .fill(.aiCoBackgroundBlue)
                     }
+                    .foregroundColor(colorScheme == .light ? .aiCoAccent : .aiCoLabel)
                 Spacer()
             }
 
@@ -42,14 +47,14 @@ struct BotMessageView: View {
                     Text(message.content)
                 }
             }
-            .foregroundStyle(message.isError ? .aiCoPositive : .aiCoLabel)
+            .foregroundStyle(.aiCoLabel)
             .font(.system(size: 14))
             .lineSpacing(6)
             .padding(.vertical, 15)
             .padding(.horizontal, 18)
             .background {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
-                    .fill(.aiCoBackgroundAccent)
+                    .fill(.aiCoBackgroundBlue)
             }
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
@@ -60,4 +65,10 @@ struct BotMessageView: View {
             Spacer()
         }
     }
+}
+
+#Preview {
+    BotMessageView(
+        message: ChatMessage(content: "ddd", isUser: true)
+    )
 }

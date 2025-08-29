@@ -68,16 +68,23 @@ struct AIProjectApp: App {
     }
 }
 
-struct SplashScreenView: View {
+struct SplashScreenView: View {    
     var body: some View {
         ZStack {
-            Color.accentColor
-                .edgesIgnoringSafeArea(.all)
+            LinearGradient(
+                colors: [.aiCoBackgroundGradientProminent, .aiCoBackgroundGradientLight],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .edgesIgnoringSafeArea(.all)
             
             Image("logo")
+                .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
+                .foregroundStyle(.white)
                 .frame(width: 200, height: 200)
+                .shadow(radius: 10)
         }
     }
 }
