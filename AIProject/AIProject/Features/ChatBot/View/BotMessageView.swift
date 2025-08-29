@@ -10,6 +10,7 @@ import SwiftUI
 struct BotMessageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
+    @Environment(\.colorScheme) var colorScheme
 
     @State private var bounce = false
 
@@ -30,9 +31,9 @@ struct BotMessageView: View {
                     }
                     .background {
                         Circle()
-                            .fill(.aiCoBackgroundAccent)
+                            .fill(.aiCoBackgroundBlue)
                     }
-                    .foregroundColor(.accent)
+                    .foregroundColor(colorScheme == .light ? .aiCoAccent : .aiCoLabel)
                 Spacer()
             }
 
@@ -53,7 +54,7 @@ struct BotMessageView: View {
             .padding(.horizontal, 18)
             .background {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
-                    .fill(.aiCoBackgroundAccent)
+                    .fill(.aiCoBackgroundBlue)
             }
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)

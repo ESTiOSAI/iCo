@@ -10,6 +10,7 @@ import SwiftUI
 struct ChatBotView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
+    @Environment(\.colorScheme) var colorScheme
 
     @StateObject private var viewModel = ChatBotViewModel()
 
@@ -46,7 +47,7 @@ struct ChatBotView: View {
                         .frame(maxWidth: isPortrait && isPad ? proxy.size.width * 0.6 : .infinity)
                         .padding(.horizontal, isPortrait && isPad ? 0 : 16)
                 }
-                .background(.aiCoBackground)
+                .background(.aiCoBackground.opacity(colorScheme == .light ? 1 : 0.5))
             }
             .frame(maxWidth: .infinity)
             .background(
