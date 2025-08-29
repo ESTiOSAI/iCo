@@ -31,6 +31,7 @@ struct MainTabView: View {
             }
         }
         .environment(router)
+        .transaction { $0.animation = nil }
     }
     
     @ViewBuilder func makeTab(_ tab: TabFeature) -> some View {
