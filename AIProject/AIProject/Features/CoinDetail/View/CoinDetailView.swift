@@ -20,10 +20,12 @@ struct CoinDetailView: View {
     
     let coin: Coin
     let onDismiss: (() -> Void)?
+    let isDashboard: Bool
     
-    init(coin: Coin, onDismiss: (() -> Void)? = nil) {
+    init(coin: Coin, onDismiss: (() -> Void)? = nil, isDashboard: Bool = false) {
         self.coin = coin
         self.onDismiss = onDismiss
+        self.isDashboard = isDashboard
         _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
@@ -35,20 +37,21 @@ struct CoinDetailView: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         // 헤더
-                        HeaderView(
-                            heading: coin.koreanName,
-                            coinSymbol: coin.coinSymbol,
-                            showBackButton: true) {
-                                if let onDismiss = onDismiss {
-                                    onDismiss()
-                                } else {
-                                    dismiss()
+                        if !isDashboard {
+                            HeaderView(
+                                heading: coin.koreanName,
+                                coinSymbol: coin.coinSymbol,
+                                showBackButton: true) {
+                                    if let onDismiss = onDismiss {
+                                        onDismiss()
+                                    } else {
+                                        dismiss()
+                                    }
                                 }
-                            }
+                        }
                         
                         VStack(spacing: 16) {
                             tabButtons
-                            
                             content(containerHeight: containerHeight)
                         }
                         .padding(.horizontal, 16)
@@ -81,12 +84,15 @@ struct CoinDetailView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            SafeAreaBackgroundView()
+            
+            if !isDashboard {
+                SafeAreaBackgroundView()
+            }
         }
         .onDisappear {
             reportViewModel.cancelAll()
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar(isDashboard ? .visible : .hidden, for: .navigationBar)
         .interactiveSwipeBackEnabled()
     }
 }
