@@ -19,13 +19,9 @@ struct CoinDetailView: View {
     @State private var keyboardObserver: NSObjectProtocol?
     
     let coin: Coin
-    let onDismiss: (() -> Void)?
-    let isDashboard: Bool
     
-    init(coin: Coin, onDismiss: (() -> Void)? = nil, isDashboard: Bool = false) {
+    init(coin: Coin) {
         self.coin = coin
-        self.onDismiss = onDismiss
-        self.isDashboard = isDashboard
         _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
@@ -37,18 +33,6 @@ struct CoinDetailView: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         // 헤더
-                        if !isDashboard {
-                            HeaderView(
-                                heading: coin.koreanName,
-                                coinSymbol: coin.coinSymbol,
-                                showBackButton: true) {
-                                    if let onDismiss = onDismiss {
-                                        onDismiss()
-                                    } else {
-                                        dismiss()
-                                    }
-                                }
-                        }
                         
                         VStack(spacing: 16) {
                             tabButtons
@@ -84,15 +68,15 @@ struct CoinDetailView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            
-            if !isDashboard {
-                SafeAreaBackgroundView()
-            }
+//            
+//            if !isDashboard {
+//                SafeAreaBackgroundView()
+//            }
         }
         .onDisappear {
             reportViewModel.cancelAll()
         }
-        .toolbar(isDashboard ? .visible : .hidden, for: .navigationBar)
+//        .toolbar(isDashboard ? .visible : .hidden, for: .navigationBar)
         .interactiveSwipeBackEnabled()
     }
 }

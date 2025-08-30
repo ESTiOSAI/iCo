@@ -25,6 +25,9 @@ struct AIProjectApp: App {
     
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var recommendCoinViewModel = RecommendCoinViewModel()
+    @State private var coinStore: CoinStore = .init(
+        coinService: DefaultCoinService(network: NetworkClient())
+    )
     
     private let coinService: UpBitAPIService = UpBitAPIService()
     private let tickerService: RealTimeTickerProvider = UpbitTickerService()
@@ -35,20 +38,14 @@ struct AIProjectApp: App {
         WindowGroup {
             ZStack {
                 if isLoading {
-                    SplashScreenView()
+                    SplashScreenView(isLoading: $isLoading)
                         .transition(.asymmetric(
                           insertion: .identity,
                           removal: .opacity.animation(.easeOut(duration: 0.3))
                         ))
                         .zIndex(1)
-                        .task {
-                            if hasSeenOnboarding { recommendCoinViewModel.loadRecommendCoin() }
-                            
-                            try? await Task.sleep(nanoseconds: 3000_000_000)
-                            await MainActor.run {
-                                isLoading = false
-                            }
-                        }
+                        .environmentObject(recommendCoinViewModel)
+                        .environment(coinStore)
                 } else {
                     if hasSeenOnboarding {
                         MainTabView(
@@ -58,6 +55,7 @@ struct AIProjectApp: App {
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environmentObject(themeManager)
                             .environmentObject(recommendCoinViewModel)
+                            .environment(coinStore)
                     } else {
                         OnboardingView()
                             .environmentObject(recommendCoinViewModel)
@@ -68,7 +66,12 @@ struct AIProjectApp: App {
     }
 }
 
-struct SplashScreenView: View {    
+struct SplashScreenView: View {
+    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
+    @Binding var isLoading: Bool
+    @EnvironmentObject var recommendCoinViewModel: RecommendCoinViewModel
+    @Environment(CoinStore.self) var coinStore
+    
     var body: some View {
         ZStack {
             Image("launchscreen-bg")
@@ -80,6 +83,14 @@ struct SplashScreenView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(height: 100)
+        }
+        .task {
+            if hasSeenOnboarding { recommendCoinViewModel.loadRecommendCoin() }
+            Task { await coinStore.loadCoins() }
+            try? await Task.sleep(for: .seconds(3))
+            await MainActor.run {
+                isLoading = false
+            }
         }
     }
 }

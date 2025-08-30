@@ -9,6 +9,8 @@ import SwiftUI
 
 struct CoinListSectionView: View {
     let sortedCoins: [BookmarkEntity]
+    @Environment(CoinStore.self) var coinStore
+    
     @Binding var selectedCategory: SortCategory?
     @Binding var nameOrder: SortOrder
     @Binding var priceOrder: SortOrder
@@ -37,10 +39,22 @@ struct CoinListSectionView: View {
             .foregroundStyle(.aiCoLabel)
 
             ForEach(sortedCoins, id: \.coinID) { coin in
-                NavigationLink {
-                    CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
-                } label: {
-                    CoinRowView(coin: coin, prefetched: imageProvider(coin.coinSymbol), onDelete: onDelete)
+                if let meta = coinStore.coins[coin.coinID] {
+                    NavigationLink {
+                        VStack(spacing: 0) {
+                            HeaderView(
+                                heading: meta.koreanName,
+                                coinSymbol: meta.coinSymbol,
+                                showBackButton: true
+                            )
+                            .toolbar(.hidden, for: .navigationBar)
+                            
+                            CoinDetailView(coin: meta)
+                                .id(coin.id)
+                        }
+                    } label: {
+                        CoinRowView(coin: coin, prefetched: imageProvider(coin.coinSymbol), onDelete: onDelete)
+                    }
                 }
             }
         }
