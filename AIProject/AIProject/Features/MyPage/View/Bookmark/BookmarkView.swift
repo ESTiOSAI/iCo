@@ -154,6 +154,7 @@ struct BookmarkView: View {
                     .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                     .alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                         Button("삭제", role: .destructive) {
+                            vm.cancelTask()
                             vm.deleteAllBookmarks()
                         }
                         Button("취소", role: .cancel) { }
