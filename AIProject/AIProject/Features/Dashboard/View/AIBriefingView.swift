@@ -71,7 +71,7 @@ struct AIBriefingView: View {
                 },
                 content: { Text($0.summary.byCharWrapping) }
             )
-            .frame(height: maxHeight)
+            .frame(height: max(maxHeight, 250))
         }
     }
 }

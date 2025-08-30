@@ -113,57 +113,116 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     }
 }
 
-#Preview() {
+#Preview("둘 중 더 큰 높이로 적용") {
+    @Previewable @Environment(\.horizontalSizeClass) var hSizeClass
     @Previewable @State var maxHeight: CGFloat = 0
     
-    HStack {
-        ReportSectionView(
-            data: ReportSectionData<String>(
-                id: "success",
-                icon: "chart.line.uptrend.xyaxis",
-                title: "시장 요약",
-                state: .success("리플(XRP)이 시카고상품거래소(CME)에서 미결제약정 10억 달러를 기록하며 가격이 폭등하고, 바이낸스에 대규모 스테이블코인이 유입되면서 암호화폐 시장에 반전 조짐이 나타나고 있습니다."),
-                timestamp: Date(),
-                onCancel: {},
-                onRetry: {}
-            ),
-            trailing: { value in
-                Button(action: { UIPasteboard.general.string = value }) {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 14, weight: .semibold))
+    ScrollView {
+        let content = Group {
+            ReportSectionView(
+                data: ReportSectionData<String>(
+                    id: "success",
+                    icon: "chart.line.uptrend.xyaxis",
+                    title: "시장 요약",
+                    state: .success("짧은 글"),
+                    timestamp: Date(),
+                    onCancel: {},
+                    onRetry: {}
+                ),
+                trailing: { value in
+                    Button(action: { UIPasteboard.general.string = value }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("내용 복사")
+                },
+                content: { value in
+                    Text(value)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("내용 복사")
-            },
-            content: { value in
-                Text(value)
-            }
-        )
-        .frame(height: maxHeight)
+            )
+            .frame(height: max(maxHeight, 250))
+            
+            ReportSectionView(
+                data: ReportSectionData<String>(
+                    id: "success",
+                    icon: "chart.line.uptrend.xyaxis",
+                    title: "시장 요약",
+                    state: .success("긴 글. 리플(XRP)이 시카고상품거래소(CME)에서 미결제약정 10억 달러를 기록하며 가격이 폭등하고, 바이낸스에 대규모 스테이블코인이 유입되면서 암호화폐 시장에 반전 조짐이 나타나고 있습니다. 다만, 대형 고래들의 매각 활동으로 인해 시장이 갑작스러운 매도세로 돌아서면서 투자자들이 불안해하고 있으며, 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 리플(XRP)이 시카고상품거래소(CME)에서 미결제약정 10억 달러를 기록하며 가격이 폭등하고, 바이낸스에 대규모 스테이블코인이 유입되면서 암호화폐 시장에 반전 조짐이 나타나고 있습니다. 다만, 대형 고래들의 매각 활동으로 인해 시장이 갑작스러운 매도세로 돌아서면서 투자자들이 불안해하고 있으며, 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다."),
+                    timestamp: Date(),
+                    onCancel: {},
+                    onRetry: {}
+                ),
+                trailing: { value in
+                    Button(action: { UIPasteboard.general.string = value }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("내용 복사")
+                },
+                content: { value in
+                    Text(value)
+                }
+            )
+            .frame(height: max(maxHeight, 250))
+        }
         
-        ReportSectionView(
-            data: ReportSectionData<String>(
-                id: "success",
-                icon: "chart.line.uptrend.xyaxis",
-                title: "시장 요약",
-                state: .success("리플(XRP)이 시카고상품거래소(CME)에서 미결제약정 10억 달러를 기록하며 가격이 폭등하고, 바이낸스에 대규모 스테이블코인이 유입되면서 암호화폐 시장에 반전 조짐이 나타나고 있습니다. 다만, 대형 고래들의 매각 활동으로 인해 시장이 갑작스러운 매도세로 돌아서면서 투자자들이 불안해하고 있으며, 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. "),
-                timestamp: Date(),
-                onCancel: {},
-                onRetry: {}
-            ),
-            trailing: { value in
-                Button(action: { UIPasteboard.general.string = value }) {
-                    Image(systemName: "doc.on.doc")
-                        .font(.system(size: 14, weight: .semibold))
+        if hSizeClass == .regular {
+            HStack { content }
+        } else {
+            VStack { content }
+        }
+        
+    }
+    .padding(.horizontal, 16)
+    .onPreferenceChange(HeightPreferenceKey.self) { value in
+        maxHeight = value
+    }
+}
+
+#Preview("최소 높이 적용") {
+    @Previewable @Environment(\.horizontalSizeClass) var hSizeClass
+    @Previewable @State var maxHeight: CGFloat = 0
+    
+    ScrollView {
+        let content = ReportSectionView(
+                data: ReportSectionData<String>(
+                    id: "success",
+                    icon: "chart.line.uptrend.xyaxis",
+                    title: "시장 요약",
+                    state: .success("짧은 글"),
+                    timestamp: Date(),
+                    onCancel: {},
+                    onRetry: {}
+                ),
+                trailing: { value in
+                    Button(action: { UIPasteboard.general.string = value }) {
+                        Image(systemName: "doc.on.doc")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("내용 복사")
+                },
+                content: { value in
+                    Text(value)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("내용 복사")
-            },
-            content: { value in
-                Text(value)
+            )
+            .frame(height: max(maxHeight, 250))
+        
+        
+        if hSizeClass == .regular {
+            HStack {
+                content
+                content
             }
-        )
-        .frame(height: maxHeight)
+        } else {
+            VStack {
+                content
+                content
+            }
+        }
+        
     }
     .padding(.horizontal, 16)
     .onPreferenceChange(HeightPreferenceKey.self) { value in
