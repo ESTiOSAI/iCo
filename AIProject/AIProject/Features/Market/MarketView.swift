@@ -14,6 +14,7 @@ struct MarketView: View {
     @State private var searchText: String = ""
     @State private var selectedCoinID: CoinID?
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @Environment(\.horizontalSizeClass) var hSizeClass
     
     @FetchRequest(
         fetchRequest: SearchRecordEntity.recent(),
@@ -55,11 +56,17 @@ struct MarketView: View {
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
-                CoinDetailView(coin: coin) {
-                    self.selectedCoinID = nil
-                }
-                    .id(coin.id)
+                VStack(spacing: 0) {
+                    HeaderView(
+                        heading: coin.koreanName,
+                        coinSymbol: coin.coinSymbol,
+                        showBackButton: hSizeClass == .regular ? false : true
+                    )
                     .toolbar(.hidden, for: .navigationBar)
+                    
+                    CoinDetailView(coin: coin)
+                    .id(coin.id)
+                }
                 
             } else {
                 CommonPlaceholderView(imageName: "logo", text: "조회할 코인을 선택하세요")

@@ -105,26 +105,24 @@ struct CoinCarouselView: View {
             handleManualScrolling(cardID: newValue)
         }
         .sheet(item: $selectedCoin) { coin in
-            NavigationStack {
-                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL), isDashboard: true)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .principal) {
-                            HStack(spacing: 8) {
-                                Text(coin.name)
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(.aiCoLabel)
-                                Text(coin.id)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(.aiCoLabelSecondary)
-                            }
-                        }
-                        ToolbarItem(placement: .topBarTrailing) {
-                            RoundedButton(imageName: "xmark") {
-                                selectedCoin = nil
-                            }
-                        }
+            
+            VStack(spacing: 0) {
+                ZStack(alignment: .center) {
+                    HeaderView(
+                        heading: coin.name,
+                        coinSymbol: coin.id,
+                        showBackButton: false
+                    )
+                    .toolbar(.hidden, for: .navigationBar)
+                    
+                    RoundedButton(imageName: "xmark") {
+                        selectedCoin = nil
                     }
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding()
+                }
+                
+                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
             }
         }
         .onAppear {
