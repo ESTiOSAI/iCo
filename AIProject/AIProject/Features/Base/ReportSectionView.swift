@@ -21,7 +21,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     let data: ReportSectionData<Value>
     @ViewBuilder var trailing: (Value) -> Trailing
     @ViewBuilder var content: (Value) -> Content
-
+    
     private let cornerRadius: CGFloat = 20
     
     // No-trailing initializer
@@ -33,7 +33,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
         self.trailing = { _ in EmptyView() }
         self.content = content
     }
-
+    
     // Trailing initializer
     init(
         data: ReportSectionData<Value>,
@@ -44,7 +44,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
         self.trailing = trailing
         self.content = content
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header
@@ -52,18 +52,18 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 Image(systemName: data.icon)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(.aiCoAccent)
-
+                
                 Text(data.title)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.aiCoLabel)
-
+                
                 Spacer()
-
+                
                 if case let .success(value) = data.state {
                     trailing(value)
                 }
             }
-
+            
             // Content
             Group {
                 switch data.state {
@@ -72,12 +72,23 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                         data.onCancel()
                     }
                 case .success(let value):
-                    content(value)
-                        .font(.system(size: 14))
-                        .foregroundStyle(.aiCoLabel)
-                        .lineSpacing(6)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxHeight: .infinity, alignment: .top)
+                    ViewThatFits(in: .vertical) {
+                        content(value)
+                            .font(.system(size: 14))
+                            .foregroundStyle(.aiCoLabel)
+                            .lineSpacing(6)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        ScrollView {
+                            content(value)
+                                .font(.system(size: 14))
+                                .foregroundStyle(.aiCoLabel)
+                                .lineSpacing(6)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.trailing, 2)
+                        }
+                        .scrollIndicators(.hidden)
+                    }
                     
                     if let ts = data.timestamp {
                         TimestampWithRefreshButtonView(timestamp: ts) {
@@ -104,4 +115,31 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
     }
+}
+
+#Preview() {
+    ReportSectionView(
+        data: ReportSectionData<String>(
+            id: "success",
+            icon: "chart.line.uptrend.xyaxis",
+            title: "시장 요약",
+            state: .success("리플(XRP)이 시카고상품거래소(CME)에서 미결제약정 10억 달러를 기록하며 가격이 폭등하고, 바이낸스에 대규모 스테이블코인이 유입되면서 암호화폐 시장에 반전 조짐이 나타나고 있습니다. 다만, 대형 고래들의 매각 활동으로 인해 시장이 갑작스러운 매도세로 돌아서면서 투자자들이 불안해하고 있으며, 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. 비트코인이 11만 달러 저지선을 이탈하며 공포가 확산되고 있습니다. "),
+            timestamp: Date(),
+            onCancel: {},
+            onRetry: {}
+        ),
+        trailing: { value in
+            Button(action: { UIPasteboard.general.string = value }) {
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 14, weight: .semibold))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("내용 복사")
+        },
+        content: { value in
+            Text(value)
+        }
+    )
+    .padding(.horizontal, 16)
+    .frame(height: 320)
 }
