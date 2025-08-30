@@ -10,6 +10,7 @@ import MessageUI
 
 struct MyPageView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(CoinStore.self) var coinStore
     @State private var selection: MyPageMenu? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showMail = false
@@ -27,7 +28,7 @@ struct MyPageView: View {
                         HeaderView(heading: selection.title, showBackButton: hSizeClass == .compact)
                         switch selection {
                         case .bookmark:
-                            BookmarkView()
+                            BookmarkView(coinStore: coinStore)
                         case .themeSet:
                             ThemeView()
                         case .feedback:

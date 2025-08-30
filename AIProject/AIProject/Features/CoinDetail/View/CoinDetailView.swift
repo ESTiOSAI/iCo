@@ -68,15 +68,10 @@ struct CoinDetailView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-//            
-//            if !isDashboard {
-//                SafeAreaBackgroundView()
-//            }
         }
         .onDisappear {
             reportViewModel.cancelAll()
         }
-//        .toolbar(isDashboard ? .visible : .hidden, for: .navigationBar)
         .interactiveSwipeBackEnabled()
     }
 }

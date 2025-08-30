@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CoinListSectionView: View {
     let sortedCoins: [BookmarkEntity]
+    
     @Environment(CoinStore.self) var coinStore
     
     @Binding var selectedCategory: SortCategory?

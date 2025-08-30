@@ -90,15 +90,6 @@ fileprivate struct CoinPriceView: View {
                     .frame(minWidth: priceWidth, alignment: .trailing)
                     .font(.system(size: 15))
                     .blinkUnderlineOnChange(ticker.snapshot.price)
-//                .offset(y: proxy.size.height + 1)
-//                    .background {
-//                        GeometryReader { proxy in
-//                            Rectangle()
-//                                .fill(.clear)
-//                                .frame(width: proxy.size.width, height: 1)
-//                                
-//                        }
-//                    }
             }
             .frame(alignment: .trailing)
             
