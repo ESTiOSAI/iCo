@@ -15,6 +15,7 @@ struct AIBriefingView: View {
     @Environment(\.verticalSizeClass) var vSizeClass
     @EnvironmentObject var themeManager: ThemeManager
     @StateObject private var viewModel: InsightViewModel
+    @State private var maxHeight: CGFloat = 0
     
     private var isPadLayout: Bool {
         hSizeClass == .regular && vSizeClass == .regular
@@ -39,8 +40,16 @@ struct AIBriefingView: View {
                     HStack(spacing: 16) {
                         briefingView
                     }
+                    .onPreferenceChange(HeightPreferenceKey.self) { value in
+                        maxHeight = value
+                    }
                 } else {
-                    briefingView
+                    VStack(spacing: 16) {
+                        briefingView
+                    }
+                    .onPreferenceChange(HeightPreferenceKey.self) { value in
+                        maxHeight = value
+                    }
                 }
                 
                 FearGreedView()
@@ -62,7 +71,7 @@ struct AIBriefingView: View {
                 },
                 content: { Text($0.summary.byCharWrapping) }
             )
-            .frame(height: 280)
+            .frame(height: maxHeight)
         }
     }
 }

@@ -72,24 +72,12 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                         data.onCancel()
                     }
                 case .success(let value):
-                    ViewThatFits(in: .vertical) {
-                        content(value)
-                            .font(.system(size: 14))
-                            .foregroundStyle(.aiCoLabel)
-                            .lineSpacing(6)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxHeight: .infinity, alignment: .top)
-                        
-                        ScrollView {
-                            content(value)
-                                .font(.system(size: 14))
-                                .foregroundStyle(.aiCoLabel)
-                                .lineSpacing(6)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(.trailing, 2)
-                        }
-                        .scrollIndicators(.hidden)
-                    }
+                    content(value)
+                        .font(.system(size: 14))
+                        .foregroundStyle(.aiCoLabel)
+                        .lineSpacing(6)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxHeight: .infinity, alignment: .top)
                     
                     if let ts = data.timestamp {
                         TimestampWithRefreshButtonView(timestamp: ts) {
@@ -115,11 +103,20 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             RoundedRectangle(cornerRadius: cornerRadius)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .preference(key: HeightPreferenceKey.self,
+                                value: geo.size.height)
+            }
+        )
     }
 }
 
 #Preview() {
-    VStack {
+    @Previewable @State var maxHeight: CGFloat = 0
+    
+    HStack {
         ReportSectionView(
             data: ReportSectionData<String>(
                 id: "success",
@@ -142,7 +139,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 Text(value)
             }
         )
-        .frame(height: 320)
+        .frame(height: maxHeight)
         
         ReportSectionView(
             data: ReportSectionData<String>(
@@ -166,7 +163,10 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 Text(value)
             }
         )
-        .frame(height: 320)
+        .frame(height: maxHeight)
     }
     .padding(.horizontal, 16)
+    .onPreferenceChange(HeightPreferenceKey.self) { value in
+        maxHeight = value
+    }
 }
