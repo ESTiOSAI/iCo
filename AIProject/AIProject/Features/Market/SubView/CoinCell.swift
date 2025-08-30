@@ -51,7 +51,7 @@ fileprivate struct CoinMetaView: View {
                     .font(.system(size: name.count < 8 ? 14 : 12))
                     .fontWeight(.bold)
                 
-                Text(symbol)
+                Text(symbol.highlighted(searchTerm))
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
@@ -89,15 +89,16 @@ fileprivate struct CoinPriceView: View {
                 Text(ticker.snapshot.formatedPrice)
                     .frame(minWidth: priceWidth, alignment: .trailing)
                     .font(.system(size: 15))
-                    .background {
-                        GeometryReader { proxy in
-                            Rectangle()
-                                .fill(.clear)
-                                .frame(width: proxy.size.width - pricePadding, height: 1)
-                                .blinkBorderOnChange(ticker.snapshot.price, duration: .milliseconds(400), color: .aiCoLabel, lineWidth: 0.7, cornerRadius:0.5)
-                                .offset(x: pricePadding, y: proxy.size.height + 1)
-                        }
-                    }
+                    .blinkUnderlineOnChange(ticker.snapshot.price)
+//                .offset(y: proxy.size.height + 1)
+//                    .background {
+//                        GeometryReader { proxy in
+//                            Rectangle()
+//                                .fill(.clear)
+//                                .frame(width: proxy.size.width, height: 1)
+//                                
+//                        }
+//                    }
             }
             .frame(alignment: .trailing)
             
@@ -127,8 +128,10 @@ fileprivate struct CoinPriceView: View {
                         }
                 }
                 .monospacedDigit()
-                .opacity(0)
+                .hidden()
             }
+            .accessibilityHidden(true) // 최적화를 위해 사용
+            .allowsHitTesting(false)
         }
     }
 }
