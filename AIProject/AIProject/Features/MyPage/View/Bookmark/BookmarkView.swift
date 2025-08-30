@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookmarkView: View {
-    @StateObject var vm = BookmarkViewModel()
+    @StateObject private var vm: BookmarkViewModel
     
     @State private var selectedCategory: SortCategory? = nil
     @State private var nameOrder: SortOrder = .none
@@ -21,6 +21,12 @@ struct BookmarkView: View {
     @State private var showingExportOptions = false
     @State private var showDeleteConfirm = false
     @State private var didCopy = false
+    
+    @State private var shareURL: IdentifiableURL?
+    
+    init(coinStore: CoinStore) {
+        _vm = StateObject(wrappedValue: BookmarkViewModel(coinStore: coinStore))
+    }
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
@@ -178,6 +184,20 @@ struct BookmarkView: View {
                         }
                         .disabled(bookmarks.isEmpty)
                         .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
+                        .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
+                            
+                            ShareLink("이미지로 내보내기", item: ShareablePNGReport{
+                                try await vm.makeFullReportPNGURL(scale: 2.0) ?? { throw URLError(.cannotCreateFile) }()
+                            }, preview: SharePreview("이미지"))
+                            //
+                            ShareLink(
+                                "PDF 내보내기",
+                                item: ShareablePDFReport {
+                                    try await vm.makeFullReportPDF(scale: 2.0) ?? { throw URLError(.cannotCreateFile) }()
+                                }, preview: SharePreview("PDF"))
+                            
+                            Button("취소", role: .cancel) {}
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
@@ -213,30 +233,6 @@ struct BookmarkView: View {
             
             SafeAreaBackgroundView()
         }
-        .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
-            Button("이미지로 내보내기") {
-                Task {
-                    if let url = await vm.makeFullReportPNGURL(scale: 2.0) {
-                        sharingItems = [url]
-                        isShowingShareSheet = true
-                    }
-                }
-            }
-            
-            Button("PDF 내보내기") {
-                Task {
-                    if let url = await vm.makeFullReportPDF(scale: 2.0) {
-                        sharingItems = [url]
-                        isShowingShareSheet = true
-                    }
-                }
-            }
-            
-            Button("취소", role: .cancel) {}
-        }
-        .sheet(isPresented: $isShowingShareSheet) {
-            ActivityView(activityItems: sharingItems)
-        }
         .sheet(isPresented: $showBulkInsertSheet) {
             BookmarkBulkInsertView()
         }
@@ -245,97 +241,6 @@ struct BookmarkView: View {
     }
 }
 
-struct BriefingSectionView: View {
-    let briefing: PortfolioBriefingDTO
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("분석 결과")
-                .font(.system(size: 14))
-                .fontWeight(.semibold)
-                .foregroundColor(Color(.aiCoAccent))
-            
-            briefing.briefing
-                .byCharWrapping
-                .highlightTextForNumbersOperator()
-                .font(.system(size: 14))
-                .fontWeight(.regular)
-                .lineSpacing(6)
-            
-            Spacer(minLength: 20)
-            
-            Text("전략 제안")
-                .font(.system(size: 14))
-                .fontWeight(.semibold)
-                .foregroundColor(Color(.aiCoAccent))
-            
-            briefing.strategy
-                .byCharWrapping
-                .highlightTextForNumbersOperator()
-                .font(.system(size: 14))
-                .fontWeight(.regular)
-                .lineSpacing(6)
-        }
-    }
-}
-
 #Preview {
-    BookmarkView()
-}
-
-struct ActivityView: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    let applicationActivities: [UIActivity]? = nil
-    
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        return UIActivityViewController(
-            activityItems: activityItems,
-            applicationActivities: applicationActivities
-        )
-    }
-    
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
-
-/// 내보내기 전용 뷰
-struct ExportReportView: View {
-    let dto: PortfolioBriefingDTO?
-    let coins: [BookmarkEntity]
-    let imageProvider: (String) -> UIImage?
-    
-    @State private var selectedCategory: SortCategory? = .name
-    @State private var nameOrder: SortOrder = .none
-    @State private var priceOrder: SortOrder = .none
-    @State private var volumeOrder: SortOrder = .none
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // 브리핑
-            if let dto {
-                BriefingSectionView(briefing: dto)
-                    .padding(16)
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.aiCoBackgroundAccent)
-                            .overlay(RoundedRectangle(cornerRadius: 20)
-                                .strokeBorder(.accentGradient, lineWidth: 0.5))
-                    )
-                    .cornerRadius(20)
-                    .padding(.horizontal, 16)
-            }
-            
-            CoinListSectionView(
-                sortedCoins: coins,
-                selectedCategory: $selectedCategory,
-                nameOrder: $nameOrder,
-                priceOrder: $priceOrder,
-                volumeOrder: $volumeOrder,
-                imageProvider: imageProvider,
-                onDelete: { _ in }
-            )
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
-        }
-        .padding(.top, 16)
-    }
+    BookmarkView(coinStore: CoinStore(coinService: DefaultCoinService(network: NetworkClient())))
 }

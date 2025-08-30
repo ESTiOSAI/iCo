@@ -45,7 +45,6 @@ struct AIProjectApp: App {
                         ))
                         .zIndex(1)
                         .environmentObject(recommendCoinViewModel)
-                        .environment(coinStore)
                 } else {
                     if hasSeenOnboarding {
                         MainTabView(
@@ -55,13 +54,13 @@ struct AIProjectApp: App {
                             .environment(\.managedObjectContext, persistenceController.container.viewContext)
                             .environmentObject(themeManager)
                             .environmentObject(recommendCoinViewModel)
-                            .environment(coinStore)
                     } else {
                         OnboardingView()
                             .environmentObject(recommendCoinViewModel)
                     }
                 }
             }
+            .environment(coinStore)
         }
     }
 }

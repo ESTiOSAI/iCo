@@ -12,6 +12,7 @@ import SwiftUI
 final class BookmarkViewModel: ObservableObject {
     private let manager: BookmarkManaging = BookmarkManager.shared
     private let service: AlanAPIService
+    private let coinStore: CoinStore
 
     @Published var briefing: PortfolioBriefingDTO?
     @Published var imageMap: [String: URL] = [:]
@@ -27,8 +28,9 @@ final class BookmarkViewModel: ObservableObject {
         return .conservative
     }()
 
-    init(service: AlanAPIService = AlanAPIService()) {
+    init(service: AlanAPIService = AlanAPIService(), coinStore: CoinStore) {
         self.service = service
+        self.coinStore = coinStore
     }
 
     func loadBriefing(character: RiskTolerance) async {
@@ -150,7 +152,7 @@ final class BookmarkViewModel: ObservableObject {
 
         let exportView = ExportReportView(
             dto: briefing, coins: coins, imageProvider: { [weak self] in self?.imageProvider(for: $0) }
-        )
+        ).environment(coinStore)
             .frame(width: targetWidth, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
         return exportView.snapshotImageExact(
@@ -199,25 +201,5 @@ final class BookmarkViewModel: ObservableObject {
         #else
         return UIScreen.main.bounds.width
         #endif
-    }
-}
-
-private extension View {
-    /// 캡처 대상 SwiftUI 뷰를 렌더링하여 UIImage로 반환합니다.
-    func snapshotImageExact(
-        scale: CGFloat = UIScreen.main.scale,
-        colorScheme: ColorScheme = .light,
-        background: Color = .white,
-        isOpaque: Bool = true
-    ) -> UIImage? {
-        let content = self
-            .fixedSize(horizontal: false, vertical: true)
-            .background(background)
-            .environment(\.colorScheme, colorScheme)
-
-        let renderer = ImageRenderer(content: content)
-        renderer.scale = scale
-        renderer.isOpaque = isOpaque
-        return renderer.uiImage
     }
 }
