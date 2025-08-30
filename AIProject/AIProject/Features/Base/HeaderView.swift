@@ -53,6 +53,10 @@ struct HeaderView: View {
             
             HStack {
                 HStack(alignment: .center, spacing: 8) {
+                    if let coinSymbol {
+                        CoinView(symbol: "\(coinSymbol)", size: 30)
+                    }
+                    
                     Text(heading)
                         .font(.system(size: 24, weight: .black))
                         .foregroundStyle(headingColor)
@@ -67,20 +71,6 @@ struct HeaderView: View {
                 .frame(maxWidth: showBackButton ? .infinity : nil)
                 
                 Spacer()
-                
-                if showSearchButton {
-                    Button {
-                        onSearchTap()
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.aiCoLabel)
-                    }
-                }
-                    
             }
         }
         .padding(.horizontal, 16)
