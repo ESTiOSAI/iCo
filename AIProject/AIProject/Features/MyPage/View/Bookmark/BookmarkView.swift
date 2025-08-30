@@ -215,22 +215,25 @@ struct BookmarkView: View {
                     .padding(16)
                 }
             }
-            .task {
+            .onChange(of: bookmarks.map(\.coinID), initial: true) { _, newValue in
                 vm.cancelTask()
-                guard !bookmarks.isEmpty else {
+
+                guard !newValue.isEmpty else {
                     vm.briefing = nil
                     vm.imageMap = [:]
                     return
                 }
-                async let imagesTask: () = vm.loadCoinImages()
-                async let briefingTask: () = vm.loadBriefing(character: vm.userInvestmentType)
-                _ = await (imagesTask, briefingTask)
+
+                vm.task = Task {
+                    async let imagesTask: Void = vm.loadCoinImages()
+                    async let briefingTask: Void = vm.loadBriefing(character: vm.userInvestmentType)
+                    _ = await (imagesTask, briefingTask)
+                }
             }
-            // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
                 Task { @MainActor in await vm.loadCoinImages() }
             }
-            
+
             SafeAreaBackgroundView()
         }
         .sheet(isPresented: $showBulkInsertSheet) {

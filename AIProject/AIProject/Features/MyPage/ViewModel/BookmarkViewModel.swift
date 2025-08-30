@@ -18,7 +18,7 @@ final class BookmarkViewModel: ObservableObject {
     @Published var imageMap: [String: URL] = [:]
     @Published var status: ResponseStatus = .loading
 
-    private var task: Task<Void, Never>?
+    var task: Task<Void, Never>?
 
     let userInvestmentType: RiskTolerance = {
         if let raw = UserDefaults.standard.string(forKey: AppStorageKey.investmentType),
@@ -34,37 +34,32 @@ final class BookmarkViewModel: ObservableObject {
     }
 
     func loadBriefing(character: RiskTolerance) async {
+        status = .loading
         do {
             let bookmarks = try manager.fetchAll()
-            print("북마크된 코인: ", bookmarks)
             guard !bookmarks.isEmpty else {
-                await MainActor.run {
-                    briefing = nil
-                    status = .success
-                }
+                briefing = nil
+                status = .success
                 return
             }
 
-            task = Task { [service] in
-                await MainActor.run { status = .loading }
-                do {
-                    let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
-                    await MainActor.run {
-                        briefing = dto
-                        status = .success
-                    }
-                } catch is CancellationError {
-                    await MainActor.run { status = .cancel(.taskCancelled) }
-                } catch let error as NetworkError {
-                    await MainActor.run { status = .failure(error) }
-                } catch {
-                    print("알 수 없는 에러발생: \(error)")
-                }
-            }
+            try Task.checkCancellation()
+
+            let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+
+            try Task.checkCancellation()
+
+            briefing = dto
+            status = .success
+        } catch is CancellationError {
+            status = .cancel(.taskCancelled)
+        } catch let error as NetworkError {
+            status = .failure(error)
         } catch {
-            print("북마크 조회 실패: \(error)")
+            print("알 수 없는 에러: \(error)")
         }
     }
+
 
     func cancelTask() {
         task?.cancel()
