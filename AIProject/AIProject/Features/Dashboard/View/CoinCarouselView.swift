@@ -111,7 +111,7 @@ struct CoinCarouselView: View {
                 cardID = nil
                 Task {
                     try? await Task.sleep(nanoseconds: CardConst.animationDuration)
-                    cardID = currentID
+                    jump(to: currentID)
                 }
             }
         }
@@ -162,7 +162,13 @@ struct CoinCarouselView: View {
 }
 
 extension CoinCarouselView {
-    func handleAutoScrolling(cardID: Int) {
+    /// 캐러셀 스크롤 위치를 변경시키는 함수
+    private func jump(to nextCardID: Int) {
+        print(cardID)
+        self.cardID = nextCardID
+    }
+    
+    private func handleAutoScrolling(cardID: Int) {
         /// 코인 리스트의 배열의 index
         ///
         /// 0: 첫번째
@@ -178,13 +184,13 @@ extension CoinCarouselView {
             /// - 10 -> 5으로 순간 이동 + 5 -> 6으로 자연스럽게 순환
             wrappedCoins.removeFirst()
             wrappedCoins.append(recommendedCoins)
-            self.cardID = cardID - totalCoinCount // 10 -> 5로 빛보다 빠르게 바꿔치기
+            jump(to: cardID - totalCoinCount) // 10 -> 5로 빛보다 빠르게 바꿔치기
             
             Task {
                 try? await Task.sleep(nanoseconds: CardConst.animationDuration) // 5 -> 6으로 애니메이션과 함께 순환하기
                 withAnimation(.easeInOut(duration: CardConst.animationDurationDouble)) {
                     if let cardID = self.cardID {
-                        self.cardID = (cardID + 1) % (totalCoinCount * 3)
+                        jump(to: (cardID + 1) % (totalCoinCount * 3))
                     }
                 }
             }
@@ -192,25 +198,25 @@ extension CoinCarouselView {
         default:
             /// 기본적인 자동 스크롤 처리
             withAnimation(.easeInOut(duration: CardConst.animationDurationDouble)) {
-                self.cardID = (cardID + 1) % (totalCoinCount * 3)
+                jump(to: (cardID + 1) % (totalCoinCount * 3))
             }
         }
     }
     
-    func handleManualScrolling(cardID: Int) {
+    private func handleManualScrolling(cardID: Int) {
         // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
         if cardID > totalCoinCount * 2 {
             isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: CardConst.animationDuration)
-                self.cardID = cardID - totalCoinCount
+                jump(to: cardID - totalCoinCount)
                 isManualScrolling = false
             }
         } else if cardID >= 0 && cardID < totalCoinCount {
             isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: CardConst.animationDuration)
-                self.cardID = cardID + totalCoinCount
+                jump(to: cardID + totalCoinCount)
                 isManualScrolling = false
             }
         }
