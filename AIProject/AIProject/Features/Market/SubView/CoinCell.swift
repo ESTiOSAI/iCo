@@ -51,7 +51,7 @@ fileprivate struct CoinMetaView: View {
                     .font(.system(size: name.count < 8 ? 14 : 12))
                     .fontWeight(.bold)
                 
-                Text(symbol)
+                Text(symbol.highlighted(searchTerm))
                     .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }

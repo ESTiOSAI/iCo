@@ -152,7 +152,7 @@ extension MarketStore {
             metas = coinMeta.filter { bookmarkIDs.contains($0.key) }
         }
         
-        let text = searchText
+        let text = searchText.localizedLowercase
         
         let filteredCoinID: Set<CoinID>
         
@@ -161,7 +161,7 @@ extension MarketStore {
         } else {
             filteredCoinID = metas
                 .filter { key, value in
-                    value.koreanName.contains(text)
+                    value.koreanName.contains(text) || value.coinSymbol.localizedLowercase.contains(text)
                 }
                 .map(\.key)
                 .reduce(into: Set<CoinID>(), { acc, e in

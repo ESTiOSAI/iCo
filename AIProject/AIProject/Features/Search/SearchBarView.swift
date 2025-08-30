@@ -19,7 +19,9 @@ struct SearchBarView: View {
                     .foregroundStyle(.aiCoLabel)
 
                 TextField("코인 이름으로 검색하세요", text: $searchText)
-                    .autocorrectionDisabled()
+                    .keyboardType(.webSearch)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled(true)
                     .padding(.horizontal, 8)
                     .submitLabel(.search)
                     .font(.system(size: 14))
