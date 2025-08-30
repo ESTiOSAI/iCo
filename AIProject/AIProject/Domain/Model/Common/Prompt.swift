@@ -82,7 +82,7 @@ enum Prompt {
                 /// 주어진 시간 동안의 암호화폐 전체 시장 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
                 
-                /// 내용 요약
+                /// 내용 요약 (글자수 200자)
                 /// 호재의 경우 긍정요인만 or 악재라면 부정 요인만 제공
                 /// 중립이라면 긍정요인, 부정요인을 자연스럽게 연결한 문자열을 제공
                 let summary: String
@@ -101,7 +101,7 @@ enum Prompt {
             struct InsightDTO: Codable {
                 /// 게시물을 기반으로 평가한 커뮤니티 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
-                /// 커뮤니티 분위기를 그렇게 평가한 이유를 문자열로 요약
+                /// 커뮤니티 분위기를 그렇게 평가한 이유를 문자열로 요약 (글자수 200자)
                 let summary: String
             }
             
