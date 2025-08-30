@@ -11,6 +11,7 @@ import SwiftUI
 /// 마켓이나 북마크 메뉴일 경우 각 파라메터에 true 값을 넣어주세요.
 struct HeaderView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.dismiss) var dismiss
     
     let heading: String
     let coinSymbol: String?
@@ -33,11 +34,11 @@ struct HeaderView: View {
     }
     
     var body: some View {
-        let isBigScreen = hSizeClass == .regular
         
         ZStack(alignment: .leading) {
-            if !isBigScreen && showBackButton {
+            if showBackButton {
                 Button {
+                    dismiss()
                     onBackButtonTap()
                 } label: {
                     Image(systemName: "chevron.backward")
@@ -52,6 +53,10 @@ struct HeaderView: View {
             
             HStack {
                 HStack(alignment: .center, spacing: 8) {
+                    if let coinSymbol {
+                        CoinView(symbol: "\(coinSymbol)", size: 30)
+                    }
+                    
                     Text(heading)
                         .font(.system(size: 24, weight: .black))
                         .foregroundStyle(headingColor)
@@ -66,20 +71,6 @@ struct HeaderView: View {
                 .frame(maxWidth: showBackButton ? .infinity : nil)
                 
                 Spacer()
-                
-                if showSearchButton {
-                    Button {
-                        onSearchTap()
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.aiCoLabel)
-                    }
-                }
-                    
             }
         }
         .padding(.horizontal, 16)
