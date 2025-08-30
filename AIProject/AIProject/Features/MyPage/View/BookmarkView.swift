@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct BookmarkView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.horizontalSizeClass) var hSizeClass
     
     @StateObject var vm = BookmarkViewModel()
 
@@ -64,9 +64,7 @@ struct BookmarkView: View {
         ZStack(alignment: .top) {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
-                    HeaderView(heading: "북마크 관리", showBackButton: true) {
-                        dismiss()
-                    }
+                    HeaderView(heading: "북마크 관리", showBackButton: hSizeClass == .regular ? false : true)
                     
                     // 북마크한 코인이 없을 시 브리핑 섹션 숨기기
                     if !bookmarks.isEmpty {
@@ -346,14 +344,4 @@ struct ExportReportView: View {
         }
         .padding(.top, 16)
     }
-}
-
-extension BookmarkView {
-    typealias CoinCache = NSCache<NSString, UIImage>
-    func exportBookmarkPNG(vm: BookmarkViewModel) async -> UIImage? {
-        let cache = CoinCache()
-        let symbols = vm.imageMap
-            return nil
-    }
-
 }

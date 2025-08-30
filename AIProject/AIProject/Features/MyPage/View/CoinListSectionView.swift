@@ -38,7 +38,17 @@ struct CoinListSectionView: View {
 
             ForEach(sortedCoins, id: \.coinID) { coin in
                 NavigationLink {
-                    CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
+                    VStack(spacing: 0) {
+                        HeaderView(
+                            heading: coin.coinID,
+                            coinSymbol: coin.coinID,
+                            showBackButton: true
+                        )
+                        .toolbar(.hidden, for: .navigationBar)
+                        
+                        CoinDetailView(coin: Coin(id: coin.coinID, koreanName: coin.coinID))
+                        .id(coin.id)
+                    }
                 } label: {
                     CoinRowView(coin: coin, prefetched: imageProvider(coin.coinSymbol), onDelete: onDelete)
                 }
