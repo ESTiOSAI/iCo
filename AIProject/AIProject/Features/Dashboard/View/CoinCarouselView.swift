@@ -29,8 +29,8 @@ struct CoinCarouselView: View {
     /// 현재 추천 코인 카드의 인덱스를 저장하며,
     /// 선택된 카드의 위치를 추적하고 스크롤 포지션을 관리하는 데 사용하는 상태 변수
     @State var cardID: Int?
-    /// 수동 스크롤 방식으로 cardID를 변경 중인지 추적
-    @State private var isManualScrolling = false
+    /// 기기 방향 전환 중인지 추적
+    @State private var isChangingDirection = false
     /// viewModel에서 받아온 코인의 배열
     private var recommendedCoins: [RecommendCoin] { viewModel.recommendCoins }
     private var totalCoinCount: Int { viewModel.numberOfCoins }
@@ -90,6 +90,14 @@ struct CoinCarouselView: View {
                 viewModel.startTimer()
             })
         )
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            // 화면 회전 시 - 스크롤 위치 보정
+            isChangingDirection = true
+            if let currentID = cardID {
+                handleOrientationChange(currentID: currentID)
+                isChangingDirection = false
+            }
+        }
         .onReceive(viewModel.timer) { _ in
             // 자동 스크롤일 경우 - 타이머를 구독해 UI 업데이트하기
             guard !isDragging,
@@ -101,19 +109,10 @@ struct CoinCarouselView: View {
         }
         .onChange(of: cardID ?? totalCoinCount) { _, newValue in
             // 수동 스크롤일 경우
-            guard !recommendedCoins.isEmpty else { return }
+            guard !recommendedCoins.isEmpty,
+                  !isChangingDirection
+            else { return }
             handleManualScrolling(cardID: newValue)
-        }
-        .onChange(of: hSizeClass) { _, _ in
-            // 화면 회전 시 스크롤 위치 재조정
-            if let currentID = cardID {
-                // 애니메이션 없이 즉시 위치 재설정
-                cardID = nil
-                Task {
-                    try? await Task.sleep(nanoseconds: CardConst.animationDuration)
-                    jump(to: currentID)
-                }
-            }
         }
         .sheet(item: $selectedCoin) { coin in
             
@@ -162,7 +161,6 @@ struct CoinCarouselView: View {
 extension CoinCarouselView {
     /// 캐러셀 스크롤 위치를 변경시키는 함수
     private func jump(to nextCardID: Int) {
-        print(cardID)
         self.cardID = nextCardID
     }
     
@@ -204,19 +202,26 @@ extension CoinCarouselView {
     private func handleManualScrolling(cardID: Int) {
         // 중간 배열 밖으로 넘어갈 경우 중간 배열의 카드로 강제 점프시키기
         if cardID > totalCoinCount * 2 {
-            isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: CardConst.animationDuration)
                 jump(to: cardID - totalCoinCount)
-                isManualScrolling = false
             }
         } else if cardID >= 0 && cardID < totalCoinCount {
-            isManualScrolling = true
             Task {
                 try await Task.sleep(nanoseconds: CardConst.animationDuration)
                 jump(to: cardID + totalCoinCount)
-                isManualScrolling = false
             }
+        }
+    }
+    
+    private func handleOrientationChange(currentID: Int) {
+        viewModel.stopTimer()
+        cardID = nil
+        // 애니메이션 없이 즉시 위치 재설정
+        Task {
+            try? await Task.sleep(nanoseconds: 100_000_000)
+            jump(to: currentID)
+            viewModel.startTimer()
         }
     }
 }
