@@ -28,6 +28,7 @@ struct DashboardView: View {
     }
     
     var body: some View {
+        let extra = max(0, -scrollOffset * 0.8)
         
         NavigationStack {
             ScrollView {
@@ -36,14 +37,15 @@ struct DashboardView: View {
                         AIBriefingView()
                     }
                     .padding(.top, tempPadding)
-                    .background(alignment: .top, content: {
-                        LinearGradient(
-                            colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
-                            startPoint: .topLeading,
-                            endPoint: .bottom
-                        )
-                        .frame(height: gradientHeight)
-                    })
+//                    .background(alignment: .top, content: {
+//                        LinearGradient(
+//                            colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
+//                            startPoint: .topLeading,
+//                            endPoint: .bottom
+//                        )
+//                        .frame(height: gradientHeight + extra)
+//                        .ignoresSafeArea(edges: .top)
+//                    })
                     .background {
                         GeometryReader { proxy in
                             Color.clear
@@ -57,24 +59,35 @@ struct DashboardView: View {
             .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
                 scrollOffset = value
             }
-            .overlay(alignment: .top) {
+            .background(alignment: .top) {
+                LinearGradient(
+                    colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
+                    startPoint: .topLeading,
+                    endPoint: .bottom
+                )
+                .frame(height: gradientHeight + 44 + extra)
+                .offset(y: scrollOffset < threshold ? 0 : -scrollOffset)
+                .animation(.easeInOut, value: scrollOffset)
+                .ignoresSafeArea(edges: .top)
+            }
+            .ignoresSafeArea()
+            .safeAreaInset(edge: .top) {
                 if hSizeClass == .compact {
-                    VStack {
+                    let defaultHeight = 44.0
                         Rectangle()
-                            .frame(height: 80)
+                        .ignoresSafeArea()
                             .containerRelativeFrame(.horizontal)
+                            .frame(height: defaultHeight)
                             .foregroundStyle(.ultraThinMaterial)
-                            .overlay(alignment: .bottom) {
+                            .overlay(alignment: .top) {
                                 Text("대시보드")
                                     .font(.system(size: 18, weight: .black))
-                                    .padding(.bottom)
                             }
-                    }
-                    .opacity(scrollOffset > threshold ? 1 : 0)
+                            .opacity(scrollOffset > threshold ? 1 : 0)
+                    .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
+                    .allowsHitTesting(false)
                 }
             }
-            .ignoresSafeArea(edges: .top)
-            
         }
     }
 }
