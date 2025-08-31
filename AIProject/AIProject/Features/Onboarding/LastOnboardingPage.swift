@@ -19,9 +19,8 @@ struct LastOnboardingPage: View {
     
     var body: some View {
         VStack {
-            ScrollView{
+            ScrollView {
                 HeaderView(heading: "나의 투자 성향 고르기")
-                    .padding(.bottom, .spacing)
                 
                 SubheaderView(subheading: "아래에서 투자 성향을 선택해주세요", description: "앞으로 제공해드릴 추천 콘텐츠와 서비스에 반영돼요")
                     .padding(.bottom, .spacing)
@@ -38,7 +37,7 @@ struct LastOnboardingPage: View {
                 .padding(.horizontal, .spacing)
                 
                 Spacer()
-                    .frame(minHeight: 100)
+                    .frame(minHeight: 60)
                 
                 RoundedRectangleFillButton(
                     title: "시작하기",
@@ -55,6 +54,7 @@ struct LastOnboardingPage: View {
                 .disabled(selectedType == nil)
                 .opacity(selectedType == nil ? 0.5 : 1)
                 .padding(.horizontal, .spacing)
+                .padding(.bottom, 30)
             }
         }
         .frame(
