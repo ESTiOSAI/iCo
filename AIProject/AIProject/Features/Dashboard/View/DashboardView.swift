@@ -37,15 +37,6 @@ struct DashboardView: View {
                         AIBriefingView()
                     }
                     .padding(.top, tempPadding)
-//                    .background(alignment: .top, content: {
-//                        LinearGradient(
-//                            colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
-//                            startPoint: .topLeading,
-//                            endPoint: .bottom
-//                        )
-//                        .frame(height: gradientHeight + extra)
-//                        .ignoresSafeArea(edges: .top)
-//                    })
                     .background {
                         GeometryReader { proxy in
                             Color.clear
