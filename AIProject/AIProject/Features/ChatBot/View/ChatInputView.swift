@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// 챗봇 입력창에 해당하는 View입니다.
 struct ChatInputView: View {
     @ObservedObject var viewModel: ChatBotViewModel
 

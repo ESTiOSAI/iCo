@@ -108,13 +108,14 @@ extension ChatBotClient: URLSessionDataDelegate {
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         if let error {
-            print("챗봇 에러 \(error.localizedDescription)")
+            print("ChatBotClient Error - \(error.localizedDescription)")
             continuation?.finish(throwing: error)
             disconnect()
         }
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse) async -> URLSession.ResponseDisposition {
+        // 정상적인 응답만을 처리하도록 합니다.
         if let httpResponse = response as? HTTPURLResponse {
             if (200..<300) ~= httpResponse.statusCode {
                 return .allow

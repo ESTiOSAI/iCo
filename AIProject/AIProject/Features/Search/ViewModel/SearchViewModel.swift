@@ -37,9 +37,8 @@ final class SearchViewModel: ObservableObject {
             do {
                 let coinDTOs = try await upbitService.fetchMarkets()
                 coins = coinDTOs.map { Coin(id: $0.coinID.replacingOccurrences(of: "KRW-", with: ""), koreanName: $0.koreanName) }
-                print(coins)
             } catch {
-                print(error.localizedDescription)
+                print("SearchViewModel - 코인 목록을 받아오는데 실패했습니다.")
             }
         }
     }
