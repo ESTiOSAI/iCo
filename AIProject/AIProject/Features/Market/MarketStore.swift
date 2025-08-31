@@ -13,10 +13,16 @@ enum CoinFilter: Int, Equatable {
     case none
 }
 
+/// 마켓 이벤트 처리를 담당
+/// 검색 / 시세 정보 / 웹소켓 상태 / 정렬 / 필터링 이벤트 처리
 @MainActor
 @Observable
 class MarketStore {
+    
+    /// 최초 한 번만 로드하기 위한 flag
     private var hasLoaded = false
+    
+    /// 실시간 시세 구독 티켓
     private let ticket = UUID().uuidString
     
     private let coinService: UpBitAPIService
@@ -24,11 +30,17 @@ class MarketStore {
     private let searchRecordManager: SearchRecordManaging = SearchRecordManager()
     
     private(set) var errorMessage: String?
+    
+    /// 변동성이 적은 메타 정보
     private(set) var coinMeta: [CoinID: Coin] = [:]
     
+    /// 변동성이 큰 시세 정보
     private var ticker: [CoinID: TickerStore] = [:]
     
+    /// 코인 구독 신청 stream task
     private var ticketStreamTask: Task<Void, Never>?
+    
+    /// 코인 시세 stream task
     private var tickerStreamTask: Task<Void, Never>?
     
     private var bookmarkIDs: Set<CoinID> = [] {
@@ -81,20 +93,31 @@ class MarketStore {
 
     var sortedCoinIDs: [CoinID] = []
     
+    /// 아래 멤버들은 View 갱신을 최소화하기 위해 사용
+    /// 현재 보여지는 코인 구독 최적화를 위한 채널
     @ObservationIgnored
     private var visibleCoinsChannel = AsyncChannel<Set<CoinListModel.ID>>()
     
+    /// 검색 최적화를 위한 채널
     @ObservationIgnored
     private var searchCoinsChannel = AsyncChannel<String>()
     
+    /// 정렬 최적화를 위한 채널
     @ObservationIgnored
     private var sortChannel = AsyncChannel<Void>()
     
+    /// 소켓이 끊길 경우 마지막에 구독한 코인을 재구독하기 위한 값
     @ObservationIgnored
     private var subscriptionSnapshot = Set<CoinID>()
+    
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService
+        print("init" + String(describing: Self.self))
+    }
+    
+    deinit {
+        print(#function, String(describing: Self.self))
     }
 }
 
@@ -105,6 +128,8 @@ extension MarketStore {
         defer { hasLoaded = true }
         await setup()
         
+        // stream이 종료되어야 다음라인이 실행되므로 별도 Task로 분리
+        // 검색에 debounce 적용
         Task {
             let stream = searchCoinsChannel
                 .debounce(for: .milliseconds(300))
@@ -114,6 +139,7 @@ extension MarketStore {
             }
         }
         
+        // 정렬에 throttle 적용
         Task {
             let stream = sortChannel
                 ._throttle(for: .milliseconds(300), latest: false)
@@ -128,10 +154,12 @@ extension MarketStore {
         await setup()
     }
     
+    // 북마크 갱신
     func update(_ items: [CoinID]) async {
         self.bookmarkIDs = Set(items)
     }
     
+    // 시세 Store 객체를 반환함
     func ticker(for id: CoinID) -> TickerStore? {
         ticker[id]
     }
@@ -142,9 +170,11 @@ extension MarketStore {
     }
     
     func sort() async {
+        // 필터링은 중복데이터 방지와 index가 필요 없어 Set으로 관리하고
+        // 정렬은 Array로 관리
         
         let metas: [CoinID: Coin]
-        
+        // 필터링 프로세스
         switch filter {
         case .none:
             metas = coinMeta
@@ -159,6 +189,7 @@ extension MarketStore {
         if searchText.isEmpty {
             filteredCoinID = Set(metas.map(\.key))
         } else {
+            // 한글명이나 영문 심볼 검색
             filteredCoinID = metas
                 .filter { key, value in
                     value.koreanName.contains(text) || value.coinSymbol.localizedLowercase.contains(text)
@@ -169,9 +200,10 @@ extension MarketStore {
                 })
         }
         
-        let filteredTickers = ticker.map(\.value)
-            .filter { filteredCoinID.contains($0.coinID) }
+        let filteredTickers = filteredCoinID
+            .compactMap { ticker[$0] }
         
+        // 정렬 프로세스
         switch sortCategory {
         case .rate:
             self.sortedCoinIDs = filteredTickers
@@ -202,6 +234,8 @@ extension MarketStore {
         await searchCoinsChannel.send(text)
     }
     
+    /// 메타정보와 국장 코인 초기 시세 정보를 불러옵니다.
+    /// - Returns: 메타 정보와 시세정보를 dictionary 형태로 반환
     private func fetchMarketCoinData() async -> ([CoinID: Coin], [CoinID: TickerStore]) {
         do {
             async let meta = try await coinService.fetchMarkets()
@@ -227,7 +261,7 @@ extension MarketStore {
     }
 }
 
-// MARK: 
+// MARK: Ticker 서비스
 
 extension MarketStore {
     
@@ -273,6 +307,7 @@ extension MarketStore {
     
     // MARK: - Private
     
+    /// 웹소켓이 죽는 걸 방지하기 위해 보내는 구독 신청을 최적화
     private func ticketStream() async {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
@@ -284,16 +319,19 @@ extension MarketStore {
         }
     }
     
-    private func performUpdate(_ ticker: TickerValue) async {
-        guard let store = self.ticker[ticker.id] else { return }
-        store.apply(ticker)
-    }
-    
+    /// 시세 정보를 stream으로 받아서 업데이트
     private func consume() async {
         for try await ticker in tickerService.subscribeTickerStream() {
             await performUpdate(ticker)
         }
     }
+    
+    private func performUpdate(_ ticker: TickerValue) async {
+        guard let store = self.ticker[ticker.id] else { return }
+        store.apply(ticker)
+    }
+    
+    
 }
 
 extension MarketStore {

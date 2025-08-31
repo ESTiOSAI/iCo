@@ -8,21 +8,34 @@
 import Foundation
 import AsyncAlgorithms
 
+/// Socket을 상태와 메세지를 포워딩하고 재연결을 책임집니다.
 public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     private var stateChannel: AsyncChannel<WebSocket.State>
     private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
     
+    /// 시도한 횟수
     private var attempts: Int = 0
     
+    /// SocketEngine Protocol
     private var base: Base?
+    
+    /// Socket 상태와 메세지를 forwarding
     private var forwardStateTask: Task<Void, Never>?
     private var forwardIncomingTask: Task<Void, Never>?
+    
+    /// 소켓 상태 재연결하기 위한 Loop
     private var loopTask: Task<Void, Never>?
     
+    /// 소켓 연결 상태 flag
     private var isClosed = true
     
+    /// 지수적으로 증가하는 재연결 대기
     private var backoff: ExponentialBackoff
+    
+    /// 재연결 정책
     private let policy: ReconnectPolicy
+    
+    /// 소켓은 재사용하기 어렵기 때문에 closure로 캡처하여 재연결 시 사용
     private let makeBase: () -> Base
     
     public nonisolated var state: AsyncStream<WebSocket.State> {
@@ -58,6 +71,7 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
         debugPrint(String(describing: Self.self), "init")
     }
     
+    /// 소켓 연결 및 재연결 loop 실행
     public func connect() async {
         guard loopTask == nil else { return }
         isClosed = false
@@ -74,10 +88,10 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
     
     public func close() async {
         isClosed = true
-        forwardStateTask?.cancel()
         forwardIncomingTask?.cancel()
         await base?.close()
         base = nil
+        forwardStateTask?.cancel()
         
         release()
     }
@@ -99,27 +113,36 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
         loopTask = nil
     }
     
+    /// 소켓을 재연결하기 위한 loop입니다.
+    /// 소켓이 죽으면 종료 원인을 분기하여 재시도 또는 종료합니다.
     private func runLoop() async throws {
         while !isClosed {
             let base = makeBase()
             self.base = base
             
+            // 채널 재생성 및 기존 포워딩 task 취소
             self.stateChannel = .init()
             self.incomingChannel = .init()
             
             forwardStateTask?.cancel()
             forwardIncomingTask?.cancel()
             
+            // forwarding 채널 시작
             forwardStateTask = Task { [weak self] in await self?.forwardState(from: base) }
             
             forwardIncomingTask = Task { [weak self] in await self?.forwardIncoming(from: base) }
             
             await base.connect()
             
+            // 소켓이 종료될 때 까지 대기 및 종료 원인 응답 대기
             let terminal = await waitTerminalEvent(from: base)
             
-            if isClosed { break }
+            // 사용자가 종료한 것이면 그냥 종료
+            if isClosed {
+                break
+            }
             
+            // 종료 원인 분기
             switch classify(closeCode: terminal.closeCode, error: terminal.error) {
             case let .closed(code, reason):
                 await stateChannel.send(.closed(code: code, reason: reason))
@@ -130,6 +153,9 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
                 release()
                 return
             case .retryable:
+                
+                // 재시도 가능한 에러이면 재시도
+                // 재연결 시간 정책 반영하여 계산
                 let delay = backoff.next()
                 print(backoff.attempt)
                 attempts += 1
@@ -140,6 +166,12 @@ public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
         }
     }
     
+    
+    /// 종료 원인 분기
+    /// - Parameters:
+    ///   - closeCode: 종료 코드 // 1000 정상 종료등
+    ///   - error: urlError // 네트워크 연결 에러 등
+    /// - Returns: 에러타입 반환 예) retryable , closed, nonRetryable
     private func classify(closeCode: URLSessionWebSocketTask.CloseCode?,
                           error: Error?) -> WebSocket.Failure {
 //        if closeCode == nil, error == nil {

@@ -7,12 +7,15 @@
 
 import Foundation
 
+/// 코인 셀의 시세 정보를 저장하고 있는 객체
 @Observable
 final class TickerStore {
     let coinID: String
     
+    // 시세 정보 데이터
     private(set) var snapshot: TickerValue
     
+    // 등락폭 - 정렬 시 필요
     var signedRate: Double { snapshot.signedRate }
     
     init(coinID: CoinID) {

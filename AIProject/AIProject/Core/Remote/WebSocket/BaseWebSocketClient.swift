@@ -8,15 +8,22 @@
 import Foundation
 import AsyncAlgorithms
 
+/// 웹소켓 client입니다. 메세지와 연결 상태 stream, 연결, 해제를 책임집니다.
 public final actor BaseWebSocketClient: NSObject, SocketEngine {
     
+    /// 소켓 상태 채널
     private var stateChannel: AsyncChannel<WebSocket.State>
+    
+    /// 메세지 채널
     private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
     
     private let url: URL
     private let session: URLSession
     private var task: URLSessionWebSocketTask?
     
+    private var pongContinuation: CheckedContinuation<Void, Error>?
+    
+    /// 핑 전송 task
     private var healthCheck: Task<Void, Never>?
     
     public nonisolated var state: AsyncStream<WebSocket.State> {
@@ -53,6 +60,8 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         debugPrint(String(describing: Self.self), #function)
     }
     
+    /// 채널을 새로 개설하고 소켓을 엽니다.
+    /// 핑을 보내는 이유는 연결된 상태를 확정적으로 기다리기 위해서입니다.
     public func connect() async {
         
         stateChannel = .init()
@@ -64,6 +73,7 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         task?.delegate = self
         task?.resume()
         
+        // 핑 응답은 연결 후에 오기 때문에 connected 시점을 캐치할 수 있음
         try? await sendPing()
     }
     
@@ -91,6 +101,8 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         incomingChannel.finish()
     }
     
+    
+    /// 상태가 연결된 동안 메세지를 수신하여 채널로 보냅니다.
     private func receiveLoop() async {
         guard let task else { return }
         while true {
@@ -170,19 +182,31 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         guard let task else { return }
         
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            self.pongContinuation = continuation
             debugPrint("Send Ping")
-            task.sendPing { error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    debugPrint("Ping Failed: \(error)")
-                    return
+            task.sendPing { [weak self] error in
+                Task {
+                    if let error {
+                        await self?.pongContinuation?.resume(throwing: error)
+                        await self?.releaseCont()
+                        debugPrint("Ping Failed: \(error)")
+                        return
+                    }
+                    debugPrint("Received Pong")
+                    await self?.pongContinuation?.resume()
+                    await self?.releaseCont()
                 }
-                debugPrint("Received Pong")
-                continuation.resume()
             }
         }
     }
     
+    private func releaseCont() async {
+        self.pongContinuation = nil
+    }
+    
+    /// Socket으로부터 Open 응답을 받으면 상태를 변경하고 메세지 stream을 시작합니다.
+    /// 핑을 주기적으로 보냅니다.
+    /// 여기서 120은 업비트의 최소 주기 시간입니다.
     private func handleConnect() async {
         await stateChannel.send(.connected)
         
@@ -190,10 +214,11 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
             await receiveLoop()
         }
         
-        checkingAlive(duration: .seconds(10))
+        checkingAlive(duration: .seconds(120))
     }
 }
 
+// MARK: 웹 소켓 Delegate로 소켓 응답 및 종료 event를 받아 처리합니다.
 extension BaseWebSocketClient: URLSessionWebSocketDelegate {
     public nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         debugPrint("didOpen")
