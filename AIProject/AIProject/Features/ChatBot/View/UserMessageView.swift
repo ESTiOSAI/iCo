@@ -7,10 +7,8 @@
 
 import SwiftUI
 
+/// 유저 메세지에 해당하는 View입니다.
 struct UserMessageView: View {
-    @Environment(\.horizontalSizeClass) var hSizeClass
-    @Environment(\.verticalSizeClass) var vSizeClass
-
     let content: String
 
     var body: some View {

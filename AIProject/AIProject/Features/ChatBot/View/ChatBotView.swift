@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// 챗봇의 최상위 View입니다.
 struct ChatBotView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
