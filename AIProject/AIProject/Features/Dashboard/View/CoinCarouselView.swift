@@ -38,12 +38,14 @@ struct CoinCarouselView: View {
     @State var wrappedCoins = [[RecommendCoin]]()
     /// 카드 선택 시 코인의 상세 페이지로 이동시키기 위해 사용하는 상태 변수
     @State var selectedCoin: RecommendCoin?
+    /// 3번 반복한 코인 리스트를 뷰에서 사용하기 쉽게 평탄화해 저장
+    var tempCoinArray: [RecommendCoin] {
+        wrappedCoins.flatMap { $0.map { $0 }}
+    }
     
     var body: some View {
         /// 화면의 가로 크기에 따라 카드 갯수를 관리하는 computed property
         var numberOfColumn: Int { hSizeClass == .regular ? 2 : 1 }
-        /// 3번 반복한 코인 리스트를 뷰에서 사용하기 쉽게 평탄화해 저장
-        let tempCoinArray = wrappedCoins.flatMap { $0.map { $0 } }
         
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .bottom, spacing: .spacing) {

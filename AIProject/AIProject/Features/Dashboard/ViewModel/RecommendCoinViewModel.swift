@@ -136,8 +136,6 @@ final class RecommendCoinViewModel: ObservableObject {
                     }
                 }
             }
-            
-            print(results.count)
             return results
         }
     }
