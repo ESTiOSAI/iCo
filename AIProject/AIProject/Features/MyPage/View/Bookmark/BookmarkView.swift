@@ -216,6 +216,7 @@ struct BookmarkView: View {
                     .padding(16)
                 }
             }
+            .padding(.bottom, 0)
             .onChange(of: bookmarks.map(\.coinID), initial: true) { _, newValue in
                 vm.cancelTask()
 
@@ -237,6 +238,7 @@ struct BookmarkView: View {
 
             SafeAreaBackgroundView()
         }
+        .ignoresSafeArea(.container, edges: .bottom)
         .sheet(isPresented: $showBulkInsertSheet) {
             BookmarkBulkInsertView()
         }
