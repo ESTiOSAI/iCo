@@ -70,7 +70,7 @@ struct DashboardView: View {
                 .animation(.easeInOut, value: scrollOffset)
                 .ignoresSafeArea(edges: .top)
             }
-            .ignoresSafeArea()
+            .ignoresSafeArea(edges: .top)
             .safeAreaInset(edge: .top) {
                 if hSizeClass == .compact {
                     let defaultHeight = 44.0
