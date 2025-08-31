@@ -59,8 +59,6 @@ class ImageProcessViewModel: ObservableObject {
                 try Task.checkCancellation()
                 let convertedSymbols = try await convertToSymbol(with: recognizedText)
                 guard !convertedSymbols.isEmpty else {
-                    print("ℹ️ OCR 처리 결과 :", recognizedText)
-                    print("ℹ️ Alan 응답 :", convertedSymbols)
                     throw ImageProcessError.noExtractedCoinID
                 }
                 
@@ -80,7 +78,6 @@ class ImageProcessViewModel: ObservableObject {
                 if verifiedCoinList.isEmpty {
                     throw ImageProcessError.noExistingCoin
                 } else {
-                    print("🚀 최종 코인 목록 :", verifiedCoinList.map({ $0.koreanName }))
                     await showAnalysisResult()
                 }
             } catch is CancellationError {
@@ -109,7 +106,6 @@ class ImageProcessViewModel: ObservableObject {
         if let error {
             errorMessage = error.description
             showErrorMessage = true
-            print("🚨 이미지 처리 중 에러 발생:", error)
         }
     }
     
@@ -135,7 +131,6 @@ class ImageProcessViewModel: ObservableObject {
         } catch is CancellationError {
             throw CancellationError()
         } catch {
-            print(#function)
             throw ImageProcessError.unknownVisionError
         }
     }
@@ -155,24 +150,19 @@ class ImageProcessViewModel: ObservableObject {
             
             var answerContent = answer.content
             
-            print("ℹ️ 앨런 프롬프트 :", prompt)
-            print("ℹ️ 앨런 응답 :", answerContent)
-            
             // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
             if answerContent.starts(with: "```json") {
                 answerContent = answerContent.extractedJSON
             }
             
             let convertedSymbols = answerContent.convertIntoArray
-
-            print("ℹ️ 파싱 후 :", convertedSymbols)
+            
             return convertedSymbols
         } catch let error as NetworkError {
             switch error {
             case .taskCancelled:
                 throw CancellationError()
             default:
-                print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
                 print(error.log())
                 throw ImageProcessError.unknownAlanError
             }
