@@ -12,18 +12,12 @@ struct CoinCell: View {
     let store: TickerStore
     let searchTerm: String
     
-    init(coin: Coin, store: TickerStore, searchTerm: String) {
-        self.coin = coin
-        self.store = store
-        self.searchTerm = searchTerm
-    }
-    
     var body: some View {
         VStack {
             HStack {
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName, searchTerm: searchTerm)
                     .frame(alignment: .leading)
-                    .layoutPriority(1)
+                    .layoutPriority(1) // 레이블이 접히는 걸 방지
                 
                 CoinPriceView(ticker: store)
                     .frame(alignment: .trailing)
@@ -36,6 +30,7 @@ struct CoinCell: View {
     }
 }
 
+/// 변하지 않는 코인 메타 정보를 렌더링
 fileprivate struct CoinMetaView: View {
     let symbol: String
     let name:String
@@ -59,17 +54,24 @@ fileprivate struct CoinMetaView: View {
         .font(.system(size: 12))
         .fontWeight(.medium)
         .foregroundStyle(.aiCoLabel)
-        .frame(alignment: .leading)
     }
 }
 
+
+/// 계속 바뀌는 코인 시세를 렌더링
 fileprivate struct CoinPriceView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
-    let ticker: TickerStore
+    /// 시세 정보 store
+    var ticker: TickerStore
     
+    /// 시세 layout shift를 막기 위해 사용되는 넓이 값
     @State private var priceWidth: CGFloat = 40
+    
+    /// 거래 layout shift를 막기 위해 사용되는 넓이 값
     @State private var volumeWidth: CGFloat = 40
+    
+    /// layout shift  보간 패딩
     private let pricePadding: CGFloat = 8
     
     private var changeColor: Color {
@@ -131,11 +133,12 @@ fileprivate struct CoinPriceView: View {
     VStack {
         CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
             .frame(height: 100)
-        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
+        CoinCell(coin: Coin(id: "KRW-BTC", koreanName: "비트코인8글자이름"), store: .init(coinID: "KRW-BTC"), searchTerm: "비트")
             .frame(height: 100)
     }
 }
 
+/// 레이블의 넓이를 가져오기 위한 key
 private struct WidthKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
@@ -143,6 +146,7 @@ private struct WidthKey: PreferenceKey {
     }
 }
 
+/// 값이 변경되면, closure를 실행 함
 private extension View {
     func measureWidth(_ onChange: @escaping (CGFloat) -> Void) -> some View {
         background {

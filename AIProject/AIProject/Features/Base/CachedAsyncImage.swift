@@ -45,7 +45,7 @@ struct CachedAsyncImage<Content: View>: View {
             await loadImage()
         }
     }
-
+    
     private func loadImage() async {
         guard !isLoading else { return }
         isLoading = true
@@ -57,7 +57,6 @@ struct CachedAsyncImage<Content: View>: View {
                 print(error)
             }
             image = nil
-//            print("이미지 로드 실패:", error.localizedDescription)
         }
         isLoading = false
     }

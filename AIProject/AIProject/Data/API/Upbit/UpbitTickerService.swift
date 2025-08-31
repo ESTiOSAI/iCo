@@ -7,8 +7,11 @@
 
 import Foundation
 
+/// 업비트 실시간 코인 시세 웹소켓 서비스
 final class UpbitTickerService: RealTimeTickerProvider {
     private let client: any SocketEngine
+    
+    /// 소켓 상태 stream
     private var stateStreamTask: Task<Void, Never>?
     
     init(
@@ -29,6 +32,8 @@ final class UpbitTickerService: RealTimeTickerProvider {
         await client.close()
     }
     
+    /// 업비트의 코인 시세 stream을 가져와 디코딩하여 Model로 만들고 forwarding
+    /// - Returns: 시세 스트림을 반환
     func subscribeTickerStream() -> AsyncStream<TickerValue> {
         AsyncStream<TickerValue> { continuation in
             Task {
@@ -47,6 +52,10 @@ final class UpbitTickerService: RealTimeTickerProvider {
         }
     }
     
+    /// 티켓과 코인 ID를 가지고 업비트에 코인 시세를 구독합니다.
+    /// - Parameters:
+    ///   - ticket: 티켓 iD
+    ///   - coins: 코인 ID 리스트 -[ "KRW-BTC", "KRW-ETH"]
     func sendTicket(ticket: String, coins: [CoinListModel.ID]) async {
         guard !coins.isEmpty else { return }
         
@@ -72,6 +81,8 @@ final class UpbitTickerService: RealTimeTickerProvider {
         }
     }
     
+    
+    /// 소켓 상태를 구독합니다.
     private func streamingState() {
         self.stateStreamTask?.cancel()
         

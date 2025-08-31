@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct CoinView: View {
+    
+    /// symbol 예) BTC, ETH
     let symbol: String
     let size: CGFloat
+    
+    /// ImageRenderer는 리렌더링 하기 때문에 비동기 작업을 기다리지 않음
     var prefetched: UIImage? = nil
     
     var body: some View {

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// 변견된 ticker를 rect border로 감싼 애니메이션 처리
 struct BlinkBorderOnChange<Value: Equatable>: ViewModifier {
     let trigger: Value
     var duration: Duration = .seconds(2)

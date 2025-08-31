@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// ticker 변경 시, underline 애니메이션 처리
 struct BlinkUnderlineOnChange<Value: Equatable>: ViewModifier {
     let trigger: Value
     var duration: Duration = .seconds(2)
@@ -43,7 +44,7 @@ struct BlinkUnderlineOnChange<Value: Equatable>: ViewModifier {
     
     @MainActor
     private func start() {
-        hideTask?.cancel()
+        hideTask?.cancel() // trigger가 새로 오면, animation 정지를 무효화하고 새로 기다림
         animating = true
         
         hideTask = Task {
