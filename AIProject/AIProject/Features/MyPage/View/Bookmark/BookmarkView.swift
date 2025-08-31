@@ -154,6 +154,7 @@ struct BookmarkView: View {
                     .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                     .alert("전체 북마크 삭제", isPresented: $showDeleteConfirm) {
                         Button("삭제", role: .destructive) {
+                            vm.cancelTask()
                             vm.deleteAllBookmarks()
                         }
                         Button("취소", role: .cancel) { }
@@ -215,24 +216,29 @@ struct BookmarkView: View {
                     .padding(16)
                 }
             }
-            .task {
+            .padding(.bottom, 0)
+            .onChange(of: bookmarks.map(\.coinID), initial: true) { _, newValue in
                 vm.cancelTask()
-                guard !bookmarks.isEmpty else {
+
+                guard !newValue.isEmpty else {
                     vm.briefing = nil
                     vm.imageMap = [:]
                     return
                 }
-                async let imagesTask: () = vm.loadCoinImages()
-                async let briefingTask: () = vm.loadBriefing(character: vm.userInvestmentType)
-                _ = await (imagesTask, briefingTask)
+
+                vm.task = Task {
+                    async let imagesTask: Void = vm.loadCoinImages()
+                    async let briefingTask: Void = vm.loadBriefing(character: vm.userInvestmentType)
+                    _ = await (imagesTask, briefingTask)
+                }
             }
-            // 북마크 심볼 세트가 바뀔 때만 이미지 갱신
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
                 Task { @MainActor in await vm.loadCoinImages() }
             }
-            
+
             SafeAreaBackgroundView()
         }
+        .ignoresSafeArea(.container, edges: .bottom)
         .sheet(isPresented: $showBulkInsertSheet) {
             BookmarkBulkInsertView()
         }
