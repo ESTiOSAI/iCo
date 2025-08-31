@@ -34,6 +34,7 @@ struct CoinView: View {
         .frame(width: size, height: size)
         .clipShape(Circle())
         .contentShape(Circle())
+        .id(symbol)
     }
 }
 
