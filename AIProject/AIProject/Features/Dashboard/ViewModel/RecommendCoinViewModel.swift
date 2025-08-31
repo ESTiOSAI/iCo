@@ -15,7 +15,7 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var recommendCoins: [RecommendCoin] = []
     @Published var fetchTimestamp: Date?
 
-    private var alanService: AlanAPIServiceProtocol
+    private var alanService: AlanRecommendServiceProtocol
     private var upbitService: UpBitApiServiceProtocol
 
     var task: Task<Void, Never>?
@@ -35,7 +35,7 @@ final class RecommendCoinViewModel: ObservableObject {
     }
 
     init(
-        alanService: AlanAPIServiceProtocol = AlanAPIService(),
+        alanService: AlanRecommendServiceProtocol = AlanAPIService(),
         upbitService: UpBitApiServiceProtocol = UpBitAPIService()
     ) {
         self.alanService = alanService
