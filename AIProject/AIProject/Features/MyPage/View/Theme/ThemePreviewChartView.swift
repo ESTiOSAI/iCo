@@ -66,7 +66,7 @@ struct CandlestickPreviewView: View {
                 .frame(height: 220)
         }
         .padding(16)
-        .background(.aiCoBackground)
+        .background(RoundedRectangle(cornerRadius: 20).fill(.aiCoBackground))
         .overlay(RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5))
         .padding(.horizontal, 16)
     }
