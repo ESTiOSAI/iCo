@@ -1,0 +1,45 @@
+{
+  "configurations" : [
+    {
+      "id" : "5B402B4B-7A19-4136-936A-4ACE1BF1EAAF",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-FIRAnalyticsDebugEnabled",
+        "enabled" : false
+      },
+      {
+        "argument" : "-FIRDebugEnabled",
+        "enabled" : false
+      }
+    ],
+    "environmentVariableEntries" : [
+      {
+        "key" : "OS_ACTIVITY_MODE",
+        "value" : "disable"
+      }
+    ],
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:AIProject.xcodeproj",
+      "identifier" : "B7B040022E387FCF005DE0BA",
+      "name" : "AIProject"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:AIProject.xcodeproj",
+        "identifier" : "B7B040142E387FD1005DE0BA",
+        "name" : "AIProjectTests"
+      }
+    }
+  ],
+  "version" : 1
+}
