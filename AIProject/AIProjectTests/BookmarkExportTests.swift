@@ -16,7 +16,7 @@ final class BookmarkExportTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        sut = BookmarkViewModel(service: AlanAPIService())
+        sut = BookmarkViewModel(service: AlanAPIService(), coinStore: CoinStore(coinService: DefaultCoinService(network: NetworkClient())))
 
         sut.briefing = PortfolioBriefingDTO(briefing: "투자 브리핑", strategy: "전략 제안")
     }
@@ -26,13 +26,13 @@ final class BookmarkExportTests: XCTestCase {
         super.tearDown()
     }
 
-    func test_makeReportPNGURL_createValidExport() {
+    func test_makeReportPNGURL_createValidExport() async {
         let fake = FakeBookmarkEntity()
         fake.coinID = "KRW-BTC"
         fake.coinKoreanName = "비트코인"
         fake.timestamp = Date()
 
-        guard let url = sut.makeFullReportPNGURL(scale: 2.0) else {
+        guard let url = await sut.makeFullReportPNGURL(scale: 2.0) else {
             XCTFail("PNG 생성 실패")
             return
         }
@@ -44,13 +44,13 @@ final class BookmarkExportTests: XCTestCase {
         XCTAssertFalse(data!.isEmpty, "PNG is Empty")
     }
 
-    func test_makeFullReportPDF_createsValidFile() {
+    func test_makeFullReportPDF_createsValidFile() async {
         let fake = FakeBookmarkEntity()
         fake.coinID = "KRW-BTC"
         fake.coinKoreanName = "비트코인"
         fake.timestamp = Date()
 
-        guard let url = sut.makeFullReportPDF(scale: 1.0) else {
+        guard let url = await sut.makeFullReportPDF(scale: 1.0) else {
             XCTFail("PDF URL 생성 실패")
             return
         }
