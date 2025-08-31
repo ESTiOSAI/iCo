@@ -40,7 +40,9 @@ struct DashboardView: View {
                     .background {
                         GeometryReader { proxy in
                             Color.clear
-                                .preference(key: ScrollOffsetPreferenceKey.self, value: -proxy.frame(in: .named(coordinateSpaceName)).minY
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: -proxy.frame(in: .named(coordinateSpaceName)).minY
                                 )
                         }
                     }
@@ -56,7 +58,7 @@ struct DashboardView: View {
                     startPoint: .topLeading,
                     endPoint: .bottom
                 )
-                .frame(height: gradientHeight + 44 + extra)
+                .frame(height: gradientHeight + extra)
                 .offset(y: scrollOffset < threshold ? 0 : -scrollOffset)
                 .animation(.easeInOut, value: scrollOffset)
                 .ignoresSafeArea(edges: .top)
@@ -65,18 +67,20 @@ struct DashboardView: View {
             .safeAreaInset(edge: .top) {
                 if hSizeClass == .compact {
                     let defaultHeight = 44.0
-                        Rectangle()
+                    
+                    Rectangle()
                         .ignoresSafeArea()
-                            .containerRelativeFrame(.horizontal)
-                            .frame(height: defaultHeight)
-                            .foregroundStyle(.ultraThinMaterial)
-                            .overlay(alignment: .top) {
-                                Text("대시보드")
-                                    .font(.system(size: 18, weight: .black))
-                            }
-                            .opacity(scrollOffset > threshold ? 1 : 0)
-                    .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
-                    .allowsHitTesting(false)
+                        .containerRelativeFrame(.horizontal)
+                        .frame(height: defaultHeight)
+                        .foregroundStyle(.ultraThinMaterial)
+                        .overlay(alignment: .center) {
+                            Text("대시보드")
+                                .font(.system(size: 18, weight: .black))
+                                .foregroundStyle(.aiCoLabel)
+                        }
+                        .opacity(scrollOffset > threshold ? 1 : 0)
+                        .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
+                        .allowsHitTesting(false)
                 }
             }
         }
