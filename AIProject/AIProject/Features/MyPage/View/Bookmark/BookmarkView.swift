@@ -235,8 +235,6 @@ struct BookmarkView: View {
             .onChange(of: Set(bookmarks.map(\.coinSymbol)), initial: false) { _,_  in
                 Task { @MainActor in await vm.loadCoinImages() }
             }
-
-            SafeAreaBackgroundView()
         }
         .ignoresSafeArea(.container, edges: .bottom)
         .sheet(isPresented: $showBulkInsertSheet) {
@@ -244,6 +242,7 @@ struct BookmarkView: View {
         }
         .navigationBarBackButtonHidden()
         .interactiveSwipeBackEnabled()
+        .scrollIndicators(.hidden)
     }
 }
 
