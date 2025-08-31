@@ -29,7 +29,7 @@ final class ReportViewModel: ObservableObject {
     let coin: Coin
     let koreanName: String
     
-    private let alanAPIService = AlanAPIService()
+    private var alanAPIService: AlanReportServiceProtocol
     
     private var overviewTask: Task<CoinOverviewDTO, Error>?
     private var weeklyTask: Task<CoinWeeklyDTO, Error>?
@@ -37,9 +37,10 @@ final class ReportViewModel: ObservableObject {
     
     private var hasStarted = false
     
-    init(coin: Coin) {
+    init(coin: Coin, alanAPIService: AlanReportServiceProtocol = AlanAPIService()) {
         self.coin = coin
         self.koreanName = coin.koreanName
+        self.alanAPIService = alanAPIService
     }
     
     func load() async {
