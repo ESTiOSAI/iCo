@@ -44,9 +44,9 @@ struct HeaderView: View {
                     Image(systemName: "chevron.backward")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 20)
-                        .fontWeight(.medium)
-                        .tint(.aiCoLabelSecondary)
+                        .frame(height: 18)
+                        .fontWeight(.regular)
+                        .tint(.aiCoLabelSecondary.opacity(0.6))
                 }
                 .padding(.trailing, .spacing)
             }
