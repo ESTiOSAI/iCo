@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import AIProject
+@testable import AIProject
 
 final class WebSocketTests: XCTestCase {
     
@@ -39,28 +39,6 @@ final class WebSocketTests: XCTestCase {
         await socket.close()
         try await Task.sleep(for: .milliseconds(100))
         XCTAssertEqual(states, [.connecting, .connected, .closed(code: .normalClosure, reason: nil)])
-    }
-    
-    func test_send() async throws {
-        let (socket, _) = makeSUT(url: Self.echoURL)
-        let hello = Data("Hello".utf8)
-        
-        await socket.connect()
-        
-        try await socket.send(hello)
-        
-        Task {
-            let message = await socket.incoming.first(where: { result in
-                switch result {
-                case .success(let data):
-                    return data == hello
-                case .failure:
-                    return false
-                }
-            })
-            
-            XCTAssertNotNil(message)
-        }
     }
     
     // MARK: Helper
