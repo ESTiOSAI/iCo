@@ -19,7 +19,7 @@ final class FearGreedViewModel: ObservableObject {
     @Published var classification: String = ""
     
     var baseColor: Color { fearGreed.color }
-
+    
     init() {
         Task {
             await self.fetchFearGreedAsync()

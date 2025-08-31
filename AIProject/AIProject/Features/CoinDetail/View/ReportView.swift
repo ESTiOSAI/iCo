@@ -10,9 +10,6 @@ import SwiftUI
 /// 코인에 대한 AI 분석 리포트를 보여주는 뷰입니다.
 ///
 /// `ReportViewModel`을 통해 받아온 개요, 주간 동향, 오늘의 시장 분위기, 주요 뉴스를 섹션별로 표시합니다.
-///
-/// - Parameters:
-///   - coin: 리포트를 보여줄 대상 코인
 struct ReportView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @ObservedObject var viewModel: ReportViewModel

@@ -32,7 +32,6 @@ struct RedditDTO: Codable {
     }
 }
 
-
 extension RedditDTO.RedditResponseDTO.Posts {
     /// Reddit 게시글 데이터 배열을 제목과 내용으로 정리한 문자열입니다.
     ///
