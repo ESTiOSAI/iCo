@@ -46,6 +46,7 @@ struct ThemeView: View {
         }
         .navigationBarBackButtonHidden()
         .interactiveSwipeBackEnabled()
+        .scrollIndicators(.hidden)
     }
 }
 

@@ -242,6 +242,7 @@ struct BookmarkView: View {
         }
         .navigationBarBackButtonHidden()
         .interactiveSwipeBackEnabled()
+        .scrollIndicators(.hidden)
     }
 }
 
