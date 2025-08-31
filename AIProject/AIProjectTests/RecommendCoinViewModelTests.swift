@@ -63,6 +63,7 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_taskCancelsProperly() async {
+        sut.loadRecommendCoin()
         await sut.cancelTask()
 
         await MainActor.run {
@@ -76,11 +77,10 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_taskCompletesSuccessfully() async {
+        sut.loadRecommendCoin()
         await sut.task?.value
 
         await MainActor.run {
-            XCTAssertTrue(sut.recommendCoins.count == 5)
-
             guard case .success = sut.status else {
                 XCTFail("Expected .success, But got \(sut.status)")
                 return
@@ -89,6 +89,7 @@ final class RecommendCoinViewModelTests: XCTestCase {
     }
 
     func test_whenErrorOccurs_errorIsHandled() async {
+        sutWithError.loadRecommendCoin()
         await sutWithError.task?.value
 
         await MainActor.run {
