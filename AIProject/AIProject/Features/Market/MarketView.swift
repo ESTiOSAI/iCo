@@ -56,18 +56,19 @@ struct MarketView: View {
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
-                VStack(spacing: 0) {
-                    HeaderView(
-                        heading: coin.koreanName,
-                        coinSymbol: coin.coinSymbol,
-                        showBackButton: hSizeClass == .regular ? false : true
-                    )
-                    .toolbar(.hidden, for: .navigationBar)
-                    
-                    CoinDetailView(coin: coin)
-                    .id(coin.id)
+                NavigationStack {
+                    VStack(spacing: 0) {
+                        HeaderView(
+                            heading: coin.koreanName,
+                            coinSymbol: coin.coinSymbol,
+                            showBackButton: hSizeClass == .regular ? false : true
+                        )
+                        .toolbar(.hidden, for: .navigationBar)
+                        
+                        CoinDetailView(coin: coin)
+                            .id(coin.id)
+                    }
                 }
-                
             } else {
                 CommonPlaceholderView(imageName: "logo", text: "조회할 코인을 선택하세요")
                     .toolbar(.hidden, for: .navigationBar)
