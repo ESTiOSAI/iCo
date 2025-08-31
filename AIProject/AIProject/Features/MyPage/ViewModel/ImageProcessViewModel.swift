@@ -173,6 +173,7 @@ class ImageProcessViewModel: ObservableObject {
                 throw CancellationError()
             default:
                 print("ℹ️ 프롬프트 :", Prompt.extractCoinID(text: textString).content)
+                print(error.log())
                 throw ImageProcessError.unknownAlanError
             }
         }
