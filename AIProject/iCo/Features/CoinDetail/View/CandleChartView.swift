@@ -67,7 +67,7 @@ struct CandleChartView: View {
           GeometryReader { _ in
             Color.clear
               .onAppear { recalcWidth(proxy) }
-              .onChange(of: proxy.plotSize) { _ in recalcWidth(proxy) }
+              .onChange(of: proxy.plotSize) { _, _ in recalcWidth(proxy) }
           }
         }
         /// X축 도메인 설정 및 스크롤 위치 초기화
