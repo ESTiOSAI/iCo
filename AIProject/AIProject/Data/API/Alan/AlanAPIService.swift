@@ -21,6 +21,7 @@ final class AlanAPIService: AlanAPIServiceProtocol {
     }
     
     /// 입력한 질문 또는 문장에 대한 응답을 가져옵니다.
+    ///
     /// - Parameter content: 질문 또는 분석할 문장
     /// - Returns: 수신한 응답 데이터
     func fetchAnswer(content: String, action: AlanAction) async throws -> AlanResponseDTO {
@@ -69,44 +70,6 @@ extension AlanAPIService {
         case .bookmarkSuggestion:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_BOOKMARK_SUGGESTION"] as? String
         }
-    }
-    
-    /// 지정된 코인에 대한 개요 정보를 JSON으로 가져옵니다.
-    ///
-    /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
-    /// - Parameter coin: 개요 정보를 요청할 코인
-    /// - Returns: 디코딩된 개요 DTO
-    func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
-        // 캐시된 응답이 있으면 바로 반환
-        let cacheURL = URL(string: "https://cache.local/coins/\(coin.id)/overview")!
-        let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-        if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
-            do {
-                return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
-            } catch let decodingError as DecodingError {
-                throw NetworkError.decodingError(decodingError)
-            }
-        }
-        
-        let prompt = Prompt.generateOverView(coinKName: coin.koreanName)
-        let dto: CoinOverviewDTO = try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
-        
-        do {
-            let jsonData = try JSONEncoder().encode(dto)
-            
-            let response = URLResponse(
-                url: cacheURL,
-                mimeType: "application/json",
-                expectedContentLength: jsonData.count,
-                textEncodingName: "utf-8"
-            )
-            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
-            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
-        } catch {
-            throw NetworkError.encodingError
-        }
-        
-        return dto
     }
     
     /// 사용자의 투자 성향과 관심 코인을 기반으로 추천 코인 목록을 요청합니다.
@@ -185,6 +148,44 @@ extension AlanAPIService {
         return dto
     }
     
+    /// 지정된 코인에 대한 개요 정보를 JSON으로 가져옵니다.
+    ///
+    /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
+    /// - Parameter coin: 개요 정보를 요청할 코인
+    /// - Returns: 디코딩된 개요 DTO
+    func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO {
+        // 캐시된 응답이 있으면 바로 반환
+        let cacheURL = URL(string: "https://cache.local/coins/\(coin.id)/overview")!
+        let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
+        if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
+            do {
+                return try JSONDecoder().decode(CoinOverviewDTO.self, from: cachedResponse.data)
+            } catch let decodingError as DecodingError {
+                throw NetworkError.decodingError(decodingError)
+            }
+        }
+        
+        let prompt = Prompt.generateOverView(coinKName: coin.koreanName)
+        let dto: CoinOverviewDTO = try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
+        
+        do {
+            let jsonData = try JSONEncoder().encode(dto)
+            
+            let response = URLResponse(
+                url: cacheURL,
+                mimeType: "application/json",
+                expectedContentLength: jsonData.count,
+                textEncodingName: "utf-8"
+            )
+            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
+            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
+        } catch {
+            throw NetworkError.encodingError
+        }
+        
+        return dto
+    }
+    
     /// 주어진 코인에 대해 주간 트렌드 데이터를 가져옵니다.
     ///
     /// - Parameter coin: 대상 코인
@@ -203,10 +204,10 @@ extension AlanAPIService {
         return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
 
-    /// 주어진 코인에 대해 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
+    /// 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
+    /// 캐시가 유효하면 캐시를 우선 사용하고, 없거나 만료되면 새로 요청 후 캐싱합니다.
     ///
-    /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
-    /// - Parameter coin: 대상 코인
+    /// - Parameter ignoreCache: 캐시 여부
     /// - Returns: 디코딩된 DTO
     func fetchTodayInsight(ignoreCache: Bool = false) async throws -> Insight {
         let now = Date.now
@@ -261,11 +262,15 @@ extension AlanAPIService {
         return dto.toDomain()
     }
     
-    /// 주어진 코인에 대해 커뮤니티 기반 인사이트 데이터를 가져옵니다.
+    /// 커뮤니티(예: Reddit) 게시글 요약을 기반으로 감정(`Sentiment`)과 요약을 생성합니다.
+    /// 캐시가 유효하면 캐시를 우선 사용하고, 없거나 만료되면 새로 요청 후 캐싱합니다.
     ///
-    /// 캐시가 있다면 캐시된 데이터를 먼저 반환하고, 없으면 새로 요청 후 캐싱합니다.
-    /// - Parameter coin: 대상 코인
-    /// - Returns: 디코딩된 DTO
+    /// - Parameters:
+    ///   - post: 요약/분석할 커뮤니티 게시글 원문 문자열
+    ///   - now: 캐시 키 생성을 위한 기준 시각(기본값: 현재 시각)
+    ///   - ignoreCache: 캐시 무시 여부
+    /// - Returns: 디코딩된 인사이트 도메인 모델
+    /// - Throws: 네트워크 오류, 디코딩 오류, 인코딩 오류
     func fetchCommunityInsight(from post: String, now: Date = .now, ignoreCache: Bool = false) async throws -> Insight {
         let now = Date.now
         let interval: TimeInterval = 60 * 60
