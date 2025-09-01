@@ -55,25 +55,25 @@ AICo는 **코인 입문자**를 위한 LLM 기반 큐레이션 서비스입니�
 <tr>
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Dashboard.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Market.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Chatbot.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Vision.png" />
 
 </td>
 
@@ -140,25 +140,25 @@ LLM 필터링 기능
 <tr>
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Chart.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/AIR.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Bookmark.png" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="https://github.com/user-attachments/assets/302796a1-3223-4915-9a5b-5840bd39c6d2" />
+<img width="200" alt="image" src="img/Widget.png" />
 
 </td>
 
