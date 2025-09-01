@@ -85,7 +85,6 @@ AICo는 **코인 입문자**를 위한 LLM 기반 큐레이션 서비스입니�
 
 투자 성향 기반 LLM 추천<br/>
 커뮤니티 API 데이터로 <br/>
-실시간 동향 제공  
 
 
 </td>
@@ -104,7 +103,7 @@ SSE Client & 에러 처리
 
 </td>
 <td align="center" width="250">
-Apple Vision 이미지 전처리 / 비식별화<br/>
+Apple Vision 전처리 / 비식별화<br/>
 LLM 필터링 기능  
 </td>
 
