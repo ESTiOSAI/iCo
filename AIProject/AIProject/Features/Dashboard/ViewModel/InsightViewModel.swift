@@ -29,7 +29,6 @@ final class InsightViewModel: ObservableObject {
     private var communityTask: Task<Insight, Error>?
     
     init() {
-        print(#function, String(describing: Self.self))
         load()
     }
     
@@ -45,7 +44,6 @@ final class InsightViewModel: ObservableObject {
             try await alanAPIService.fetchTodayInsight()
         }
         
-        // FIXME: 통일감이 없어보이는
         communityTask = Task { [weak self] in
             try await withTaskCancellationHandler(
                 operation: {
@@ -104,7 +102,6 @@ final class InsightViewModel: ObservableObject {
     
     func cancelOverall() {
         overallTask?.cancel()
-        // FIXME: 취소 작업을 여기서 구현한다면
     }
     
     func cancelCommunity() {
@@ -117,7 +114,6 @@ final class InsightViewModel: ObservableObject {
     }
     
     deinit {
-        print(#function, String(describing: Self.self))
         cancelAll()
     }
 }

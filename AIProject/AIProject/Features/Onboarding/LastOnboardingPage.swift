@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+/// 온보딩 마지막 단계에서 투자 성향을 선택하는 화면입니다.
+///
+/// 사용자가 보수적/중립적/공격적 등의 투자 성향(`RiskTolerance`)을 선택하면
+/// 해당 값이 `AppStorage`에 저장되고, 추천 코인 데이터 로딩에 반영됩니다.
+///
+/// - Properties:
+///   - recommendCoinViewModel: 추천 코인 데이터를 관리하는 뷰모델(`EnvironmentObject`)
+///   - storedInvestmentType: 선택된 투자 성향을 `AppStorage`에 저장
+///   - selectedType: 현재 사용자가 선택한 투자 성향 상태
+///   - isLandscape: 가로/세로 레이아웃 여부를 나타내는 바인딩 값
+///   - onFinish: 온보딩 완료 시 호출되는 콜백
 struct LastOnboardingPage: View {
     @EnvironmentObject var recommendCoinViewModel: RecommendCoinViewModel
     
@@ -14,7 +25,7 @@ struct LastOnboardingPage: View {
     
     @State private var selectedType: RiskTolerance?
     @Binding var isLandscape: Bool
-
+    
     var onFinish: () -> Void
     
     var body: some View {
@@ -46,7 +57,6 @@ struct LastOnboardingPage: View {
                     if let selected = selectedType {
                         storedInvestmentType = selected.rawValue
                         
-                        print("저장된 투자 성향: \(storedInvestmentType.isEmpty ? "없음" : storedInvestmentType)")
                         recommendCoinViewModel.loadRecommendCoin(selectedPreference: storedInvestmentType)
                     }
                     onFinish()

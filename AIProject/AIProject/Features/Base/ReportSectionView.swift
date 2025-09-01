@@ -7,6 +7,16 @@
 
 import SwiftUI
 
+/// 보고서 화면에서 섹션별 데이터를 표현하기 위한 모델입니다.
+///
+/// - Properties:
+///   - id: 섹션을 구분하기 위한 고유 식별자
+///   - icon: 헤더에 표시할 SF Symbol 아이콘 이름
+///   - title: 섹션 제목
+///   - state: 섹션의 데이터 상태(`FetchState`)
+///   - timestamp: 데이터의 마지막 업데이트 시각 (선택 사항)
+///   - onCancel: 로딩 중 취소 동작을 실행하는 클로저
+///   - onRetry: 실패나 취소 시 재시도를 실행하는 클로저
 struct ReportSectionData<Value>: Identifiable {
     let id: String
     let icon: String
@@ -17,6 +27,15 @@ struct ReportSectionData<Value>: Identifiable {
     let onRetry: () -> Void
 }
 
+/// 보고서 화면에서 섹션 단위로 콘텐츠를 표시하는 뷰입니다.
+///
+/// 아이콘, 제목, 상태에 따른 콘텐츠, 재시도/취소 버튼 등을 포함하여
+/// 개별 섹션을 카드 형태로 표현합니다.
+///
+/// - Generics:
+///   - Value: 섹션에 표시할 데이터 타입
+///   - Trailing: 헤더 우측에 배치할 추가 뷰 타입
+///   - Content: 본문에 표시할 뷰 타입
 struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     let data: ReportSectionData<Value>
     @ViewBuilder var trailing: (Value) -> Trailing
@@ -187,27 +206,27 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     
     ScrollView {
         let content = ReportSectionView(
-                data: ReportSectionData<String>(
-                    id: "success",
-                    icon: "chart.line.uptrend.xyaxis",
-                    title: "시장 요약",
-                    state: .success("짧은 글"),
-                    timestamp: Date(),
-                    onCancel: {},
-                    onRetry: {}
-                ),
-                trailing: { value in
-                    Button(action: { UIPasteboard.general.string = value }) {
-                        Image(systemName: "doc.on.doc")
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("내용 복사")
-                },
-                content: { value in
-                    Text(value)
+            data: ReportSectionData<String>(
+                id: "success",
+                icon: "chart.line.uptrend.xyaxis",
+                title: "시장 요약",
+                state: .success("짧은 글"),
+                timestamp: Date(),
+                onCancel: {},
+                onRetry: {}
+            ),
+            trailing: { value in
+                Button(action: { UIPasteboard.general.string = value }) {
+                    Image(systemName: "doc.on.doc")
+                        .font(.system(size: 14, weight: .semibold))
                 }
-            )
+                .buttonStyle(.plain)
+                .accessibilityLabel("내용 복사")
+            },
+            content: { value in
+                Text(value)
+            }
+        )
             .frame(height: max(maxHeight, 250))
         
         

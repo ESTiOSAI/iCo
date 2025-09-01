@@ -155,7 +155,6 @@ final class ReportViewModel: ObservableObject {
     
     deinit {
         cancelAll()
-        print(String(describing: Self.self), #function)
     }
 }
 
