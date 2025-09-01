@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 // MARK: - Test Fixtures (테스트 더미 데이터)
 
@@ -46,7 +46,7 @@ enum TestFixtures {
     }
 
     enum Coin {
-        static let btc = AIProject.Coin(id: "BTC", koreanName: "비트코인")
+        static let btc = iCo.Coin(id: "BTC", koreanName: "비트코인")
     }
 }
 

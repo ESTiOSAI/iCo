@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@testable import AIProject
+@testable import iCo
 
 /// 네트워크 호출 없이 테스트가 원하는 결과/에러를 주입하는 더블(Mock)
 final class MockPriceProvider: CoinPriceProvider {

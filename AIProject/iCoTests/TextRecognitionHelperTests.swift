@@ -7,7 +7,7 @@
 
 import XCTest
 import Vision
-@testable import AIProject
+@testable import iCo
 
 // MARK: - TextRecognitionHelper 테스트
 final class TextRecognitionHelperTests: XCTestCase {

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 // MARK: - ImageProcessViewModel 테스트
 final class ImageProcessViewModelTests: XCTestCase {

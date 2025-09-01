@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 @MainActor
 final class BookmarkExportTests: XCTestCase {

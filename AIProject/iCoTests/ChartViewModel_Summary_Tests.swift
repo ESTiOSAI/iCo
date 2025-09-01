@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 /// summary(마지막가/절대변화/변화율) 계산을 검증하는 테스트
 @MainActor
