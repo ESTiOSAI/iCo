@@ -20,9 +20,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B7B040142E387FD1005DE0BA"
-               BuildableName = "AIProjectTests.xctest"
-               BlueprintName = "AIProjectTests"
-               ReferencedContainer = "container:AIProject.xcodeproj">
+               BuildableName = "iCoTests.xctest"
+               BlueprintName = "iCoTests"
+               ReferencedContainer = "container:iCo.xcodeproj">
             </BuildableReference>
             <SkippedTests>
                <Test
