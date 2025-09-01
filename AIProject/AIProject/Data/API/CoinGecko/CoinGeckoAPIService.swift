@@ -149,7 +149,7 @@ final class CoinGeckoAPIService: CoinImageProvider {
                 async let secondBatch = try await fetchCoinImagesByIDs(ids: end, vsCurrency: vsCurrency)
                 let firstDTO = try await firstBatch
                 let secondDTO = try await secondBatch
-                print("batch result: \(firstDTO.count)개, \(secondDTO.count)개")
+                //print("batch result: \(firstDTO.count)개, \(secondDTO.count)개")
                 dtos = firstDTO + secondDTO
             } else {
                 dtos = try await fetchCoinImagesByIDs(ids: englishNames, vsCurrency: vsCurrency)

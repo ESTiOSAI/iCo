@@ -64,7 +64,6 @@ final class BookmarkViewModel: ObservableObject {
     func cancelTask() {
         task?.cancel()
         task = nil
-        print("cancel Task!")
     }
 
     func deleteAllBookmarks() {
@@ -111,7 +110,7 @@ final class BookmarkViewModel: ObservableObject {
             }
 
             imageMap = map
-            print(imageMap)
+            //print(imageMap)
         } catch {
             print("이미지 로드 실패:", error)
             imageMap = [:]
