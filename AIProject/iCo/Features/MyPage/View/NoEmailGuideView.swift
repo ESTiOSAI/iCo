@@ -56,5 +56,6 @@ struct NoEmailGuideView: View {
             }
         }
         .padding()
+        .interactiveSwipeBackEnabled()
     }
 }

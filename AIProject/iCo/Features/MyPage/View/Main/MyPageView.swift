@@ -14,7 +14,6 @@ struct MyPageView: View {
     @State private var selection: MyPageMenu? = nil
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var showMail = false
-    @State private var showNoEmailView = false
     
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -42,6 +41,9 @@ struct MyPageView: View {
             }
         }
         .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $showMail) {
+            MailView()
+        }
     }
     
     // MARK: - Sidebar
@@ -83,14 +85,18 @@ struct MyPageView: View {
                             MyPageMenuRow(title: menu.title, imageName: menu.icon)
                                 .contentShape(.rect)
                                 .onTapGesture {
-                                    selection = menu
+                                    if MFMailComposeViewController.canSendMail() {
+                                        showMail = true
+                                    } else {
+                                        selection = menu
+                                    }
                                 }
                         }
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                         .listRowSpacing(16)
                     } header: {
                         HStack {
-                            Text("개인화 설정")
+                            Text("기타 메뉴")
                                 .fontWeight(.semibold)
                             Spacer()
                         }
