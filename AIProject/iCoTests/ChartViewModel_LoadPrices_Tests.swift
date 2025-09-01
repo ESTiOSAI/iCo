@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 /// loadPrices의 시간 필터링과 인덱스 재매핑(0..N)을 검증하는 테스트
 @MainActor

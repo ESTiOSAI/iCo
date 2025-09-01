@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 final class ReportViewModelCancellationTests: XCTestCase {
     private var spy: SpyAlanAPIService!

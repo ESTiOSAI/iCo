@@ -6,7 +6,7 @@
 //
 
 import XCTest
-import AIProject
+import iCo
 
 final class UpbitTicketEncodeTests: XCTestCase {
 

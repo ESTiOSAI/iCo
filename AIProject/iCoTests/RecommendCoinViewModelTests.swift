@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 struct AlanServiceStub: AlanRecommendServiceProtocol {
     enum Fixtures {
@@ -25,7 +25,7 @@ struct AlanServiceStub: AlanRecommendServiceProtocol {
     var delay: Duration = .zero
     var isError: Bool = false
 
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [AIProject.RecommendCoinDTO] {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [iCo.RecommendCoinDTO] {
         if delay > .zero {
             try await Task.sleep(for: delay)
         }

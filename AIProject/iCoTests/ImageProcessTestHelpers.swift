@@ -6,7 +6,7 @@
 //
 
 import UIKit
-@testable import AIProject
+@testable import iCo
 
 // MARK: - Helper Methods
 final class ImageProcessTestHelpers {

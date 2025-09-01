@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import AIProject
+@testable import iCo
 
 /// 차트 X축 도메인/초기 스크롤 시각 계산을 검증하는 테스트
 /// - 핵심: 상한은 "마지막 데이터 +5분"과 정확히 일치해야 하며,
