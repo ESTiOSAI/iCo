@@ -27,45 +27,45 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4E50EAE62E64B18E005AE3BB /* AIProject.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = AIProject.xctestplan; sourceTree = "<group>"; };
+		4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = iCo.xctestplan; sourceTree = "<group>"; };
 		A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B75CFBAC2E45D42C0055632C /* AdServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdServices.framework; path = System/Library/Frameworks/AdServices.framework; sourceTree = SDKROOT; };
 		B75D1B212E459ADB006839B5 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
-		B7B040032E387FCF005DE0BA /* AIProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7B040032E387FCF005DE0BA /* iCo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iCo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7B040152E387FD1005DE0BA /* iCoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iCoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */ = {
+		A98DE7E02E3C8C4F003F2F4F /* Exceptions for "iCo" folder in "iCo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Resource/Info.plist,
 			);
-			target = B7B040022E387FCF005DE0BA /* AIProject */;
+			target = B7B040022E387FCF005DE0BA /* iCo */;
 		};
-		A9E81AC42E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectTests" target */ = {
+		A9E81AC42E52FACE00216220 /* Exceptions for "iCo" folder in "iCoTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Data/DB/CoinImage/CoinImageEntity+CoreDataClass.swift",
 				"Data/DB/CoinImage/CoinImageEntity+CoreDataProperties.swift",
 			);
-			target = B7B040142E387FD1005DE0BA /* AIProjectTests */;
+			target = B7B040142E387FD1005DE0BA /* iCoTests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		B7B040052E387FCF005DE0BA /* AIProject */ = {
+		B7B040052E387FCF005DE0BA /* iCo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "AIProject" folder in "AIProject" target */,
-				A9E81AC42E52FACE00216220 /* Exceptions for "AIProject" folder in "AIProjectTests" target */,
+				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "iCo" folder in "iCo" target */,
+				A9E81AC42E52FACE00216220 /* Exceptions for "iCo" folder in "iCoTests" target */,
 			);
-			path = AIProject;
+			path = iCo;
 			sourceTree = "<group>";
 		};
-		B7B040182E387FD1005DE0BA /* AIProjectTests */ = {
+		B7B040182E387FD1005DE0BA /* iCoTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AIProjectTests;
+			path = iCoTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -105,10 +105,10 @@
 		B7B03FFA2E387FCF005DE0BA = {
 			isa = PBXGroup;
 			children = (
-				4E50EAE62E64B18E005AE3BB /* AIProject.xctestplan */,
+				4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */,
 				A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */,
-				B7B040052E387FCF005DE0BA /* AIProject */,
-				B7B040182E387FD1005DE0BA /* AIProjectTests */,
+				B7B040052E387FCF005DE0BA /* iCo */,
+				B7B040182E387FD1005DE0BA /* iCoTests */,
 				B75D1B1C2E4597FC006839B5 /* Frameworks */,
 				B7B040042E387FCF005DE0BA /* Products */,
 			);
@@ -117,8 +117,8 @@
 		B7B040042E387FCF005DE0BA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B7B040032E387FCF005DE0BA /* AIProject.app */,
-				B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */,
+				B7B040032E387FCF005DE0BA /* iCo.app */,
+				B7B040152E387FD1005DE0BA /* iCoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,9 +126,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B7B040022E387FCF005DE0BA /* AIProject */ = {
+		B7B040022E387FCF005DE0BA /* iCo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B7B040292E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "AIProject" */;
+			buildConfigurationList = B7B040292E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "iCo" */;
 			buildPhases = (
 				B7B03FFF2E387FCF005DE0BA /* Sources */,
 				B7B040002E387FCF005DE0BA /* Frameworks */,
@@ -140,21 +140,21 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				B7B040052E387FCF005DE0BA /* AIProject */,
+				B7B040052E387FCF005DE0BA /* iCo */,
 			);
-			name = AIProject;
+			name = iCo;
 			packageProductDependencies = (
 				A9F6C9F12E4465FE005D88E2 /* AsyncAlgorithms */,
 				B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */,
 				B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */,
 			);
 			productName = AIProject;
-			productReference = B7B040032E387FCF005DE0BA /* AIProject.app */;
+			productReference = B7B040032E387FCF005DE0BA /* iCo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B7B040142E387FD1005DE0BA /* AIProjectTests */ = {
+		B7B040142E387FD1005DE0BA /* iCoTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B7B0402C2E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "AIProjectTests" */;
+			buildConfigurationList = B7B0402C2E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "iCoTests" */;
 			buildPhases = (
 				B7B040112E387FD1005DE0BA /* Sources */,
 				B7B040122E387FD1005DE0BA /* Frameworks */,
@@ -166,13 +166,13 @@
 				B7B040172E387FD1005DE0BA /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				B7B040182E387FD1005DE0BA /* AIProjectTests */,
+				B7B040182E387FD1005DE0BA /* iCoTests */,
 			);
-			name = AIProjectTests;
+			name = iCoTests;
 			packageProductDependencies = (
 			);
 			productName = AIProjectTests;
-			productReference = B7B040152E387FD1005DE0BA /* AIProjectTests.xctest */;
+			productReference = B7B040152E387FD1005DE0BA /* iCoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -194,7 +194,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B7B03FFE2E387FCF005DE0BA /* Build configuration list for PBXProject "AIProject" */;
+			buildConfigurationList = B7B03FFE2E387FCF005DE0BA /* Build configuration list for PBXProject "iCo" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -212,8 +212,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B7B040022E387FCF005DE0BA /* AIProject */,
-				B7B040142E387FD1005DE0BA /* AIProjectTests */,
+				B7B040022E387FCF005DE0BA /* iCo */,
+				B7B040142E387FD1005DE0BA /* iCoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -283,7 +283,7 @@
 /* Begin PBXTargetDependency section */
 		B7B040172E387FD1005DE0BA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B7B040022E387FCF005DE0BA /* AIProject */;
+			target = B7B040022E387FCF005DE0BA /* iCo */;
 			targetProxy = B7B040162E387FD1005DE0BA /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -427,7 +427,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/App/Resource/Info.plist;
+				INFOPLIST_FILE = iCo/App/Resource/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "아이코";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -442,7 +442,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.aico;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -463,7 +463,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AIProject/App/Resource/Info.plist;
+				INFOPLIST_FILE = iCo/App/Resource/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "아이코";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -478,7 +478,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.aico;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -494,11 +494,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SJDR485DTV;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.AIProjectTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -507,7 +507,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIProject.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AIProject";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iCo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iCo";
 			};
 			name = Debug;
 		};
@@ -518,11 +518,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = SJDR485DTV;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.AIProjectTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -531,14 +531,14 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AIProject.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AIProject";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iCo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iCo";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B7B03FFE2E387FCF005DE0BA /* Build configuration list for PBXProject "AIProject" */ = {
+		B7B03FFE2E387FCF005DE0BA /* Build configuration list for PBXProject "iCo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B7B040272E387FD1005DE0BA /* Debug */,
@@ -547,7 +547,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B7B040292E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "AIProject" */ = {
+		B7B040292E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "iCo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B7B0402A2E387FD1005DE0BA /* Debug */,
@@ -556,7 +556,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B7B0402C2E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "AIProjectTests" */ = {
+		B7B0402C2E387FD1005DE0BA /* Build configuration list for PBXNativeTarget "iCoTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B7B0402D2E387FD1005DE0BA /* Debug */,

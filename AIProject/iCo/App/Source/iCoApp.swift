@@ -16,7 +16,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 @main
-struct AIProjectApp: App {
+struct iCoApp: App {
     let persistenceController = PersistenceController.shared
     @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     

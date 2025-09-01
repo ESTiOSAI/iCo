@@ -35,9 +35,9 @@
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:AIProject.xcodeproj",
+        "containerPath" : "container:iCo.xcodeproj",
         "identifier" : "B7B040142E387FD1005DE0BA",
-        "name" : "AIProjectTests"
+        "name" : "iCoTests"
       }
     }
   ],

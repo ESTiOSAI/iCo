@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B7B040022E387FCF005DE0BA"
-               BuildableName = "AIProject.app"
-               BlueprintName = "AIProject"
-               ReferencedContainer = "container:AIProject.xcodeproj">
+               BuildableName = "iCo.app"
+               BlueprintName = "iCo"
+               ReferencedContainer = "container:iCo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -27,42 +27,14 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
-      <TestPlans>
-         <TestPlanReference
-            reference = "container:AIProject.xctestplan"
-            default = "YES">
-         </TestPlanReference>
-      </TestPlans>
-      <Testables>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B7B040142E387FD1005DE0BA"
-               BuildableName = "AIProjectTests.xctest"
-               BlueprintName = "AIProjectTests"
-               ReferencedContainer = "container:AIProject.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B7B0401E2E387FD1005DE0BA"
-               BuildableName = "AIProjectUITests.xctest"
-               BlueprintName = "AIProjectUITests"
-               ReferencedContainer = "container:AIProject.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      shouldAutocreateTestPlan = "YES">
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      enableThreadSanitizer = "YES"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
@@ -74,28 +46,18 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B7B040022E387FCF005DE0BA"
-            BuildableName = "AIProject.app"
-            BlueprintName = "AIProject"
-            ReferencedContainer = "container:AIProject.xcodeproj">
+            BuildableName = "iCo.app"
+            BlueprintName = "iCo"
+            ReferencedContainer = "container:iCo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-FIRAnalyticsDebugEnabled"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-FIRDebugEnabled"
-            isEnabled = "NO">
-         </CommandLineArgument>
-      </CommandLineArguments>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "OS_ACTIVITY_MODE"
-            value = "disable"
+      <AdditionalOptions>
+         <AdditionalOption
+            key = "NSZombieEnabled"
+            value = "YES"
             isEnabled = "YES">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
+         </AdditionalOption>
+      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -108,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B7B040022E387FCF005DE0BA"
-            BuildableName = "AIProject.app"
-            BlueprintName = "AIProject"
-            ReferencedContainer = "container:AIProject.xcodeproj">
+            BuildableName = "iCo.app"
+            BlueprintName = "iCo"
+            ReferencedContainer = "container:iCo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
