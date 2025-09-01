@@ -9,31 +9,31 @@ import SwiftUI
 
 struct BookmarkView: View {
     @StateObject private var vm: BookmarkViewModel
-    
+
     @State private var selectedCategory: SortCategory? = nil
     @State private var nameOrder: SortOrder = .none
     @State private var priceOrder: SortOrder = .none
     @State private var volumeOrder: SortOrder = .none
-    
+
     @State private var showBulkInsertSheet = false
     @State private var isShowingShareSheet = false
     @State private var sharingItems: [Any] = []
     @State private var showingExportOptions = false
     @State private var showDeleteConfirm = false
     @State private var didCopy = false
-    
+
     @State private var shareURL: IdentifiableURL?
-    
+
     init(coinStore: CoinStore) {
         _vm = StateObject(wrappedValue: BookmarkViewModel(coinStore: coinStore))
     }
-    
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \BookmarkEntity.timestamp, ascending: false)],
         animation: .default
     )
     private var bookmarks: FetchedResults<BookmarkEntity>
-    
+
     private var isExportDisabled: Bool {
         if bookmarks.isEmpty || vm.briefing == nil { return true }
         switch vm.status {
@@ -43,7 +43,7 @@ struct BookmarkView: View {
             return true
         }
     }
-    
+
     // 정렬 데이터
     var sortedCoins: [BookmarkEntity] {
         switch selectedCategory{
@@ -58,12 +58,12 @@ struct BookmarkView: View {
             }
         case .volume:
             return Array(bookmarks)
-            
+
         case .none:
             return Array(bookmarks)
         }
     }
-    
+
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
@@ -72,9 +72,9 @@ struct BookmarkView: View {
                     HStack {
                         SubheaderView(imageName: "sparkles", subheading: "아이코가 북마크를 분석했어요")
                             .padding(.leading, -16)
-                        
+
                         Spacer()
-                        
+
                         RoundedButton(title: didCopy ? "복사 완료" : "내용 복사", imageName: didCopy ? "checkmark" : "document.on.document") {
                             guard let dto = vm.briefing else { return }
                             let text =
@@ -85,10 +85,10 @@ struct BookmarkView: View {
                         [전략 제안]
                         \(dto.strategy)
                         """
-                            
+
                             UIPasteboard.general.string = text
                             didCopy = true
-                            
+
                             Task {
                                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                                 await MainActor.run { didCopy = false }
@@ -99,7 +99,7 @@ struct BookmarkView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
-                    
+
                     Group {
                         switch vm.status {
                         case .loading:
@@ -131,7 +131,7 @@ struct BookmarkView: View {
                     )
                     .cornerRadius(20)
                     .padding(.horizontal, 16)
-                    
+
                     Text(String.aiGeneratedContentNotice)
                         .font(.system(size: 11))
                         .foregroundColor(.aiCoNeutral)
@@ -141,12 +141,12 @@ struct BookmarkView: View {
                         .padding(.horizontal, 16)
                         .padding(.bottom, 40)
                 }
-                
+
                 HStack {
                     SubheaderView(subheading: "북마크한 코인")
-                    
+
                     Spacer()
-                    
+
                     RoundedButton(title: "전체 삭제", imageName: "trash") {
                         showDeleteConfirm = true
                     }
@@ -164,29 +164,29 @@ struct BookmarkView: View {
                 }
                 .padding(.trailing, 16)
                 .padding(.bottom, 16)
-                
+
                 // 북마크한 코인이 없을 시 플레이스홀더 뷰 보여주기
                 if sortedCoins.isEmpty {
                     CommonPlaceholderView(imageName: "placeholder-no-coin", text: "아직 북마크한 코인이 없어요\n북마크를 등록해 아이코의 AI리포트를 받아보세요")
                         .padding(.vertical, 50)
                 }
-                
+
                 HStack(spacing: 16) {
                     RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(sortedCoins.isEmpty)) {
                         showBulkInsertSheet = true
                     }
-                    
+
                     // 북마크한 코인이 없을 시 내보내기 버튼 숨기기
                     if !bookmarks.isEmpty {
                         RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) {
                             guard !bookmarks.isEmpty else { return }
                             showingExportOptions = true
-                            
+
                         }
                         .disabled(bookmarks.isEmpty)
                         .opacity(bookmarks.isEmpty ? 0.6 : 1.0)
                         .confirmationDialog("내보내기", isPresented: $showingExportOptions, titleVisibility: .visible) {
-                            
+
                             ShareLink("이미지로 내보내기", item: ShareablePNGReport{
                                 try await vm.makeFullReportPNGURL(scale: 2.0) ?? { throw URLError(.cannotCreateFile) }()
                             }, preview: SharePreview("이미지"))
@@ -196,13 +196,13 @@ struct BookmarkView: View {
                                 item: ShareablePDFReport {
                                     try await vm.makeFullReportPDF(scale: 2.0) ?? { throw URLError(.cannotCreateFile) }()
                                 }, preview: SharePreview("PDF"))
-                            
+
                             Button("취소", role: .cancel) {}
                         }
                     }
                 }
                 .padding(.horizontal, 16)
-                
+
                 if !sortedCoins.isEmpty {
                     CoinListSectionView(
                         sortedCoins: sortedCoins,

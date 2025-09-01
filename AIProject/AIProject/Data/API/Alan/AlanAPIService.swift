@@ -360,7 +360,6 @@ extension AlanAPIService {
 
         // 캐시가 있다면 즉시 반환
         if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
-            print("캐시 사용")
             return try JSONDecoder().decode(PortfolioBriefingDTO.self, from: cachedResponse.data)
         }
 
