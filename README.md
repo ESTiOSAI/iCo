@@ -1,8 +1,8 @@
-# AICo: AI Coin Curator
+# iCo: AI Coin Curator
 
-<p align="center"> <img src="docs/images/logo.png" width="200"/> </p> <p align="center"> <b>LLM 기반 코인 초보자를 위한 맞춤 큐레이션 서비스</b><br/> 아이폰과 아이패드 모두에서 최적화된 경험을 제공합니다. </p>
-
-// 아이패드와 폰이 같이 있는 이미지면 좋을 듯
+<p align="center"> 
+<img width="80%" alt="image" src="https://github.com/user-attachments/assets/80688f3a-8e32-4343-81a1-292f28902c07" />
+</p> <p align="center"> <b>LLM 기반 코인 초보자를 위한 맞춤 큐레이션 서비스</b><br/> 아이폰과 아이패드 모두에서 최적화된 경험을 제공합니다. </p>
 
 ## ✨ Introduction
 
@@ -24,68 +24,165 @@ AICo는 **코인 입문자**를 위한 LLM 기반 큐레이션 서비스입니�
 <table>
 <tr>
 <td align="center" width="250">
-  
-### 💈 대시보드  
-<img src="docs/images/dashboard.png" width="200"/><br/>
-투자 성향 기반 LLM 추천<br/>
-커뮤니티 API 데이터로 실시간 동향 제공  
+
+### 대시보드
 
 </td>
+
 <td align="center" width="250">
 
-### 🪙 마켓  
-<img src="docs/images/market.png" width="200"/><br/>
-웹소켓 실시간 코인 시세<br/>
-정렬 / 필터링 및 시세 애니메이션  
+### 마켓
 
 </td>
+
 <td align="center" width="250">
 
-### 🤖 챗봇  
-<img src="docs/images/chatbot.png" width="200"/><br/>
-LLM 기반 코인 답변 챗봇<br/>
-SSE Client & 에러 처리  
+### 챗봇
 
 </td>
+
 <td align="center" width="250">
 
-### 👁️ Vision  
-<img src="docs/images/vision.png" width="200"/><br/>
-Apple Vision 이미지 전처리 / 비식별화<br/>
-LLM 필터링 기능  
+### 비전
 
 </td>
+
+
+
+
 </tr>
 
 <tr>
 <td align="center" width="250">
 
-### 📈 캔들 차트  
-<img src="docs/images/chart.png" width="200"/><br/>
+<img width="200" alt="image" src="img/Dashboard.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Market.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Chatbot.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Vision.png" />
+
+</td>
+
+</tr>
+
+<tr>
+
+<td align="center" width="250">
+
+투자 성향 기반 LLM 추천<br/>
+커뮤니티 API 데이터로 <br/>
+
+
+</td>
+<td align="center" width="250">
+
+웹소켓 실시간 코인 시세<br/>
+정렬 / 필터링 및 시세 애니메이션  
+
+
+</td>
+<td align="center" width="250">
+
+LLM 기반 코인 답변 챗봇<br/>
+SSE Client & 에러 처리  
+
+
+</td>
+<td align="center" width="250">
+Apple Vision 전처리 / 비식별화<br/>
+LLM 필터링 기능  
+</td>
+
+</tr>
+
+<tr>
+<td align="center" width="250">
+
+### 캔들차트
+
+</td>
+
+<td align="center" width="250">
+
+### AI리포트
+
+</td>
+
+<td align="center" width="250">
+
+### 북마크
+
+</td>
+
+<td align="center" width="250">
+
+### 위젯
+
+</td>
+
+
+
+<tr>
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Chart.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/AIR.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Bookmark.png" />
+
+</td>
+
+<td align="center" width="250">
+
+<img width="200" alt="image" src="img/Widget.png" />
+
+</td>
+
+
+<tr>
+<td align="center" width="250">
+
 실시간 캔들 차트 구현<br/>
 코인별 상세 데이터 가시화  
 
 </td>
 <td align="center" width="250">
 
-### 📋 AI 리포트  
-<img src="docs/images/report.png" width="200"/><br/>
 선택한 코인 기반 리포트 자동 생성<br/>
 🤯 문구 추가 예정  
 
 </td>
 <td align="center" width="250">
 
-### 🔖 북마크  
-<img src="docs/images/bookmark.png" width="200"/><br/>
 관심 코인 저장 및 리포트 연동<br/>
 PDF / 이미지 내보내기  
 
 </td>
 <td align="center" width="250">
 
-### ⚙️ 위젯  
-<img src="docs/images/widget.png" width="200"/><br/>
 북마크한 코인 시세 확인<br/>
 홈 화면에서 빠른 접근  
 
@@ -103,12 +200,13 @@ PDF / 이미지 내보내기
 
 ## 🧩 Architecture
 
-구조도 추가하기
-<p align="center"> <img src="docs/images/architecture.png" width="500"/> </p>
+<p align="center"> <img width="80%"  alt="iCo_clean_architecture_services" src="https://github.com/user-attachments/assets/7a5d5364-80a7-4779-9556-e9ed7285ecb1" />
+ </p>
 
+### 📁 Structure
 
 ```swift
-AICo
+iCo
 ├── App                     
 │   ├── Resource      
 ├── Core                  
@@ -163,22 +261,72 @@ AICo
 
 <details> <summary>ImageLoader 최적화</summary> - GIF / JPEG 혼합 처리 시 메모리 최적화 - Prefetch + Cancel + Cache 전략 적용 </details>
 
-## 📁 Architecture
+## 📎 Reference
 
-아키텍처 구조도 이미지 그리기
-### Structure
+- [Video](https://drive.google.com/file/d/1h0XQ7qj6O9IL2tzn2vtZVoIGDKkPu5Ax/view?usp=share_link)
+
+- [Figma](https://www.figma.com/design/jVDfsW25yVPrDtD40wrevN/-%EC%95%84%EC%9D%B4%EC%BD%94--UI?node-id=0-1&p=f&t=R6i4SBeDMeM3hWAK-0)
+
+- [PPT](https://www.figma.com/slides/NOTycuwmLG5K3DCBdII56m/AICo?node-id=4-1185&t=fPHXetsC70C6RCuq-0)
 
 ## 👥 Contributors
 
-<table> <tr> <td align="center"><img src="docs/members/daehun.png" width="100"/><br/><b>강대훈</b></td> <td align="center"><img src="docs/members/minji.png" width="100"/><br/><b>강민지</b></td> <td align="center"><img src="docs/members/hyunjin.png" width="100"/><br/><b>백현진</b></td> <td align="center"><img src="docs/members/heejai.png" width="100"/><br/><b>서희재</b></td> <td align="center"><img src="docs/members/kangho.png" width="100"/><br/><b>이강호</b></td> <td align="center"><img src="docs/members/jihyun.png" width="100"/><br/><b>장지현</b></td> </tr> </table>
-### 회고 한마디 씩
-
-## 📎 Reference
-
-- [Video]()
-
-- [Figma]()
-    
-- [Bottles_iOS](https://github.com/Nexters/Bottles_iOS)
-
-
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/kanghun1121">
+        <img src="https://github.com/kanghun1121.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>강대훈</b></sub>
+      </a>
+      <br />
+챗봇</br>코인추천
+    </td>
+    <td align="center">
+      <a href="https://github.com/aldalddl">
+        <img src="https://github.com/aldalddl.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>강민지</b></sub>
+      </a>
+      <br />
+      차트, 테마
+    </td>
+    <td align="center">
+      <a href="https://github.com/HyeonjinBack">
+        <img src="https://github.com/HyeonjinBack.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>백현진</b></sub>
+      </a>
+      <br />
+      북마크, 위젯
+    </td>
+    <td align="center">
+      <a href="https://github.com/kitcat-s">
+        <img src="https://github.com/kitcat-s.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>서희재</b></sub>
+      </a>
+      <br />
+대쉬보드</br> 케로셀
+    </td>
+    <td align="center">
+      <a href="https://github.com/ibcylon">
+        <img src="https://github.com/ibcylon.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>이강호</b></sub>
+      </a>
+      <br />
+      코인 시세
+    </td>
+    <td align="center">
+      <a href="https://github.com/jihyeonjjang">
+        <img src="https://github.com/jihyeonjjang.png" width="100px;" alt=""/>
+        <br />
+        <sub><b>장지현</b></sub>
+      </a>
+      <br />
+      AI 리포트
+</br>마이페이지
+    </td>
+  </tr>
+</table>
