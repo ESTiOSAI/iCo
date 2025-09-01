@@ -10,9 +10,6 @@ import SwiftUI
 
 /// 앨런 API 관련 서비스를 제공합니다.
 final class AlanAPIService: AlanAPIServiceProtocol {
-    @AppStorage(AppStorageKey.cacheBriefTodayTimestamp) private var cacheBriefTodayTimestamp: String = ""
-    @AppStorage(AppStorageKey.cacheBriefCommunityTimestamp) private var cacheBriefCommunityTimestamp: String = ""
-
     private let network: NetworkClient
     private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
     
@@ -203,7 +200,7 @@ extension AlanAPIService {
         let prompt = Prompt.generateTodayNews(coinKName: coin.koreanName)
         return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
-
+    
     /// 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
     /// 캐시가 유효하면 캐시를 우선 사용하고, 없거나 만료되면 새로 요청 후 캐싱합니다.
     ///
@@ -213,19 +210,20 @@ extension AlanAPIService {
         let now = Date.now
         let interval: TimeInterval = 60 * 60
         
-        if !ignoreCache,
-           !cacheBriefTodayTimestamp.isEmpty,
-           let savedDate = Date.dateAndTimeFormatter.date(from: cacheBriefTodayTimestamp) {
-            let cacheURL = URL(string: "https://cache.local/dashboard/today/\(cacheBriefTodayTimestamp)")!
-            let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-            
-            if let cachedResponse = URLCache.shared.cachedResponse(for: request),
-               now.timeIntervalSince(savedDate) < interval {
-                do {
-                    let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
-                    return dto.toDomain()
-                } catch let decodingError as DecodingError {
-                    throw NetworkError.decodingError(decodingError)
+        if !ignoreCache {
+            if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefTodayTimestamp) as? String, let savedDate = Date.dateAndTimeFormatter.date(from: lastTimestamp) {
+                let cacheURL = URL(string: "https://cache.local/dashboard/today/\(lastTimestamp)")!
+                let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
+                
+                if let cachedResponse = URLCache.shared.cachedResponse(for: request),
+                   now.timeIntervalSince(savedDate) < interval {
+                    do {
+                        let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                        return dto.toDomain()
+                    } catch let decodingError as DecodingError {
+                        throw NetworkError.decodingError(decodingError)
+                    }
+                    
                 }
             }
         }
@@ -251,13 +249,13 @@ extension AlanAPIService {
             throw NetworkError.encodingError
         }
         
-        if !cacheBriefTodayTimestamp.isEmpty {
-            let oldCacheURL = URL(string: "https://cache.local/dashboard/today/\(cacheBriefTodayTimestamp)")!
+        if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefTodayTimestamp) as? String {
+            let oldCacheURL = URL(string: "https://cache.local/dashboard/today/\(lastTimestamp)")!
             let oldRequest = URLRequest(url: oldCacheURL, cachePolicy: .returnCacheDataElseLoad)
             URLCache.shared.removeCachedResponse(for: oldRequest)
         }
         
-        cacheBriefTodayTimestamp = now.dateAndTime
+        UserDefaults.standard.set(now.dateAndTime, forKey: AppStorageKey.cacheBriefTodayTimestamp)
         
         return dto.toDomain()
     }
@@ -275,19 +273,19 @@ extension AlanAPIService {
         let now = Date.now
         let interval: TimeInterval = 60 * 60
         
-        if !ignoreCache,
-           !cacheBriefCommunityTimestamp.isEmpty,
-           let savedDate = Date.dateAndTimeFormatter.date(from: cacheBriefCommunityTimestamp) {
-            let cacheURL = URL(string: "https://cache.local/dashboard/community/\(cacheBriefCommunityTimestamp)")!
-            let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-            
-            if let cachedResponse = URLCache.shared.cachedResponse(for: request),
-               now.timeIntervalSince(savedDate) < interval {
-                do {
-                    let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
-                    return dto.toDomain()
-                } catch let decodingError as DecodingError {
-                    throw NetworkError.decodingError(decodingError)
+        if !ignoreCache {
+            if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefCommunityTimestamp) as? String, let savedDate = Date.dateAndTimeFormatter.date(from: lastTimestamp) {
+                let cacheURL = URL(string: "https://cache.local/dashboard/community/\(lastTimestamp)")!
+                let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
+                
+                if let cachedResponse = URLCache.shared.cachedResponse(for: request),
+                   now.timeIntervalSince(savedDate) < interval {
+                    do {
+                        let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
+                        return dto.toDomain()
+                    } catch let decodingError as DecodingError {
+                        throw NetworkError.decodingError(decodingError)
+                    }
                 }
             }
         }
@@ -313,13 +311,13 @@ extension AlanAPIService {
             throw NetworkError.encodingError
         }
         
-        if !cacheBriefCommunityTimestamp.isEmpty {
-            let oldCacheURL = URL(string: "https://cache.local/dashboard/community/\(cacheBriefCommunityTimestamp)")!
+        if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefCommunityTimestamp) as? String {
+            let oldCacheURL = URL(string: "https://cache.local/dashboard/community/\(lastTimestamp)")!
             let oldRequest = URLRequest(url: oldCacheURL, cachePolicy: .returnCacheDataElseLoad)
             URLCache.shared.removeCachedResponse(for: oldRequest)
         }
         
-        cacheBriefCommunityTimestamp = Date.dateAndTimeFormatter.string(from: now)
+        UserDefaults.standard.set(now.dateAndTime, forKey: AppStorageKey.cacheBriefCommunityTimestamp)
         
         return dto.toDomain()
     }
@@ -327,45 +325,45 @@ extension AlanAPIService {
     /// 북마크된 코인 전체에 대한 투자 브리핑과 전략 제안을 JSON 형식으로 가져옵니다.
     func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: RiskTolerance) async throws -> PortfolioBriefingDTO {
         let coinNames = coins.map { $0.coinID }.joined(separator: ", ")
-
+        
         // 온보딩 때 받을 투자 성향
         let importance: String
         switch character {
         case .conservative:
             importance = "원금 보전을 최우선으로 고려하며, 최근 가격 흐름이나 테마보다는 안정적인 종목 위주로 접근."
-
+            
         case .moderatelyConservative:
             importance = "안정성을 중시하되, 일부 성장 가능성이 있는 종목도 보조적으로 고려하며, 단기 변동성에는 크게 영향을 받지 않음."
-
+            
         case .moderate:
             importance = "안정성과 성장을 균형 있게 추구하며, 테마·시가 총액·최근 가격 흐름을 모두 균형적으로 참고."
-
+            
         case .moderatelyAggressive:
             importance = "성장성을 우선시하되, 안정성도 일정 부분 고려하며, 최근 가격 흐름과 거래량 변화에 적극적으로 반응."
-
+            
         case .aggressive:
             importance = "단기간의 높은 수익을 최우선으로 고려하며, 최근 가격 흐름과 거래량 변화를 중점적으로 참고하고, 테마는 보조적으로만 반영."
         }
-
+        
         // 캐시 키 구성
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd"
         let today = formatter.string(from: Date())
-
+        
         let bookmarkKey = coins.map { $0.coinID }.sorted().joined(separator: ",")
         let key = "\(today)_\(bookmarkKey)"
-
+        
         let cacheURL = URL(string: "https://cache.local/bookmarkBriefing/\(key)")!
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-
+        
         // 캐시가 있다면 즉시 반환
         if let cachedResponse = URLCache.shared.cachedResponse(for: request) {
             return try JSONDecoder().decode(PortfolioBriefingDTO.self, from: cachedResponse.data)
         }
-
+        
         let prompt = Prompt.generateBookmarkBriefing(importance: importance, bookmarks: coinNames)
         let answer = try await fetchAnswer(content: prompt.content, action: .bookmarkSuggestion)
-
+        
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
@@ -374,9 +372,9 @@ extension AlanAPIService {
                 )
             )
         }
-
+        
         let dto = try JSONDecoder().decode(PortfolioBriefingDTO.self, from: jsonData)
-
+        
         // 응답 캐싱
         let response = URLResponse(
             url: cacheURL,
@@ -386,7 +384,7 @@ extension AlanAPIService {
         )
         let cacheEntry = CachedURLResponse(response: response, data: jsonData)
         URLCache.shared.storeCachedResponse(cacheEntry, for: request)
-
+        
         return dto
     }
 }
