@@ -113,11 +113,6 @@ class MarketStore {
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService
-        print("init" + String(describing: Self.self))
-    }
-    
-    deinit {
-        print(#function, String(describing: Self.self))
     }
 }
 
