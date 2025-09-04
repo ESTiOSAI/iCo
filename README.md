@@ -280,7 +280,7 @@ iCo
         <sub><b>강대훈</b></sub>
       </a>
       <br />
-챗봇</br>코인추천
+챗봇</br>코인추천, 네트워크
     </td>
     <td align="center">
       <a href="https://github.com/aldalddl">
@@ -289,7 +289,7 @@ iCo
         <sub><b>강민지</b></sub>
       </a>
       <br />
-      차트, 테마
+      캔들 차트 </br> 테마 변경
     </td>
     <td align="center">
       <a href="https://github.com/HyeonjinBack">
@@ -298,7 +298,7 @@ iCo
         <sub><b>백현진</b></sub>
       </a>
       <br />
-      북마크, 위젯
+      북마크</br>위젯, CoreData
     </td>
     <td align="center">
       <a href="https://github.com/kitcat-s">
@@ -307,7 +307,7 @@ iCo
         <sub><b>서희재</b></sub>
       </a>
       <br />
-대쉬보드</br> 케로셀
+대쉬보드</br> 케로셀, 비전
     </td>
     <td align="center">
       <a href="https://github.com/ibcylon">
@@ -316,7 +316,8 @@ iCo
         <sub><b>이강호</b></sub>
       </a>
       <br />
-      코인 시세
+      코인 시세</br>
+      이미지로더
     </td>
     <td align="center">
       <a href="https://github.com/jihyeonjjang">
@@ -326,7 +327,7 @@ iCo
       </a>
       <br />
       AI 리포트
-</br>마이페이지
+</br>네트워크 에러/취소
     </td>
   </tr>
 </table>
