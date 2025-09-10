@@ -10,28 +10,20 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    private var image: CGImage?
-    private var coinNames: Set<String>
-    
-    init(image: CGImage, coinNames: Set<String>) {
-        self.image = image
-        self.coinNames = coinNames
-    }
-    
-    func handleOCR() async throws -> [String] {
-        let texts = try await recognizeText()
-        let redacted = texts.map { redactNonCoinName(in: $0) }
+    func handleOCR(from image: CGImage, with coinSet: Set<String>) async throws -> [String] {
+        let texts = try await recognizeText(from: image)
+        let redacted = texts.map { redactNonCoinName(in: $0, using: coinSet) }
         return redacted
     }
     
     /// OCR을 처리하는 함수
-    func recognizeText() async throws -> [String] {
+    func recognizeText(from image: CGImage?) async throws -> [String] {
         guard let image else { throw ImageProcessError.unknownVisionError }
         
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { [weak self] request, error in
                 guard self != nil else {
-                    continuation.resume(returning: [])
+                    continuation.resume(throwing: ImageProcessError.unknownVisionError)
                     return
                 }
                 
@@ -64,7 +56,7 @@ final class TextRecognitionHelper {
     }
     
     /// 비식별화를 처리하는 함수
-    private func redactNonCoinName(in text: String) -> String {
+    private func redactNonCoinName(in text: String, using coinNames: Set<String>) -> String {
         var redacted = ""
         
         // lemma 스킴을 사용해 원형 단어를 반환하기
@@ -125,7 +117,6 @@ final class TextRecognitionHelper {
     }
     
     deinit {
-        image = nil
         print("helper", #function)
     }
 }
