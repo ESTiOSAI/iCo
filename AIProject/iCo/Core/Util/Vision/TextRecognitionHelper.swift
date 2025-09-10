@@ -10,10 +10,10 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    private var image: UIImage?
+    private var image: CGImage?
     private var coinNames: Set<String>
     
-    init(image: UIImage, coinNames: Set<String>) {
+    init(image: CGImage, coinNames: Set<String>) {
         self.image = image
         self.coinNames = coinNames
     }
@@ -26,9 +26,7 @@ final class TextRecognitionHelper {
     
     /// OCR을 처리하는 함수
     func recognizeText() async throws -> [String] {
-        guard let cgImage = image?.cgImage else {
-            throw NSError(domain: "TextRecognitionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "🚨 CGImage가 유효하지 않음"])
-        }
+        guard let image else { throw ImageProcessError.unknownVisionError }
         
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { [weak self] request, error in
@@ -56,7 +54,7 @@ final class TextRecognitionHelper {
             request.usesLanguageCorrection = true
             request.revision = VNRecognizeTextRequestRevision3
             
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            let handler = VNImageRequestHandler(cgImage: image, options: [:])
             do {
                 try handler.perform([request])
             } catch {
