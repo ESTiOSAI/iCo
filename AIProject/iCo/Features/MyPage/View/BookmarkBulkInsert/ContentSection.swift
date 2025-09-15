@@ -64,12 +64,12 @@ struct ContentSection: View {
                     if let photoPickerItem = newValue,
                        let data = try? await photoPickerItem.loadTransferable(type: Data.self),
                        let originalImage = UIImage(data: data),
-                       let optimizeImages = originalImage.optimizeImages() {
+                       let optimizedImage = originalImage.resizeImageIfNeeded() {
                         // 미리보기 표시용 리사이즈 이미지
-                        displayImage = optimizeImages.display
+                        displayImage = optimizedImage
                         
                         // OCR 작업 용 최적화 이미지
-                        let ocrImage = optimizeImages.ocr
+                        guard let ocrImage = optimizedImage.cgImage else { return }
                         vm.processImage(from: ocrImage)
                     }
                 }

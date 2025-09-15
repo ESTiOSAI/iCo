@@ -8,7 +8,7 @@
 import SwiftUI
 
 extension UIImage {
-    func optimizeImages() -> (display: UIImage, ocr: CGImage)? {
+    func resizeImageIfNeeded() -> UIImage? {
         let maxDimension: CGFloat = 1024
         let currentMax = max(size.width, size.height)
         
@@ -26,15 +26,11 @@ extension UIImage {
             
             // 새로운 사이즈로 이미지 렌더링하기
             let renderer = UIGraphicsImageRenderer(size: newSize)
-            let displayImage = renderer.image { _ in
+            return renderer.image { _ in
                 self.draw(in: CGRect(origin: .zero, size: newSize))
             }
-            
-            guard let ocrImage = displayImage.cgImage else { return nil }
-            return (displayImage, ocrImage)
         } else {
-            guard let ocrImage = self.cgImage else { return nil }
-            return (self, ocrImage)
+            return self
         }
     }
 }

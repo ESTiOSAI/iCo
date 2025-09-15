@@ -117,7 +117,6 @@ struct CoinCarouselView: View {
             handleManualScrolling(cardID: newValue)
         }
         .sheet(item: $selectedCoin) { coin in
-            
             VStack(spacing: 0) {
                 ZStack(alignment: .center) {
                     HeaderView(
