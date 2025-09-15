@@ -12,20 +12,22 @@ struct ContentSection: View {
     @ObservedObject var vm: ImageProcessViewModel
     
     @State var selectedItem: PhotosPickerItem?
-    @State var selectedImage: UIImage?
+    @State var displayImage: UIImage?
     
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
             
             VStack {
-                if selectedImage == nil {
+                if displayImage == nil {
                     // 이미지 등록 전
                     CommonPlaceholderView(imageName: "placeholder-no-image", text: "선택된 이미지가 없어요")
                 } else {
                     // 이미지 등록 후
                     ZStack {
-                        ImagePreviewView(selectedImage: selectedImage!)
+                        if let displayImage {
+                            ImagePreviewView(selectedImage: displayImage)
+                        }
                         
                         if vm.isLoading {
                             VStack(spacing: 16) {
@@ -59,10 +61,16 @@ struct ContentSection: View {
             .padding(.horizontal, 16)
             .onChange(of: selectedItem) { _, newValue in
                 Task {
-                    if let data = try? await newValue?.loadTransferable(type: Data.self),
-                       let uiImage = UIImage(data: data) {
-                        selectedImage = uiImage
-                        vm.processImage(from: selectedImage!)
+                    if let photoPickerItem = newValue,
+                       let data = try? await photoPickerItem.loadTransferable(type: Data.self),
+                       let originalImage = UIImage(data: data),
+                       let optimizedImage = originalImage.resizeImageIfNeeded() {
+                        // 미리보기 표시용 리사이즈 이미지
+                        displayImage = optimizedImage
+                        
+                        // OCR 작업 용 최적화 이미지
+                        guard let ocrImage = optimizedImage.cgImage else { return }
+                        vm.processImage(from: ocrImage)
                     }
                 }
             }

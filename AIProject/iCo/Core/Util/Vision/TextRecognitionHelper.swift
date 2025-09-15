@@ -10,43 +10,37 @@ import Vision
 import NaturalLanguage
 
 final class TextRecognitionHelper {
-    private var image: UIImage?
-    private var coinNames: Set<String>
-    
-    init(image: UIImage, coinNames: Set<String>) {
-        self.image = image
-        self.coinNames = coinNames
-    }
-    
-    func handleOCR() async throws -> [String] {
-        let texts = try await recognizeText()
-        let redacted = texts.map { redactNonCoinName(in: $0) }
+    func handleOCR(from image: CGImage, with coinSet: Set<String>) async throws -> [String] {
+        let texts = try await recognizeText(from: image)
+        let redacted = texts.map { redactNonCoinName(in: $0, using: coinSet) }
         return redacted
     }
     
     /// OCR을 처리하는 함수
-    func recognizeText() async throws -> [String] {
-        guard let cgImage = image?.cgImage else {
-            throw NSError(domain: "TextRecognitionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "🚨 CGImage가 유효하지 않음"])
-        }
+    func recognizeText(from image: CGImage?) async throws -> [String] {
+        guard let image else { throw ImageProcessError.unknownVisionError }
         
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { [weak self] request, error in
-                guard self != nil else {
-                    continuation.resume(returning: [])
-                    return
-                }
-                
+                // continuation에서 에러를 반환하면 안전하게 종료하기
                 if let error {
                     continuation.resume(throwing: error)
                     return
                 }
                 
-                guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                    continuation.resume(returning: [])
+                // DataRace로 인한 참조 해제가 발생하면 안전하게 종료하기
+                guard self != nil else {
+                    continuation.resume(throwing: ImageProcessError.unknownVisionError)
                     return
                 }
                 
+                // 메모리 부족 등으로 Vision 처리 자체가 실패하면 안전하게 종료하기
+                guard let observations = request.results as? [VNRecognizedTextObservation] else {
+                    continuation.resume(throwing: ImageProcessError.unknownVisionError)
+                    return
+                }
+                
+                // 결과 Parsing하기
                 let results = observations.compactMap { $0.topCandidates(1).first?.string }
                 continuation.resume(returning: results)
             }
@@ -56,7 +50,7 @@ final class TextRecognitionHelper {
             request.usesLanguageCorrection = true
             request.revision = VNRecognizeTextRequestRevision3
             
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            let handler = VNImageRequestHandler(cgImage: image, options: [:])
             do {
                 try handler.perform([request])
             } catch {
@@ -66,7 +60,7 @@ final class TextRecognitionHelper {
     }
     
     /// 비식별화를 처리하는 함수
-    private func redactNonCoinName(in text: String) -> String {
+    private func redactNonCoinName(in text: String, using coinNames: Set<String>) -> String {
         var redacted = ""
         
         // lemma 스킴을 사용해 원형 단어를 반환하기
@@ -127,7 +121,6 @@ final class TextRecognitionHelper {
     }
     
     deinit {
-        image = nil
         print("helper", #function)
     }
 }
