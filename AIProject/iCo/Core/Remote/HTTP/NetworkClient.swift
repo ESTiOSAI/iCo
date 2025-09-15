@@ -33,6 +33,36 @@ final class NetworkClient {
         }
     }
     
+    func postRequest<T: Decodable>(to endpoint: Endpoint) async throws -> T {
+        do {
+            var urlRequest = URLRequest(url: endpoint.path)
+            urlRequest.httpMethod = endpoint.method.rawValue
+            urlRequest.allHTTPHeaderFields = endpoint.headers
+            urlRequest.httpBody = endpoint.body
+            
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NetworkError.invalidResponse
+            }
+            
+            let statusCode = httpResponse.statusCode
+            try handleStatusCode(statusCode, data: data)
+            
+            do {
+                return try JSONDecoder().decode(T.self, from: data)
+            } catch let decodingError as DecodingError {
+                throw NetworkError.decodingError(decodingError)
+            }
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            throw NetworkError.taskCancelled
+        } catch let urlError as URLError {
+            throw NetworkError.networkError(urlError)
+        }  catch {
+            throw error
+        }
+    }
+    
     private func handleStatusCode(_ statusCode: Int, data: Data) throws {
         switch statusCode {
         case 200..<300:
