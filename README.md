@@ -172,7 +172,7 @@ LLM 필터링 기능
 <td align="center" width="250">
 
 선택한 코인 기반 리포트 자동 생성<br/>
-🤯 문구 추가 예정  
+코인 뉴스, 주간 동향 제공  
 
 </td>
 <td align="center" width="250">
@@ -200,7 +200,9 @@ PDF / 이미지 내보내기
 
 ## 🧩 Architecture
 
-<p align="center"> <img width="80%"  alt="iCo_clean_architecture_services" src="https://github.com/user-attachments/assets/7a5d5364-80a7-4779-9556-e9ed7285ecb1" />
+<p align="center">
+ <img width="80%" alt="image" src="https://github.com/user-attachments/assets/78cee1e4-6263-4ede-b0c2-a7f744689bfe" />
+
  </p>
 
 ### 📁 Structure
@@ -261,7 +263,7 @@ iCo
 
 <details> <summary>ImageLoader 최적화</summary> - GIF / JPEG 혼합 처리 시 메모리 최적화 - Prefetch + Cancel + Cache 전략 적용 </details>
 
-## 📎 Reference
+## 📎 Attachments
 
 - [Video](https://drive.google.com/file/d/1h0XQ7qj6O9IL2tzn2vtZVoIGDKkPu5Ax/view?usp=share_link)
 
@@ -327,7 +329,7 @@ iCo
       </a>
       <br />
       AI 리포트
-</br>네트워크 에러/취소
+</br>네트워크 Layer
     </td>
   </tr>
 </table>
