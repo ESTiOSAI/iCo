@@ -22,6 +22,12 @@ final class TextRecognitionHelper {
         
         return try await withCheckedThrowingContinuation { continuation in
             let request = VNRecognizeTextRequest { [weak self] request, error in
+                // continuation에서 에러를 반환하면 안전하게 종료하기
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                
                 // DataRace로 인한 참조 해제가 발생하면 안전하게 종료하기
                 guard self != nil else {
                     continuation.resume(throwing: ImageProcessError.unknownVisionError)
@@ -31,12 +37,6 @@ final class TextRecognitionHelper {
                 // 메모리 부족 등으로 Vision 처리 자체가 실패하면 안전하게 종료하기
                 guard let observations = request.results as? [VNRecognizedTextObservation] else {
                     continuation.resume(throwing: ImageProcessError.unknownVisionError)
-                    return
-                }
-                
-                // continuation에서 에러를 반환하면 안전하게 종료하기
-                if let error {
-                    continuation.resume(throwing: error)
                     return
                 }
                 
