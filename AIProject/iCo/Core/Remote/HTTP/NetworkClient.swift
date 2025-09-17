@@ -9,9 +9,9 @@ import Foundation
 
 /// Network 통신을 담당하는 객체
 final class NetworkClient {
-    func request<T: Decodable>(url: URL) async throws -> T {
+    func request<T: Decodable>(for request: URLRequest) async throws -> T {
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(for: request)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw NetworkError.invalidResponse
@@ -33,19 +33,13 @@ final class NetworkClient {
         }
     }
     
-    func postRequest<T: Decodable>(to endpoint: Endpoint) async throws -> T {
+    func request<T: Decodable>(url: URL) async throws -> T {
         do {
-            var urlRequest = URLRequest(url: endpoint.path)
-            urlRequest.httpMethod = endpoint.method.rawValue
-            urlRequest.allHTTPHeaderFields = endpoint.headers
-            urlRequest.httpBody = endpoint.body
-            
-            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+            let (data, response) = try await URLSession.shared.data(from: url)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw NetworkError.invalidResponse
             }
-            
             let statusCode = httpResponse.statusCode
             try handleStatusCode(statusCode, data: data)
             
