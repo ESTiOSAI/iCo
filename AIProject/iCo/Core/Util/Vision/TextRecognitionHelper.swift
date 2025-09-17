@@ -11,9 +11,15 @@ import NaturalLanguage
 
 final class TextRecognitionHelper {
     func handleOCR(from image: CGImage, with coinSet: Set<String>) async throws -> [String] {
+        /// OCR 실행하기
         let texts = try await recognizeText(from: image)
+        guard !texts.isEmpty else {
+            return []
+        }
+        
+        /// 비식별화 실행하기
         let redacted = texts.map { redactNonCoinName(in: $0, using: coinSet) }
-        return redacted
+        return !redacted.isEmpty ? [] : redacted
     }
     
     /// OCR을 처리하는 함수
