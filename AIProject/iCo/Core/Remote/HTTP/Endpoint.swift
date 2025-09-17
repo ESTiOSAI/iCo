@@ -23,7 +23,7 @@ extension Requestable {
         }
         
         guard let queryDictionary = try? queryParameters.toDictionary() else {
-            throw NetworkError.invalidURL // TODO: Fix
+            throw NetworkError.invalidURL
         }
         
         var queryItemList : [URLQueryItem] = []
@@ -46,11 +46,11 @@ extension Requestable {
         }
         
         guard let bodyDictionary = try? bodyParameters.toDictionary() else {
-            throw NetworkError.invalidURL // TODO: Fix
+            throw NetworkError.encodingError
         }
         
         guard let encodedBody = try? JSONSerialization.data(withJSONObject: bodyDictionary) else {
-            throw NetworkError.invalidURL // TODO: Fix
+            throw NetworkError.encodingError
         }
         
         return encodedBody
