@@ -68,12 +68,6 @@ final class UpBitAPIService: UpBitApiServiceProtocol {
     func fetchCandles(id market: String, count: Int = 1, to: Date? = nil) async throws -> [MinuteCandleDTO] {
         var urlString = "\(endpoint)/candles/minutes/1?market=\(market)&count=\(count)"
         
-        if let to = to {
-            let formatter = ISO8601DateFormatter()
-            formatter.timeZone = TimeZone(identifier: "UTC")
-            let toString = formatter.string(from: to)
-            urlString += "&to=\(toString)"
-        }
         
         guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
         let minuteCandleDTOs: [MinuteCandleDTO] = try await network.request(url: url)
