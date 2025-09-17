@@ -7,19 +7,6 @@
 
 import Foundation
 
-enum RedditEndpoint {
-    case main
-}
-
-extension RedditEndpoint: Requestable {
-    var baseURL: String { "https://oauth.reddit.com" }
-    var path: String { "/r/cryptocurrency/top.json" }
-    var httpMethod: HTTPMethod { .get }
-    var queryParameters: Encodable? { ["t": "day", "limit": "5"] }
-    var bodyParameters: Encodable? { nil }
-    var headers: [String : String] { [:] }
-}
-
 /// 레딧 API 관련 서비스를 제공합니다.
 final class RedditAPIService: CommunityProvider {
     private let network: NetworkClient
