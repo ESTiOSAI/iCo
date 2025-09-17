@@ -8,7 +8,7 @@
 import Foundation
 
 /// Gemini API 관련 서비스를 제공합니다.
-final class LLMAPIService {
+final class LLMAPIService: LLMProvider {
     private let network: NetworkClient
     
     init(networkClient: NetworkClient = .init()) {
