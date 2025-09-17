@@ -9,6 +9,10 @@
 struct LLMRequestBody: Codable {
     let contents: [Content]
     
+    init(content: String) {
+        self.contents = [Content(parts: [Content.Part(text: content)])]
+    }
+    
     struct Content: Codable {
         let parts: [Part]
         
