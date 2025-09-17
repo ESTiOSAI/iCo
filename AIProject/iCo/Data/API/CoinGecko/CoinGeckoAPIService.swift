@@ -10,7 +10,6 @@ import Foundation
 /// CoinGecko에서 코인 이미지(URL)를 조회하는 서비스를 제공합니다.
 final class CoinGeckoAPIService: CoinImageProvider {
     private let network: NetworkClient
-    private let endpoint: String = "https://api.coingecko.com/api/v3"
 
     init(network: NetworkClient = .init()) {
         self.network = network
@@ -21,14 +20,14 @@ final class CoinGeckoAPIService: CoinImageProvider {
     ///   - symbols: 코인 심볼 배열 (ex. ["btc", "eth", "bonk"])
     ///   - vsCurrency: 표기 통화 (가격을 쓰지 않더라도 엔드포인트 특성상 필요, 기본: "krw")
     /// - Returns: 이미지 정보를 포함한 DTO 배열
-    func fetchCoinImages(symbols: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] { // MARK: Request
+    func fetchCoinImages(symbols: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] {
         let urlRequest = try CoinGeckoEndpoint.bySymbol(symbols: symbols, currency: vsCurrency).makeURLrequest()
         let dtos: [CoinGeckoImageDTO] = try await network.request(for: urlRequest)
         return dtos
     }
     
     //MARK: -- 온보딩 뷰에서 저장하는 새로운 fetch
-    func fetchCoinImagesByIDs(ids: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] { // MARK: Request
+    func fetchCoinImagesByIDs(ids: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] {
         let urlRequest = try CoinGeckoEndpoint.byID(ids: ids, currency: vsCurrency).makeURLrequest()
         let dtos: [CoinGeckoImageDTO] = try await network.request(for: urlRequest)
         return dtos

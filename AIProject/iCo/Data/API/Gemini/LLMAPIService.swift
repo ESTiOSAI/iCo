@@ -15,14 +15,13 @@ final class LLMAPIService {
     }
     
     func postAnswer(content: String, action: AlanAction) async throws -> LLMResponseDTO {
-        let endpoint = GeminiEndpoint.main(body: LLMRequestBody(content: content), action: action)
-        let request = try endpoint.makeURLrequest()
-        let responseDTO: LLMResponseDTO = try await network.request(for: request)
+        let urlRequest = GeminiEndpoint.main(body: LLMRequestBody(content: content), action: action).makeURLrequest()
+        let responseDTO: LLMResponseDTO = try await network.request(for: urlRequest)
         return responseDTO
     }
 }
 
-private extension LLMAPIService {
+extension LLMAPIService {
     /// 지정된 프롬프트와 작업 타입에 따라 JSON String 응답을 받아 디코딩된 DTO를 반환합니다.
     ///
     /// - Parameters:
