@@ -7,6 +7,35 @@
 
 import Foundation
 
+enum CoinGeckoEndpoint {
+    case bySymbol(symbols: [String], currency: String)
+    case byID(ids: [String], currency: String)
+}
+
+extension CoinGeckoEndpoint: Requestable {
+    var baseURL: String { "https://api.coingecko.com/api/v3" }
+    var path: String { "/coins/markets" }
+    var httpMethod: HTTPMethod { .get }
+    var bodyParameters: Encodable? { nil }
+    var headers: [String : String] { [:] }
+    
+    var queryParameters: Encodable? {
+        switch self {
+        case .bySymbol(let symbols, let currency):
+            return ["vs_currency": currency.lowercased(), "symbols": formattedData(symbols: symbols)]
+        case .byID(let ids, let currency):
+            return ["vs_currency": currency.lowercased(), "ids": formattedData(symbols: ids)]
+        }
+    }
+    
+    private func formattedData(symbols: [String]) -> String {
+        symbols
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            .filter { !$0.isEmpty }
+            .joined(separator: ",")
+    }
+}
+
 /// CoinGecko에서 코인 이미지(URL)를 조회하는 서비스를 제공합니다.
 final class CoinGeckoAPIService: CoinImageProvider {
     private let network: NetworkClient
