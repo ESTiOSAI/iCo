@@ -7,6 +7,19 @@
 
 import Foundation
 
+enum FearGreedEndpoint {
+    case main
+}
+
+extension FearGreedEndpoint: Requestable {
+    var baseURL: String { "https://api.alternative.me" }
+    var path: String { "/fng" }
+    var httpMethod: HTTPMethod { .get }
+    var queryParameters: Encodable? { nil }
+    var bodyParameters: Encodable? { nil }
+    var headers: [String : String] { [:] }
+}
+
 /// 공포 탐욕 지수 API 관련 서비스를 제공합니다.
 final class FearGreedAPIService: FearGreedProvider {
     private let network: NetworkClient
