@@ -8,7 +8,7 @@
 import Foundation
 
 enum GeminiEndpoint {
-    case main(body: Encodable, action: AlanAction)
+    case main(body: Encodable, action: LLMAction)
 }
 
 extension GeminiEndpoint: Requestable {
@@ -35,14 +35,14 @@ extension GeminiEndpoint: Requestable {
         ]
     }
     
-    private func getAction() -> AlanAction {
+    private func getAction() -> LLMAction {
         switch self {
         case .main(_, let action):
             return action
         }
     }
     
-    private func switchClientID(for action: AlanAction) -> String? {
+    private func switchClientID(for action: LLMAction) -> String? {
         switch action {
         case .coinRecomendation:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String

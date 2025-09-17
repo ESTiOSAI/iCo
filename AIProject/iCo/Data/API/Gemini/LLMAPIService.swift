@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Gemini API 관련 서비스를 제공합니다.
 final class LLMAPIService {
     private let network: NetworkClient
     
@@ -14,8 +15,8 @@ final class LLMAPIService {
         self.network = networkClient
     }
     
-    func postAnswer(content: String, action: AlanAction) async throws -> LLMResponseDTO {
-        let urlRequest = GeminiEndpoint.main(body: LLMRequestBody(content: content), action: action).makeURLrequest()
+    func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO {
+        let urlRequest = try GeminiEndpoint.main(body: LLMRequestBody(content: content), action: action).makeURLrequest()
         let responseDTO: LLMResponseDTO = try await network.request(for: urlRequest)
         return responseDTO
     }
@@ -28,7 +29,7 @@ extension LLMAPIService {
     ///   - prompt: 요청을 생성하는 프롬프트
     ///   - action: 요청 목적에 따른 작업 타입
     /// - Returns: 디코딩된 DTO 객체
-    private func fetchDTO<T: Decodable>(prompt: Prompt, action: AlanAction) async throws -> T {
+    private func fetchDTO<T: Decodable>(prompt: Prompt, action: LLMAction) async throws -> T {
         let answer = try await postAnswer(content: prompt.content, action: action)
         
         guard let text = answer.candidates.first?.content.parts.first?.text else {

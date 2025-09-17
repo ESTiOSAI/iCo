@@ -21,7 +21,7 @@ final class AlanAPIService: AlanAPIServiceProtocol {
     ///
     /// - Parameter content: 질문 또는 분석할 문장
     /// - Returns: 수신한 응답 데이터
-    func fetchAnswer(content: String, action: AlanAction) async throws -> AlanResponseDTO {
+    func fetchAnswer(content: String, action: LLMAction) async throws -> AlanResponseDTO {
         guard let clientID = switchClientID(for: action), !clientID.isEmpty else { throw NetworkError.invalidAPIKey }
         
         let urlString = "\(endpoint)?content=\(content)&client_id=\(clientID)"
@@ -37,7 +37,7 @@ final class AlanAPIService: AlanAPIServiceProtocol {
     ///   - prompt: 요청을 생성하는 프롬프트
     ///   - action: 요청 목적에 따른 작업 타입
     /// - Returns: 디코딩된 DTO 객체
-    private func fetchDTO<T: Decodable>(prompt: Prompt, action: AlanAction) async throws -> T {
+    private func fetchDTO<T: Decodable>(prompt: Prompt, action: LLMAction) async throws -> T {
         let answer = try await fetchAnswer(content: prompt.content, action: action)
         
         guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
@@ -54,7 +54,7 @@ final class AlanAPIService: AlanAPIServiceProtocol {
 
 extension AlanAPIService {
     /// Alan이 수행할 작업에 따라 ClientID를 전환합니다.
-    private func switchClientID(for action: AlanAction) -> String? {
+    private func switchClientID(for action: LLMAction) -> String? {
         switch action {
         case .coinRecomendation:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
