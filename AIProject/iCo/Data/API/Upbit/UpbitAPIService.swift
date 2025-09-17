@@ -109,7 +109,6 @@ final class UpBitAPIService: UpBitApiServiceProtocol {
     func fetchCandles(id market: String, count: Int = 1, to: Date? = nil) async throws -> [MinuteCandleDTO] {
         let urlRequest = try UpbitEndpoint.candles(id: market, count: count, to: to).makeURLrequest()
         let minuteCandleDTOs: [MinuteCandleDTO] = try await network.request(for: urlRequest)
-        print(minuteCandleDTOs)
         return minuteCandleDTOs
     }
 }
