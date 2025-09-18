@@ -25,9 +25,9 @@ final class AppConnectivityManager {
                 last = now
                 await MainActor.run {
                     if now {
-                        self.banner.showOnline("온라인 복귀")
+                        self.banner.showOnline("온라인 상태입니다")
                     } else {
-                        self.banner.showOffline("오프라인입니다")
+                        self.banner.showOffline("오프라인 상태입니다")
                     }
                 }
             }
