@@ -89,6 +89,7 @@
 		B7C7256B2E7BDD43000E1191 /* Exceptions for "iCOWidget" folder in "iCo" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppGroup.swift,
 				WidgetCoinSummary.swift,
 			);
 			target = B7B040022E387FCF005DE0BA /* iCo */;
