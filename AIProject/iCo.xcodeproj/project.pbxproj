@@ -14,6 +14,9 @@
 		B75D1B1E2E4597FC006839B5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */; };
 		B75D1B202E459806006839B5 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1F2E459806006839B5 /* FirebaseCrashlytics */; };
 		B75D1B222E459ADB006839B5 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75D1B212E459ADB006839B5 /* AdSupport.framework */; };
+		B7C71D2B2E7BD9D7000E1191 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7C71D2A2E7BD9D7000E1191 /* WidgetKit.framework */; };
+		B7C71D2D2E7BD9D7000E1191 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B7C71D2C2E7BD9D7000E1191 /* SwiftUI.framework */; };
+		B7C71D3A2E7BD9D9000E1191 /* iCOWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B7C71D292E7BD9D6000E1191 /* iCOWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,7 +27,28 @@
 			remoteGlobalIDString = B7B040022E387FCF005DE0BA;
 			remoteInfo = AIProject;
 		};
+		B7C71D382E7BD9D9000E1191 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B7B03FFB2E387FCF005DE0BA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7C71D282E7BD9D6000E1191;
+			remoteInfo = iCOWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B7C71D3A2E7BD9D9000E1191 /* iCOWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = iCo.xctestplan; sourceTree = "<group>"; };
@@ -33,6 +57,10 @@
 		B75D1B212E459ADB006839B5 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		B7B040032E387FCF005DE0BA /* iCo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iCo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7B040152E387FD1005DE0BA /* iCoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iCoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7C71D292E7BD9D6000E1191 /* iCOWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = iCOWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B7C71D2A2E7BD9D7000E1191 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B7C71D2C2E7BD9D7000E1191 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		B7C71D412E7BDB70000E1191 /* iCOWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iCOWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -51,6 +79,13 @@
 			);
 			target = B7B040142E387FD1005DE0BA /* iCoTests */;
 		};
+		B7C71D3F2E7BD9D9000E1191 /* Exceptions for "iCOWidget" folder in "iCOWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -66,6 +101,14 @@
 		B7B040182E387FD1005DE0BA /* iCoTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = iCoTests;
+			sourceTree = "<group>";
+		};
+		B7C71D2E2E7BD9D7000E1191 /* iCOWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B7C71D3F2E7BD9D9000E1191 /* Exceptions for "iCOWidget" folder in "iCOWidgetExtension" target */,
+			);
+			path = iCOWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -90,6 +133,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B7C71D262E7BD9D6000E1191 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B7C71D2D2E7BD9D7000E1191 /* SwiftUI.framework in Frameworks */,
+				B7C71D2B2E7BD9D7000E1191 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -98,6 +150,8 @@
 			children = (
 				B75CFBAC2E45D42C0055632C /* AdServices.framework */,
 				B75D1B212E459ADB006839B5 /* AdSupport.framework */,
+				B7C71D2A2E7BD9D7000E1191 /* WidgetKit.framework */,
+				B7C71D2C2E7BD9D7000E1191 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -105,10 +159,12 @@
 		B7B03FFA2E387FCF005DE0BA = {
 			isa = PBXGroup;
 			children = (
+				B7C71D412E7BDB70000E1191 /* iCOWidgetExtension.entitlements */,
 				4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */,
 				A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */,
 				B7B040052E387FCF005DE0BA /* iCo */,
 				B7B040182E387FD1005DE0BA /* iCoTests */,
+				B7C71D2E2E7BD9D7000E1191 /* iCOWidget */,
 				B75D1B1C2E4597FC006839B5 /* Frameworks */,
 				B7B040042E387FCF005DE0BA /* Products */,
 			);
@@ -119,6 +175,7 @@
 			children = (
 				B7B040032E387FCF005DE0BA /* iCo.app */,
 				B7B040152E387FD1005DE0BA /* iCoTests.xctest */,
+				B7C71D292E7BD9D6000E1191 /* iCOWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,10 +191,12 @@
 				B7B040002E387FCF005DE0BA /* Frameworks */,
 				B7B040012E387FCF005DE0BA /* Resources */,
 				B75D1FD22E45C153006839B5 /* ShellScript */,
+				B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				B7C71D392E7BD9D9000E1191 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				B7B040052E387FCF005DE0BA /* iCo */,
@@ -175,6 +234,28 @@
 			productReference = B7B040152E387FD1005DE0BA /* iCoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7C71D3E2E7BD9D9000E1191 /* Build configuration list for PBXNativeTarget "iCOWidgetExtension" */;
+			buildPhases = (
+				B7C71D252E7BD9D6000E1191 /* Sources */,
+				B7C71D262E7BD9D6000E1191 /* Frameworks */,
+				B7C71D272E7BD9D6000E1191 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				B7C71D2E2E7BD9D7000E1191 /* iCOWidget */,
+			);
+			name = iCOWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = iCOWidgetExtension;
+			productReference = B7C71D292E7BD9D6000E1191 /* iCOWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -182,7 +263,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					B7B040022E387FCF005DE0BA = {
@@ -191,6 +272,9 @@
 					B7B040142E387FD1005DE0BA = {
 						CreatedOnToolsVersion = 16.3;
 						TestTargetID = B7B040022E387FCF005DE0BA;
+					};
+					B7C71D282E7BD9D6000E1191 = {
+						CreatedOnToolsVersion = 16.4;
 					};
 				};
 			};
@@ -214,6 +298,7 @@
 			targets = (
 				B7B040022E387FCF005DE0BA /* iCo */,
 				B7B040142E387FD1005DE0BA /* iCoTests */,
+				B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -232,6 +317,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9C265DB2E40B12500C987E5 /* Secrets.xcconfig in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B7C71D272E7BD9D6000E1191 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +370,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B7C71D252E7BD9D6000E1191 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -285,6 +384,11 @@
 			isa = PBXTargetDependency;
 			target = B7B040022E387FCF005DE0BA /* iCo */;
 			targetProxy = B7B040162E387FD1005DE0BA /* PBXContainerItemProxy */;
+		};
+		B7C71D392E7BD9D9000E1191 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;
+			targetProxy = B7C71D382E7BD9D9000E1191 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -420,11 +524,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iCo/iCo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7HK4Z95VZD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iCo/App/Resource/Info.plist;
@@ -442,9 +549,10 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.aico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = aicoprovisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -457,10 +565,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iCo/iCo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7HK4Z95VZD;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iCo/App/Resource/Info.plist;
@@ -478,9 +589,10 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.aico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = aicoprovisioning;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -535,6 +647,74 @@
 			};
 			name = Release;
 		};
+		B7C71D3C2E7BD9D9000E1191 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = iCOWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7HK4Z95VZD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iCOWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = iCOWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.aico.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = aicoprovisioningwidget;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B7C71D3D2E7BD9D9000E1191 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = iCOWidgetExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7HK4Z95VZD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iCOWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = iCOWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.est.aico.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = aicoprovisioningwidget;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -561,6 +741,15 @@
 			buildConfigurations = (
 				B7B0402D2E387FD1005DE0BA /* Debug */,
 				B7B0402E2E387FD1005DE0BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B7C71D3E2E7BD9D9000E1191 /* Build configuration list for PBXNativeTarget "iCOWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7C71D3C2E7BD9D9000E1191 /* Debug */,
+				B7C71D3D2E7BD9D9000E1191 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
