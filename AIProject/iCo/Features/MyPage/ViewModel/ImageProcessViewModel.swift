@@ -26,8 +26,8 @@ class ImageProcessViewModel: ObservableObject {
     @Published var showErrorMessage = false
     @Published var errorMessage = ""
     
-    /// 업비트 코인 목록과 대조를 거친 최종 코인의 배열
-    @Published var verifiedCoinList = Set<CoinDTO>()
+    /// Alan 식별 + 업비트 검증을 거친 최종 코인의 배열
+    @Published var verifiedCoinList = [CoinDTO]()
     
     /// 북마크 대량 등록을 위해 이미지에 대한 비동기 처리를 컨트롤하는 함수
     func processImage(from selectedImage: CGImage) {
@@ -43,7 +43,7 @@ class ImageProcessViewModel: ObservableObject {
                 
                 // 코인 이름 Set 으로 변환하기
                 let coinNameSet: Set<String> = Set(coinList.flatMap {[
-                    $0.coinID.replacingOccurrences(of: "KRW-", with: "").lowercased(), // 마켓 이름을 제외한 코인 심볼을 사용하기
+                    String($0.coinID[$0.coinID.index($0.coinID.startIndex, offsetBy: 4)...].lowercased()), // 마켓 이름을 제외한 코인 심볼을 사용하기
                     $0.koreanName,
                     $0.englishName.lowercased()
                 ]})
@@ -54,15 +54,25 @@ class ImageProcessViewModel: ObservableObject {
                 guard !recognizedText.isEmpty else {
                     throw ImageProcessError.noRecognizedText
                 }
-                print("➡️ recognizedText: ", recognizedText)
                 
                 // 읽어온 텍스트에서 코인 이름을 추출하기
                 try Task.checkCancellation()
-                try convertToSymbol(from: recognizedText)
-                guard !verifiedCoinList.isEmpty else {
+                let convertedSymbols = try await convertToSymbol(with: recognizedText)
+                guard !convertedSymbols.isEmpty else {
                     throw ImageProcessError.noExtractedCoinID
                 }
-                print("➡️ verifiedCoinList: ", verifiedCoinList)
+                
+                // 업비트 코인 리스트에 포함된 coinID만 배열에 담기
+                try Task.checkCancellation()
+                for symbol in convertedSymbols {
+                    do {
+                        try await verifyAndAppend(symbol: symbol)
+                    } catch is CancellationError {
+                        throw CancellationError()
+                    } catch {
+                        continue
+                    }
+                }
                 
                 // 최종 리스트가 비어있을 경우
                 if verifiedCoinList.isEmpty {
@@ -129,26 +139,51 @@ class ImageProcessViewModel: ObservableObject {
         }
     }
     
-    /// 전달받은 문자열 배열과 CoinDTO를 매핑하고 verifiedCoinList를 업데이트하는 함수
-    private func convertToSymbol(from text: [String]) throws {
-        guard let coinList else {
-            throw ImageProcessError.noCoinFetched
+    /// Alan을 이용해 전달받은 문자열 배열에서 coinID를 추출하는 함수
+    private func convertToSymbol(with text: [String]) async throws -> [String] {
+        let textString = text.description
+        let prompt = Prompt.extractCoinID(text: textString).content
+        
+        do {
+            try Task.checkCancellation()
+            
+            let answer = try await AlanAPIService().fetchAnswer(
+                content: prompt,
+                action: .coinIDExtraction
+            )
+            
+            var answerContent = answer.content
+            
+            // Alan이 간헐적으로 JSON에 담아서 내려주는 경우에 대응
+            if answerContent.starts(with: "```json") {
+                answerContent = answerContent.extractedJSON
+            }
+            
+            let convertedSymbols = answerContent.convertIntoArray
+            
+            return convertedSymbols
+        } catch let error as NetworkError {
+            switch error {
+            case .taskCancelled:
+                throw CancellationError()
+            default:
+                print(error.log())
+                throw ImageProcessError.unknownAlanError
+            }
         }
+    }
+    
+    /// 업비트 API를 호출해 coinID가 실제로 존재하는지 검증, 검증된 coinID를 배열에 저장하는 함수
+    private func verifyAndAppend(symbol: String) async throws {
+        try Task.checkCancellation()
         
-        // 빠른 검색을 위해 키가 String, 값이 CoinDTO인 딕셔너리 만들기
-        var lookup: [String: CoinDTO] = [:]
-        for coin in coinList {
-            lookup[coin.coinID.replacingOccurrences(of: "KRW-", with: "").lowercased()] = coin
-            lookup[coin.koreanName] = coin
-            lookup[coin.englishName.lowercased()] = coin
-        }
+        // 한국 마켓만 사용하므로 한국 마켓 이름 추가하기
+        let krwSymbolName = "KRW-\(symbol.uppercased())"
         
-        // 딕셔너리와 CoinDTO를 매핑하기
-        let mappedCoins = text.compactMap { lookup[$0] }
-        
-        // Set에 삽입하기
-        for coin in mappedCoins {
-            verifiedCoinList.insert(coin)
+        if let coinList {
+            await MainActor.run {
+                verifiedCoinList.append(contentsOf: coinList.filter { $0.coinID == krwSymbolName })
+            }
         }
     }
     

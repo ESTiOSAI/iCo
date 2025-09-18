@@ -11,21 +11,9 @@ import NaturalLanguage
 
 final class TextRecognitionHelper {
     func handleOCR(from image: CGImage, with coinSet: Set<String>) async throws -> [String] {
-        /// OCR 실행하기
         let texts = try await recognizeText(from: image)
-        guard !texts.isEmpty else {
-            return []
-        }
-        
-        /// 비식별화 실행하기
         let redacted = texts.map { redactNonCoinName(in: $0, using: coinSet) }
-        guard !redacted.isEmpty else {
-            return []
-        }
-        print("➡️ redactedText:", redacted)
-        
-        /// 마스킹 문자들을 제거하고 반환하기
-        return filterMaskingCharacters(from: redacted)
+        return redacted
     }
     
     /// OCR을 처리하는 함수
@@ -98,16 +86,6 @@ final class TextRecognitionHelper {
         }
         
         return redacted.trimmingCharacters(in: .whitespaces)
-    }
-    
-    /// 마스킹 문자열을 제거하는 함수
-    private func filterMaskingCharacters(from text: [String]) -> [String] {
-        let maskingCharacters: CharacterSet = ["*", " "]
-        
-        return text.compactMap {
-            let cleaned = $0.components(separatedBy: maskingCharacters).joined()
-            return cleaned.isEmpty ? nil : cleaned
-        }
     }
     
     /// 레벤슈타인의 거리를 계산하는 함수

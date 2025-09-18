@@ -8,7 +8,7 @@
 import Foundation
 
 /// 업비트에서 거래 가능한 종목 목록 DTO
-struct CoinDTO: Codable, Hashable {
+struct CoinDTO: Codable {
     /// 마켓 식별자
     let coinID: String
     /// 코인의 한글 이름 ex) 비트코인
