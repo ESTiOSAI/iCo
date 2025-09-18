@@ -41,7 +41,7 @@ enum Prompt {
                 let description: String
             }
             
-            "\(coinKName)" 개요를 위 JSON 형식으로 한글 답변 (마크다운 금지, 출처 제외)
+            "\(coinKName)" 개요를 위 JSON 형식으로 답변 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case .generateTodayNews(let coinKName, let today):
             """
@@ -56,9 +56,9 @@ enum Prompt {
                 let newsSourceURL: String
             }
             
-            \(today) 기준 최근 24시간 뉴스를 분석해 \(coinKName) 시장 분위기를 요약
+            \(today) 기준 최근 24시간 한국 뉴스를 분석해 \(coinKName) 시장 분위기를 요약
             분석하는데 사용된 뉴스 중 3개를 뉴스 배열에 제목, 요약, 해당 뉴스 출처 링크를 담아 전달
-            위 JSON 형식으로 작성 (마크다운 금지, 답변에 출처 금지)
+            위 JSON 형식으로 작성 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case .generateWeeklyTrends(let coinKName, let today):
             """
@@ -69,7 +69,7 @@ enum Prompt {
             }
             
             \(today) 기준 일주일 동안의 가격 추이, 거래량 변화 요약
-            "\(coinKName)"에 대해 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
+            "\(coinKName)"에 대해 위 JSON 형식으로 작성 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case .extractCoinID(let text):
             """
@@ -83,9 +83,9 @@ enum Prompt {
                 let summary: String
             }
             
-            현재 국내 시간을 기준으로 최근 2시간 뉴스 기반 암호화폐 전체 시장 분위기(호재, 악재, 중립) 제공
-            뉴스를 분석해 그렇게 판단한 이유 200자로 요약
-            호재라면 긍정 요인, 악재라면 부정 요인만 요약, 중립이라면 긍정, 부정 요인을 자연스럽게 연결해 요약
+            \(today) 기준 최근 2시간동안 한국 암호화폐 뉴스 분석 후 분위기(호재, 악재, 중립)와 그렇게 판단한 이유 200자로 요약
+            이유는 호재라면 긍정 요인, 악재라면 부정 요인만 요약, 중립이라면 긍정, 부정 요인을 자연스럽게 연결해 요약 
+            위 JSON 형식으로 작성 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case.generateCommunityInsight(let redditPost):
             """
@@ -97,7 +97,7 @@ enum Prompt {
                 let summary: String
             }
             
-            커뮤니티 분위기(호재, 악재, 중립)와 그렇게 평가한 이유를 200자로 요약해 위 JSON으로 제공
+            커뮤니티 분위기(호재, 악재, 중립)와 그렇게 평가한 이유를 한글로 200자로 요약해 위 JSON으로 제공 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case .generateBookmarkBriefing(let importance, let bookmarks):
             """
