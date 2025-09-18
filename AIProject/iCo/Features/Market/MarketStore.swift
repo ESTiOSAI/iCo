@@ -7,6 +7,7 @@
 
 import Foundation
 import AsyncAlgorithms
+import WidgetKit
 
 enum CoinFilter: Int, Equatable {
     case bookmark
@@ -162,6 +163,7 @@ extension MarketStore {
     private func setup() async {
         (coinMeta, ticker) = await fetchMarketCoinData()
         await sort()
+        await saveBookmarkSummaryToWidget()
     }
     
     func sort() async {
@@ -336,5 +338,42 @@ extension MarketStore {
 
     func deleteRecord(_ id: CoinID) {
         try? searchRecordManager.delete(query: id)
+    }
+}
+
+extension MarketStore {
+    /// 북마크된 코인의 시세 요약을 위젯에 저장 (히스토리 포함, 캔들 API 활용)
+    func saveBookmarkSummaryToWidget() async {
+        let bookmarks = (try? BookmarkManager.shared.fetchAll()) ?? []
+
+        let nameMap = Dictionary(uniqueKeysWithValues: bookmarks.map { ($0.coinID, $0.coinKoreanName) })
+
+        let bookmarkIDs = Set(bookmarks.map { $0.coinID })
+        let bookmarkTickers = bookmarkIDs.compactMap { ticker[$0] }
+
+        var summaries: [WidgetCoinSummary] = []
+
+        for t in bookmarkTickers {
+            // 캔들 데이터 가져오기 (최근 10분봉)
+            let candles = try? await coinService.fetchCandles(id: t.coinID, count: 10)
+            let history = candles?.map { $0.tradePrice }.reversed() ?? []
+
+            let summary = WidgetCoinSummary(
+                id: t.coinID,
+                koreanName: nameMap[t.coinID] ?? "",
+                price: t.snapshot.price,
+                change: t.snapshot.signedRate * 100,
+                history: Array(history)
+            )
+            summaries.append(summary)
+        }
+
+        // UserDefaults 저장
+        let defaults = UserDefaults(suiteName: "group.com.est.aico")
+        if let data = try? JSONEncoder().encode(summaries) {
+            defaults?.set(data, forKey: "widgetSummary")
+        }
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "CoinWidget")
     }
 }
