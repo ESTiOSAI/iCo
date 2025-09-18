@@ -15,7 +15,7 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var recommendCoins: [RecommendCoin] = []
     @Published var fetchTimestamp: Date?
 
-    private var alanService: AlanRecommendServiceProtocol
+    private var llmService: LLMProvider
     private var upbitService: UpBitApiServiceProtocol
 
     var task: Task<Void, Never>?
@@ -35,10 +35,10 @@ final class RecommendCoinViewModel: ObservableObject {
     }
 
     init(
-        alanService: AlanRecommendServiceProtocol = AlanAPIService(),
+        llmService: LLMProvider = LLMAPIService(),
         upbitService: UpBitApiServiceProtocol = UpBitAPIService()
     ) {
-        self.alanService = alanService
+        self.llmService = llmService
         self.upbitService = upbitService
     }
 
@@ -58,7 +58,7 @@ final class RecommendCoinViewModel: ObservableObject {
                     .sorted()
                     .joined(separator: ",")
                 
-                let recommendCoinDTOs = try await alanService.fetchRecommendCoins(
+                let recommendCoinDTOs = try await llmService.fetchRecommendCoins(
                     preference: selectedPreference ?? userInvestmentType,
                     bookmarkCoins: bookmarkCoins,
                     ignoreCache: ignoreCache
@@ -70,7 +70,7 @@ final class RecommendCoinViewModel: ObservableObject {
                 }
                 
                 let results = await fetchRecommendCoins(from: recommendCoinDTOs)
-
+                
                 await MainActor.run {
                     recommendCoins = results
                     status = .success
