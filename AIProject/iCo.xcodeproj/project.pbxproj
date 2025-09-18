@@ -94,6 +94,14 @@
 			);
 			target = B7B040022E387FCF005DE0BA /* iCo */;
 		};
+		B7C72D9C2E7BDE49000E1191 /* Exceptions for "iCo" folder in "iCOWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App/Resource/Assets.xcassets,
+				"Core/Util/Double+Util.swift",
+			);
+			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -102,6 +110,7 @@
 			exceptions = (
 				A98DE7E02E3C8C4F003F2F4F /* Exceptions for "iCo" folder in "iCo" target */,
 				A9E81AC42E52FACE00216220 /* Exceptions for "iCo" folder in "iCoTests" target */,
+				B7C72D9C2E7BDE49000E1191 /* Exceptions for "iCo" folder in "iCOWidgetExtension" target */,
 			);
 			path = iCo;
 			sourceTree = "<group>";
