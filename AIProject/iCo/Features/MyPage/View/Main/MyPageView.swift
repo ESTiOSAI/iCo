@@ -24,7 +24,11 @@ struct MyPageView: View {
             if let selection {
                 NavigationStack {
                     VStack(spacing: 0) {
-                        HeaderView(heading: selection.title, showBackButton: hSizeClass == .compact)
+                        HeaderView(
+                            heading: selection.title,
+                            showBackButton: hSizeClass == .compact,
+                            onBackButtonTap: { self.selection = nil }
+                        )
                         switch selection {
                         case .bookmark:
                             BookmarkView(coinStore: coinStore)
