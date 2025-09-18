@@ -9,10 +9,10 @@ import Foundation
 
 struct CoinWeeklyDTO: Codable {
     /// 최근 일주일 가격 추이
-    let priceTrend: String
+    let coinWeeklyPriceSummary: String
     
     /// 최근 일주일 거래량 변화
-    let volumeChange: String
+    let coinWeeklyVolumeSummary: String
     
     /// 지난 일주일간 가격 추이와 거래량 변화의 주요 원인
     let reason: String
@@ -21,8 +21,8 @@ struct CoinWeeklyDTO: Codable {
 extension CoinWeeklyDTO {
     var weekly: AttributedString {
         AttributedString("""
-        - 가격 추이: \(priceTrend)
-        - 거래량 변화: \(volumeChange)
+        - 가격 추이: \(coinWeeklyPriceSummary)
+        - 거래량 변화: \(coinWeeklyVolumeSummary)
         - 원인: \(reason)
         """.byCharWrapping)
     }

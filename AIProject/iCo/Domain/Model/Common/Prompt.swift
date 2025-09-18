@@ -5,17 +5,19 @@
 //  Created by 강대훈 on 8/1/25.
 //
 
+import Foundation
+
 /// 정형화된 프롬프트 객체
 enum Prompt {
     case recommendCoin(preference: String, bookmark: String)
     case generateOverView(coinKName: String)
-    case generateTodayNews(coinKName: String)
-    case generateWeeklyTrends(coinKName: String)
+    case generateTodayNews(coinKName: String, today: String = Date().dateAndTime)
+    case generateWeeklyTrends(coinKName: String, today: String = Date().dateAndTime)
     case extractCoinID(text: String)
-    case generateTodayInsight
+    case generateTodayInsight(today: String = Date().dateAndTime)
     case generateCommunityInsight(redditPost: String)
     case generateBookmarkBriefing(importance: String, bookmarks: String)
-
+    
     var content: String {
         switch self {
         case .recommendCoin(let preference, let bookmark):
@@ -39,73 +41,63 @@ enum Prompt {
                 let description: String
             }
             
-            "\(coinKName)" 개요를 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
+            "\(coinKName)" 개요를 위 JSON 형식으로 한글 답변 (마크다운 금지, 출처 제외)
             """
-        case .generateTodayNews(let coinKName):
+        case .generateTodayNews(let coinKName, let today):
             """
             struct CoinTodayNewsDTO: Codable {
                 let summaryOfTodaysMarketSentiment: String
                 let articles: [CoinArticleDTO] // 3개
             }
-
+            
             struct CoinArticleDTO: Codable {
                 let title: String
                 let summary: String
                 let newsSourceURL: String
             }
-
-            1. 현재 국내 시간을 기준으로 최근 24시간 뉴스를 분석해 \(coinKName)시장 분위기를 요약
-            2. 분석하는데 사용된 뉴스 중 3개를 뉴스 배열에 제목, 요약, 해당 뉴스 출처 링크를 담아 전달
-
-            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 답변에 출처 금지)
+            
+            \(today) 기준 최근 24시간 뉴스를 분석해 \(coinKName) 시장 분위기를 요약
+            분석하는데 사용된 뉴스 중 3개를 뉴스 배열에 제목, 요약, 해당 뉴스 출처 링크를 담아 전달
+            위 JSON 형식으로 작성 (마크다운 금지, 답변에 출처 금지)
             """
-        case .generateWeeklyTrends(let coinKName):
+        case .generateWeeklyTrends(let coinKName, let today):
             """
             struct CoinWeeklyDTO: Codable {
-                let priceTrend: String
-                let volumeChange: String
+                let coinWeeklyPriceSummary: String
+                let coinWeeklyVolumeSummary: String
                 let reason: String
             }
-
-            1. 현재 국내 시간을 기준으로 일주일 동안의 정보 사용
-
-            위 조건에 따라 "\(coinKName)"에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
+            
+            \(today) 기준 일주일 동안의 가격 추이, 거래량 변화 요약
+            "\(coinKName)"에 대해 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
             """
         case .extractCoinID(let text):
             """
             아래의 문자열에서 가상화폐를 찾아. 빈 배열에 모든 화폐의 심볼을 담고 “,” 로 구분해서 반환해. 응답에 다른 설명은 배제해.
             \(text)
             """
-        case.generateTodayInsight:
+        case.generateTodayInsight(let today):
             """
             struct InsightDTO: Codable {
-                /// 주어진 시간 동안의 암호화폐 전체 시장 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
-                
-                /// 내용 요약 (글자수 200자)
-                /// 호재의 경우 긍정요인만 or 악재라면 부정 요인만 제공
-                /// 중립이라면 긍정요인, 부정요인을 자연스럽게 연결한 문자열을 제공
                 let summary: String
             }
             
-            1. 현재 국내 시간을 기준으로 최근 2시간 뉴스 기반
-            2. 뉴스 전반을 분석해 시장 분위기를 요약 
-            
-            위 조건에 따라 암호화폐 전체 시장에 대한 내용을 위 JSON 형식으로 작성 (마크다운 금지, 출처 제외)
+            현재 국내 시간을 기준으로 최근 2시간 뉴스 기반 암호화폐 전체 시장 분위기(호재, 악재, 중립) 제공
+            뉴스를 분석해 그렇게 판단한 이유 200자로 요약
+            호재라면 긍정 요인, 악재라면 부정 요인만 요약, 중립이라면 긍정, 부정 요인을 자연스럽게 연결해 요약
             """
         case.generateCommunityInsight(let redditPost):
             """
             \(redditPost)
-            지금 보낸 건, reddit의 r/CryptoCurrecy community에서, 하루동안 좋아요를 가장 많이 받은 게시물 5개의 제목과 내용이야.
+            위 내용은 reddit의 r/CryptoCurrecy community의 top 5 게시물의 제목과 내용
             
             struct InsightDTO: Codable {
-                /// 게시물을 기반으로 평가한 커뮤니티 분위기 (호재 / 악재 / 중립)
                 let todaysSentiment: String
-                /// 커뮤니티 분위기를 그렇게 평가한 이유를 문자열로 요약 (글자수 200자)
                 let summary: String
             }
             
-            이 게시물들을 InsightDTO를 기반으로 JSON으로 응답해줘(마크다운 금지, 출처 제외).
+            커뮤니티 분위기(호재, 악재, 중립)와 그렇게 평가한 이유를 200자로 요약해 위 JSON으로 제공
             """
         case .generateBookmarkBriefing(let importance, let bookmarks):
             """

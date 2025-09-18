@@ -209,7 +209,7 @@ extension LLMAPIService {
         let cacheURL = URL(string: "https://cache.local/dashboard/today/\(now.dateAndTime)")!
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
         
-        let prompt = Prompt.generateTodayInsight
+        let prompt = Prompt.generateTodayInsight()
         let dto: InsightDTO = try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
         
         do {

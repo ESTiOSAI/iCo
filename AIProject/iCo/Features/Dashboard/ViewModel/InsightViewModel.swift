@@ -22,7 +22,7 @@ final class InsightViewModel: ObservableObject {
     @Published var overall: FetchState<Insight> = .loading
     @Published var community: FetchState<Insight> = .loading
     
-    private let alanAPIService = AlanAPIService()
+    private let alanAPIService = LLMAPIService()
     private let redditAPIService = RedditAPIService()
     
     private var overallTask: Task<Insight, Error>?

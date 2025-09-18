@@ -59,9 +59,9 @@ extension AlanAPIService {
         case .coinRecomendation:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
         case .dashboardBriefingGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_AI_BRIEFING_GENERATION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_AI_BRIEFING_GENERATION"] as? String
         case .coinReportGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_COIN_REPORT_GENERATION"] as? String
         case .coinIDExtraction:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
         case .bookmarkSuggestion:
@@ -231,7 +231,7 @@ extension AlanAPIService {
         let cacheURL = URL(string: "https://cache.local/dashboard/today/\(now.dateAndTime)")!
         let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
         
-        let prompt = Prompt.generateTodayInsight
+        let prompt = Prompt.generateTodayInsight()
         let dto: InsightDTO = try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
         
         do {
@@ -388,3 +388,4 @@ extension AlanAPIService {
         return dto
     }
 }
+
