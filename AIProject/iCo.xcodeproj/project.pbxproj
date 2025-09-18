@@ -86,6 +86,13 @@
 			);
 			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;
 		};
+		B7C7256B2E7BDD43000E1191 /* Exceptions for "iCOWidget" folder in "iCo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				WidgetCoinSummary.swift,
+			);
+			target = B7B040022E387FCF005DE0BA /* iCo */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -106,6 +113,7 @@
 		B7C71D2E2E7BD9D7000E1191 /* iCOWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				B7C7256B2E7BDD43000E1191 /* Exceptions for "iCOWidget" folder in "iCo" target */,
 				B7C71D3F2E7BD9D9000E1191 /* Exceptions for "iCOWidget" folder in "iCOWidgetExtension" target */,
 			);
 			path = iCOWidget;
