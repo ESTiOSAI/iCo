@@ -18,10 +18,10 @@ struct HeaderView: View {
     let headingColor: Color
     
     var showSearchButton = false
-    var showBackButton = false
-    
     let onSearchTap: () -> Void
-    let onBackButtonTap: () -> Void
+    
+    var showBackButton = false
+    var onBackButtonTap: (() -> Void)?
 
     init(heading: String, headingColor: Color = .aiCoLabel, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: @escaping () -> Void = { }) {
         self.heading = heading
@@ -38,8 +38,11 @@ struct HeaderView: View {
         ZStack(alignment: .leading) {
             if showBackButton {
                 Button {
-                    dismiss()
-                    onBackButtonTap()
+                    if let onBackButtonTap {
+                        onBackButtonTap()
+                    } else {
+                        dismiss()
+                    }
                 } label: {
                     Image(systemName: "chevron.backward")
                         .resizable()
