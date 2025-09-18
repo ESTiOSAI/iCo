@@ -65,3 +65,10 @@ extension Date {
     }
 }
 
+extension Date {
+    var asUpbitISO8601: String {
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        return formatter.string(from: self)
+    }
+}

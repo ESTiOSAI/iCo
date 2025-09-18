@@ -9,6 +9,30 @@ import Foundation
 
 /// Network 통신을 담당하는 객체
 final class NetworkClient {
+    func request<T: Decodable>(for request: URLRequest) async throws -> T {
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw NetworkError.invalidResponse
+            }
+            let statusCode = httpResponse.statusCode
+            try handleStatusCode(statusCode, data: data)
+            
+            do {
+                return try JSONDecoder().decode(T.self, from: data)
+            } catch let decodingError as DecodingError {
+                throw NetworkError.decodingError(decodingError)
+            }
+        } catch let urlError as URLError where urlError.code == .cancelled {
+            throw NetworkError.taskCancelled
+        } catch let urlError as URLError {
+            throw NetworkError.networkError(urlError)
+        }  catch {
+            throw error
+        }
+    }
+    
     func request<T: Decodable>(url: URL) async throws -> T {
         do {
             let (data, response) = try await URLSession.shared.data(from: url)

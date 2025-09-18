@@ -10,7 +10,6 @@ import Foundation
 /// CoinGecko에서 코인 이미지(URL)를 조회하는 서비스를 제공합니다.
 final class CoinGeckoAPIService: CoinImageProvider {
     private let network: NetworkClient
-    private let endpoint: String = "https://api.coingecko.com/api/v3"
 
     init(network: NetworkClient = .init()) {
         self.network = network
@@ -22,21 +21,15 @@ final class CoinGeckoAPIService: CoinImageProvider {
     ///   - vsCurrency: 표기 통화 (가격을 쓰지 않더라도 엔드포인트 특성상 필요, 기본: "krw")
     /// - Returns: 이미지 정보를 포함한 DTO 배열
     func fetchCoinImages(symbols: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] {
-        let trimmed = symbols
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-            .filter { !$0.isEmpty }
-
-        guard !trimmed.isEmpty else { return [] }
-
-        var comps = URLComponents(string: "\(endpoint)/coins/markets")
-        comps?.queryItems = [
-            URLQueryItem(name: "vs_currency", value: vsCurrency.lowercased()),
-            URLQueryItem(name: "symbols", value: trimmed.joined(separator: ","))
-        ]
-
-        guard let url = comps?.url else { throw NetworkError.invalidURL }
-
-        let dtos: [CoinGeckoImageDTO] = try await network.request(url: url)
+        let urlRequest = try CoinGeckoEndpoint.bySymbol(symbols: symbols, currency: vsCurrency).makeURLrequest()
+        let dtos: [CoinGeckoImageDTO] = try await network.request(for: urlRequest)
+        return dtos
+    }
+    
+    //MARK: -- 온보딩 뷰에서 저장하는 새로운 fetch
+    func fetchCoinImagesByIDs(ids: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] {
+        let urlRequest = try CoinGeckoEndpoint.byID(ids: ids, currency: vsCurrency).makeURLrequest()
+        let dtos: [CoinGeckoImageDTO] = try await network.request(for: urlRequest)
         return dtos
     }
 
@@ -109,28 +102,6 @@ final class CoinGeckoAPIService: CoinImageProvider {
             return (dto.symbol.uppercased(), url)
         }
         )
-    }
-
-    //MARK: -- 온보딩 뷰에서 저장하는 새로운 fetch
-
-    func fetchCoinImagesByIDs(ids: [String], vsCurrency: String = "krw") async throws -> [CoinGeckoImageDTO] {
-        let trimmed = ids
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
-            .filter { !$0.isEmpty }
-
-        guard !trimmed.isEmpty else { return [] }
-
-        var comps = URLComponents(string: "\(endpoint)/coins/markets")
-        comps?.queryItems = [
-            URLQueryItem(name: "vs_currency", value: vsCurrency.lowercased()),
-            URLQueryItem(name: "ids", value: trimmed.joined(separator: ",")),
-        ]
-
-        guard let url = comps?.url else { throw NetworkError.invalidURL }
-
-        let dtos: [CoinGeckoImageDTO] = try await network.request(url: url)
-        //print(dtos, dtos.count)
-        return dtos
     }
 
     func fetchImageMapByEnglishNames(

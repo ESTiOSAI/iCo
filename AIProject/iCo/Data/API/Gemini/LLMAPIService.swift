@@ -1,36 +1,28 @@
 //
-//  AlanAPIService.swift
-//  AIProject
+//  GeminiAPIService.swift
+//  iCo
 //
-//  Created by 강대훈 on 7/30/25.
+//  Created by 강대훈 on 9/15/25.
 //
 
 import Foundation
-import SwiftUI
 
-/// 앨런 API 관련 서비스를 제공합니다.
-final class AlanAPIService: AlanAPIServiceProtocol {
+/// Gemini API 관련 서비스를 제공합니다.
+final class LLMAPIService: LLMProvider {
     private let network: NetworkClient
-    private let endpoint: String = "https://kdt-api-function.azurewebsites.net/api/v1/question"
     
     init(networkClient: NetworkClient = .init()) {
         self.network = networkClient
     }
     
-    /// 입력한 질문 또는 문장에 대한 응답을 가져옵니다.
-    ///
-    /// - Parameter content: 질문 또는 분석할 문장
-    /// - Returns: 수신한 응답 데이터
-    func fetchAnswer(content: String, action: LLMAction) async throws -> AlanResponseDTO {
-        guard let clientID = switchClientID(for: action), !clientID.isEmpty else { throw NetworkError.invalidAPIKey }
-        
-        let urlString = "\(endpoint)?content=\(content)&client_id=\(clientID)"
-        guard let url = URL(string: urlString) else { throw NetworkError.invalidURL }
-        let alanResponseDTO: AlanResponseDTO = try await network.request(url: url)
-        
-        return alanResponseDTO
+    func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO {
+        let urlRequest = try GeminiEndpoint.main(body: LLMRequestBody(content: content), action: action).makeURLrequest()
+        let responseDTO: LLMResponseDTO = try await network.request(for: urlRequest)
+        return responseDTO
     }
-    
+}
+
+extension LLMAPIService {
     /// 지정된 프롬프트와 작업 타입에 따라 JSON String 응답을 받아 디코딩된 DTO를 반환합니다.
     ///
     /// - Parameters:
@@ -38,9 +30,13 @@ final class AlanAPIService: AlanAPIServiceProtocol {
     ///   - action: 요청 목적에 따른 작업 타입
     /// - Returns: 디코딩된 DTO 객체
     private func fetchDTO<T: Decodable>(prompt: Prompt, action: LLMAction) async throws -> T {
-        let answer = try await fetchAnswer(content: prompt.content, action: action)
+        let answer = try await postAnswer(content: prompt.content, action: action)
         
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+        guard let text = answer.candidates.first?.content.parts.first?.text else {
+            throw NetworkError.invalidResponse
+        }
+        
+        guard let jsonData = text.extractedJSON.data(using: .utf8) else {
             throw NetworkError.encodingError
         }
         
@@ -48,24 +44,6 @@ final class AlanAPIService: AlanAPIServiceProtocol {
             return try JSONDecoder().decode(T.self, from: jsonData)
         } catch let decodingError as DecodingError {
             throw NetworkError.decodingError(decodingError)
-        }
-    }
-}
-
-extension AlanAPIService {
-    /// Alan이 수행할 작업에 따라 ClientID를 전환합니다.
-    private func switchClientID(for action: LLMAction) -> String? {
-        switch action {
-        case .coinRecomendation:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
-        case .dashboardBriefingGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_AI_BRIEFING_GENERATION"] as? String
-        case .coinReportGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
-        case .coinIDExtraction:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
-        case .bookmarkSuggestion:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_BOOKMARK_SUGGESTION"] as? String
         }
     }
     
@@ -362,9 +340,13 @@ extension AlanAPIService {
         }
         
         let prompt = Prompt.generateBookmarkBriefing(importance: importance, bookmarks: coinNames)
-        let answer = try await fetchAnswer(content: prompt.content, action: .bookmarkSuggestion)
+        let answer = try await postAnswer(content: prompt.content, action: .bookmarkSuggestion)
         
-        guard let jsonData = answer.content.extractedJSON.data(using: .utf8) else {
+        guard let text = answer.candidates.first?.content.parts.first?.text else {
+            throw NetworkError.invalidResponse
+        }
+        
+        guard let jsonData = text.extractedJSON.data(using: .utf8) else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: [],

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AlanAction {
+enum LLMAction {
     /// 코인 추천
     case coinRecomendation
     /// 대시보드 AI 브리핑
