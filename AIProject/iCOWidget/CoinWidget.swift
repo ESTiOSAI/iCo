@@ -18,6 +18,7 @@ struct CoinEntry: TimelineEntry {
 //MARK: - Provider
 struct CoinProvider: AppIntentTimelineProvider {
     private let suite = AppGroup.suite
+    private let api = UpBitWidgetAPI()
 
     func placeholder(in context: Context) -> CoinEntry {
         CoinEntry(date: Date(), coins: sampleData)
@@ -25,55 +26,93 @@ struct CoinProvider: AppIntentTimelineProvider {
 
     func snapshot(for configuration: CoinWidgetConfigurationIntent,
                   in context: Context) async -> CoinEntry {
-        CoinEntry(date: Date(),
-                  coins: loadSummaries(configuration: configuration, family: context.family))
+        await loadEntry(configuration: configuration, family: context.family)
     }
-
+    
     func timeline(for configuration: CoinWidgetConfigurationIntent,
                   in context: Context) async -> Timeline<CoinEntry> {
-        let coins = loadSummaries(configuration: configuration, family: context.family)
-        let entry  = CoinEntry(date: Date(), coins: coins)
-        let next   = Calendar.current.date(byAdding: .minute, value: 30, to: Date())!
+        
+        let entry = await loadEntry(configuration: configuration, family: context.family)
+        let next = Calendar.current.date(byAdding: .minute, value: 5, to: Date())!
         return Timeline(entries: [entry], policy: .after(next))
     }
 
     // MARK: - Helpers
 
-    private func loadAllFromDefaults() -> [WidgetCoinSummary] {
+    /// UserDefaults에서 [북마크된 코인 ID : 한국이름] 불러오기
+    private func loadBookmarkDict() -> [String: String] {
         let defaults = UserDefaults(suiteName: suite)
-        if let data = defaults?.data(forKey: "widgetSummary"),
-           let all = try? JSONDecoder().decode([WidgetCoinSummary].self, from: data) {
-            return all
+        return defaults?.dictionary(forKey: "widgetBookmarks") as? [String: String] ?? [:]
+    }
+    
+    private func loadEntry(configuration: CoinWidgetConfigurationIntent,
+                           family: WidgetFamily) async -> CoinEntry {
+        let bookmarkDict = loadBookmarkDict()
+        guard !bookmarkDict.isEmpty else {
+            return CoinEntry(date: Date(), coins: [])
         }
-        return []
+
+        var summaries: [WidgetCoinSummary] = []
+
+        await withTaskGroup(of: WidgetCoinSummary?.self) { group in
+            for (id, name) in bookmarkDict {
+                group.addTask {
+                    do {
+                        // 현재 시세
+                        guard let ticker = try await api.fetchQuotes(id: id) else { return nil }
+                        // 최근 캔들
+                        let candles = try await api.fetchCandles(id: id, count: 10)
+                        let history = candles.map { $0.tradePrice }.reversed()
+
+                        return WidgetCoinSummary(
+                            id: id,
+                            koreanName: name,
+                            price: ticker.tradePrice,
+                            change: ticker.signedChangeRate * 100,
+                            history: Array(history)
+                        )
+                    } catch {
+                        print("위젯 네트워크 실패: \(error)")
+                        return nil
+                    }
+                }
+            }
+
+            for await summary in group {
+                if let s = summary { summaries.append(s) }
+            }
+        }
+
+        let picked = filterSummaries(all: summaries,
+                                     configuration: configuration,
+                                     family: family)
+
+        return CoinEntry(date: Date(), coins: picked)
     }
 
-    private func loadSummaries(configuration: CoinWidgetConfigurationIntent,
-                               family: WidgetFamily) -> [WidgetCoinSummary] {
-
-        let all = loadAllFromDefaults()
+    private func filterSummaries(all: [WidgetCoinSummary],
+                                 configuration: CoinWidgetConfigurationIntent,
+                                 family: WidgetFamily) -> [WidgetCoinSummary] {
         let byID = Dictionary(uniqueKeysWithValues: all.map { ($0.id, $0) })
 
-        // 1) 사용자가 고른 것 우선
         var picked: [WidgetCoinSummary] = []
-        if let first = configuration.firstCoin?.id, let s1 = byID[first] {
+        if let first = configuration.firstCoin?.id,
+            let s1 = byID[first] {
             picked.append(s1)
         }
-        if family == .systemLarge,                       // Large에서만 두번째 사용
+        if family == .systemLarge,
            let second = configuration.secondCoin?.id,
-           second != configuration.firstCoin?.id,        // 중복 방지
+           second != configuration.firstCoin?.id,
            let s2 = byID[second] {
             picked.append(s2)
         }
 
-        // 2) 비어있을 때는 전체 중 앞에서 채우기
         let needed = maxCount(for: family) - picked.count
         if needed > 0 {
-            let remaining = all.filter { c in picked.contains(where: { $0.id == c.id }) == false }
+            let remaining = all.filter { c in !picked.contains(where: { $0.id == c.id }) }
             picked.append(contentsOf: remaining.prefix(needed))
         }
 
-        // 3) 최대 개수 제한
         return Array(picked.prefix(maxCount(for: family)))
     }
 

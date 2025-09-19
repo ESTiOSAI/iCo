@@ -8,8 +8,8 @@
 import Foundation
 
 public struct WidgetCoinSummary: Codable, Hashable {
-    public let id: String          // ex) "KRW-BTC"
-    public let koreanName: String  // ex) "비트코인"
+    public let id: String
+    public let koreanName: String
     public let price: Double
     public let change: Double
     public let history: [Double]

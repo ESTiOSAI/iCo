@@ -60,7 +60,6 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
-
     func cancelTask() {
         task?.cancel()
         task = nil
