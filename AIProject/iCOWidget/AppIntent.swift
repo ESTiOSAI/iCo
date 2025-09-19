@@ -37,14 +37,15 @@ struct CoinAppEntity: AppEntity, Hashable, Identifiable {
 
     struct DefaultQuery: EntityQuery {
         private let suite = AppGroup.suite
-        
+
         func suggestedEntities() async throws -> [CoinAppEntity] {
             let defaults = UserDefaults(suiteName: suite)
-            guard let data = defaults?.data(forKey: "widgetSummary"),
-                  let items = try? JSONDecoder().decode([WidgetCoinSummary].self, from: data) else {
+            
+            guard let dict = defaults?.dictionary(forKey: "widgetBookmarks") as? [String: String] else {
                 return []
             }
-            return items.map { CoinAppEntity(id: $0.id, koreanName: $0.koreanName) }
+
+            return dict.map { CoinAppEntity(id: $0.key, koreanName: $0.value) }
         }
 
         func entities(for identifiers: [String]) async throws -> [CoinAppEntity] {
