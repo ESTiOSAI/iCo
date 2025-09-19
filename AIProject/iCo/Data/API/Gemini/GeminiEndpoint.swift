@@ -53,7 +53,7 @@ extension GeminiEndpoint: Requestable {
         case .coinIDExtraction:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
         case .bookmarkSuggestion:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_BOOKMARK_SUGGESTION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_BOOKMARK_SUGGESTION"] as? String
         }
     }
 }
