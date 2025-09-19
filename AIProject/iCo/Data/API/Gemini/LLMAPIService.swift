@@ -308,10 +308,10 @@ extension LLMAPIService {
         let importance: String
         switch character {
         case .conservative:
-            importance = "원금 보전을 최우선으로 고려하며, 최근 가격 흐름이나 테마보다는 안정적인 종목 위주로 접근."
+            importance = "원금 보전을 최우선으로 고려하며 안정적인 종목 위주로 접근."
             
         case .moderatelyConservative:
-            importance = "안정성을 중시하되, 일부 성장 가능성이 있는 종목도 보조적으로 고려하며, 단기 변동성에는 크게 영향을 받지 않음."
+            importance = "안정성을 중시하되, 일부 성장 가능성이 있는 종목도 보조적으로 고려."
             
         case .moderate:
             importance = "안정성과 성장을 균형 있게 추구하며, 테마·시가 총액·최근 가격 흐름을 모두 균형적으로 참고."
@@ -320,7 +320,7 @@ extension LLMAPIService {
             importance = "성장성을 우선시하되, 안정성도 일정 부분 고려하며, 최근 가격 흐름과 거래량 변화에 적극적으로 반응."
             
         case .aggressive:
-            importance = "단기간의 높은 수익을 최우선으로 고려하며, 최근 가격 흐름과 거래량 변화를 중점적으로 참고하고, 테마는 보조적으로만 반영."
+            importance = "단기간의 높은 수익을 최우선으로 고려하며, 최근 가격 흐름과 거래량 변화를 중점적으로 참고."
         }
         
         // 캐시 키 구성

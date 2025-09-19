@@ -11,7 +11,7 @@ import SwiftUI
 @MainActor
 final class BookmarkViewModel: ObservableObject {
     private let manager: BookmarkManaging = BookmarkManager.shared
-    private let service: AlanAPIService
+    private let llmService: LLMProvider
     private let coinStore: CoinStore
 
     @Published var briefing: PortfolioBriefingDTO?
@@ -28,8 +28,8 @@ final class BookmarkViewModel: ObservableObject {
         return .conservative
     }()
 
-    init(service: AlanAPIService = AlanAPIService(), coinStore: CoinStore) {
-        self.service = service
+    init(llmService: LLMProvider = LLMAPIService(), coinStore: CoinStore) {
+        self.llmService = llmService
         self.coinStore = coinStore
     }
 
@@ -45,7 +45,7 @@ final class BookmarkViewModel: ObservableObject {
 
             try Task.checkCancellation()
 
-            let dto = try await service.fetchBookmarkBriefing(for: bookmarks, character: character)
+            let dto = try await llmService.fetchBookmarkBriefing(for: bookmarks, character: character)
 
             try Task.checkCancellation()
 
