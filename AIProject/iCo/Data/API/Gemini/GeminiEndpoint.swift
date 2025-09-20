@@ -47,9 +47,9 @@ extension GeminiEndpoint: Requestable {
         case .coinRecomendation:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
         case .dashboardBriefingGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_AI_BRIEFING_GENERATION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_AI_BRIEFING_GENERATION"] as? String
         case .coinReportGeneration:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_REPORT_GENERATION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_COIN_REPORT_GENERATION"] as? String
         case .coinIDExtraction:
             return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_ID_EXTRACTION"] as? String
         case .bookmarkSuggestion:

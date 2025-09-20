@@ -29,7 +29,7 @@ final class ReportViewModel: ObservableObject {
     let coin: Coin
     let koreanName: String
     
-    private var alanAPIService: AlanReportServiceProtocol
+    private var llmService: LLMProvider = LLMAPIService()
     
     private var overviewTask: Task<CoinOverviewDTO, Error>?
     private var weeklyTask: Task<CoinWeeklyDTO, Error>?
@@ -37,10 +37,9 @@ final class ReportViewModel: ObservableObject {
     
     private var hasStarted = false
     
-    init(coin: Coin, alanAPIService: AlanReportServiceProtocol = AlanAPIService()) {
+    init(coin: Coin) {
         self.coin = coin
         self.koreanName = coin.koreanName
-        self.alanAPIService = alanAPIService
     }
     
     func load() async {
@@ -52,13 +51,13 @@ final class ReportViewModel: ObservableObject {
             today = .loading
         }
         
-        overviewTask = Task { try await alanAPIService.fetchOverview(for: coin) }
+        overviewTask = Task { try await llmService.fetchOverview(for: coin) }
         
         weeklyTask = Task { [weak self] in
             try await withTaskCancellationHandler(
                 operation: {
                     guard let self else { throw CancellationError() }
-                    return try await self.alanAPIService.fetchWeeklyTrends(for: self.coin)
+                    return try await self.llmService.fetchWeeklyTrends(for: self.coin)
                 },
                 onCancel: { [weak self] in
                     self?.weekly = .cancel(.taskCancelled)
@@ -71,7 +70,7 @@ final class ReportViewModel: ObservableObject {
             try await withTaskCancellationHandler(
                 operation: {
                     guard let self else { throw CancellationError() }
-                    return try await self.alanAPIService.fetchTodayNews(for: self.coin)
+                    return try await self.llmService.fetchTodayNews(for: self.coin)
                 },
                 onCancel: { [weak self] in
                     self?.today = .cancel(.taskCancelled)
@@ -104,7 +103,7 @@ final class ReportViewModel: ObservableObject {
             overview = .loading
         }
         
-        overviewTask = Task { try await alanAPIService.fetchOverview(for: coin) }
+        overviewTask = Task { try await llmService.fetchOverview(for: coin) }
         
         Task {
             await updateOverviewUI()
@@ -120,7 +119,7 @@ final class ReportViewModel: ObservableObject {
             weekly = .loading
         }
         
-        weeklyTask = Task { try await alanAPIService.fetchWeeklyTrends(for: coin) }
+        weeklyTask = Task { try await llmService.fetchWeeklyTrends(for: coin) }
         
         Task {
             await updateWeeklyUI()
@@ -136,7 +135,7 @@ final class ReportViewModel: ObservableObject {
             today = .loading
         }
         
-        todayTask = Task { try await alanAPIService.fetchTodayNews(for: coin) }
+        todayTask = Task { try await llmService.fetchTodayNews(for: coin) }
         
         Task {
             await updateTodayUI()

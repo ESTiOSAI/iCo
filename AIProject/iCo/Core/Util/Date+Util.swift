@@ -25,10 +25,11 @@ extension Date {
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
     }()
-
+    
     var dateAndTime: String {
         Date.dateAndTimeFormatter.string(from: self)
-    }}
+    }
+}
 
 /// `Date` 타입에 시간을 지정된 형식으로 포맷팅하는 기능을 추가하는 확장.
 ///

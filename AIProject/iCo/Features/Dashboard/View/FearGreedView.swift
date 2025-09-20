@@ -12,13 +12,9 @@ import SwiftUI
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @StateObject private var viewModel: FearGreedViewModel
+    @StateObject private var viewModel: FearGreedViewModel = FearGreedViewModel()
     
     private static let cornerRadius: CGFloat = 20
-    
-    init(viewModel: FearGreedViewModel = FearGreedViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
     
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
