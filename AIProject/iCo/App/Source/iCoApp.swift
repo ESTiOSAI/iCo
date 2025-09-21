@@ -24,7 +24,6 @@ struct iCoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @StateObject private var themeManager = ThemeManager()
-    @StateObject private var recommendCoinViewModel = RecommendCoinViewModel()
     @State private var coinStore: CoinStore = .init(
         coinService: DefaultCoinService(network: NetworkClient())
     )
@@ -47,7 +46,6 @@ struct iCoApp: App {
                             removal: .opacity.animation(.easeOut(duration: 0.3))
                         ))
                         .zIndex(1)
-                        .environmentObject(recommendCoinViewModel)
                 } else {
                     if hasSeenOnboarding {
                         MainTabView(
@@ -60,10 +58,8 @@ struct iCoApp: App {
                         })
                         .environment(\.managedObjectContext, persistenceController.container.viewContext)
                         .environmentObject(themeManager)
-                        .environmentObject(recommendCoinViewModel)
                     } else {
                         OnboardingView()
-                            .environmentObject(recommendCoinViewModel)
                     }
                 }
             }
@@ -78,9 +74,7 @@ struct iCoApp: App {
 }
 
 struct SplashScreenView: View {
-    @AppStorage("hasSeenOnboarding") var hasSeenOnboarding: Bool = false
     @Binding var isLoading: Bool
-    @EnvironmentObject var recommendCoinViewModel: RecommendCoinViewModel
     @Environment(CoinStore.self) var coinStore
 
     var body: some View {
@@ -96,8 +90,7 @@ struct SplashScreenView: View {
                 .frame(height: 100)
         }
         .task {
-            if hasSeenOnboarding { recommendCoinViewModel.loadRecommendCoin() }
-            Task { await coinStore.loadCoins() }
+            await coinStore.loadCoins()
             try? await Task.sleep(for: .seconds(3))
             await MainActor.run {
                 isLoading = false

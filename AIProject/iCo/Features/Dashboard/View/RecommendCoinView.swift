@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RecommendCoinView: View {
-    @EnvironmentObject var viewModel: RecommendCoinViewModel
+    @StateObject private var viewModel = RecommendCoinViewModel()
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -32,6 +32,9 @@ struct RecommendCoinView: View {
             }
         }
         .padding(.bottom, 40)
+        .task {
+            viewModel.loadRecommendCoin() 
+        }
     }
     
     @ViewBuilder
