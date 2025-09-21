@@ -82,6 +82,7 @@ struct MyPageView: View {
                         .fill(.aiCoBackground)
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
+                .listRowSeparator(.hidden)
                 
                 VStack {
                     Section {
