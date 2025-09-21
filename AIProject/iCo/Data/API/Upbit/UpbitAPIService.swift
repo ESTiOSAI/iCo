@@ -29,7 +29,7 @@ final class UpBitAPIService: UpBitApiServiceProtocol {
     func fetchTicker(by currency: String) async throws -> [TickerValue] {
         let urlRequest = try UpbitEndpoint.ticker(currency: currency).makeURLrequest()
         let tickerDTOs: [TickerDTO] = try await network.request(for: urlRequest)
-        return tickerDTOs.map { TickerValue(id: $0.coinID, price: $0.tradePrice, volume: $0.accTradeVolume, rate: $0.changeRate, change: .init(rawValue: $0.change)) }
+        return tickerDTOs.map { $0.toDomain() }
     }
 
     /// 지정한 마켓의 체결 이력을 가져옵니다.
