@@ -17,6 +17,8 @@ struct CandleChartView: View {
     @State private var centerOfVisibleXRange: Date
     /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
     @State private var dynamicVisibleYDomain: ClosedRange<Double>? = nil
+    /// 디바운스용 워크아이템 (중복 실행 / 레이스 방지)
+    @State private var yAxisRecalcWorkItem: DispatchWorkItem?
     /// 플롯 높이 (픽셀 → 데이터 단위 환산에 필요)
     @State private var plotHeight: CGFloat = 1
 
@@ -121,6 +123,27 @@ struct CandleChartView: View {
         }
         /// 차트 오른쪽 영역에 여백 추가: 라벨/마지막 캔들 여유
         .chartPlotStyle { $0.padding(.trailing, 20).padding(.bottom, 8) }
+    
+    // MARK: - Y 스케일 계산 (디바운스)
+    /// 디바운스 스케줄러: 빠른 스크롤 중엔 재계산을 미루고,
+    /// 사용자가 잠깐 멈추면 한 번만 실행하여 깜빡임/부하를 줄임
+    private func scheduleYAxisRecalcDebounced() {
+        yAxisRecalcWorkItem?.cancel()
+        
+        let work = DispatchWorkItem {
+            self.recalcVisibleYAxisDomain()
+            
+            // 관성으로 더 움직인 경우를 커버하기 위해 80ms 뒤 한 번 더 재계산
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                self.recalcVisibleYAxisDomain()
+            }
+        }
+        
+        yAxisRecalcWorkItem = work
+        
+        // 사용자가 잠깐 멈출 때 한 번만 실행되도록 0.12초 지연
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
     
     // MARK: - Y 스케일 실제 재계산
     private func recalcVisibleYAxisDomain() {
