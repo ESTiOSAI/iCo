@@ -42,11 +42,11 @@ struct ReportNewsSectionView: View {
                         
                         Spacer()
                         
-                        RoundedButton(title: "원문보기", imageName: "chevron.right") {
-                             if let url = URL(string: article.newsSourceURL) {
-                                 safariItem = IdentifiableURL(url: url)
-                             }
-                        }
+//                        RoundedButton(title: "원문보기", imageName: "chevron.right") {
+//                             if let url = URL(string: article.newsSourceURL) {
+//                                 safariItem = IdentifiableURL(url: url)
+//                             }
+//                        }
                     }
                     
                     Text(article.summary.byCharWrapping)
