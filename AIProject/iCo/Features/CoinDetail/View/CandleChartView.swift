@@ -9,9 +9,10 @@ import SwiftUI
 import Charts
 
 /// 캔들 차트: 가격 시계열을 고가/저가 선(RuleMark) + 시가/종가 직사각형(RectangleMark)으로 표현
+/// X축은 48분 윈도우로 수평 스크롤 가능, Y축은 보이는 구간에 맞춰 자동 스케일링
 struct CandleChartView: View {
+    // MARK: - State
     /// 화면 간격에 맞춰 계산된 캔들 바 폭(pt)
-    /// `recalcWidth(_:)`에서 갱신되며 기본값 4pt는 초기 렌더용
     @State private var candleWidth: CGFloat = 4
     /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
     @State private var centerOfVisibleXRange: Date
@@ -22,6 +23,7 @@ struct CandleChartView: View {
     /// 플롯 높이 (픽셀 → 데이터 단위 환산에 필요)
     @State private var plotHeight: CGFloat = 1
 
+    // MARK: - Constants
     /// 한 화면에 보여줄 X 구간 (초) -  48분
     private let visibleLengthInSeconds: TimeInterval = 48 * 60
     /// 초기 오른쪽 여백 (초) - 마지막 봉 기준 5분
@@ -30,6 +32,7 @@ struct CandleChartView: View {
     private let yLookahead: TimeInterval = 60
     private let yLookbehind: TimeInterval = 30
     
+    // MARK: - Inputs
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
     let yRange: ClosedRange<Double>
@@ -38,6 +41,7 @@ struct CandleChartView: View {
     let positiveColor: Color
     let negativeColor: Color
         
+    // MARK: - Init
     init(
         data: [CoinPrice],
         xDomain: ClosedRange<Date>,
@@ -66,16 +70,16 @@ struct CandleChartView: View {
         }
     }
         
+    // MARK: - Body
     var body: some View {
-        /// 라벨과 같은 타임존의 캘린더로 틱/그리드 계산
+        // 라벨과 같은 타임존의 캘린더
         let timeZone  = timeFormatter.timeZone ?? .current
         let calendar = Calendar.gregorian(timeZone: timeZone)
 
-        /// X축 틱: 항상 00/15/30/45만 생성
+        // X축 틱: 00/15/30/45만 생성
         let rawTicks = quarterTicksStrict(in: xDomain, calendar: calendar)
 
-        /// 라벨 경계 버퍼
-        /// 우측 경계로부터 3분 이내 라벨은 숨김 (클리핑/치우침 방지)
+        // 우측 경계 버퍼 (경계 3분 내 라벨 숨김)
         let step: TimeInterval = 15 * 60
         let buffer = step * 0.2 // 15분의 20% = 3분
         
@@ -89,7 +93,7 @@ struct CandleChartView: View {
         
         Chart {
             ForEach(data, id: \.date) { point in
-                /// 고가/저가 수직선 표시 (위꼬리/아래꼬리 역할)
+                // 고가/저가 (꼬리)
                 RuleMark(
                     x: .value("Date", point.date),
                     yStart: .value("Low", point.low),
@@ -97,7 +101,7 @@ struct CandleChartView: View {
                 )
                 .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
                 
-                /// 시가/종가 직사각형 (실체 바)
+                // 시가/종가 (바디)
                 RectangleMark(
                     x: .value("Date", point.date),
                     yStart: .value("Open", point.open),
@@ -132,6 +136,7 @@ struct CandleChartView: View {
         // Y축: 동적 도메인(없으면 yRange)
         .chartYScale(domain: dynamicVisibleYDomain ?? yRange)
 
+        // X축 눈금: 15분 간격 + 정시 그리드
         .chartXAxis {
             AxisMarks(values: ticks) { value in
                 AxisTick()
@@ -141,6 +146,7 @@ struct CandleChartView: View {
                 }
             }
         }
+        // Y축 눈금: 단위별 포맷
         .chartYAxis {
             AxisMarks { value in
                 AxisGridLine()
@@ -254,11 +260,11 @@ struct CandleChartView: View {
         dynamicVisibleYDomain = nextLower ... nextUpper
     }
     
-    /// 현재 X축 스케일을 기반으로 캔들 바 폭을 재계산.
+    // MARK: - 캔들 폭 재계산
     private func recalcWidth(_ proxy: ChartProxy) {
-        // 현재 축 스케일에서 "1분"이 화면상 몇 pt 인지 측정
+        // 현재 축 스케일에서 1분이 화면상 몇 pt 인지 측정
         guard let last = data.last?.date, // 마지막 캔들 시각
-              let prev = Calendar.current.date(byAdding: .minute, value: -1, to: last), // 마지막 캔들 - 1분 전 시각
+              let prev = Calendar.current.date(byAdding: .minute, value: -1, to: last), // 마지막 캔들 -1분 전 시각
               let x2 = proxy.position(forX: last),
               let x1 = proxy.position(forX: prev) else { return }
 
@@ -275,9 +281,9 @@ struct CandleChartView: View {
       }
     }
 
-    /// 정각·15·30·45 분 틱 생성 (안전 처리)
+    /// 정각·15·30·45 분 틱 생성
     private func quarterTicksStrict(in domain: ClosedRange<Date>, calendar: Calendar) -> [Date] {
-        // 시(hour) 시작 시각 계산(실패 시 합리적 폴백)
+        // 시(hour) 시작 시각 계산
         let hourStart: Date = {
             if let interval = calendar.dateInterval(of: .hour, for: domain.lowerBound) {
                 return interval.start
