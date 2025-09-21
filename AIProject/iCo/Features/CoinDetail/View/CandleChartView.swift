@@ -13,6 +13,20 @@ struct CandleChartView: View {
     /// 화면 간격에 맞춰 계산된 캔들 바 폭(pt)
     /// `recalcWidth(_:)`에서 갱신되며 기본값 4pt는 초기 렌더용
     @State private var candleWidth: CGFloat = 4
+    /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
+    @State private var centerOfVisibleXRange: Date
+    /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
+    @State private var dynamicVisibleYDomain: ClosedRange<Double>? = nil
+    /// 플롯 높이 (픽셀 → 데이터 단위 환산에 필요)
+    @State private var plotHeight: CGFloat = 1
+
+    /// 한 화면에 보여줄 X 구간 (초) -  48분
+    private let visibleLengthInSeconds: TimeInterval = 48 * 60
+    /// 초기 오른쪽 여백 (초) - 마지막 봉 기준 5분
+    private let initialRightPadding: TimeInterval = 5 * 60
+    /// Y 계산 시 우측 1분, 좌측 30초 만큼 구간 확장
+    private let yLookahead: TimeInterval = 60
+    private let yLookbehind: TimeInterval = 30
     
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
@@ -107,6 +121,50 @@ struct CandleChartView: View {
         }
         /// 차트 오른쪽 영역에 여백 추가: 라벨/마지막 캔들 여유
         .chartPlotStyle { $0.padding(.trailing, 20).padding(.bottom, 8) }
+    
+    // MARK: - Y 스케일 실제 재계산
+    private func recalcVisibleYAxisDomain() {
+        guard !data.isEmpty else {
+            dynamicVisibleYDomain = yRange
+            return
+        }
+
+        // 현재 X 가시 구간 (중심±길이/2)
+        let windowCenter = centerOfVisibleXRange
+        let windowStart  = windowCenter.addingTimeInterval(-visibleLengthInSeconds / 2)
+        let windowEnd    = windowCenter.addingTimeInterval( visibleLengthInSeconds / 2)
+
+        // 오른쪽으로 1분, 왼쪽으로 30초 확장해서 스캔
+        let yStart = windowStart.addingTimeInterval(-yLookbehind)
+        let yEnd   = windowEnd.addingTimeInterval(  yLookahead)
+
+        // 현재 보이는 구간의 캔들만 추출
+        let visibleCandles = data.lazy.filter { $0.date >= yStart && $0.date <= yEnd }
+
+        guard let minPrice = visibleCandles.map(\.low).min(),
+              let maxPrice = visibleCandles.map(\.high).max()
+        else { dynamicVisibleYDomain = yRange; return }
+
+        // 여유 폭 계산
+        let rawRange = maxPrice - minPrice // 보이는 캔들의 순수 고저 폭
+        let safeRange = max(rawRange, 10) // 너무 좁을 때 최소 폭 10 보장
+        let padding = safeRange * 0.20 // 위/아래 20% 여유
+        
+        // pt → 데이터 환산 (현재 도메인 + 여유 패딩으로 계산)
+        let proposedSpan = (maxPrice - minPrice) + 2 * padding
+        let unitsPerPt   = proposedSpan / Double(max(plotHeight, 1))
+
+        // 꼭대기 잘림 방지 여유
+        let pixelGuard   = unitsPerPt * 6.0
+        // 변동폭 대비 최소 비율 가드 (매우 좁은 구간 보정)
+        let relativeGuard = 0.003 * max(1, rawRange)
+        // 둘 중 큰 값 채택 -> 어떤 상황에서도 최소한의 여유 확보
+        let guardBand = max(pixelGuard, relativeGuard)
+
+        // Y 도메인 재계산
+        let nextLower = minPrice - padding - guardBand
+        let nextUpper = maxPrice + padding + guardBand
+        dynamicVisibleYDomain = nextLower ... nextUpper
     }
     
     /// 현재 X축 스케일을 기반으로 캔들 바 폭을 재계산.
