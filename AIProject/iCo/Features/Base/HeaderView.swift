@@ -23,7 +23,7 @@ struct HeaderView: View {
     var showBackButton = false
     var onBackButtonTap: (() -> Void)?
 
-    init(heading: String, headingColor: Color = .aiCoLabel, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: @escaping () -> Void = { }) {
+    init(heading: String, headingColor: Color = .aiCoLabel, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil) {
         self.heading = heading
         self.headingColor = headingColor
         self.coinSymbol = coinSymbol
