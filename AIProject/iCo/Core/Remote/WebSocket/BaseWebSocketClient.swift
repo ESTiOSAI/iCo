@@ -166,15 +166,15 @@ public final actor BaseWebSocketClient: NSObject, SocketEngine {
         self.healthCheck?.cancel()
         
         self.healthCheck = Task {
-                while task != nil {
-                    do {
-                        try await Task.sleep(for: duration, clock: .suspending)
-                        try await sendPing()
-                    } catch {
-                        await handleClose(with: error)
-                        break
-                    }
+            while task != nil {
+                do {
+                    try await Task.sleep(for: duration, clock: .suspending)
+                    try await sendPing()
+                } catch {
+                    await handleClose(with: error)
+                    break
                 }
+            }
         }
     }
     
