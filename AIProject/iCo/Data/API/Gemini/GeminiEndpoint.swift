@@ -45,7 +45,7 @@ extension GeminiEndpoint: Requestable {
     private func switchClientID(for action: LLMAction) -> String? {
         switch action {
         case .coinRecomendation:
-            return Bundle.main.infoDictionary?["ALAN_API_KEY_COIN_RECOMENDATION"] as? String
+            return Bundle.main.infoDictionary?["GEMINI_API_KEY_COIN_RECOMENDATION"] as? String
         case .dashboardBriefingGeneration:
             return Bundle.main.infoDictionary?["GEMINI_API_KEY_AI_BRIEFING_GENERATION"] as? String
         case .coinReportGeneration:
