@@ -83,6 +83,7 @@ struct MyPageView: View {
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
                 
                 VStack {
                     Section {
@@ -115,6 +116,7 @@ struct MyPageView: View {
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
                 .listRowSeparator(.hidden)
+                .listRowBackground(Color.clear)
             }
             .listStyle(.plain)
         }
