@@ -37,7 +37,35 @@ struct CandleChartView: View {
     let timeFormatter: DateFormatter
     let positiveColor: Color
     let negativeColor: Color
-    
+        
+    init(
+        data: [CoinPrice],
+        xDomain: ClosedRange<Date>,
+        yRange: ClosedRange<Double>,
+        scrollTo: Date,
+        timeFormatter: DateFormatter,
+        positiveColor: Color,
+        negativeColor: Color
+    ) {
+        self.data = data
+        self.xDomain = xDomain
+        self.yRange = yRange
+        self.scrollTo = scrollTo
+        self.timeFormatter = timeFormatter
+        self.positiveColor = positiveColor
+        self.negativeColor = negativeColor
+        
+        // 마지막 캔들 시각을 기준으로 '오른쪽 여백 5분'을 확보하도록 초기 중심을 설정
+        if let lastCandleTime = data.last?.date {
+            let initialCenter = lastCandleTime
+                .addingTimeInterval(initialRightPadding - visibleLengthInSeconds / 2)
+            _centerOfVisibleXRange = State(initialValue: initialCenter)
+        } else {
+            // 데이터가 비어있을 때는 기존 scrollTo로 폴백
+            _centerOfVisibleXRange = State(initialValue: scrollTo)
+        }
+    }
+        
     var body: some View {
         /// 라벨과 같은 타임존의 캘린더로 틱/그리드 계산
         let timeZone  = timeFormatter.timeZone ?? .current
@@ -51,12 +79,13 @@ struct CandleChartView: View {
         let step: TimeInterval = 15 * 60
         let buffer = step * 0.2 // 15분의 20% = 3분
         
-        /// 라벨 기준: 도메인 상한이 아니라 실제 보이는 오른쪽 끝 "마지막 캔들 시각"을 사용
-        let lastDataX = data.last?.date ?? xDomain.upperBound
-        let visibleRight = lastDataX
-        
-        /// 버퍼 이내(경계 근접) 라벨은 숨김
+        // 라벨 기준: 눈에 실제 보이는 오른쪽 (마지막 캔들 시각)
+        let visibleRight = data.last?.date ?? xDomain.upperBound
+        // 3분 버퍼 이내(경계 근접) 라벨은 숨김
         let ticks = rawTicks.filter { $0.addingTimeInterval(buffer) <= visibleRight }
+        
+        // Y 라벨 포맷 범위
+        let yLablesDomain = dynamicVisibleYDomain ?? yRange
         
         Chart {
             ForEach(data, id: \.date) { point in
@@ -78,23 +107,31 @@ struct CandleChartView: View {
                 .foregroundStyle( point.close >= point.open ? positiveColor : negativeColor )
             }
         }
-        /// 플롯 크기/스케일 변화 시 캔들 폭 재계산
+        // 플롯 크기 변화 시 캔들 폭 재계산 + 플롯 높이 기록
         .chartOverlay { proxy in
           GeometryReader { _ in
             Color.clear
-              .onAppear { recalcWidth(proxy) }
-              .onChange(of: proxy.plotSize) { _, _ in recalcWidth(proxy) }
+                  .onAppear {
+                      recalcWidth(proxy)
+                      plotHeight = max(1, proxy.plotSize.height)
+                  }
+                  .onChange(of: proxy.plotSize) { _, newSize in
+                      recalcWidth(proxy)
+                      plotHeight = max(1, newSize.height)
+                      // 플롯 크기 변경 → 픽셀 가드 환산값도 변하므로 재계산
+                      recalcVisibleYAxisDomain()
+                  }
           }
         }
-        /// X축 도메인 설정 및 스크롤 위치 초기화
+        // X축: 스케일/스크롤/가시 길이
         .chartXScale(domain: xDomain)
-        .chartScrollPosition(initialX: scrollTo)
+        .chartScrollPosition(x: $centerOfVisibleXRange)
         .chartScrollableAxes(.horizontal)
-        /// Y축 도메인 설정 (동적 범위)
-        .chartYScale(domain: yRange)
-        /// 한 화면에서 보이는 X축 범위 (2880초 = 48분)
-        .chartXVisibleDomain(length: 2880)
-        /// X축 눈금: 고정 틱 사용(15분 간격) + 정시에만 세로선
+        .chartXVisibleDomain(length: visibleLengthInSeconds)
+
+        // Y축: 동적 도메인(없으면 yRange)
+        .chartYScale(domain: dynamicVisibleYDomain ?? yRange)
+
         .chartXAxis {
             AxisMarks(values: ticks) { value in
                 AxisTick()
@@ -110,19 +147,46 @@ struct CandleChartView: View {
                 AxisTick()
                 if let v = value.as(Double.self) {
                     AxisValueLabel {
-                        if yRange.upperBound >= 1_000_000 {
-                            Text(String(format: "%.1fM", v / 1_000_000)) // 백만 단위
-                        } else if yRange.upperBound >= 1_000 {
-                            Text(String(format: "%.1fK", v / 1_000)) // 천 단위
+                        if yLablesDomain.upperBound >= 1_000_000 {
+                            Text(String(format: "%.2fM", v / 1_000_000)) // 백만 단위
+                        } else if yLablesDomain.upperBound >= 1_000 {
+                            Text(String(format: "%.2fK", v / 1_000)) // 천 단위
                         } else {
-                            Text(String(format: "%.0f", v)) // 원 단위 그대로
+                            Text(String(format: "%.0f", v)) // 원 단위
                         }
                     }
                 }
             }
         }
-        /// 차트 오른쪽 영역에 여백 추가: 라벨/마지막 캔들 여유
-        .chartPlotStyle { $0.padding(.trailing, 20).padding(.bottom, 8) }
+        
+        // 플롯 여백: 라벨/상단 시각적 여유
+        .chartPlotStyle { plot in
+            plot.padding(.trailing, 20)
+                .padding(.top, 6)
+                .padding(.bottom, 8)
+        }
+        
+        // 초기 Y 계산
+        .onAppear {
+            recalcVisibleYAxisDomain() // Y축 첫 계산
+        }
+        
+        // 스크롤(중심) 변경 → 디바운스 후 2회 확인샷
+        .onChange(of: centerOfVisibleXRange, initial: false) { _, _ in
+            scheduleYAxisRecalcDebounced()
+        }
+        
+        // 데이터 최신 봉 갱신 → 즉시 재계산
+        .onChange(of: data.last?.date, initial: false) { _, _ in
+            recalcVisibleYAxisDomain()
+        }
+        
+        // 뷰 소멸 시 디바운스 작업 정리(메모리/레이스 안전)
+        .onDisappear {
+            yAxisRecalcWorkItem?.cancel()
+            yAxisRecalcWorkItem = nil
+        }
+    }
     
     // MARK: - Y 스케일 계산 (디바운스)
     /// 디바운스 스케줄러: 빠른 스크롤 중엔 재계산을 미루고,
