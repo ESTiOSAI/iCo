@@ -142,11 +142,23 @@ final class ChartViewModel: ObservableObject {
             /// - 분봉(차트용): 캔들 렌더링에 사용
             /// - Ticker(헤더용): 전일 대비/누적 거래대금 등 헤더 지표(목록 화면과 동일 정의)에 사용
             async let pricesTask: [CoinPrice] = priceService.fetchPrices(market: marketCode, interval: interval)
-            async let tickerTask: [TickerValue] = tickerAPI.fetchTicker(by: currency)
+            async let quotesTask: [TickerDTO]  = tickerAPI.fetchQuotes(id: marketCode)
 
-            let (fetchedPrices, tickers) = try await (pricesTask, tickerTask)
-            try Task.checkCancellation()  
-            let ticker = tickers.first { $0.id == marketCode }
+            // 헤더는 실패해도 화면은 뜨게: prices는 반드시, quotes는 옵셔널 취급
+            let fetchedPrices = try await pricesTask
+            let quotes = (try? await quotesTask) ?? []
+            
+            try Task.checkCancellation()
+            
+            let ticker = quotes.first.map {
+                TickerValue(
+                    id: $0.coinID,
+                    price: $0.tradePrice,
+                    volume: $0.accTradeVolume,
+                    rate: $0.changeRate,
+                    change: .init(rawValue: $0.change)
+                )
+            }
                                     
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
@@ -287,8 +299,15 @@ final class ChartViewModel: ObservableObject {
             prices.removeAll(where: { $0.date < cutoff })
 
             /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
-            async let tickerTask: [TickerValue] = tickerAPI.fetchTicker(by: currency)
-            if let t = try await tickerTask.first(where: { $0.id == market }) {
+            async let quotesTask: [TickerDTO] = tickerAPI.fetchQuotes(id: market)
+            if let q = try await quotesTask.first {
+                let t = TickerValue(
+                    id: q.coinID,
+                    price: q.tradePrice,
+                    volume: q.accTradeVolume,
+                    rate: q.changeRate,
+                    change: .init(rawValue: q.change)
+                )
                 let signedRate = (t.change == .fall) ? -t.rate : t.rate
                 headerLastPrice  = t.price
                 headerChangeRate = signedRate * 100
