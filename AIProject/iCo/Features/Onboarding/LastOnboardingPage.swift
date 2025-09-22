@@ -56,8 +56,6 @@ struct LastOnboardingPage: View {
                 ) {
                     if let selected = selectedType {
                         storedInvestmentType = selected.rawValue
-                        
-                        recommendCoinViewModel.loadRecommendCoin(selectedPreference: storedInvestmentType)
                     }
                     onFinish()
                 }

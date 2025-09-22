@@ -110,7 +110,6 @@ extension MarketView {
             }
             .padding(.vertical, 20)
         }
-        .background(.background)
     }
 }
 
