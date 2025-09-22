@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WidgetKit
 
 /// 코인 차트 화면의 상태를 관리하는 ViewModel
 @MainActor
@@ -73,7 +74,20 @@ final class ChartViewModel: ObservableObject {
     func toggleBookmark() {
         if let result = try? BookmarkManager.shared.toggle(coinID: coinSymbol, coinKoreanName: coinName) {
             self.isBookmarked = result
+            saveBookmarkIDsToWidget()
         }
+    }
+    
+    func saveBookmarkIDsToWidget() {
+        let bookmarks = (try? BookmarkManager.shared.fetchAll()) ?? []
+
+        // coinID → koreanName 매핑
+        let nameMap = Dictionary(uniqueKeysWithValues: bookmarks.map { ($0.coinID, $0.coinKoreanName) })
+
+        let defaults = UserDefaults(suiteName: AppGroup.suite)
+        defaults?.set(nameMap, forKey: "widgetBookmarks")
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "CoinWidget")
     }
     
     /// 주기적으로 가격 데이터를 불러오는 갱신 루프를 시작

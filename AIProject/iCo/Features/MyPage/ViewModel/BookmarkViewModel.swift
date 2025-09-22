@@ -7,6 +7,7 @@
 
 import CoreData
 import SwiftUI
+import WidgetKit
 
 @MainActor
 final class BookmarkViewModel: ObservableObject {
@@ -60,7 +61,6 @@ final class BookmarkViewModel: ObservableObject {
         }
     }
 
-
     func cancelTask() {
         task?.cancel()
         task = nil
@@ -71,6 +71,7 @@ final class BookmarkViewModel: ObservableObject {
             try manager.deleteAll()
             briefing = nil
             imageMap = [:]
+            saveBookmarkIDsToWidget()
         } catch {
             print(error)
         }
@@ -80,9 +81,22 @@ final class BookmarkViewModel: ObservableObject {
         do {
             try manager.remove(coinID: bookmark.coinID)
             Task { await loadCoinImages() }
+            saveBookmarkIDsToWidget()
         } catch {
             print(error)
         }
+    }
+    
+    func saveBookmarkIDsToWidget() {
+        let bookmarks = (try? BookmarkManager.shared.fetchAll()) ?? []
+
+        // coinID → koreanName 매핑
+        let nameMap = Dictionary(uniqueKeysWithValues: bookmarks.map { ($0.coinID, $0.coinKoreanName) })
+
+        let defaults = UserDefaults(suiteName: AppGroup.suite)
+        defaults?.set(nameMap, forKey: "widgetBookmarks")
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "CoinWidget")
     }
 
 // MARK: - CoinGecko관련
