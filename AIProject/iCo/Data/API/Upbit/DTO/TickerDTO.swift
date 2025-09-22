@@ -9,11 +9,13 @@ import Foundation
 
 /// 특정 코인의 실시간 시세, 다양한 시세 관련 정보를 포함하는 데이터 DTO
 struct TickerDTO: Decodable {
+
     /// 코인 마켓 코드
-    ///
     let coinID: String
+
     /// 최근 체결 일자 및 시각
-    let tradeTimestamp: Int
+    @Default<Int>
+    var tradeTimestamp: Int
 
     /// 당일 시가
     @Default<Double>
@@ -33,7 +35,7 @@ struct TickerDTO: Decodable {
     var prevClosingPrice: Double
 
     /// 전일 대비 가격 변화 (RISE, FALL, EVEN)
-    let change: String
+    var change: String
     /// 전일 대비 가격 변화
     @Default<Double>
     var changePrice: Double
@@ -64,7 +66,8 @@ struct TickerDTO: Decodable {
     @Default<String>
     var lowest52WeekDate: String
 
-    let timestamp: Int
+    @Default<Int>
+    var timestamp: Int
 
     enum CodingKeys: String, CodingKey {
         case coinID = "market"
@@ -97,5 +100,17 @@ extension TickerDTO: Sendable {
     /// 체결 일자 및 시간을 Date 형식으로 반환합니다.
     var tradeDateTime: Date {
         Date(timeIntervalSince1970: TimeInterval(tradeTimestamp) / 1000)
+    }
+
+    func toDomain() -> TickerValue {
+        TickerValue(
+            id: coinID,
+            price: tradePrice,
+            volume: accTradeVolume,
+            rate: changeRate,
+            change: .init(
+                rawValue: change
+            )
+        )
     }
 }

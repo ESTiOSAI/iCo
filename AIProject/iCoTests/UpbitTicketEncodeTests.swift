@@ -6,9 +6,25 @@
 //
 
 import XCTest
-import iCo
+@testable import iCo
 
 final class UpbitTicketEncodeTests: XCTestCase {
+
+    func test_tickerDTO_decoding() async throws {
+        let data = Data(
+            """
+        [
+            {
+                "market": "KRW-AVNT",
+                "trade_price": 3001.00000000,
+                "change": "RISE"
+            },
+        ]
+        """.utf8)
+        let dto = try JSONDecoder().decode([TickerDTO].self, from: data)
+        let value = dto.map { $0.toDomain() }.first
+        XCTAssertEqual("KRW-AVNT", value?.id)
+    }
 
     func test_ticket_encoding() throws {
         let ticket = UUID().uuidString
