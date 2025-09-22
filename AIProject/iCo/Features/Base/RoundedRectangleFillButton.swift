@@ -33,29 +33,6 @@ struct RoundedRectangleFillButton: View {
     }
 }
 
-#if DEBUG
-func dummyAction() {
-    print("sayHi")
-}
-#endif
-
-#Preview {
-    VStack(spacing: 16) {
-        HStack(spacing: 16) {
-            RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) { dummyAction() }
-            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { dummyAction() }
-            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { dummyAction() }
-                .disabled(true)
-        }
-        
-        VStack(spacing: 16) {
-            RoundedRectangleFillButton(title: "내보내기", isHighlighted: .constant(false)) { dummyAction() }
-            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(true))
-        }
-    }
-    .padding(16)
-}
-
 struct RoundedRectangleFillButtonView: View {
     let cornerRadius: CGFloat = 10
     
@@ -90,4 +67,21 @@ struct RoundedRectangleFillButtonView: View {
                 .strokeBorder(!isHighlighted ? .defaultGradient : .accentGradient, lineWidth: 0.5)
         )
     }
+}
+
+#Preview {
+    VStack(spacing: 16) {
+        HStack(spacing: 16) {
+            RoundedRectangleFillButton(title: "가져오기", imageName: "square.and.arrow.down", isHighlighted: .constant(false)) { }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(false)) { }
+                .disabled(true)
+        }
+        
+        VStack(spacing: 16) {
+            RoundedRectangleFillButton(title: "내보내기", isHighlighted: .constant(false)) { }
+            RoundedRectangleFillButton(title: "내보내기", imageName: "square.and.arrow.up", isHighlighted: .constant(true))
+        }
+    }
+    .padding(16)
 }

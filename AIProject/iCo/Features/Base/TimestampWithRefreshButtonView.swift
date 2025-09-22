@@ -34,5 +34,5 @@ struct TimestampWithRefreshButtonView: View {
 }
 
 #Preview {
-    TimestampWithRefreshButtonView(timestamp: Date.now, action: { dummyAction() })
+    TimestampWithRefreshButtonView(timestamp: Date.now, action: {  })
 }

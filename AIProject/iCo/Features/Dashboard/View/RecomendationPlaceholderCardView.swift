@@ -68,5 +68,5 @@ struct RecomendationPlaceholderCardView: View {
 }
 
 #Preview {
-    RecomendationPlaceholderCardView(status: .cancel, message: "아이코가 추천할 코인을\n고르는 중이에요", action: dummyAction)
+    RecomendationPlaceholderCardView(status: .cancel, message: "아이코가 추천할 코인을\n고르는 중이에요", action: { })
 }
