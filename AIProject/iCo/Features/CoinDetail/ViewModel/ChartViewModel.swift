@@ -84,7 +84,7 @@ final class ChartViewModel: ObservableObject {
         // coinID → koreanName 매핑
         let nameMap = Dictionary(uniqueKeysWithValues: bookmarks.map { ($0.coinID, $0.coinKoreanName) })
 
-        let defaults = UserDefaults(suiteName: "group.com.est.ico")
+        let defaults = UserDefaults(suiteName: AppGroup.suite)
         defaults?.set(nameMap, forKey: "widgetBookmarks")
 
         WidgetCenter.shared.reloadTimelines(ofKind: "CoinWidget")
