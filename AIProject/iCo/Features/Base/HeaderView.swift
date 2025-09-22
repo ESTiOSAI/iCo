@@ -16,6 +16,7 @@ struct HeaderView: View {
     let heading: String
     let coinSymbol: String?
     let headingColor: Color
+    var topPadding: CGFloat
     
     var showSearchButton = false
     let onSearchTap: () -> Void
@@ -23,9 +24,10 @@ struct HeaderView: View {
     var showBackButton = false
     var onBackButtonTap: (() -> Void)?
 
-    init(heading: String, headingColor: Color = .aiCoLabel, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil) {
+    init(heading: String, headingColor: Color = .aiCoLabel, topPadding: CGFloat = 30, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil) {
         self.heading = heading
         self.headingColor = headingColor
+        self.topPadding = topPadding
         self.coinSymbol = coinSymbol
         self.showSearchButton = showSearchButton
         self.onSearchTap = onSearchTap
@@ -77,7 +79,7 @@ struct HeaderView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 30)
+        .padding(.top, topPadding)
         .padding(.bottom, 20)
     }
 }
