@@ -121,6 +121,7 @@ struct CoinCarouselView: View {
                 ZStack(alignment: .center) {
                     HeaderView(
                         heading: coin.name,
+                        topPadding: 20,
                         coinSymbol: coin.id,
                         showBackButton: false
                     )
