@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.est.aico</string>
+		<string>group.com.est.ico</string>
 	</array>
 </dict>
 </plist>

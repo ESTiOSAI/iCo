@@ -8,5 +8,5 @@
 import Foundation
 
 enum AppGroup {
-    static let suite = "group.com.est.aico"
+    static let suite = "group.com.est.ico"
 }
