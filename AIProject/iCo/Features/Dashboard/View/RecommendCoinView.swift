@@ -33,7 +33,7 @@ struct RecommendCoinView: View {
         }
         .padding(.bottom, 40)
         .task {
-            viewModel.loadRecommendCoin() 
+            viewModel.loadRecommendCoin()
         }
     }
     

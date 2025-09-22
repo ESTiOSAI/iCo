@@ -32,20 +32,20 @@ struct DashboardView: View {
         
         NavigationStack {
             ScrollView {
-                    VStack {
-                        RecommendCoinView()
-                        AIBriefingView()
+                VStack {
+                    RecommendCoinView()
+                    AIBriefingView()
+                }
+                .padding(.top, tempPadding)
+                .background {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(
+                                key: ScrollOffsetPreferenceKey.self,
+                                value: -proxy.frame(in: .named(coordinateSpaceName)).minY
+                            )
                     }
-                    .padding(.top, tempPadding)
-                    .background {
-                        GeometryReader { proxy in
-                            Color.clear
-                                .preference(
-                                    key: ScrollOffsetPreferenceKey.self,
-                                    value: -proxy.frame(in: .named(coordinateSpaceName)).minY
-                                )
-                        }
-                    }
+                }
             }
             .scrollIndicators(.hidden)
             .coordinateSpace(name: coordinateSpaceName)
