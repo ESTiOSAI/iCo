@@ -55,7 +55,7 @@ struct RoundedRectangleButton: View {
 
 #Preview {
     VStack {
-        RoundedRectangleButton(title: "가져오기") { dummyAction() }
-        RoundedRectangleButton(title: "가져오기", isActive: true) { dummyAction() }
+        RoundedRectangleButton(title: "가져오기") { }
+        RoundedRectangleButton(title: "가져오기", isActive: true) { }
     }
 }

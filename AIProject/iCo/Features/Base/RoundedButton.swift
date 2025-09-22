@@ -51,10 +51,10 @@ struct RoundedButton: View {
 
 #Preview {
     VStack {
-        RoundedButton(title: "With Image", imageName: "xmark", action: { dummyAction() })
+        RoundedButton(title: "With Image", imageName: "xmark", action: { })
             .disabled(true)
-        RoundedButton(title: "Text Only", imageName: nil, action: { dummyAction() })
-        RoundedButton(title: nil, imageName: "xmark", action: { dummyAction() })
+        RoundedButton(title: "Text Only", imageName: nil, action: { })
+        RoundedButton(title: nil, imageName: "xmark", action: { })
     }
     .padding()
     .background(.aiCoBackground)

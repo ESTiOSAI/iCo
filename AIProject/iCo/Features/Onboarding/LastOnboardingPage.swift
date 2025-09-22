@@ -73,6 +73,6 @@ struct LastOnboardingPage: View {
 }
 
 #Preview {
-    LastOnboardingPage(isLandscape: .constant(true), onFinish: dummyAction)
+    LastOnboardingPage(isLandscape: .constant(true), onFinish: { })
         .environmentObject(RecommendCoinViewModel())
 }
