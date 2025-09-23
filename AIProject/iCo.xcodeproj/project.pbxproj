@@ -39,14 +39,14 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
 				B7C71D3A2E7BD9D9000E1191 /* iCOWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -208,8 +208,8 @@
 				B7B03FFF2E387FCF005DE0BA /* Sources */,
 				B7B040002E387FCF005DE0BA /* Frameworks */,
 				B7B040012E387FCF005DE0BA /* Resources */,
-				B75D1FD22E45C153006839B5 /* ShellScript */,
 				B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */,
+				B75D1FD22E45C153006839B5 /* ShellScript */,
 			);
 			buildRules = (
 			);
