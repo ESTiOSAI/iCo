@@ -26,4 +26,6 @@ enum AppStorageKey {
     static let cacheBriefTodayTimestamp = "cacheBriefTodayTimestamp"
     /// 커뮤니티 브리핑 캐시 시각 저장 키
     static let cacheBriefCommunityTimestamp = "cacheBriefCommunityTimestamp"
+    /// 위젯에 북마크된 데이터 저장 키
+    static let widgetBookmarks = "widgetBookmarks"
 }

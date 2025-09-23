@@ -42,7 +42,7 @@ struct CoinProvider: AppIntentTimelineProvider {
     /// UserDefaults에서 [북마크된 코인 ID : 한국이름] 불러오기
     private func loadBookmarkDict() -> [String: String] {
         let defaults = UserDefaults(suiteName: suite)
-        return defaults?.dictionary(forKey: "widgetBookmarks") as? [String: String] ?? [:]
+        return defaults?.dictionary(forKey: AppStorageKey.widgetBookmarks) as? [String: String] ?? [:]
     }
     
     private func loadEntry(configuration: CoinWidgetConfigurationIntent,

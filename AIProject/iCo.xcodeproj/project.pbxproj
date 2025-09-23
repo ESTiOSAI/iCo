@@ -98,6 +98,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Resource/Assets.xcassets,
+				Core/Local/UserDefaults/AppStorageKey.swift,
 				"Core/Util/Double+Util.swift",
 			);
 			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;

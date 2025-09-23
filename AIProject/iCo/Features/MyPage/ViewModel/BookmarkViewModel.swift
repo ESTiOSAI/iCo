@@ -94,7 +94,7 @@ final class BookmarkViewModel: ObservableObject {
         let nameMap = Dictionary(uniqueKeysWithValues: bookmarks.map { ($0.coinID, $0.coinKoreanName) })
 
         let defaults = UserDefaults(suiteName: AppGroup.suite)
-        defaults?.set(nameMap, forKey: "widgetBookmarks")
+        defaults?.set(nameMap, forKey: AppStorageKey.widgetBookmarks)
 
         WidgetCenter.shared.reloadTimelines(ofKind: "CoinWidget")
     }
