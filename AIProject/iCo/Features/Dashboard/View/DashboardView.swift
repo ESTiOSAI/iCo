@@ -17,16 +17,12 @@ struct DashboardView: View {
     @State var scrollOffset: CGFloat = 0
     @State var topInset: CGFloat = 0
     
-    var threshold: CGFloat {
-        hSizeClass == .regular ? 120 : 80
-    }
-    
     var gradientHeight: CGFloat {
         CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + topInset
     }
     
     var body: some View {
-        let extra = max(0, -scrollOffset * 0.8)
+        let extraHeight = max(0, -scrollOffset * 1.2)
         
         GeometryReader { outerProxy in
             NavigationStack {
@@ -57,10 +53,8 @@ struct DashboardView: View {
                         startPoint: .topLeading,
                         endPoint: .bottom
                     )
-                    .frame(height: gradientHeight + extra)
-                    .offset(y: scrollOffset < threshold ? 0 : -scrollOffset)
-                    .animation(.easeInOut, value: scrollOffset)
-                    .ignoresSafeArea(edges: .top)
+                    .frame(height: gradientHeight + extraHeight)
+                    .offset(y: scrollOffset < 0 ? 0 : -scrollOffset)
                 }
                 .ignoresSafeArea(edges: .top)
                 .safeAreaInset(edge: .top) {
@@ -77,8 +71,8 @@ struct DashboardView: View {
                                     .font(.system(size: 18, weight: .black))
                                     .foregroundStyle(.aiCoLabel)
                             }
-                            .opacity(scrollOffset > threshold ? 1 : 0)
-                            .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
+                            .opacity(scrollOffset > topInset ? 1 : 0)
+                            .animation(.easeInOut, value: scrollOffset > topInset)
                             .allowsHitTesting(false)
                     }
                 }
