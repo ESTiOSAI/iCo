@@ -20,7 +20,7 @@ struct RecomendationPlaceholderCardView: View {
         GeometryReader { geoProxy in
             ZStack {
                 if hSizeClass == .compact {
-                    HStack(alignment: .bottom, spacing: 16) {
+                    HStack(alignment: .bottom, spacing: .spacingS) {
                         Group {
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
@@ -29,7 +29,7 @@ struct RecomendationPlaceholderCardView: View {
                             Color.aiCoBackgroundWhite.opacity(0.9)
                                 .background(.ultraThinMaterial)
                                 .frame(
-                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacing * 2),
+                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacingXs * 2),
                                     height: CardConst.cardHeight
                                 )
                             
@@ -56,7 +56,7 @@ struct RecomendationPlaceholderCardView: View {
                     }
                             : nil
                 )
-                .frame(maxWidth: hSizeClass == .regular ? 400 : .infinity)
+                .frame(maxWidth: hSizeClass == .regular ? 500 : .infinity)
                 .frame(height: CardConst.cardHeight)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 .overlay(

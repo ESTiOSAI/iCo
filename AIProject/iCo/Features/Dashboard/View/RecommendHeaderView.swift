@@ -19,6 +19,8 @@ struct RecommendHeaderView: View {
                 imageColor: .white,
                 fontColor: .white
             )
+            
+            Spacer()
         }
         .frame(height: CardConst.headerHeight)
     }
