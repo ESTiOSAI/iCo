@@ -61,15 +61,21 @@ struct DashboardView: View {
                     if hSizeClass == .compact {
                         let defaultHeight = 44.0
                         
-                        Rectangle()
+                        Color.aiCoBackgroundWhite.opacity(0.5) // .ultraThinMaterial이 너무 어두워 하얀색 섞기
                             .ignoresSafeArea()
                             .containerRelativeFrame(.horizontal)
                             .frame(height: defaultHeight)
-                            .foregroundStyle(.ultraThinMaterial)
+                            .background(.ultraThinMaterial)
                             .overlay(alignment: .center) {
                                 Text("대시보드")
-                                    .font(.system(size: 18, weight: .black))
+                                    .font(.system(size: 18, weight: .semibold))
                                     .foregroundStyle(.aiCoLabel)
+                                    .offset(y: -5) // 텍스트가 네비게이션바 중앙에 오도록 위치 조정하기
+                            }
+                            .overlay(alignment: .bottom) { // 헤더 하단에 구분선 추가하기
+                                Rectangle()
+                                    .frame(height: 0.5)
+                                    .foregroundStyle(Color(.lightGray))
                             }
                             .opacity(scrollOffset > topInset ? 1 : 0)
                             .animation(.easeInOut, value: scrollOffset > topInset)
