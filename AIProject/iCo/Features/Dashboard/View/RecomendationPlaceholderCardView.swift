@@ -23,29 +23,7 @@ struct RecomendationPlaceholderCardView: View {
             ZStack {
                 // 작은 화면에서는 카드 스택 배경 보여주기
                 if hSizeClass == .compact {
-                    HStack(alignment: .bottom, spacing: .spacingS) {
-                        Group {
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
-                            
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(
-                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacingXs * 2),
-                                    height: CardConst.cardHeight
-                                )
-                            
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(.defaultGradient, lineWidth: 0.5)
-                        }
-                    }
+                    CardStack(viewWidth: geoProxy.size.width)
                     .frame(maxWidth: geoProxy.size.width - (CardConst.cardInnerPadding * 2))
                 }
                 
@@ -66,6 +44,36 @@ struct RecomendationPlaceholderCardView: View {
                     hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5) : nil)
             }
             .frame(width: geoProxy.size.width)
+        }
+    }
+    
+    private struct CardStack: View {
+        let viewWidth: CGFloat
+        
+        var body: some View {
+            HStack(alignment: .bottom, spacing: .spacingS) {
+                Group {
+                    Color.aiCoBackgroundWhite.opacity(0.9)
+                        .background(.ultraThinMaterial)
+                        .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
+                    
+                    Color.aiCoBackgroundWhite.opacity(0.9)
+                        .background(.ultraThinMaterial)
+                        .frame(
+                            width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXs * 2),
+                            height: CardConst.cardHeight
+                        )
+                    
+                    Color.aiCoBackgroundWhite.opacity(0.9)
+                        .background(.ultraThinMaterial)
+                        .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(.defaultGradient, lineWidth: 0.5)
+                }
+            }
         }
     }
 }
