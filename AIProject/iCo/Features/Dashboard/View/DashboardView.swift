@@ -68,27 +68,7 @@ struct DashboardView: View {
                 .safeAreaInset(edge: .top) {
                     // 아이폰일 때 스크롤 내리면 커스텀 네비게이션바 보여주기
                     if hSizeClass == .compact {
-                        let defaultHeight = 44.0
-                        
-                        Color.aiCoBackgroundWhite.opacity(0.5) // .ultraThinMaterial이 너무 어두워 하얀색 섞기
-                            .ignoresSafeArea()
-                            .containerRelativeFrame(.horizontal)
-                            .frame(height: defaultHeight)
-                            .background(.ultraThinMaterial)
-                            .overlay(alignment: .center) {
-                                Text("대시보드")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundStyle(.aiCoLabel)
-                                    .offset(y: -5) // 텍스트가 네비게이션바 중앙에 오도록 위치 조정하기
-                            }
-                            .overlay(alignment: .bottom) { // 헤더 하단에 구분선 추가하기
-                                Rectangle()
-                                    .frame(height: 0.5)
-                                    .foregroundStyle(Color(.lightGray))
-                            }
-                            .opacity(scrollOffset > topInset ? 1 : 0)
-                            .animation(.easeInOut, value: scrollOffset > topInset)
-                            .allowsHitTesting(false)
+                        CustomNavigationBar(scrollOffset: scrollOffset, topInset: topInset)
                     }
                 }
             }
@@ -99,6 +79,35 @@ struct DashboardView: View {
                     topInset = outerProxy.safeAreaInsets.top
                 }
             }
+        }
+    }
+    
+    struct CustomNavigationBar: View {
+        let scrollOffset: CGFloat
+        let topInset: CGFloat
+        
+        let defaultHeight = 44.0
+        
+        var body: some View {
+            Color.aiCoBackgroundWhite.opacity(0.5) // .ultraThinMaterial이 너무 어두워 하얀색 섞기
+                .ignoresSafeArea()
+                .containerRelativeFrame(.horizontal)
+                .frame(height: defaultHeight)
+                .background(.ultraThinMaterial)
+                .overlay(alignment: .center) {
+                    Text("대시보드")
+                        .font(.system(size: 18, weight: .black))
+                        .foregroundStyle(.aiCoLabel)
+						.offset(y: -5) // 텍스트가 네비게이션바 중앙에 오도록 위치 조정하기
+                }
+                .overlay(alignment: .bottom) { // 네비게이션바 하단에 구분선 추가하기
+                    Rectangle()
+                        .frame(height: 0.5)
+                        .foregroundStyle(Color(.lightGray))
+                }
+                .opacity(scrollOffset > topInset ? 1 : 0)
+                .animation(.easeInOut, value: scrollOffset > topInset)
+                .allowsHitTesting(false)
         }
     }
 }
