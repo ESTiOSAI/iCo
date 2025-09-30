@@ -84,7 +84,11 @@ struct DashboardView: View {
                 }
             }
             .onAppear {
-                topInset = outerProxy.safeAreaInsets.top
+                // 아이패드에서 다른 탭으로 갔다 돌아오면 topInset이 변경되는 이슈가 있어 초기값이 0일 때만 업데이트되도록 제한
+                // 아마도 네비게이션바나 상단 탭바 관련 값이 변경돼서 재계산하는 것으로 의심됨
+                if topInset == 0 {
+                    topInset = outerProxy.safeAreaInsets.top
+                }
             }
         }
     }
