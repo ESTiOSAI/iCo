@@ -7,18 +7,21 @@
 
 import SwiftUI
 
-/// DefaultProgressView가 공중에 어색하게 떠있는 것을 개선하기 위해 만든 카드의 플레이스홀더뷰
-/// 사실 플레이스홀더 뷰를 메인으로 띄우고, 네트워크 로드가 완료되면 내부 컨텐츠만 바꾸는 방식으로 가고 싶은데... 추후에 변경하는 것으로...
+/// DefaultProgressView가 공중에 어색하게 떠있는 것을 개선하기 위해 만든 카드의 플레이스홀더뷰입니다.
 struct RecomendationPlaceholderCardView: View {
-    @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.horizontalSizeClass) private var hSizeClass
     
+    /// 코인 추천 상태를 받는 속성
     var status: DefaultProgressView.Status
+    /// 코인 추천 결과에 따른 메시지를 받는 속성
     var message: String
+    /// 버튼 터치 시 실행할 액션을 받는 속성
     var action: () -> Void
     
     var body: some View {
         GeometryReader { geoProxy in
             ZStack {
+                // 작은 화면에서는 카드 스택 배경 보여주기
                 if hSizeClass == .compact {
                     HStack(alignment: .bottom, spacing: .spacingS) {
                         Group {

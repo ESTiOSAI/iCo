@@ -14,14 +14,20 @@ struct DashboardView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     
     @Namespace var coordinateSpaceName: Namespace.ID
+    /// 스크롤의 위치를 저장하는 상태 변수
     @State var scrollOffset: CGFloat = 0
+    /// 상단 여백을 저장하는 상태 변수: onAppear에서 실제 높이를 계산함
     @State var topInset: CGFloat = 0
     
+    /// 배경색의 높이를 저장하는 계산 속성: 헤더의 높이 + 여백 + 카드의 높이 / 2 + 상단 여백
+    /// 배경이 카드의 중앙까지만 깔리게 해야 하는데 뷰가 여러 계층으로 나눠져있어서 각 컴포넌트의 높이를 계산해서 사용함
     var gradientHeight: CGFloat {
         CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + topInset
     }
     
     var body: some View {
+        /// 배경색에 Sticky 효과 적용을 위해 추가적인 높이: 스크롤 위치만큼 더해주기 위해 사용
+        /// 쫀득한 효과를 더 드라마틱하게 보여주기 위해 스크롤 위치의 1.2배만큼 늘리기
         let extraHeight = max(0, -scrollOffset * 1.2)
         
         GeometryReader { outerProxy in
@@ -33,6 +39,7 @@ struct DashboardView: View {
                     }
                     .padding(.top, topInset)
                     .background {
+                        // scrollOffset을 구하기 위해 ScrollOffsetPreferenceKey 적용하기
                         GeometryReader { proxy in
                             Color.clear
                                 .preference(
@@ -48,6 +55,7 @@ struct DashboardView: View {
                     scrollOffset = value
                 }
                 .background(alignment: .top) {
+                    // 메인 그레디언트 배경
                     LinearGradient(
                         colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
                         startPoint: .topLeading,
@@ -58,6 +66,7 @@ struct DashboardView: View {
                 }
                 .ignoresSafeArea(edges: .top)
                 .safeAreaInset(edge: .top) {
+                    // 아이폰일 때 스크롤 내리면 커스텀 네비게이션바 보여주기
                     if hSizeClass == .compact {
                         let defaultHeight = 44.0
                         
@@ -100,6 +109,7 @@ struct DashboardView: View {
         .environmentObject(RecommendCoinViewModel())
 }
 
+/// scrollOffset을 구하기 위한 PreferenceKey
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat { .zero }
     

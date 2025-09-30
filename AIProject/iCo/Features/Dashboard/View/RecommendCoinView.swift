@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+/// 코인 추천 최상단 뷰입니다.
+/// 코인 추천 네트워크 콜을 실행하면서 헤더와 컨텐츠 뷰를 호출하고
+/// 컨텐츠 뷰에 코인 추천 상태별로 알맞은 뷰를 뿌려줍니다.
 struct RecommendCoinView: View {
     @StateObject private var viewModel = RecommendCoinViewModel()
 
