@@ -12,76 +12,79 @@ import SwiftUI
 /// 관심 코인 기반 추천, AI 브리핑으로 구성합니다.
 struct DashboardView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
+    
     @Namespace var coordinateSpaceName: Namespace.ID
     @State var scrollOffset: CGFloat = 0
-    
-    var tempPadding: CGFloat {
-        hSizeClass == .regular ? 70 : 50
-    }
+    @State var topInset: CGFloat = 0
     
     var threshold: CGFloat {
         hSizeClass == .regular ? 120 : 80
     }
     
     var gradientHeight: CGFloat {
-        CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + tempPadding
+        CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + topInset
     }
     
     var body: some View {
         let extra = max(0, -scrollOffset * 0.8)
         
-        NavigationStack {
-            ScrollView {
-                VStack {
-                    RecommendCoinView()
-                    AIBriefingView()
+        GeometryReader { outerProxy in
+            NavigationStack {
+                ScrollView {
+                    VStack {
+                        RecommendCoinView()
+                        AIBriefingView()
+                    }
+                    .padding(.top, topInset)
+                    .background {
+                        GeometryReader { proxy in
+                            Color.clear
+                                .preference(
+                                    key: ScrollOffsetPreferenceKey.self,
+                                    value: -proxy.frame(in: .named(coordinateSpaceName)).minY
+                                )
+                        }
+                    }
                 }
-                .padding(.top, tempPadding)
-                .background {
-                    GeometryReader { proxy in
-                        Color.clear
-                            .preference(
-                                key: ScrollOffsetPreferenceKey.self,
-                                value: -proxy.frame(in: .named(coordinateSpaceName)).minY
-                            )
+                .scrollIndicators(.hidden)
+                .coordinateSpace(name: coordinateSpaceName)
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                    scrollOffset = value
+                }
+                .background(alignment: .top) {
+                    LinearGradient(
+                        colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
+                        startPoint: .topLeading,
+                        endPoint: .bottom
+                    )
+                    .frame(height: gradientHeight + extra)
+                    .offset(y: scrollOffset < threshold ? 0 : -scrollOffset)
+                    .animation(.easeInOut, value: scrollOffset)
+                    .ignoresSafeArea(edges: .top)
+                }
+                .ignoresSafeArea(edges: .top)
+                .safeAreaInset(edge: .top) {
+                    if hSizeClass == .compact {
+                        let defaultHeight = 44.0
+                        
+                        Rectangle()
+                            .ignoresSafeArea()
+                            .containerRelativeFrame(.horizontal)
+                            .frame(height: defaultHeight)
+                            .foregroundStyle(.ultraThinMaterial)
+                            .overlay(alignment: .center) {
+                                Text("대시보드")
+                                    .font(.system(size: 18, weight: .black))
+                                    .foregroundStyle(.aiCoLabel)
+                            }
+                            .opacity(scrollOffset > threshold ? 1 : 0)
+                            .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
+                            .allowsHitTesting(false)
                     }
                 }
             }
-            .scrollIndicators(.hidden)
-            .coordinateSpace(name: coordinateSpaceName)
-            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                scrollOffset = value
-            }
-            .background(alignment: .top) {
-                LinearGradient(
-                    colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
-                    startPoint: .topLeading,
-                    endPoint: .bottom
-                )
-                .frame(height: gradientHeight + extra)
-                .offset(y: scrollOffset < threshold ? 0 : -scrollOffset)
-                .animation(.easeInOut, value: scrollOffset)
-                .ignoresSafeArea(edges: .top)
-            }
-            .ignoresSafeArea(edges: .top)
-            .safeAreaInset(edge: .top) {
-                if hSizeClass == .compact {
-                    let defaultHeight = 44.0
-                    
-                    Rectangle()
-                        .ignoresSafeArea()
-                        .containerRelativeFrame(.horizontal)
-                        .frame(height: defaultHeight)
-                        .foregroundStyle(.ultraThinMaterial)
-                        .overlay(alignment: .center) {
-                            Text("대시보드")
-                                .font(.system(size: 18, weight: .black))
-                                .foregroundStyle(.aiCoLabel)
-                        }
-                        .opacity(scrollOffset > threshold ? 1 : 0)
-                        .animation(.snappy(duration: 0.2), value: scrollOffset > threshold)
-                        .allowsHitTesting(false)
-                }
+            .onAppear {
+                topInset = outerProxy.safeAreaInsets.top
             }
         }
     }
