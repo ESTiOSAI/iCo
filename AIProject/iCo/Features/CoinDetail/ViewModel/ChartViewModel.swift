@@ -37,6 +37,11 @@ final class ChartViewModel: ObservableObject {
 
     /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
+    /// 신규 상장 판별 플래그
+    @Published private(set) var isNewlyListed: Bool = false
+    
+    /// 신규 상장 판별 위한 24시간 상수
+    private let twentyFourHours: TimeInterval = 24 * 60 * 60
     
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
@@ -194,6 +199,14 @@ final class ChartViewModel: ObservableObject {
                 )
             }
             
+            /// 신규 상장 여부 계산 (보유 분봉 범위가 24h 미만이면 true)
+            if let first = self.prices.first?.date, let last = self.prices.last?.date {
+                let span = last.timeIntervalSince(first)
+                self.isNewlyListed = span < twentyFourHours - 60  // 1분 여유
+            } else { // prices가 비어있을 때 (상장 직후)
+                self.isNewlyListed = true
+            }
+            
             if let ticker = ticker {
                 /// 현재가
                 headerLastPrice = ticker.price
@@ -312,6 +325,14 @@ final class ChartViewModel: ObservableObject {
             let cutoff = Date().addingTimeInterval(-24 * 60 * 60)
             prices.removeAll(where: { $0.date < cutoff })
 
+            /// 신규 상장 여부 재판단
+            if let first = prices.first?.date, let last = prices.last?.date {
+                let span = last.timeIntervalSince(first)
+                isNewlyListed = span < twentyFourHours - 60
+            } else {
+                isNewlyListed = true
+            }
+            
             /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
             async let quotesTask: [TickerDTO] = tickerAPI.fetchQuotes(id: market)
             if let q = try await quotesTask.first {
