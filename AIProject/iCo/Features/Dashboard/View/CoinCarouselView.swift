@@ -52,25 +52,23 @@ struct CoinCarouselView: View {
                 ForEach(tempCoinArray.indices, id: \.self) { index in
                     let coin = tempCoinArray[index]
                     
-                    VStack {
-                        RecommendCardView(recommendCoin: coin)
-                            .frame(
-                                width: nil,
-                                height: CardConst.cardHeight
+                    RecommendCardView(recommendCoin: coin)
+                        .frame(
+                            width: nil,
+                            height: CardConst.cardHeight
+                        )
+                        .onTapGesture { selectedCoin = coin }
+                        .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
+                            content.scaleEffect(
+                                y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
+                                anchor: .bottom
                             )
-                            .onTapGesture { selectedCoin = coin }
-                            .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
-                                content.scaleEffect(
-                                    y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
-                                    anchor: .bottom
-                                )
-                            }
-                    }
-                    .containerRelativeFrame(
-                        .horizontal,
-                        count: numberOfColumn, // 컨테이너의 크기에 따라 한 화면에 몇 개의 카드를 보여줄지 결정하기
-                        spacing: .spacingSmall
-                    )
+                        }
+                        .containerRelativeFrame(
+                            .horizontal,
+                            count: numberOfColumn, // 컨테이너의 크기에 따라 한 화면에 몇 개의 카드를 보여줄지 결정하기
+                            spacing: .spacingSmall
+                        )
                 }
             }
             .scrollTargetLayout()
