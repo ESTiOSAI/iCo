@@ -42,11 +42,11 @@ struct RecomendationPlaceholderCardView: View {
                     }
                     
                     Card()
+                        .frame(maxWidth: hSizeClass == .compact ? .infinity : 500)
                         .frame(
                             width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXSmall * 2),
                             height: CardConst.cardHeight
                         )
-                        .frame(maxWidth: hSizeClass == .compact ? .infinity : 500)
                     
                     if hSizeClass == .compact {
                         Card()
