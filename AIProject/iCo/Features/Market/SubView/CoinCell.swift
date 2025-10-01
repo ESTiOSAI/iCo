@@ -17,10 +17,12 @@ struct CoinCell: View {
             HStack {
                 CoinMetaView(symbol: coin.coinSymbol, name: coin.koreanName, searchTerm: searchTerm)
                     .frame(alignment: .leading)
-                    .layoutPriority(1) // 레이블이 접히는 걸 방지
+                
+                Spacer()
                 
                 CoinPriceView(ticker: store)
                     .frame(alignment: .trailing)
+                    .layoutPriority(1)
             }
         }
         .id(coin.id)
@@ -105,7 +107,6 @@ fileprivate struct CoinPriceView: View {
         .font(.system(size: 12))
         .fontWeight(.medium)
         .foregroundStyle(.aiCoLabel)
-        .frame(maxWidth: .infinity, alignment: .trailing)
         .background {
             VStack {
                 ZStack {
