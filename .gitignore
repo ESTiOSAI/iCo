@@ -64,3 +64,4 @@ fastlane/test_output
 *.DS_Store
 *.xcconfig
 AIProject/AIProject/App/Resource/GoogleService-Info.plist
+AIProject/iCo/App/Resource/GoogleService-Info.plist
