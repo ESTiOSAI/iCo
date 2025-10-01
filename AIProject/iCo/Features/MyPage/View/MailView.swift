@@ -35,7 +35,7 @@ struct MailView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
         vc.mailComposeDelegate = context.coordinator
-        vc.setToRecipients(["jihyeon9975@icloud.com"])
+        vc.setToRecipients(["teamicohelp@gmail.com"])
         vc.setSubject("[아이코(AICo)] 피드백")
         vc.setMessageBody("아이코에 대한 다양한 내용을 작성해주세요.", isHTML: false)
         return vc
