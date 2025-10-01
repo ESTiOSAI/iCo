@@ -12,7 +12,7 @@ extension CGFloat {
     /// 기본 간격: 16
     static let spacing: CGFloat = 16.0
     /// 14
-    static let spacingS: CGFloat = 14.0
+    static let spacingSmall: CGFloat = 14.0
     /// 10
-    static let spacingXs: CGFloat = 10.0
+    static let spacingXSmall: CGFloat = 10.0
 }

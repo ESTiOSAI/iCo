@@ -51,7 +51,7 @@ struct RecomendationPlaceholderCardView: View {
         let viewWidth: CGFloat
         
         var body: some View {
-            HStack(alignment: .bottom, spacing: .spacingS) {
+            HStack(alignment: .bottom, spacing: .spacingSmall) {
                 Group {
                     Color.aiCoBackgroundWhite.opacity(0.9)
                         .background(.ultraThinMaterial)
@@ -60,7 +60,7 @@ struct RecomendationPlaceholderCardView: View {
                     Color.aiCoBackgroundWhite.opacity(0.9)
                         .background(.ultraThinMaterial)
                         .frame(
-                            width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXs * 2),
+                            width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXSmall * 2),
                             height: CardConst.cardHeight
                         )
                     

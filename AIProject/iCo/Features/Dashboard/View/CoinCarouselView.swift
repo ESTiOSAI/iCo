@@ -48,7 +48,7 @@ struct CoinCarouselView: View {
         var numberOfColumn: Int { hSizeClass == .regular ? 2 : 1 }
         
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .bottom, spacing: .spacingS) {
+            HStack(alignment: .bottom, spacing: .spacingSmall) {
                 ForEach(tempCoinArray.indices, id: \.self) { index in
                     let coin = tempCoinArray[index]
                     
@@ -69,14 +69,14 @@ struct CoinCarouselView: View {
                     .containerRelativeFrame(
                         .horizontal,
                         count: numberOfColumn, // 컨테이너의 크기에 따라 한 화면에 몇 개의 카드를 보여줄지 결정하기
-                        spacing: .spacingS
+                        spacing: .spacingSmall
                     )
                 }
             }
             .scrollTargetLayout()
             .frame(height: CardConst.cardHeight, alignment: .top)
         }
-        .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacingXs) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
+        .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacingXSmall) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(
             id: $cardID,
