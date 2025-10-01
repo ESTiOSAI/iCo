@@ -36,6 +36,7 @@ struct HeaderView: View {
     }
     
     var body: some View {
+        let buttonWidth: CGFloat = 44
         
         ZStack(alignment: .leading) {
             if showBackButton {
@@ -57,6 +58,9 @@ struct HeaderView: View {
             }
             
             HStack {
+                Spacer()
+                    .frame(width: showBackButton ? buttonWidth : 0)
+                
                 HStack(alignment: .center, spacing: 8) {
                     if let coinSymbol {
                         CoinView(symbol: "\(coinSymbol)", size: 30)
@@ -65,6 +69,8 @@ struct HeaderView: View {
                     Text(heading)
                         .font(.system(size: 24, weight: .black))
                         .foregroundStyle(headingColor)
+                        .lineLimit(2)
+                        .truncationMode(.tail)
                         .multilineTextAlignment(showBackButton ? .center : .leading)
                     
                     if let coinSymbol {
@@ -76,6 +82,7 @@ struct HeaderView: View {
                 .frame(maxWidth: showBackButton ? .infinity : nil)
                 
                 Spacer()
+                    .frame(width: showBackButton ? buttonWidth : nil)
             }
         }
         .padding(.horizontal, 16)
@@ -89,7 +96,8 @@ struct HeaderView: View {
         .padding(.bottom, 16)
     HeaderView(heading: "북마크 관리", showBackButton: true)
         .padding(.bottom, 16)
-    HeaderView(heading: "비트코인", coinSymbol: "BTC", showBackButton: true)
+    HeaderView(heading: "월드리버티파이낸셜유에스디", coinSymbol: "BTC", showBackButton: true)
         .padding(.bottom, 16)
-    SubheaderView(subheading: "북마크하신 코인들을 분석해봤어요")
+    HeaderView(heading: "월드리버티파이낸셜유에스디월드리버티파이낸셜유에스디", coinSymbol: "BTC", showBackButton: true)
+        .padding(.bottom, 16)
 }
