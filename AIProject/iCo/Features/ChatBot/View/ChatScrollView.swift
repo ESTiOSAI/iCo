@@ -99,7 +99,7 @@ struct ChatScrollView<Content: View>: View {
         )
         .onPreferenceChange(ChatOffSetPreferenceKey.self) { value in
             scrollOffSet = value.y
-            reachToBottom = contentHeight <= (value.y + viewportHeight + 50) // 50: 스크롤 바닥 근처인지를 확인하는 최소 임계값입니다.
+            reachToBottom = contentHeight <= (value.y + viewportHeight + 150) // 150: 스크롤 바닥 근처인지를 확인하는 최소 임계값입니다.
         }
     }
 }
