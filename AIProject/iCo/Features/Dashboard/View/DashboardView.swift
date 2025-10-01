@@ -82,7 +82,7 @@ struct DashboardView: View {
         }
     }
     
-    struct CustomNavigationBar: View {
+    private struct CustomNavigationBar: View {
         let scrollOffset: CGFloat
         let topInset: CGFloat
         
