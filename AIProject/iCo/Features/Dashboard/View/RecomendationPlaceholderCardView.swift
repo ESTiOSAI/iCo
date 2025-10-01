@@ -9,71 +9,63 @@ import SwiftUI
 
 /// DefaultProgressView가 공중에 어색하게 떠있는 것을 개선하기 위해 만든 카드의 플레이스홀더뷰입니다.
 struct RecomendationPlaceholderCardView: View {
-    @Environment(\.horizontalSizeClass) private var hSizeClass
-    
     /// 코인 추천 상태를 받는 속성
-    var status: DefaultProgressView.Status
+    let status: DefaultProgressView.Status
     /// 코인 추천 결과에 따른 메시지를 받는 속성
-    var message: String
+    let message: String
     /// 버튼 터치 시 실행할 액션을 받는 속성
-    var action: () -> Void
+    let action: () -> Void
     
     var body: some View {
         GeometryReader { geoProxy in
-            ZStack {
-                // 작은 화면에서는 카드 스택 배경 보여주기
-                if hSizeClass == .compact {
-                    CardStack(viewWidth: geoProxy.size.width)
-                    .frame(maxWidth: geoProxy.size.width - (CardConst.cardInnerPadding * 2))
+            DefaultProgressView(status: status, message: message) { action() }
+                .background {
+                    Background(viewWidth: geoProxy.size.width)
                 }
-                
-                VStack {
-                    DefaultProgressView(status: status, message: message) { action() }
-                }
-                .background(hSizeClass == .regular ?
-                    ZStack {
-                        Rectangle().fill(.ultraThinMaterial)
-                        Color.aiCoBackgroundWhite.opacity(0.9)
-                    }
-                            : nil
-                )
-                .frame(maxWidth: hSizeClass == .regular ? 500 : .infinity)
-                .frame(height: CardConst.cardHeight)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .overlay(
-                    hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5) : nil)
-            }
-            .frame(width: geoProxy.size.width)
         }
     }
     
-    private struct CardStack: View {
+    /// horizontalSizeClass에 따라 배경에 카드 스택을 보여줄지 하나의 카드만 보여줄지를 결정하는 구조체입니다.
+    /// 카드는 크기만 변경되므로 구조체로 만들어 재사용했습니다.
+    private struct Background: View {
+        @Environment(\.horizontalSizeClass) var hSizeClass
+        
         let viewWidth: CGFloat
+        let smallCardHeight = CardConst.cardHeight * CardConst.cardHeightMultiplier
         
         var body: some View {
             HStack(alignment: .bottom, spacing: .spacingSmall) {
                 Group {
-                    Color.aiCoBackgroundWhite.opacity(0.9)
-                        .background(.ultraThinMaterial)
-                        .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
+                    if hSizeClass == .compact {
+                        Card()
+                            .frame(width: 100, height: smallCardHeight)
+                    }
                     
-                    Color.aiCoBackgroundWhite.opacity(0.9)
-                        .background(.ultraThinMaterial)
+                    Card()
                         .frame(
                             width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXSmall * 2),
                             height: CardConst.cardHeight
                         )
+                        .frame(maxWidth: hSizeClass == .compact ? .infinity : 500)
                     
-                    Color.aiCoBackgroundWhite.opacity(0.9)
-                        .background(.ultraThinMaterial)
-                        .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
+                    if hSizeClass == .compact {
+                        Card()
+                            .frame(width: 100, height: smallCardHeight)
+                    }
                 }
+            }
+        }
+    }
+    
+    private struct Card: View {
+        var body: some View {
+            Color.aiCoBackgroundWhite.opacity(0.9)
+                .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .overlay {
                     RoundedRectangle(cornerRadius: 24)
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 }
-            }
         }
     }
 }
