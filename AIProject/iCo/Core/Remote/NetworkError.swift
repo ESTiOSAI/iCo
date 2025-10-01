@@ -21,18 +21,21 @@ enum NetworkError: Error {
     case encodingError
     /// 디코딩 오류로, 발생 위치와 DecodingError를 포함합니다.
     case decodingError(_ error: DecodingError)
-    
     /// API 키가 유효하지 않거나 누락된 경우입니다.
     case invalidAPIKey
-    /// API 호출 한도를 초과한 경우입니다.
-    case quotaExceeded(_ statusCode: Int)
-    /// 요청한 리소스를 찾을 수 없는 경우입니다 (404).
-    case notFound(_ statusCode: Int)
-    /// 요청 URI가 너무 길어 서버가 처리할 수 없는 경우입니다.
-    case uriTooLong(_ statusCode: Int)
     
-    /// 서버가 유지보수 중이거나 일시적으로 사용할 수 없는 경우입니다.
+    /// 요청 본문의 형식이 잘못된 경우입니다. (400)
+    case invalidArgument(_ statusCode: Int)
+    /// API 키에 필요한 권한이 없는 경우입니다. (403)
+    case permissionDenied(_ statusCode: Int)
+    /// 요청한 리소스를 찾을 수 없는 경우입니다. (404)
+    case notFound(_ statusCode: Int)
+    /// 무료 등급 비율 제한을 초과한 경우입니다. (429)
+    case resourceExhausted(_ statusCode: Int)
+    /// 서버가 유지보수 중이거나 일시적으로 사용할 수 없는 경우입니다. (500, 503)
     case serviceUnavilable(_ statusCode: Int)
+    /// 서비스가 기한 내에 처리를 완료할 수 없는 경우입니다. timeout (504)
+    case deadlineExceeded(_ statusCode: Int)
     /// 서버 내부 오류(500번대 HTTP 응답 등)입니다.
     case serverError(_ statusCode: Int)
     /// 서버로부터 전달된 상태 코드와 오류 메시지를 포함한 오류입니다.
@@ -47,12 +50,15 @@ enum NetworkError: Error {
 extension NetworkError: LocalizedError {
     /// 사용자에게 표시할 오류 설명입니다.
     ///
-    /// - `taskCancelled`: "작업이 취소되었습니다. 아래 버튼을 눌러 다시 시도해 주세요."
-    /// - 그 외: "데이터를 불러오는 데 실패했어요. 잠시 후 다시 시도해 주세요."
+    /// - `taskCancelled`: "작업이 취소되었어요. 아래 버튼을 눌러 다시 시도해 주세요."
+    /// - `resourceExhausted`:"요청이 많아 지금은 답변할 수 없어요. 잠시 후 다시 시도해 주세요"
+    /// - 그 외: "데이터를 불러오지 못했어요. 잠시 후 다시 시도해 주세요."
     var errorDescription: String? {
         switch self {
         case .taskCancelled:
-            return "작업이 취소됐어요"
+            return "작업이 취소되었어요\n아래 버튼을 눌러 다시 시도해 주세요"
+        case .resourceExhausted:
+            return "요청이 많아 지금은 답변할 수 없어요\n잠시 후 다시 시도해 주세요"
         default:
             return "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요"
         }

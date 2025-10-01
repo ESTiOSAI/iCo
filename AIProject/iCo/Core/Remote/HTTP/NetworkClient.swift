@@ -61,14 +61,18 @@ final class NetworkClient {
         switch statusCode {
         case 200..<300:
             return
-        case 401:
-            throw NetworkError.quotaExceeded(statusCode)
+        case 400:
+            throw NetworkError.invalidArgument(statusCode)
+        case 403:
+            throw NetworkError.permissionDenied(statusCode)
         case 404:
             throw NetworkError.notFound(statusCode)
-        case 414:
-            throw NetworkError.uriTooLong(statusCode)
-        case 503:
+        case 429:
+            throw NetworkError.resourceExhausted(statusCode)
+        case 500, 503:
             throw NetworkError.serviceUnavilable(statusCode)
+        case 504:
+            throw NetworkError.deadlineExceeded(statusCode)
         case 500..<600:
             throw NetworkError.serverError(statusCode)
         default:
