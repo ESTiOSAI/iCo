@@ -7,62 +7,65 @@
 
 import SwiftUI
 
-/// DefaultProgressView가 공중에 어색하게 떠있는 것을 개선하기 위해 만든 카드의 플레이스홀더뷰
-/// 사실 플레이스홀더 뷰를 메인으로 띄우고, 네트워크 로드가 완료되면 내부 컨텐츠만 바꾸는 방식으로 가고 싶은데... 추후에 변경하는 것으로...
+/// DefaultProgressView가 공중에 어색하게 떠있는 것을 개선하기 위해 만든 카드의 플레이스홀더뷰입니다.
 struct RecomendationPlaceholderCardView: View {
-    @Environment(\.horizontalSizeClass) var hSizeClass
-    
-    var status: DefaultProgressView.Status
-    var message: String
-    var action: () -> Void
+    /// 코인 추천 상태를 받는 속성
+    let status: DefaultProgressView.Status
+    /// 코인 추천 결과에 따른 메시지를 받는 속성
+    let message: String
+    /// 버튼 터치 시 실행할 액션을 받는 속성
+    let action: () -> Void
     
     var body: some View {
         GeometryReader { geoProxy in
-            ZStack {
-                if hSizeClass == .compact {
-                    HStack(alignment: .bottom, spacing: 16) {
-                        Group {
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
-                            
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(
-                                    width: geoProxy.size.width - (CardConst.cardInnerPadding * 2) - (.spacing * 2),
-                                    height: CardConst.cardHeight
-                                )
-                            
-                            Color.aiCoBackgroundWhite.opacity(0.9)
-                                .background(.ultraThinMaterial)
-                                .frame(width: 100, height: CardConst.cardHeight * CardConst.cardHeightMultiplier)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 24)
-                                .strokeBorder(.defaultGradient, lineWidth: 0.5)
-                        }
-                    }
-                    .frame(maxWidth: geoProxy.size.width - (CardConst.cardInnerPadding * 2))
+            DefaultProgressView(status: status, message: message) { action() }
+                .background {
+                    Background(viewWidth: geoProxy.size.width)
                 }
-                
-                VStack {
-                    DefaultProgressView(status: status, message: message) { action() }
-                }
-                .background(hSizeClass == .regular ?
-                    ZStack {
-                        Rectangle().fill(.ultraThinMaterial)
-                        Color.aiCoBackgroundWhite.opacity(0.9)
+        }
+    }
+    
+    /// horizontalSizeClass에 따라 배경에 카드 스택을 보여줄지 하나의 카드만 보여줄지를 결정하는 구조체입니다.
+    /// 카드는 크기만 변경되므로 구조체로 만들어 재사용했습니다.
+    private struct Background: View {
+        @Environment(\.horizontalSizeClass) var hSizeClass
+        
+        let viewWidth: CGFloat
+        let smallCardHeight = CardConst.cardHeight * CardConst.cardHeightMultiplier
+        
+        var body: some View {
+            HStack(alignment: .bottom, spacing: .spacingSmall) {
+                Group {
+                    if hSizeClass == .compact {
+                        Card()
+                            .frame(width: 100, height: smallCardHeight)
                     }
-                            : nil
-                )
-                .frame(maxWidth: hSizeClass == .regular ? 400 : .infinity)
-                .frame(height: CardConst.cardHeight)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .overlay(
-                    hSizeClass == .regular ? RoundedRectangle(cornerRadius: 20).strokeBorder(.defaultGradient, lineWidth: 0.5) : nil)
+                    
+                    Card()
+                        .frame(
+                            width: viewWidth - (CardConst.cardInnerPadding * 2) - (.spacingXSmall * 2),
+                            height: CardConst.cardHeight
+                        )
+                        .frame(maxWidth: hSizeClass == .compact ? .infinity : 500)
+                    
+                    if hSizeClass == .compact {
+                        Card()
+                            .frame(width: 100, height: smallCardHeight)
+                    }
+                }
             }
-            .frame(width: geoProxy.size.width)
+        }
+    }
+    
+    private struct Card: View {
+        var body: some View {
+            Color.aiCoBackgroundWhite.opacity(0.9)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(.defaultGradient, lineWidth: 0.5)
+                }
         }
     }
 }

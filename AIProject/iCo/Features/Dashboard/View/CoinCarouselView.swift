@@ -48,35 +48,33 @@ struct CoinCarouselView: View {
         var numberOfColumn: Int { hSizeClass == .regular ? 2 : 1 }
         
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(alignment: .bottom, spacing: .spacing) {
+            HStack(alignment: .bottom, spacing: .spacingSmall) {
                 ForEach(tempCoinArray.indices, id: \.self) { index in
                     let coin = tempCoinArray[index]
                     
-                    VStack {
-                        RecommendCardView(recommendCoin: coin)
-                            .frame(
-                                width: nil,
-                                height: CardConst.cardHeight
+                    RecommendCardView(recommendCoin: coin)
+                        .frame(
+                            width: nil,
+                            height: CardConst.cardHeight
+                        )
+                        .onTapGesture { selectedCoin = coin }
+                        .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
+                            content.scaleEffect(
+                                y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
+                                anchor: .bottom
                             )
-                            .onTapGesture { selectedCoin = coin }
-                            .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
-                                content.scaleEffect(
-                                    y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
-                                    anchor: .bottom
-                                )
-                            }
-                    }
-                    .containerRelativeFrame(
-                        .horizontal,
-                        count: numberOfColumn, // 컨테이너의 크기에 따라 한 화면에 몇 개의 카드를 보여줄지 결정하기
-                        spacing: .spacing
-                    )
+                        }
+                        .containerRelativeFrame(
+                            .horizontal,
+                            count: numberOfColumn, // 컨테이너의 크기에 따라 한 화면에 몇 개의 카드를 보여줄지 결정하기
+                            spacing: .spacingSmall
+                        )
                 }
             }
             .scrollTargetLayout()
             .frame(height: CardConst.cardHeight, alignment: .top)
         }
-        .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacing) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
+        .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacingXSmall) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(
             id: $cardID,
