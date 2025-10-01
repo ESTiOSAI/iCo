@@ -45,9 +45,7 @@ final class ChatBotViewModel: ObservableObject {
     ///
     /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
-    func sendMessage() async {
-        let message = searchText
-
+    func sendMessage(message: String) async {
         searchText = ""
         isStreaming = true
 

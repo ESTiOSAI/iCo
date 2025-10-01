@@ -10,7 +10,7 @@ import SwiftUI
 /// 챗봇 입력창에 해당하는 View입니다.
 struct ChatInputView: View {
     @ObservedObject var viewModel: ChatBotViewModel
-
+    
     @FocusState private var isFocused: Bool
 
     var body: some View {
@@ -22,7 +22,7 @@ struct ChatInputView: View {
                 .focused($isFocused)
 
             Button {
-                Task { await viewModel.sendMessage() }
+                Task { await viewModel.sendMessage(message: viewModel.searchText) }
             } label: {
                 Image(systemName: "arrow.up")
                     .padding(10)
