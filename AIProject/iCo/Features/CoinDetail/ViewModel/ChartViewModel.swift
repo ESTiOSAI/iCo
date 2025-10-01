@@ -420,7 +420,12 @@ extension ChartViewModel {
     ///   - data: 시각화할 가격 데이터 배열
     /// - Returns: 마지막 데이터 시점 +5분
     func scrollToTime(for data: [CoinPrice]) -> Date {
-        data.last?.date.addingTimeInterval(60 * 5) ?? Date()
+        guard let last = data.last?.date,
+              let first = data.first?.date else {
+            return Date()
+        }
+        
+        return (last.timeIntervalSince(first) < twentyFourHours) ? last : last.addingTimeInterval(60 * 5)
     }
 }
 
