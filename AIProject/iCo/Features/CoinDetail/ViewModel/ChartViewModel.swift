@@ -395,10 +395,24 @@ extension ChartViewModel {
     /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
     func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
-        let lastDate = data.last?.date ?? now
-        let xStart = now.addingTimeInterval(-60 * 60 * 24)
-        let xEnd = lastDate.addingTimeInterval(60 * 5)
-        return xStart...xEnd
+
+        guard let first = data.first?.date, let last = data.last?.date else {
+            // 데이터 없으면 기존 폴백
+            let xStart = now.addingTimeInterval(-60 * 60 * 24)
+            return xStart...now
+        }
+        
+        let span = last.timeIntervalSince(first)
+
+        if span < twentyFourHours {
+            // 신규 상장(24h 미만): 데이터 있는 구간만 보여줌 (패딩 없이)
+            return first...last
+        } else {
+            // 신규 상장 아닐 경우 기존 동작 유지: 24h 고정 + 오른쪽 5분 버퍼
+            let xStart = now.addingTimeInterval(-60 * 60 * 24)
+            let xEnd = last.addingTimeInterval(60 * 5)
+            return xStart...xEnd
+        }
     }
     
     /// 초기 차트 스크롤 위치를 지정할 시각을 반환
