@@ -38,7 +38,7 @@ struct ChatBotFAQView: View {
             Group {
                 VStack(spacing: 15) {
                     HStack {
-                        Text("안녕하세요, iCo 챗봇입니다.\n궁금하신 내용을 선택해주세요.")
+                        Text("안녕하세요, 아이코 챗봇입니다.\n궁금하신 내용을 선택해주세요.")
                             .font(.system(size: 15))
                         Spacer()
                     }
