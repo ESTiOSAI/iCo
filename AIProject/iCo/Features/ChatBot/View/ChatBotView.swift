@@ -57,14 +57,14 @@ struct ChatBotView: View {
                     Color.clear
                         .onAppear {
                             if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
-                                isPortrait = orientation.isPortrait
+                                isPortrait = !orientation.isPortrait
                             }
                             
                             isPad = hSizeClass == .regular && vSizeClass == .regular
                         }
                         .onChange(of: proxy.size) {
                             if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
-                                isPortrait = orientation.isPortrait
+                                isPortrait = !orientation.isPortrait
                             }
                             
                             isPad = hSizeClass == .regular && vSizeClass == .regular
