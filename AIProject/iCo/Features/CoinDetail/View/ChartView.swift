@@ -73,14 +73,14 @@ struct ChartView: View {
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
         .onAppear {
-            onNewlyListedChange(viewModel.isNewlyListed)
+            onNewlyListedChange(viewModel.showNewBadge)
             viewModel.checkBookmark()
             viewModel.retry()
         }
         .onDisappear {
             viewModel.stopUpdating()
         }
-        .onChange(of: viewModel.isNewlyListed) { _, newValue in
+        .onChange(of: viewModel.showNewBadge) { _, newValue in
             onNewlyListedChange(newValue)
         }
         .onChange(of: scenePhase, initial: false) { _, newPhase in

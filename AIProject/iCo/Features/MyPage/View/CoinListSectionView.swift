@@ -17,6 +17,8 @@ struct CoinListSectionView: View {
     @Binding var priceOrder: SortOrder
     @Binding var volumeOrder: SortOrder
 
+    @State private var showNewBadge = false
+    
     let imageProvider: (String) -> UIImage?
     let onDelete: (BookmarkEntity) -> Void
 
@@ -46,12 +48,15 @@ struct CoinListSectionView: View {
                             HeaderView(
                                 heading: meta.koreanName,
                                 coinSymbol: meta.coinSymbol,
-                                showBackButton: true
+                                showBackButton: true,
+                                showNewBadge: showNewBadge
                             )
                             .toolbar(.hidden, for: .navigationBar)
                             
-                            CoinDetailView(coin: meta)
-                                .id(coin.id)
+                            CoinDetailView(coin: meta) { isNew in
+                                showNewBadge = isNew
+                            }
+                            .id(coin.id)
                         }
                     } label: {
                         CoinRowView(coin: coin, prefetched: imageProvider(coin.coinSymbol), onDelete: onDelete)

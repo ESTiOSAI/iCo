@@ -38,7 +38,7 @@ final class ChartViewModel: ObservableObject {
     /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
     /// 신규 상장 판별 플래그
-    @Published private(set) var isNewlyListed: Bool = false
+    @Published private(set) var showNewBadge: Bool = false
     
     /// 신규 상장 판별 위한 24시간 상수
     private let twentyFourHours: TimeInterval = 24 * 60 * 60
@@ -202,9 +202,16 @@ final class ChartViewModel: ObservableObject {
             /// 신규 상장 여부 계산 (보유 분봉 범위가 24h 미만이면 true)
             if let first = self.prices.first?.date, let last = self.prices.last?.date {
                 let span = last.timeIntervalSince(first)
-                self.isNewlyListed = span < twentyFourHours - 60  // 1분 여유
+                
+                // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
+                if self.prices.count >= 24 * 60 {
+                    self.showNewBadge = false
+                } else {
+                    // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
+                    self.showNewBadge = span < twentyFourHours - 60
+                }
             } else { // prices가 비어있을 때 (상장 직후)
-                self.isNewlyListed = true
+                self.showNewBadge = true
             }
             
             if let ticker = ticker {
@@ -331,14 +338,14 @@ final class ChartViewModel: ObservableObject {
                 
                 // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
                 if prices.count >= 24 * 60 {
-                    isNewlyListed = false
+                    showNewBadge = false
                 } else {
                     // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
-                    isNewlyListed = span < twentyFourHours - 60
+                    showNewBadge = span < twentyFourHours - 60
                 }
             } else {
                 // 데이터가 없으면 신규 취급
-                isNewlyListed = true
+                showNewBadge = true
             }
             
             /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
