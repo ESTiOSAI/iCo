@@ -14,8 +14,7 @@ struct ChatBotView: View {
     @Environment(\.colorScheme) var colorScheme
 
     @StateObject private var viewModel = ChatBotViewModel()
-
-    @State private var searchText: String = ""
+    
     @State private var isPortrait: Bool = false
     @State private var isPad: Bool = false
 
@@ -27,6 +26,8 @@ struct ChatBotView: View {
                 VStack(spacing: 0) {
                     ChatScrollView(viewModel: viewModel) {
                         LazyVStack(spacing: 20) {
+                            ChatBotFAQView(viewModel: viewModel)
+                            
                             ForEach(viewModel.messages) { message in
                                 Group {
                                     if message.isUser {
@@ -55,11 +56,17 @@ struct ChatBotView: View {
                 GeometryReader { proxy in
                     Color.clear
                         .onAppear {
-                            isPortrait = !UIDevice.current.orientation.isPortrait
+                            if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
+                                isPortrait = orientation.isPortrait
+                            }
+                            
                             isPad = hSizeClass == .regular && vSizeClass == .regular
                         }
                         .onChange(of: proxy.size) {
-                            isPortrait = !UIDevice.current.orientation.isPortrait
+                            if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
+                                isPortrait = orientation.isPortrait
+                            }
+                            
                             isPad = hSizeClass == .regular && vSizeClass == .regular
                         }
                 }
