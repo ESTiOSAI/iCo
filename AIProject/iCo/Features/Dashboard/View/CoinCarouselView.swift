@@ -43,6 +43,8 @@ struct CoinCarouselView: View {
         wrappedCoins.flatMap { $0.map { $0 }}
     }
     
+    @State private var showNewBadge = false
+    
     var body: some View {
         /// 화면의 가로 크기에 따라 카드 갯수를 관리하는 computed property
         var numberOfColumn: Int { hSizeClass == .regular ? 2 : 1 }
@@ -121,7 +123,8 @@ struct CoinCarouselView: View {
                         heading: coin.name,
                         topPadding: 20,
                         coinSymbol: coin.id,
-                        showBackButton: false
+                        showBackButton: false,
+                        showNewBadge: showNewBadge
                     )
                     .toolbar(.hidden, for: .navigationBar)
                     
@@ -132,7 +135,9 @@ struct CoinCarouselView: View {
                     .padding()
                 }
                 
-                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))
+                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))  { isNew in
+                    showNewBadge = isNew
+                }
             }
             .background(.background)
         }
