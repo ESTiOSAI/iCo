@@ -39,14 +39,14 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
 				B7C71D3A2E7BD9D9000E1191 /* iCOWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -98,6 +98,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Resource/Assets.xcassets,
+				Core/Local/UserDefaults/AppStorageKey.swift,
 				"Core/Util/Double+Util.swift",
 			);
 			target = B7C71D282E7BD9D6000E1191 /* iCOWidgetExtension */;
@@ -208,8 +209,8 @@
 				B7B03FFF2E387FCF005DE0BA /* Sources */,
 				B7B040002E387FCF005DE0BA /* Frameworks */,
 				B7B040012E387FCF005DE0BA /* Resources */,
-				B75D1FD22E45C153006839B5 /* ShellScript */,
 				B7C71D3B2E7BD9D9000E1191 /* Embed Foundation Extensions */,
+				B75D1FD22E45C153006839B5 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -565,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -605,7 +606,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -687,7 +688,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -721,7 +722,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

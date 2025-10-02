@@ -41,7 +41,7 @@ struct CoinAppEntity: AppEntity, Hashable, Identifiable {
         func suggestedEntities() async throws -> [CoinAppEntity] {
             let defaults = UserDefaults(suiteName: suite)
             
-            guard let dict = defaults?.dictionary(forKey: "widgetBookmarks") as? [String: String] else {
+            guard let dict = defaults?.dictionary(forKey: AppStorageKey.widgetBookmarks) as? [String: String] else {
                 return []
             }
 
