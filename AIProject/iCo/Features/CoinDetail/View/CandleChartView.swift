@@ -15,7 +15,7 @@ struct CandleChartView: View {
     /// 화면 간격에 맞춰 계산된 캔들 바 폭(pt)
     @State private var candleWidth: CGFloat = 4
     /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
-    @State private var centerOfVisibleXRange: Date
+    @State private var centerOfVisibleXRange: Date = Date()
     /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
     @State private var dynamicVisibleYDomain: ClosedRange<Double>? = nil
     /// 디바운스용 워크아이템 (중복 실행 / 레이스 방지)
@@ -58,16 +58,6 @@ struct CandleChartView: View {
         self.timeFormatter = timeFormatter
         self.positiveColor = positiveColor
         self.negativeColor = negativeColor
-        
-        // 마지막 캔들 시각을 기준으로 '오른쪽 여백 5분'을 확보하도록 초기 중심을 설정
-        if let lastCandleTime = data.last?.date {
-            let initialCenter = lastCandleTime
-                .addingTimeInterval(initialRightPadding - visibleLengthInSeconds / 2)
-            _centerOfVisibleXRange = State(initialValue: initialCenter)
-        } else {
-            // 데이터가 비어있을 때는 기존 scrollTo로 폴백
-            _centerOfVisibleXRange = State(initialValue: scrollTo)
-        }
     }
         
     // MARK: - Body
@@ -90,6 +80,11 @@ struct CandleChartView: View {
         
         // Y 라벨 포맷 범위
         let yLablesDomain = dynamicVisibleYDomain ?? yRange
+        
+        // 현재 X축 도메인의 전체 길이 (보이는 데이터 구간의 총 범위) 
+        let domainSpan = xDomain.upperBound.timeIntervalSince(xDomain.lowerBound)
+        // 한 화면에 보여줄 X 가시 길이를 결정. 기본 48분, 도메인이 더 짧으면 도메인에 맞춰 축소 (최소 1분 가드)
+        let visibleLength = min(visibleLengthInSeconds, max(60, domainSpan))
         
         Chart {
             ForEach(data, id: \.date) { point in
@@ -177,6 +172,11 @@ struct CandleChartView: View {
             recalcVisibleYAxisDomain() // Y축 첫 계산
         }
         
+        // 초기 스크롤 중심 계산: 데이터/신규상장 여부(24h 미만) 기준으로 계산
+        .onAppear {
+            centerOfVisibleXRange = initialCenter(for: data)
+        }
+        
         // 스크롤(중심) 변경 → 디바운스 후 2회 확인샷
         .onChange(of: centerOfVisibleXRange, initial: false) { _, _ in
             scheduleYAxisRecalcDebounced()
@@ -192,6 +192,25 @@ struct CandleChartView: View {
             yAxisRecalcWorkItem?.cancel()
             yAxisRecalcWorkItem = nil
         }
+    }
+    
+    /// 초기 스크롤 중심 계산
+    /// - 도메인이 24h 미만이면 오른쪽 패딩 0 (데이터 구간만 꽉 차게)
+    /// - 그 외에는 +5m 버퍼를 주어 끝이 붙어 보이지 않게
+    private func initialCenter(for data: [CoinPrice]) -> Date {
+        guard let last = data.last?.date, let first = data.first?.date else {
+            // 데이터 없으면 상위에서 내려준 scrollTo로 폴백
+            return scrollTo
+        }
+        // 현재 데이터가 커버하는 전체 X 범위(초)
+        let domainSpan = last.timeIntervalSince(first)
+        // 한 화면 가시 길이: 기본 48분, 도메인이 더 짧으면 도메인에 맞춰 축소 (최소 1분 가드)
+        let initialLength = min(visibleLengthInSeconds, max(60, domainSpan))
+        // 오른쪽 여백: 신규 상장(24h 미만)일 땐 0, 그 외엔 5분 버퍼
+        let rightPad: TimeInterval = (domainSpan < 24*60*60) ? 0 : initialRightPadding
+        
+        // 중심 = [오른쪽 여백] - [가시 길이/2]
+        return last.addingTimeInterval(rightPad - initialLength / 2)
     }
     
     // MARK: - Y 스케일 계산 (디바운스)

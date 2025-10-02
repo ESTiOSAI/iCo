@@ -21,12 +21,16 @@ struct ChartView: View {
     /// 시스템 앱 상태(active/inactive/background) 변화를 View에 전달하는 환경값
     @Environment(\.scenePhase) private var scenePhase
 
+    var onNewlyListedChange: (Bool) -> Void = { _ in }
+    
     // MARK: - Init
     init(
         coin: Coin,
         priceService: any CoinPriceProvider = UpbitPriceService(),
-        tickerAPI: UpBitAPIService = UpBitAPIService()
+        tickerAPI: UpBitAPIService = UpBitAPIService(),
+        onNewlyListedChange: @escaping (Bool) -> Void = { _ in }
     ) {
+        self.onNewlyListedChange = onNewlyListedChange
         _viewModel = StateObject(
             wrappedValue: ChartViewModel(
                 coin: coin,
@@ -69,11 +73,15 @@ struct ChartView: View {
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
         .onAppear {
+            onNewlyListedChange(viewModel.isNewlyListed)
             viewModel.checkBookmark()
             viewModel.retry()
         }
         .onDisappear {
             viewModel.stopUpdating()
+        }
+        .onChange(of: viewModel.isNewlyListed) { _, newValue in
+            onNewlyListedChange(newValue)
         }
         .onChange(of: scenePhase, initial: false) { _, newPhase in
             switch newPhase {

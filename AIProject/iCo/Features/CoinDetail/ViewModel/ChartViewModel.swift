@@ -37,6 +37,11 @@ final class ChartViewModel: ObservableObject {
 
     /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
+    /// 신규 상장 판별 플래그
+    @Published private(set) var isNewlyListed: Bool = false
+    
+    /// 신규 상장 판별 위한 24시간 상수
+    private let twentyFourHours: TimeInterval = 24 * 60 * 60
     
     /// 가격 데이터를 가져오는 서비스
     private let priceService: CoinPriceProvider
@@ -194,6 +199,14 @@ final class ChartViewModel: ObservableObject {
                 )
             }
             
+            /// 신규 상장 여부 계산 (보유 분봉 범위가 24h 미만이면 true)
+            if let first = self.prices.first?.date, let last = self.prices.last?.date {
+                let span = last.timeIntervalSince(first)
+                self.isNewlyListed = span < twentyFourHours - 60  // 1분 여유
+            } else { // prices가 비어있을 때 (상장 직후)
+                self.isNewlyListed = true
+            }
+            
             if let ticker = ticker {
                 /// 현재가
                 headerLastPrice = ticker.price
@@ -312,6 +325,22 @@ final class ChartViewModel: ObservableObject {
             let cutoff = Date().addingTimeInterval(-24 * 60 * 60)
             prices.removeAll(where: { $0.date < cutoff })
 
+            /// 신규 상장 여부 재판단
+            if let first = prices.first?.date, let last = prices.last?.date {
+                let span = last.timeIntervalSince(first)
+                
+                // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
+                if prices.count >= 24 * 60 {
+                    isNewlyListed = false
+                } else {
+                    // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
+                    isNewlyListed = span < twentyFourHours - 60
+                }
+            } else {
+                // 데이터가 없으면 신규 취급
+                isNewlyListed = true
+            }
+            
             /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
             async let quotesTask: [TickerDTO] = tickerAPI.fetchQuotes(id: market)
             if let q = try await quotesTask.first {
@@ -374,10 +403,24 @@ extension ChartViewModel {
     /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
     func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
-        let lastDate = data.last?.date ?? now
-        let xStart = now.addingTimeInterval(-60 * 60 * 24)
-        let xEnd = lastDate.addingTimeInterval(60 * 5)
-        return xStart...xEnd
+
+        guard let first = data.first?.date, let last = data.last?.date else {
+            // 데이터 없으면 기존 폴백
+            let xStart = now.addingTimeInterval(-60 * 60 * 24)
+            return xStart...now
+        }
+        
+        let span = last.timeIntervalSince(first)
+
+        if span < twentyFourHours {
+            // 신규 상장(24h 미만): 데이터 있는 구간만 보여줌 (패딩 없이)
+            return first...last
+        } else {
+            // 신규 상장 아닐 경우 기존 동작 유지: 24h 고정 + 오른쪽 5분 버퍼
+            let xStart = now.addingTimeInterval(-60 * 60 * 24)
+            let xEnd = last.addingTimeInterval(60 * 5)
+            return xStart...xEnd
+        }
     }
     
     /// 초기 차트 스크롤 위치를 지정할 시각을 반환
@@ -385,7 +428,12 @@ extension ChartViewModel {
     ///   - data: 시각화할 가격 데이터 배열
     /// - Returns: 마지막 데이터 시점 +5분
     func scrollToTime(for data: [CoinPrice]) -> Date {
-        data.last?.date.addingTimeInterval(60 * 5) ?? Date()
+        guard let last = data.last?.date,
+              let first = data.first?.date else {
+            return Date()
+        }
+        
+        return (last.timeIntervalSince(first) < twentyFourHours) ? last : last.addingTimeInterval(60 * 5)
     }
 }
 
