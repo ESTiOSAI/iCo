@@ -328,8 +328,16 @@ final class ChartViewModel: ObservableObject {
             /// 신규 상장 여부 재판단
             if let first = prices.first?.date, let last = prices.last?.date {
                 let span = last.timeIntervalSince(first)
-                isNewlyListed = span < twentyFourHours - 60
+                
+                // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
+                if prices.count >= 24 * 60 {
+                    isNewlyListed = false
+                } else {
+                    // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
+                    isNewlyListed = span < twentyFourHours - 60
+                }
             } else {
+                // 데이터가 없으면 신규 취급
                 isNewlyListed = true
             }
             
