@@ -18,7 +18,8 @@ actor ImageLoader {
         config.urlCache = URLCache.shared
         return URLSession(configuration: config)
     }()
-    
+    private let imageService: CoinGeckoAPIService = CoinGeckoAPIService()
+
     private init() {
         decodedCache = DecodedImageCache()
     }
@@ -34,10 +35,15 @@ actor ImageLoader {
     
     private func image(for symbol: String, useCacheOnly: Bool = false) async throws -> UIImage {
         
-        guard let key = loadFromDiskCache(from: symbol) else {
-            throw URLError(.fileDoesNotExist)
+        if let key = loadFromDiskCache(from: symbol) {
+           return try await image(for: key, useCacheOnly: useCacheOnly)
+        } else {
+            guard let key = try await imageService.fetchCoinImages(symbols: [symbol.lowercased()]).first?.imageURL else {
+                throw URLError(.fileDoesNotExist)
+            }
+            try CoinImageManager.shared.addDict([symbol: key])
+            return try await image(for: key, useCacheOnly: useCacheOnly)
         }
-        return try await image(for: key, useCacheOnly: useCacheOnly)
     }
 
     @discardableResult
