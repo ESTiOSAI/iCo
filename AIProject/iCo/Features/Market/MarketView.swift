@@ -64,7 +64,7 @@ struct MarketView: View {
                             heading: coin.koreanName,
                             coinSymbol: coin.coinSymbol,
                             showBackButton: hSizeClass == .regular ? false : true,
-                            isNewlyListed: isNewlyListed
+                            showNewBadge: isNewlyListed
                         )
                         .toolbar(.hidden, for: .navigationBar)
                         
