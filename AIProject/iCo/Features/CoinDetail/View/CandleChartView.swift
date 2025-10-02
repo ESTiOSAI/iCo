@@ -15,7 +15,7 @@ struct CandleChartView: View {
     /// 화면 간격에 맞춰 계산된 캔들 바 폭(pt)
     @State private var candleWidth: CGFloat = 4
     /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
-    @State private var centerOfVisibleXRange: Date
+    @State private var centerOfVisibleXRange: Date = Date()
     /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
     @State private var dynamicVisibleYDomain: ClosedRange<Double>? = nil
     /// 디바운스용 워크아이템 (중복 실행 / 레이스 방지)
@@ -58,38 +58,6 @@ struct CandleChartView: View {
         self.timeFormatter = timeFormatter
         self.positiveColor = positiveColor
         self.negativeColor = negativeColor
-        
-
-        if let lastCandleTime = data.last?.date, let firstCandleTime = data.first?.date {
-            let domainSpan = lastCandleTime.timeIntervalSince(firstCandleTime)
-            let initialLength = min(visibleLengthInSeconds, max(60, domainSpan))
-            // 도메인 우측 정렬: 오른쪽 여백은 '도메인 < 24h'일 땐 0, 그 외엔 +5m
-            let rightPad: TimeInterval = (domainSpan < 24*60*60) ? 0 : initialRightPadding
-            let initialCenter = lastCandleTime.addingTimeInterval(rightPad - initialLength / 2)
-            _centerOfVisibleXRange = State(initialValue: initialCenter)
-        } else {
-            _centerOfVisibleXRange = State(initialValue: scrollTo)
-        }
-
-        
-        // 마지막 캔들 시각을 기준으로 초기 스크롤 중심을 계산
-        // - 도메인(데이터가 존재하는 X 범위)이 24h 미만(신규 상장 등)인 경우: 오른쪽 여백을 두지 않고 데이터만 꽉 차게 보이도록 함
-        // - 도메인이 충분히 길면(≥24h): 기존 UX 유지 차원에서 오른쪽에 5분 여백을 둬서 맨 끝이 붙어 보이지 않게 함
-        if let lastCandleTime = data.last?.date,
-            let firstCandleTime = data.first?.date {
-            // 현재 데이터가 커버하는 전체 X 범위(초)
-            let domainSpan = lastCandleTime.timeIntervalSince(firstCandleTime)
-            // 한 화면 가시 길이: 기본 48분, 도메인이 더 짧으면 도메인에 맞춰 축소 (최소 1분 가드)
-            let initialLength = min(visibleLengthInSeconds, max(60, domainSpan))
-            // 오른쪽 여백: 신규 상장(24h 미만)일 땐 0, 그 외엔 5분 버퍼
-            let rightPad: TimeInterval = (domainSpan < 24*60*60) ? 0 : initialRightPadding
-            // 초기 중심 = [오른쪽 여백] - [가시 길이/2]
-            let initialCenter = lastCandleTime.addingTimeInterval(rightPad - initialLength / 2)
-            _centerOfVisibleXRange = State(initialValue: initialCenter)
-        } else {
-            // 데이터가 비어있을 때는 기본 스크롤 시각으로 폴백
-            _centerOfVisibleXRange = State(initialValue: scrollTo)
-        }
     }
         
     // MARK: - Body
@@ -204,6 +172,11 @@ struct CandleChartView: View {
             recalcVisibleYAxisDomain() // Y축 첫 계산
         }
         
+        // 초기 스크롤 중심 계산: 데이터/신규상장 여부(24h 미만) 기준으로 계산
+        .onAppear {
+            centerOfVisibleXRange = initialCenter(for: data)
+        }
+        
         // 스크롤(중심) 변경 → 디바운스 후 2회 확인샷
         .onChange(of: centerOfVisibleXRange, initial: false) { _, _ in
             scheduleYAxisRecalcDebounced()
@@ -219,6 +192,25 @@ struct CandleChartView: View {
             yAxisRecalcWorkItem?.cancel()
             yAxisRecalcWorkItem = nil
         }
+    }
+    
+    /// 초기 스크롤 중심 계산
+    /// - 도메인이 24h 미만이면 오른쪽 패딩 0 (데이터 구간만 꽉 차게)
+    /// - 그 외에는 +5m 버퍼를 주어 끝이 붙어 보이지 않게
+    private func initialCenter(for data: [CoinPrice]) -> Date {
+        guard let last = data.last?.date, let first = data.first?.date else {
+            // 데이터 없으면 상위에서 내려준 scrollTo로 폴백
+            return scrollTo
+        }
+        // 현재 데이터가 커버하는 전체 X 범위(초)
+        let domainSpan = last.timeIntervalSince(first)
+        // 한 화면 가시 길이: 기본 48분, 도메인이 더 짧으면 도메인에 맞춰 축소 (최소 1분 가드)
+        let initialLength = min(visibleLengthInSeconds, max(60, domainSpan))
+        // 오른쪽 여백: 신규 상장(24h 미만)일 땐 0, 그 외엔 5분 버퍼
+        let rightPad: TimeInterval = (domainSpan < 24*60*60) ? 0 : initialRightPadding
+        
+        // 중심 = [오른쪽 여백] - [가시 길이/2]
+        return last.addingTimeInterval(rightPad - initialLength / 2)
     }
     
     // MARK: - Y 스케일 계산 (디바운스)
