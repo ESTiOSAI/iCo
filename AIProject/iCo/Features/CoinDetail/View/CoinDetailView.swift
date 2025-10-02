@@ -44,28 +44,6 @@ struct CoinDetailView: View {
                         .padding(.horizontal, 16)
                         .onAppear {
                             if baseHeight == nil { baseHeight = proxy.size.height }
-                            guard keyboardObserver == nil else { return }
-                            keyboardObserver = NotificationCenter.default.addObserver(
-                                forName: UIResponder.keyboardWillChangeFrameNotification,
-                                object: nil,
-                                queue: .main
-                            ) { note in
-                                if let end = note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                                    let h = UIScreen.main.bounds.intersection(end).height
-                                    isKeyboardVisible = h > 0
-                                }
-                            }
-                        }
-                        .onChange(of: proxy.size.height) { _, newValue in
-                            if !isKeyboardVisible {
-                                baseHeight = newValue
-                            }
-                        }
-                        .onDisappear {
-                            if let token = keyboardObserver {
-                                NotificationCenter.default.removeObserver(token)
-                                keyboardObserver = nil
-                            }
                         }
                     }
                 }
