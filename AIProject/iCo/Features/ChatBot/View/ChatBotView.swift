@@ -56,11 +56,17 @@ struct ChatBotView: View {
                 GeometryReader { proxy in
                     Color.clear
                         .onAppear {
-                            isPortrait = !UIDevice.current.orientation.isPortrait
+                            if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
+                                isPortrait = orientation.isPortrait
+                            }
+                            
                             isPad = hSizeClass == .regular && vSizeClass == .regular
                         }
                         .onChange(of: proxy.size) {
-                            isPortrait = !UIDevice.current.orientation.isPortrait
+                            if let orientation = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first?.interfaceOrientation {
+                                isPortrait = orientation.isPortrait
+                            }
+                            
                             isPad = hSizeClass == .regular && vSizeClass == .regular
                         }
                 }
