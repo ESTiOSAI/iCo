@@ -52,7 +52,7 @@ struct MarketView: View {
             }
             .toolbar(removing: .sidebarToggle)
             .toolbar(.hidden, for: .navigationBar)
-            .navigationSplitViewColumnWidth(min: 330, ideal: 340, max: 350)
+            .navigationSplitViewColumnWidth(min: 340, ideal: 340, max: 350)
             
         } detail: {
             if let selectedCoinID, let coin = store.coinMeta[selectedCoinID] {
