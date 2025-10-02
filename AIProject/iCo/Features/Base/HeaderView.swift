@@ -18,19 +18,14 @@ struct HeaderView: View {
     let headingColor: Color
     var topPadding: CGFloat
     
-    var showSearchButton = false
-    let onSearchTap: () -> Void
-    
     var showBackButton = false
     var onBackButtonTap: (() -> Void)?
 
-    init(heading: String, headingColor: Color = .aiCoLabel, topPadding: CGFloat = 30, coinSymbol: String? = nil, showSearchButton: Bool = false, onSearchTap: @escaping () -> Void = { }, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil) {
+    init(heading: String, headingColor: Color = .aiCoLabel, topPadding: CGFloat = 30, coinSymbol: String? = nil, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil) {
         self.heading = heading
         self.headingColor = headingColor
         self.topPadding = topPadding
         self.coinSymbol = coinSymbol
-        self.showSearchButton = showSearchButton
-        self.onSearchTap = onSearchTap
         self.showBackButton = showBackButton
         self.onBackButtonTap = onBackButtonTap
     }
@@ -67,10 +62,9 @@ struct HeaderView: View {
                     }
                     
                     Text(heading)
-                        .font(.system(size: 24, weight: .black))
+                        .font(.system(size: heading.count < 11 ? 24 : 20, weight: .black))
                         .foregroundStyle(headingColor)
                         .lineLimit(2)
-                        .truncationMode(.tail)
                         .multilineTextAlignment(showBackButton ? .center : .leading)
                     
                     if let coinSymbol {
@@ -81,8 +75,7 @@ struct HeaderView: View {
                 }
                 .frame(maxWidth: showBackButton ? .infinity : nil)
                 
-                Spacer()
-                    .frame(width: showBackButton ? buttonWidth : nil)
+                Spacer(minLength: showBackButton ? buttonWidth : 0)
             }
         }
         .padding(.horizontal, 16)
@@ -99,5 +92,7 @@ struct HeaderView: View {
     HeaderView(heading: "월드리버티파이낸셜유에스디", coinSymbol: "BTC", showBackButton: true)
         .padding(.bottom, 16)
     HeaderView(heading: "월드리버티파이낸셜유에스디월드리버티파이낸셜유에스디", coinSymbol: "BTC", showBackButton: true)
+        .padding(.bottom, 16)
+    HeaderView(heading: "월드리버티파이낸셜유에스디월드리버티파이낸셜유에스디", coinSymbol: "BTC", showBackButton: false)
         .padding(.bottom, 16)
 }
