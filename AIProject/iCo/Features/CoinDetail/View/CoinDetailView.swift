@@ -25,8 +25,11 @@ struct CoinDetailView: View {
     
     let coin: Coin
     
-    init(coin: Coin) {
+    var onNewlyListedChange: (Bool) -> Void = { _ in }
+    
+    init(coin: Coin, onNewlyListedChange: @escaping (Bool) -> Void = { _ in }) {
         self.coin = coin
+        self.onNewlyListedChange = onNewlyListedChange
         _reportViewModel = StateObject(wrappedValue: ReportViewModel(coin: coin))
     }
     
@@ -86,7 +89,7 @@ extension CoinDetailView {
     @ViewBuilder
     fileprivate func content(containerHeight: CGFloat) -> some View {
         if hSizeClass == .regular {
-            ChartView(coin: coin)
+            ChartView(coin: coin, onNewlyListedChange: onNewlyListedChange)
                 .frame(height: containerHeight * Layout.regularChartRatio)
             
             ReportView(viewModel: reportViewModel)
@@ -94,7 +97,7 @@ extension CoinDetailView {
         } else {
             switch selectedTab {
             case .chart:
-                ChartView(coin: coin)
+                ChartView(coin: coin, onNewlyListedChange: onNewlyListedChange)
                     .frame(height: containerHeight * Layout.compactChartRatio)
             case .report:
                 ReportView(viewModel: reportViewModel)

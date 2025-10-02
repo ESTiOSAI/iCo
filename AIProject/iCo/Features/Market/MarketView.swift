@@ -22,6 +22,8 @@ struct MarketView: View {
     )
     private var records: FetchedResults<SearchRecordEntity>
     
+    @State private var isNewlyListed: Bool = false
+    
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         store = MarketStore(coinService: coinService, tickerService: tickerService)
     }
@@ -61,13 +63,21 @@ struct MarketView: View {
                         HeaderView(
                             heading: coin.koreanName,
                             coinSymbol: coin.coinSymbol,
-                            showBackButton: hSizeClass == .regular ? false : true
+                            showBackButton: hSizeClass == .regular ? false : true,
+                            isNewlyListed: isNewlyListed
                         )
                         .toolbar(.hidden, for: .navigationBar)
                         
-                        CoinDetailView(coin: coin)
-                            .id(coin.id)
+                        CoinDetailView(coin: coin) { isNew in
+                            withAnimation(.spring(response: 0.25, dampingFraction: 0.9)) {
+                                isNewlyListed = isNew
+                            }
+                        }
+                        .id(coin.id)
                     }
+                }
+                .onChange(of: selectedCoinID) { _, _ in
+                    isNewlyListed = false
                 }
             } else {
                 CommonPlaceholderView(imageName: "logo", text: "조회할 코인을 선택하세요")
