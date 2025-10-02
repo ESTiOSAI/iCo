@@ -12,6 +12,19 @@ enum CoinResource {
     case symbol(String)
 }
 
+extension CoinResource: Equatable {
+    static func ==(lhs: CoinResource, rhs: CoinResource) -> Bool {
+        switch (lhs, rhs) {
+        case (.url(let lhsURL), .url(let rhsURL)):
+            return lhsURL == rhsURL
+        case (.symbol(let lhsSymbol), .symbol(let rhsSymbol)):
+            return lhsSymbol == rhsSymbol
+        default:
+            return false
+        }
+    }
+}
+
 struct CachedAsyncImage<Content: View>: View {
     let resource: CoinResource
     let useCacheOnly: Bool
@@ -41,7 +54,7 @@ struct CachedAsyncImage<Content: View>: View {
                 placeholder
             }
         }
-        .task {
+        .task(id: resource) {
             await loadImage()
         }
     }
@@ -54,7 +67,7 @@ struct CachedAsyncImage<Content: View>: View {
         } catch {
             if let error = error as? URLError, error.code == .fileDoesNotExist {
                 // TODO: Retry fallback
-                print(error)
+                print("image 불러오기 실패")
             }
             image = nil
         }
