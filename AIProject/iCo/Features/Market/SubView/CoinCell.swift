@@ -44,7 +44,7 @@ fileprivate struct CoinMetaView: View {
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(name.highlighted(searchTerm))
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .font(.system(size: name.count < 8 ? 14 : 12))
                     .fontWeight(.bold)
                 
