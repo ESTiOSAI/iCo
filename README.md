@@ -4,6 +4,12 @@
 <img width="80%" alt="image" src="https://github.com/user-attachments/assets/80688f3a-8e32-4343-81a1-292f28902c07" />
 </p> <p align="center"> <b>LLM 기반 코인 초보자를 위한 맞춤 큐레이션 서비스</b><br/> 아이폰과 아이패드 모두에서 최적화된 경험을 제공합니다. </p>
 
+<div align="center">
+<a href= "https://apps.apple.com/kr/app/%EC%95%84%EC%9D%B4%EC%BD%94/id6752840491" target="_blank">
+ <img height="60" alt="image" src="https://github.com/user-attachments/assets/dbbcaf2d-de41-407c-ae76-1886968268d6" />
+</a>
+</div>
+
 ## ✨ Introduction
 
 AICo는 **코인 입문자**를 위한 LLM 기반 큐레이션 서비스입니다.  
