@@ -86,6 +86,7 @@ struct DefaultProgressView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
                 .padding(.bottom, 10)
+                .fixedSize(horizontal: false, vertical: true)
             
             switch status {
             case .loading:

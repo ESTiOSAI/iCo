@@ -19,7 +19,6 @@ struct CoinDetailView: View {
     @StateObject var reportViewModel: ReportViewModel
     
     @State private var selectedTab: Tab = .chart
-    @State private var baseHeight: CGFloat?
     @State private var isKeyboardVisible = false
     @State private var keyboardObserver: NSObjectProtocol?
     
@@ -36,7 +35,8 @@ struct CoinDetailView: View {
     var body: some View {
         ZStack(alignment: .top) {
             GeometryReader { proxy in
-                let containerHeight = baseHeight ?? proxy.size.height
+                let safeArea = proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom
+                let containerHeight = proxy.size.height - safeArea
                 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -45,9 +45,6 @@ struct CoinDetailView: View {
                             content(containerHeight: containerHeight)
                         }
                         .padding(.horizontal, 16)
-                        .onAppear {
-                            if baseHeight == nil { baseHeight = proxy.size.height }
-                        }
                     }
                 }
                 .scrollIndicators(.hidden)
@@ -134,7 +131,7 @@ extension CoinDetailView {
     /// 차트 높이 비율은 size class에 따라 다르게 적용됩니다.
     private enum Layout {
         static let regularChartRatio: CGFloat = 0.55
-        static let compactChartRatio: CGFloat = 0.8
+        static let compactChartRatio: CGFloat = 0.85
     }
 }
 
