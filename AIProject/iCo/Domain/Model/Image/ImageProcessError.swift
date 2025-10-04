@@ -24,6 +24,9 @@ enum ImageProcessError: Error, CustomStringConvertible {
     /// 기타 Vision 자체에서 발생한 에러
     case unknownVisionError
     
+    /// 기타 Alan API에서 발생한 에러
+    case unknownAlanError
+    
     var description: String {
         switch self {
         case .noRecognizedText:
