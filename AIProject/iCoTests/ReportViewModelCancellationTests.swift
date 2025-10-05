@@ -9,15 +9,15 @@ import XCTest
 @testable import iCo
 
 final class ReportViewModelCancellationTests: XCTestCase {
-    private var spy: SpyAlanAPIService!
+    private var spy: SpyLLMAPIService!
     private var sut: ReportViewModel!
     
     private func makeSUT() -> ReportViewModel {
-        ReportViewModel(coin: TestFixtures.Coin.btc, alanAPIService: spy)
+        ReportViewModel(coin: TestFixtures.Coin.btc, llmService: spy)
     }
     
     override func setUpWithError() throws {
-        spy = SpyAlanAPIService()
+        spy = SpyLLMAPIService()
         sut = self.makeSUT()
     }
 

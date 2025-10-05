@@ -18,29 +18,36 @@ final class NetworkErrorTests: XCTestCase {
 
     func testErrorDescription_returnsCorrectMessages() {
         let cancelled = NetworkError.taskCancelled
-        let expectedCancelledMessage = "작업이 취소됐어요"
-
-        let expectedDefaultMessage = "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요"
+        let exhausted = NetworkError.resourceExhausted(429)
+        
         let errors: [NetworkError] = [
+            .networkError(URLError(.badURL)),
             .invalidURL,
             .invalidResponse,
             .encodingError,
             .decodingError(DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "테스트"))),
             .invalidAPIKey,
-            .quotaExceeded(429),
+            .invalidArgument(400),
+            .permissionDenied(403),
             .notFound(404),
-            .uriTooLong(414),
             .serviceUnavilable(503),
-            .serverError(500),
-            .remoteError(400, "에러"),
+            .deadlineExceeded(504),
+            .serverError(505),
+            .remoteError(419, "에러"),
             .unknown(999),
             .webSocketError,
-            .networkError(URLError(.badURL))
         ]
+        
+        let expectedCancelledMessage = "작업이 취소되었어요\n아래 버튼을 눌러 다시 시도해 주세요"
+        let expectedExhaustedMessage = "요청이 많아 지금은 답변할 수 없어요\n잠시 후 다시 시도해 주세요"
+        let expectedDefaultMessage = "데이터를 불러오지 못했어요\n잠시 후 다시 시도해 주세요"
 
         let cancelledMessage = cancelled.errorDescription
-
         XCTAssertEqual(cancelledMessage, expectedCancelledMessage)
+        
+        let exhaustedMessage = exhausted.errorDescription
+        XCTAssertEqual(exhaustedMessage, expectedExhaustedMessage)
+        
         for error in errors {
             XCTAssertEqual(error.errorDescription, expectedDefaultMessage)
         }
