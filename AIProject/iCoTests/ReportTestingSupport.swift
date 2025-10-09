@@ -23,8 +23,8 @@ enum TestFixtures {
 
     enum Weekly {
         static let sample = CoinWeeklyDTO(
-            priceTrend: "상승",
-            volumeChange: "+12%",
+            coinWeeklyPriceSummary: "상승",
+            coinWeeklyVolumeSummary: "+12%",
             reason: "기관 유입"
         )
     }
@@ -50,12 +50,12 @@ enum TestFixtures {
     }
 }
 
-// MARK: - SpyAlanAPIService (Report 전용 Spy)
+// MARK: - SpyLLMAPIService (Report 전용 Spy)
 
 /// Spy 설정이 누락되었을 때 테스트에서 빠르게 드러내기 위한 로컬 에러
 private enum SpyError: Error { case unconfigured }
 
-final class SpyAlanAPIService: AlanReportServiceProtocol, @unchecked Sendable {
+final class SpyLLMAPIService: LLMReportFetching, @unchecked Sendable {
     struct Config {
         var overviewDelayNS: UInt64 = 50_000_000
         var weeklyDelayNS: UInt64 = 50_000_000

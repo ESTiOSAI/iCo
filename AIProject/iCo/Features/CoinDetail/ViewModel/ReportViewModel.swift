@@ -28,7 +28,7 @@ final class ReportViewModel: ObservableObject {
     let coin: Coin
     let koreanName: String
     
-    private var llmService: LLMProvider = LLMAPIService()
+    private var llmService: LLMReportFetching
     
     private var overviewTask: Task<CoinOverviewDTO, Error>?
     private var weeklyTask: Task<CoinWeeklyDTO, Error>?
@@ -36,9 +36,10 @@ final class ReportViewModel: ObservableObject {
     
     private var hasStarted = false
     
-    init(coin: Coin) {
+    init(coin: Coin, llmService: LLMReportFetching = LLMAPIService()) {
         self.coin = coin
         self.koreanName = coin.koreanName
+        self.llmService = llmService
     }
     
     func load() async {

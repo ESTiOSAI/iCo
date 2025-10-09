@@ -7,12 +7,15 @@
 
 import Foundation
 
-protocol LLMProvider {
-    func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO
-    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
+protocol LLMReportFetching {
     func fetchOverview(for coin: Coin) async throws -> CoinOverviewDTO
     func fetchWeeklyTrends(for coin: Coin) async throws -> CoinWeeklyDTO
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO
+}
+
+protocol LLMProvider: LLMReportFetching {
+    func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
     func fetchTodayInsight(ignoreCache: Bool) async throws -> Insight
     func fetchCommunityInsight(from post: String, now: Date, ignoreCache: Bool) async throws -> Insight
     func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: RiskTolerance) async throws -> PortfolioBriefingDTO
