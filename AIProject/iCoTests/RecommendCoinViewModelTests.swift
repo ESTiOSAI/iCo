@@ -8,7 +8,7 @@
 import XCTest
 @testable import iCo
 
-struct AlanServiceStub: AlanRecommendServiceProtocol {
+struct LLMServiceStub: LLMRecommendCoinFetching {
     enum Fixtures {
         static let recommendDTOs: [RecommendCoinDTO] = [
             .init(name: "메이플 파이낸스", symbol: "KRW-SYRUP", comment: "A"),
@@ -42,15 +42,15 @@ final class RecommendCoinViewModelTests: XCTestCase {
     var sut: RecommendCoinViewModel!
     var sutWithError: RecommendCoinViewModel!
 
-    var alanStub: AlanServiceStub!
-    var alanStubWithError: AlanServiceStub!
+    var alanStub: LLMServiceStub!
+    var alanStubWithError: LLMServiceStub!
 
     override func setUp() {
         super.setUp()
-        alanStub = AlanServiceStub(result: .success(AlanServiceStub.Fixtures.recommendDTOs), delay: .seconds(2))
-        sut = RecommendCoinViewModel(alanService: alanStub)
-        alanStubWithError = AlanServiceStub(result: .success(AlanServiceStub.Fixtures.recommendDTOs), delay: .seconds(2), isError: true)
-        sutWithError = RecommendCoinViewModel(alanService: alanStubWithError)
+        alanStub = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2))
+        sut = RecommendCoinViewModel(llmService: alanStub)
+        alanStubWithError = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2), isError: true)
+        sutWithError = RecommendCoinViewModel(llmService: alanStubWithError)
     }
 
     override func tearDown() {
