@@ -13,7 +13,11 @@ protocol LLMReportFetching {
     func fetchTodayNews(for coin: Coin) async throws -> CoinTodayNewsDTO
 }
 
-protocol LLMProvider: LLMReportFetching {
+protocol LLMRecommendCoinFetching {
+    func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
+}
+
+protocol LLMProvider: LLMReportFetching, LLMRecommendCoinFetching {
     func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO
     func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
     func fetchTodayInsight(ignoreCache: Bool) async throws -> Insight
