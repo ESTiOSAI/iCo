@@ -42,15 +42,15 @@ final class RecommendCoinViewModelTests: XCTestCase {
     var sut: RecommendCoinViewModel!
     var sutWithError: RecommendCoinViewModel!
 
-    var alanStub: LLMServiceStub!
-    var alanStubWithError: LLMServiceStub!
+    var llmStub: LLMServiceStub!
+    var llmStubWithError: LLMServiceStub!
 
     override func setUp() {
         super.setUp()
-        alanStub = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2))
-        sut = RecommendCoinViewModel(llmService: alanStub)
-        alanStubWithError = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2), isError: true)
-        sutWithError = RecommendCoinViewModel(llmService: alanStubWithError)
+        llmStub = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2))
+        sut = RecommendCoinViewModel(llmService: llmStub)
+        llmStubWithError = LLMServiceStub(result: .success(LLMServiceStub.Fixtures.recommendDTOs), delay: .seconds(2), isError: true)
+        sutWithError = RecommendCoinViewModel(llmService: llmStubWithError)
     }
 
     override func tearDown() {
@@ -58,8 +58,8 @@ final class RecommendCoinViewModelTests: XCTestCase {
         sut = nil
         sutWithError = nil
 
-        alanStub = nil
-        alanStubWithError = nil
+        llmStub = nil
+        llmStubWithError = nil
     }
 
     func test_taskCancelsProperly() async {
