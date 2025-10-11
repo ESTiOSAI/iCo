@@ -24,7 +24,7 @@ struct ChatInputView: View {
             Button {
                 Task { await viewModel.sendMessage(message: viewModel.searchText) }
             } label: {
-                Image(systemName: "arrow.up")
+                Image(systemName: viewModel.isStreaming ? "square.fill" : "arrow.up")
                     .padding(10)
             }
             .frame(width: 30, height: 30)

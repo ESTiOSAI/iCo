@@ -35,6 +35,7 @@ final class ChatBotViewModel: ObservableObject {
 
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
+    private var streamTask: Task<Void, Error>?
 
     init(chatBotClient: ChatBotClient = ChatBotClient()) {
         self.chatBotClient = chatBotClient
@@ -46,35 +47,50 @@ final class ChatBotViewModel: ObservableObject {
     /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
     func sendMessage(message: String) async {
-        searchText = ""
-        isStreaming = true
-
-        do {
+        if isStreaming {
+            cancelStream()
+        } else {
+            searchText = ""
+            isStreaming = true
             addMessage(with: message)
             isReceived = true
-            try await chatBotClient.connect(content: message)
-            try await observeStream()
+            
+            do {
+                try await chatBotClient.connect(content: message)
+                try await observeStream()
+            } catch let error as NetworkError {
+                switch error {
+                case .taskCancelled:
+                    chatBotClient.disconnect()
+                default:
+                    chatBotClient.disconnect()
+                    showStreamError()
+                }
+            } catch {
+                print("알 수 없는 에러 발생.")
+            }
+            
             isReceived = false
-        } catch {
-            await MainActor.run { showStreamError() }
+            isStreaming = false
         }
-
-        isStreaming = false
     }
 
     /// 챗봇 SSE 스트림을 관찰하여 토큰 단위로 UI에 메시지를 업데이트합니다.
     private func observeStream() async throws {
         guard let stream = chatBotClient.stream else { return }
 
-        for try await content in stream {
-            try await Task.sleep(for: .seconds(0.05))
-            await MainActor.run {
-                if let index = messages.lastIndex(where: { !$0.isUser }) {
-                    let message = messages[index]
-                    messages[index] = ChatMessage(content: message.content + content, isUser: false)
+        streamTask = Task {
+            for try await content in stream {
+                await MainActor.run {
+                    if let index = messages.lastIndex(where: { !$0.isUser }) {
+                        let message = messages[index]
+                        messages[index] = ChatMessage(content: message.content + content, isUser: false)
+                    }
                 }
             }
         }
+        
+        try await streamTask?.value
     }
 
     /// 사용자 메시지와 빈 챗봇 응답 메시지를 목록에 추가합니다.
@@ -92,7 +108,7 @@ final class ChatBotViewModel: ObservableObject {
     /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
     private func checkValid() {
-        isEditable = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isStreaming
+        isEditable = !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isStreaming
     }
     
     /// SSE 데이터 전달 과정에서 에러가 발생했을 때 호출합니다.
@@ -103,5 +119,12 @@ final class ChatBotViewModel: ObservableObject {
         if let index = messages.lastIndex(where: { !$0.isUser }) {
             messages[index] = ChatMessage(content: "알 수 없는 에러가 발생했습니다.", isUser: false, isError: true)
         }
+    }
+    
+    @MainActor
+    private func cancelStream() {
+        chatBotClient.continuation?.finish(throwing: NetworkError.taskCancelled)
+        streamTask?.cancel()
+        streamTask = nil
     }
 }
