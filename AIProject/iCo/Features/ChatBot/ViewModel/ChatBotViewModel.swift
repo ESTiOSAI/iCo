@@ -35,6 +35,7 @@ final class ChatBotViewModel: ObservableObject {
 
     /// 서버와 통신하는 클라이언트입니다.
     private let chatBotClient: ChatBotClient
+    /// 메세지 전송 스트림 작업입니다.
     private var streamTask: Task<Void, Error>?
 
     init(chatBotClient: ChatBotClient = ChatBotClient()) {
@@ -42,6 +43,7 @@ final class ChatBotViewModel: ObservableObject {
     }
 
     /// 사용자가 입력한 메시지를 전송하고, 챗봇 응답 스트림을 관찰하여 UI에 반영합니다.
+    /// 만약 메세지가 이미 전송 중인 상태라면, 메세지 전송을 중단합니다.
     /// - Parameter content: 사용자가 전송하는 메세지 내용입니다.
     ///
     /// 이 메소드는 메인 쓰레드에서 실행됩니다.
@@ -121,6 +123,9 @@ final class ChatBotViewModel: ObservableObject {
         }
     }
     
+    /// 메세지 전송을 취소합니다.
+    ///
+    /// 이 메소드는 메인 쓰레드에서 실행됩니다.
     @MainActor
     private func cancelStream() {
         chatBotClient.continuation?.finish(throwing: NetworkError.taskCancelled)
