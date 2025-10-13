@@ -25,19 +25,20 @@ struct ChatInputView: View {
                 Task { await viewModel.sendMessage(message: viewModel.searchText) }
             } label: {
                 Image(systemName: viewModel.isStreaming ? "square.fill" : "arrow.up")
+                    .foregroundStyle(viewModel.isEditable && !viewModel.isStreaming ? .aiCoAccent : .aiCoNeutral)
                     .padding(10)
             }
             .frame(width: 30, height: 30)
             .background {
                 Circle()
-                    .fill(viewModel.isEditable ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
+                    .fill(viewModel.isEditable && !viewModel.isStreaming ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
             }
             .onChange(of: viewModel.isTapped) {
                 isFocused = false
             }
             .overlay {
                 Circle()
-                    .strokeBorder(viewModel.isEditable ? .accentGradient : .defaultGradient, lineWidth: 0.5)
+                    .strokeBorder(viewModel.isEditable && !viewModel.isStreaming ? .accentGradient : .defaultGradient, lineWidth: 0.5)
             }
             .disabled(!viewModel.isEditable)
         }
