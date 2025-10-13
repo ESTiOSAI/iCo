@@ -16,7 +16,7 @@ final class BookmarkExportTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        sut = BookmarkViewModel(service: AlanAPIService(), coinStore: CoinStore(coinService: DefaultCoinService(network: NetworkClient())))
+        sut = BookmarkViewModel(coinStore: CoinStore(coinService: DefaultCoinService(network: NetworkClient())))
 
         sut.briefing = PortfolioBriefingDTO(briefing: "투자 브리핑", strategy: "전략 제안")
     }
