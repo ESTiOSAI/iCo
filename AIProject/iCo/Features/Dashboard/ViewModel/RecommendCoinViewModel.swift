@@ -15,7 +15,7 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var recommendCoins: [RecommendCoin] = []
     @Published var fetchTimestamp: Date?
 
-    private var llmService: LLMProvider
+    private var llmService: LLMRecommendCoinFetching
     private var upbitService: UpBitApiServiceProtocol
 
     var task: Task<Void, Never>?
@@ -35,7 +35,7 @@ final class RecommendCoinViewModel: ObservableObject {
     }
 
     init(
-        llmService: LLMProvider = LLMAPIService(),
+        llmService: LLMRecommendCoinFetching = LLMAPIService(),
         upbitService: UpBitApiServiceProtocol = UpBitAPIService()
     ) {
         self.llmService = llmService

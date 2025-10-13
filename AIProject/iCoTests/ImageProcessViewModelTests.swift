@@ -13,7 +13,7 @@ final class ImageProcessViewModelTests: XCTestCase {
     var sut: ImageProcessViewModel!
     
     var mockCoinList: [CoinDTO]!
-    var mockImage: UIImage!
+    var mockImage: CGImage!
     
     override func setUp() async throws {
         try await super.setUp()
@@ -33,7 +33,7 @@ final class ImageProcessViewModelTests: XCTestCase {
     // 이미지에서 글자를 찾지 못했을 때 알맞은 에러를 반환하는지?
     func testImageProcessViewModel_whenNoTextIsReturned_terminateWithError() async throws {
         // Given
-        mockImage = ImageProcessTestHelpers.createTestImage(with: "")
+        mockImage = ImageProcessTestHelpers.createTestImage(with: "").cgImage
         
         // When
         sut = ImageProcessViewModel()
@@ -64,7 +64,7 @@ final class ImageProcessViewModelTests: XCTestCase {
         }
         
         // Given
-        mockImage = ImageProcessTestHelpers.createTestImage(with: "bittcoin batcoin")
+        mockImage = ImageProcessTestHelpers.createTestImage(with: "bittcoin batcoin").cgImage
         
         // When
         sut = ImageProcessViewModel()
