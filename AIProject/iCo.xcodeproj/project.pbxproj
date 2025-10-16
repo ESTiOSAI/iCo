@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A9C265DA2E40B11D00C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
-		A9C265DB2E40B12500C987E5 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */; };
 		A9F6C9F22E4465FE005D88E2 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A9F6C9F12E4465FE005D88E2 /* AsyncAlgorithms */; };
 		B75CFBAD2E45D42C0055632C /* AdServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B75CFBAC2E45D42C0055632C /* AdServices.framework */; };
 		B75D1B1E2E4597FC006839B5 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B75D1B1D2E4597FC006839B5 /* FirebaseAnalytics */; };
@@ -52,7 +50,6 @@
 
 /* Begin PBXFileReference section */
 		4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = iCo.xctestplan; sourceTree = "<group>"; };
-		A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B75CFBAC2E45D42C0055632C /* AdServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdServices.framework; path = System/Library/Frameworks/AdServices.framework; sourceTree = SDKROOT; };
 		B75D1B212E459ADB006839B5 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		B7B040032E387FCF005DE0BA /* iCo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iCo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -180,7 +177,6 @@
 			children = (
 				B7C71D412E7BDB70000E1191 /* iCOWidgetExtension.entitlements */,
 				4E50EAE62E64B18E005AE3BB /* iCo.xctestplan */,
-				A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */,
 				B7B040052E387FCF005DE0BA /* iCo */,
 				B7B040182E387FD1005DE0BA /* iCoTests */,
 				B7C71D2E2E7BD9D7000E1191 /* iCOWidget */,
@@ -327,7 +323,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9C265DA2E40B11D00C987E5 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,7 +330,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A9C265DB2E40B12500C987E5 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,7 +408,8 @@
 /* Begin XCBuildConfiguration section */
 		B7B040272E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -480,7 +475,8 @@
 		};
 		B7B040282E387FD1005DE0BA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -539,7 +535,8 @@
 		};
 		B7B0402A2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -571,7 +568,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = icoprovisioning;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.est.ico";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -580,7 +577,8 @@
 		};
 		B7B0402B2E387FD1005DE0BA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -611,7 +609,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = icoprovisioning;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.est.ico";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -620,17 +618,20 @@
 		};
 		B7B0402D2E387FD1005DE0BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SJDR485DTV;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -644,17 +645,20 @@
 		};
 		B7B0402E2E387FD1005DE0BA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A9C265D92E40B11D00C987E5 /* Secrets.xcconfig */;
+			baseConfigurationReferenceAnchor = B7B040052E387FCF005DE0BA /* iCo */;
+			baseConfigurationReferenceRelativePath = App/Resource/Secrets.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = SJDR485DTV;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ai.iCoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
@@ -692,7 +696,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = icoprovisioningwidget;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.est.ico.widget";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -726,7 +730,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.est.ico.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = icoprovisioningwidget;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.est.ico.widget";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
