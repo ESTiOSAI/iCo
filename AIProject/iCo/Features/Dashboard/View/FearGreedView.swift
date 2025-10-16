@@ -91,6 +91,8 @@ extension FearGreedView {
                             .font(.system(size: size.width * 0.15, weight: .semibold))
                             .foregroundStyle(viewModel.fearGreed.color)
                             .padding(.top, size.height * 0.01)
+                            .frame(maxWidth: size.width * 0.6)
+                            .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.5)
                     }
                     .offset(y: size.height * 0.15)
