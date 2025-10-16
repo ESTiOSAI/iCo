@@ -20,8 +20,7 @@ struct BriefingSectionView: View {
             briefing.briefing
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.system(size: 14))
-                .fontWeight(.regular)
+                .font(AppFont.dynamic(size: 14))
                 .lineSpacing(6)
             
             Spacer(minLength: 20)
@@ -34,8 +33,7 @@ struct BriefingSectionView: View {
             briefing.strategy
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.system(size: 14))
-                .fontWeight(.regular)
+                .font(AppFont.dynamic(size: 14))
                 .lineSpacing(6)
         }
     }
