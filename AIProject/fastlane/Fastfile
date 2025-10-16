@@ -16,8 +16,68 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Description of what the lane does"
-  lane :custom_lane do
-    # add actions here: https://docs.fastlane.tools/actions
+  desc "빌드하고 TestFlight에 업로드"
+  lane :testflight do
+
+    api_key =
+        app_store_connect_api_key(
+          key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
+          is_key_content_base64: true,
+          issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+          key_content: ENV["APP_STORE_CONNECT_KEY_CONTENT"],
+          in_house: false
+        )
+        
+#    create_keychain(
+#        name: ENV["KEYCHAIN_NAME"],
+#        password: ENV["KEYCHAIN_PASSWORD"],
+#        timeout: 1800,
+#        default_keychain: true,
+#        unlock: true,
+#        lock_when_sleeps: false
+#    )
+
+    increment_version_number(
+      version_number: ENV["VERSION"],
+      xcodeproj: "./iCo.xcodeproj"
+    )
+
+    latest = latest_testflight_build_number(
+      version: ENV["VERSION"],
+      platform: "ios"
+    )
+
+    increment_build_number(
+      build_number: latest + 1,
+      xcodeproj: "./iCo.xcodeproj",
+    )
+
+    match(
+      type: "appstore",
+      keychain_name: ENV["KEYCHAIN_NAME"],
+      keychain_password: ENV["KEYCHAIN_PASSWORD"],
+      readonly: true
+    )
+
+    build_app(
+      scheme: "iCo",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          "com.est.ico" => "match AppStore com.est.ico",
+          "com.est.ico.widget" => "match AppStore com.est.ico.widget"
+        }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: false,
+      submit_beta_review: false,
+      distribute_external: false,
+      changelog: "새로운 기능 및 버그 수정"
+    )
   end
 end
