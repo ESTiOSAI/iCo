@@ -37,8 +37,12 @@ final class ChartViewModel: ObservableObject {
 
     /// 취소/재시도 버튼을 실제 동작(네트워크 취소, 주기 루프 중단/재개)에 연결하는 상태 허브 (공용 컴포넌트 DefaultProgressView/StatusSwitch 연동)
     @Published private(set) var status: ResponseStatus = .loading
+    
     /// 신규 상장 판별 플래그
     @Published private(set) var showNewBadge: Bool = false
+    
+    /// 최초 로딩에서 측정한 가장 이른 1분봉 시각 (신규상장 배지 판단용)
+    private var firstSeenCandleDate: Date? = nil
     
     /// 신규 상장 판별 위한 24시간 상수
     private let twentyFourHours: TimeInterval = 24 * 60 * 60
@@ -163,7 +167,6 @@ final class ChartViewModel: ObservableObject {
             async let pricesTask: [CoinPrice] = priceService.fetchPrices(market: marketCode, interval: interval)
             async let quotesTask: [TickerDTO]  = tickerAPI.fetchQuotes(id: marketCode)
 
-            // 헤더는 실패해도 화면은 뜨게: prices는 반드시, quotes는 옵셔널 취급
             let fetchedPrices = try await pricesTask
             let quotes = (try? await quotesTask) ?? []
             
@@ -179,6 +182,16 @@ final class ChartViewModel: ObservableObject {
                 )
             }
                                     
+            /// 최초 관측한 1분봉 시각을 기록
+            /// 이미 값이 있으면 더 이른 시각으로만 갱신
+            if let earliest = fetchedPrices.map(\.date).min() {
+                if let prev = self.firstSeenCandleDate {
+                    self.firstSeenCandleDate = min(prev, earliest)
+                } else {
+                    self.firstSeenCandleDate = earliest
+                }
+            }
+            
             let now = Date()
             let startTime = now.addingTimeInterval(-24 * 60 * 60)
 
@@ -199,20 +212,9 @@ final class ChartViewModel: ObservableObject {
                 )
             }
             
-            /// 신규 상장 여부 계산 (보유 분봉 범위가 24h 미만이면 true)
-            if let first = self.prices.first?.date, let last = self.prices.last?.date {
-                let span = last.timeIntervalSince(first)
-                
-                // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
-                if self.prices.count >= 24 * 60 {
-                    self.showNewBadge = false
-                } else {
-                    // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
-                    self.showNewBadge = span < twentyFourHours - 60
-                }
-            } else { // prices가 비어있을 때 (상장 직후)
-                self.showNewBadge = true
-            }
+            /// 신규 상장 여부 계산
+            self.showNewBadge = shouldShowNewBadge(candleCount: filteredPrices.count,
+                                                   last: filteredPrices.last?.date ?? now)
             
             if let ticker = ticker {
                 /// 현재가
@@ -332,21 +334,13 @@ final class ChartViewModel: ObservableObject {
             let cutoff = Date().addingTimeInterval(-24 * 60 * 60)
             prices.removeAll(where: { $0.date < cutoff })
 
-            /// 신규 상장 여부 재판단
-            if let first = prices.first?.date, let last = prices.last?.date {
-                let span = last.timeIntervalSince(first)
-                
-                // 24h 분봉(1440개) 이상이면 초 경계 오차와 무관하게 신규 상장이 아닌 경우로 간주 (오탐 방지)
-                if prices.count >= 24 * 60 {
-                    showNewBadge = false
-                } else {
-                    // 시간폭 기준: 24h보다 짧으면 신규로 판단 (1분 여유)
-                    showNewBadge = span < twentyFourHours - 60
-                }
-            } else {
-                // 데이터가 없으면 신규 취급
-                showNewBadge = true
+            if self.firstSeenCandleDate == nil {
+                self.firstSeenCandleDate = prices.first?.date
             }
+            
+            /// 신규 상장 여부 재계산
+            showNewBadge = shouldShowNewBadge(candleCount: prices.count,
+                                              last: prices.last?.date ?? Date())
             
             /// 헤더 동기 갱신 — UI 상태 변화 없음 (Progress View 없음)
             async let quotesTask: [TickerDTO] = tickerAPI.fetchQuotes(id: market)
@@ -378,6 +372,28 @@ final class ChartViewModel: ObservableObject {
         }
     }
     
+    /// 신규 상장 여부 계산
+    /// - Parameters:
+    ///   - candleCount: 최근 24시간 필터링된 1분봉 개수
+    ///   - last: 최근(마지막) 캔들의 시각
+    /// - Returns: 신규 상장 배지 표시 여부
+    private func shouldShowNewBadge(candleCount: Int, last: Date) -> Bool {
+        // 1) 장수 코인: 개수로 즉시 판정
+        // 최근 24시간 1분봉이 1440개면 장수 코인으로 간주 (신규 배지X)
+        if candleCount >= 24 * 60 {
+            return false
+        }
+        
+        // 2) 신규 후보: age(관측 시작~마지막 시간 차) < 24h 일 때만 신규 (신규 배지O)
+        if let first = self.firstSeenCandleDate {
+            let age = last.timeIntervalSince(first)
+            return age < twentyFourHours
+        }
+        
+        // 관측 시작 시각 없으면(상장 직후/지연) 신규로 표시
+        return true
+    }
+    
     /// 현재 `prices` 기준의 간단한 요약 정보
     /// 마지막 가격, 절대 변화량, 등락률 (%)을 계산해 반환
     var summary: PriceSummary? {
@@ -407,24 +423,21 @@ extension ChartViewModel {
     /// X축의 시간 범위(Domain)를 계산
     /// - Parameters:
     ///   - data: 시각화할 가격 데이터 배열
-    /// - Returns: 당일 자정부터 현재(마지막 데이터)까지의 시점이며, 여유 공간을 위한 현재 시점 +5분까지의 시간 범위 추가
+    /// - Returns:
+    ///    - 신규 상장(showNewBadge == true): firstSeenCandleDate(또는 데이터의 첫 시각) ~ 마지막 캔들 시각 범위만 표시 (있는 만큼만)
+    ///   - 그 외: 최근 24시간 고정 범위 + 오른쪽 5분 버퍼
     func xAxisDomain(for data: [CoinPrice]) -> ClosedRange<Date> {
         let now = Date()
 
         guard let first = data.first?.date, let last = data.last?.date else {
-            // 데이터 없으면 기존 폴백
-            let xStart = now.addingTimeInterval(-60 * 60 * 24)
-            return xStart...now
+            return now.addingTimeInterval(-twentyFourHours)...now
         }
         
-        let span = last.timeIntervalSince(first)
-
-        if span < twentyFourHours {
-            // 신규 상장(24h 미만): 데이터 있는 구간만 보여줌 (패딩 없이)
-            return first...last
+        if showNewBadge {
+            let start = self.firstSeenCandleDate ?? first
+            return start...last
         } else {
-            // 신규 상장 아닐 경우 기존 동작 유지: 24h 고정 + 오른쪽 5분 버퍼
-            let xStart = now.addingTimeInterval(-60 * 60 * 24)
+            let xStart = now.addingTimeInterval(-twentyFourHours)
             let xEnd = last.addingTimeInterval(60 * 5)
             return xStart...xEnd
         }
@@ -433,14 +446,13 @@ extension ChartViewModel {
     /// 초기 차트 스크롤 위치를 지정할 시각을 반환
     /// - Parameters:
     ///   - data: 시각화할 가격 데이터 배열
-    /// - Returns: 마지막 데이터 시점 +5분
+    /// - Returns:
+    ///   - 신규 상장: 마지막 캔들 시각
+    ///   - 그 외: 마지막 캔들 시각 + 5분 버퍼
     func scrollToTime(for data: [CoinPrice]) -> Date {
-        guard let last = data.last?.date,
-              let first = data.first?.date else {
-            return Date()
-        }
+        guard let last = data.last?.date else { return Date() }
         
-        return (last.timeIntervalSince(first) < twentyFourHours) ? last : last.addingTimeInterval(60 * 5)
+        return showNewBadge ? last : last.addingTimeInterval(60 * 5)
     }
 }
 
