@@ -33,6 +33,11 @@ jobs:
         mv temp/XCConfig/Secrets.xcconfig AIProject/iCo/App/Resource/
         mv temp/GoogleServices/GoogleService-Info.plist AIProject/iCo/App/Resource/
 
+    - name: Configure git auth for match repo
+      run: git config --global url."https://${GIT_TOKEN}@github.com/".insteadOf "https://github.com/"
+      env:
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+
     - name: install fastlane
       run: brew install fastlane
       
