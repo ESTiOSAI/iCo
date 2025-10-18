@@ -6,6 +6,8 @@ name: Swift
 on:
   push:
     branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
 
 jobs:
   testflight:
