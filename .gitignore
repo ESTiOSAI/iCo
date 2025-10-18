@@ -65,3 +65,6 @@ fastlane/test_output
 *.xcconfig
 AIProject/AIProject/App/Resource/GoogleService-Info.plist
 AIProject/iCo/App/Resource/GoogleService-Info.plist
+AIProject/fastlane/.env
+AIProject/fastlane/.env
+AIProject/fastlane/report.xml
