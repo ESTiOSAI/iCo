@@ -1,0 +1,54 @@
+# This workflow will build a Swift project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
+
+name: Swift
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  testflight:
+
+    runs-on: macos-latest
+
+    steps:
+   # 레파지토리 체크인
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # XCConfig / GoogleService 등의 파일을 클론
+    - name: Clone Secret file
+      uses: actions/checkout@v4
+      with:
+        repository: ESTiOSAI/Secrets
+        path: temp/
+        token: ${{ secrets.SECRET_TOKEN }}
+    
+    # 가져온 파일 이동
+    - name: Move config
+      run: |
+        mv temp/XCConfig/Secrets.xcconfig AIProject/iCo/App/Resource/
+        mv temp/GoogleServices/GoogleService-Info.plist AIProject/iCo/App/Resource/
+    
+    - uses: actions/checkout@v4
+    - name: Build
+      run: fastlane testflight
+      env:
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+
+    - name: install fastlane
+      run: brew install fastlane
+      
+    - name: execute lane
+      working-directory: iCo
+      run: fastlane testflight
+      env:
+        MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+        APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+        APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+        KEYCHAIN_NAME: ${{ secrets.KEYCHAIN_NAME }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
