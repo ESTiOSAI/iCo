@@ -5,9 +5,7 @@ name: TestFlight
 
 on:
   push:
-    branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+    branches: [ "main" ]
 
 jobs:
   testflight:
