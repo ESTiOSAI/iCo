@@ -32,12 +32,6 @@ jobs:
       run: |
         mv temp/XCConfig/Secrets.xcconfig AIProject/iCo/App/Resource/
         mv temp/GoogleServices/GoogleService-Info.plist AIProject/iCo/App/Resource/
-    
-    - uses: actions/checkout@v4
-    - name: Build
-      run: fastlane testflight
-      env:
-        GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
 
     - name: install fastlane
       run: brew install fastlane
