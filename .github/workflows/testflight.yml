@@ -37,7 +37,6 @@ jobs:
       run: brew install fastlane
       
     - name: execute lane
-      working-directory: iCo
       run: fastlane testflight
       env:
         MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
