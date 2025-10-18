@@ -1,18 +1,3 @@
-# This file contains the fastlane.tools configuration
-# You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
-
 default_platform(:ios)
 
 platform :ios do
@@ -28,34 +13,21 @@ platform :ios do
           in_house: false
         )
         
-#    create_keychain(
-#        name: ENV["KEYCHAIN_NAME"],
-#        password: ENV["KEYCHAIN_PASSWORD"],
-#        timeout: 1800,
-#        default_keychain: true,
-#        unlock: true,
-#        lock_when_sleeps: false
-#    )
-
-    increment_version_number(
-      version_number: ENV["VERSION"],
-      xcodeproj: "./iCo.xcodeproj"
+   create_keychain(
+        name: ENV["KEYCHAIN_NAME"],
+        password: ENV["KEYCHAIN_PASSWORD"],
+        timeout: 1800,
+        default_keychain: true,
+        unlock: true,
+        lock_when_sleeps: false
     )
 
-    latest = latest_testflight_build_number(
-      version: ENV["VERSION"],
-      platform: "ios"
-    )
-
-    increment_build_number(
-      build_number: latest + 1,
-      xcodeproj: "./iCo.xcodeproj",
-    )
+    increment_build_number
 
     match(
       type: "appstore",
-      keychain_name: ENV["KEYCHAIN_NAME"],
-      keychain_password: ENV["KEYCHAIN_PASSWORD"],
+       keychain_name: ENV["KEYCHAIN_NAME"],
+       keychain_password: ENV["KEYCHAIN_PASSWORD"],
       readonly: true
     )
 
