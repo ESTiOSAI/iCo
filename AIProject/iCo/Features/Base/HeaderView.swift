@@ -23,7 +23,7 @@ struct HeaderView: View {
     
     var showNewBadge = false
     
-    init(heading: String, headingColor: Color = .aiCoLabel, topPadding: CGFloat = 30, coinSymbol: String? = nil, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil, showNewBadge: Bool = false) {
+    init(heading: String, headingColor: Color = .iCoLabel, topPadding: CGFloat = 30, coinSymbol: String? = nil, showBackButton: Bool = false, onBackButtonTap: ( () -> Void)? = nil, showNewBadge: Bool = false) {
         self.heading = heading
         self.headingColor = headingColor
         self.topPadding = topPadding
@@ -73,7 +73,7 @@ struct HeaderView: View {
                     HStack(alignment: .center, spacing: 4) {
                         Text(heading)
                             .font(.system(size: heading.count < 11 ? 21 : 18, weight: .black))
-                            .foregroundStyle(.aiCoLabel)
+                            .foregroundStyle(.iCoLabel)
                             .lineLimit(2)
                         
                         if showNewBadge {
@@ -81,13 +81,13 @@ struct HeaderView: View {
                                 .font(.system(size: 12, weight: .heavy))
                                 .foregroundStyle(.white)
                                 .padding(4)
-                                .background(Circle().foregroundStyle(.aiCoAccent))
+                                .background(Circle().foregroundStyle(.iCoAccent))
                         }
                     }
                     
                     Text(coin)
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.aiCoLabelSecondary)
+                        .foregroundStyle(.iCoLabelSecondary)
                 }
             }
         } else {
@@ -130,7 +130,7 @@ private struct BackButton: View {
                 .scaledToFit()
                 .frame(width: 15, height: 24)
                 .fontWeight(.regular)
-                .tint(.aiCoLabelSecondary.opacity(0.6))
+                .tint(.iCoLabelSecondary.opacity(0.6))
         }
     }
 }

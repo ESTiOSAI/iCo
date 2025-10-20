@@ -40,12 +40,12 @@ struct SegmentedControlView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .foregroundColor(selection == idx ? .aiCoBackgroundWhite : .aiCoLabelSecondary)
+                        .foregroundColor(selection == idx ? .iCoBackgroundWhite : .iCoLabelSecondary)
                         .background(
                             ZStack {
                                 if selection == idx {
                                     Capsule()
-                                        .fill(.aiCoAccent)
+                                        .fill(.iCoAccent)
                                         .matchedGeometryEffect(id: "underline", in: underlineAnimation)
                                 }
                             }
@@ -54,7 +54,7 @@ struct SegmentedControlView: View {
             }
         }
         .padding(8)
-        .background(.aiCoBackgroundAccent)
+        .background(.iCoBackgroundAccent)
         .frame(width: width)
         .clipShape(Capsule())
         .overlay { Capsule().strokeBorder(.defaultGradient, lineWidth: 0.5) }

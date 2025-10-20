@@ -17,7 +17,7 @@ struct HeaderSection: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             
             Text("아이코가 자동으로 북마크를 등록해드려요")
-                .foregroundStyle(.aiCoLabelSecondary)
+                .foregroundStyle(.iCoLabelSecondary)
                 .font(.system(size: 15))
                 .frame(maxWidth: .infinity, alignment: .leading)
         }

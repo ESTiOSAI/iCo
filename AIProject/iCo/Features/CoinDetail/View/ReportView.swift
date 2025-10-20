@@ -19,12 +19,12 @@ struct ReportView: View {
             if hSizeClass == .regular {
                 Text("AI 리포트")
                     .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
+                    .foregroundStyle(.iCoLabel)
             }
             
             Text(String.aiGeneratedContentNotice)
                 .font(.system(size: 11))
-                .foregroundStyle(.aiCoNeutral)
+                .foregroundStyle(.iCoNeutral)
                 .lineSpacing(5)
             
             ForEach(viewModel.sectionDataSource) { data in

@@ -59,7 +59,7 @@ struct RecomendationPlaceholderCardView: View {
     
     private struct Card: View {
         var body: some View {
-            Color.aiCoBackgroundWhite.opacity(0.9)
+            Color.iCoBackgroundWhite.opacity(0.9)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 24))
                 .overlay {

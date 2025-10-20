@@ -79,7 +79,7 @@ struct MyPageView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(.aiCoBackground)
+                        .fill(.iCoBackground)
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
                 .listRowSeparator(.hidden)
@@ -112,7 +112,7 @@ struct MyPageView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(.aiCoBackground)
+                        .fill(.iCoBackground)
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)
                 )
                 .listRowSeparator(.hidden)

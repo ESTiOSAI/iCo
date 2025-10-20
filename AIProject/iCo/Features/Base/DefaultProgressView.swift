@@ -55,22 +55,22 @@ struct DefaultProgressView: View {
                 switch status {
                 case .loading:
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .aiCoAccent))
+                        .progressViewStyle(CircularProgressViewStyle(tint: .iCoAccent))
                         .scaleEffect(1.7) // 크기 살짝 키우기
                         .padding(16)
-                        .background(.aiCoBackgroundAccent)
+                        .background(.iCoBackgroundAccent)
                 case .failure:
                     Image(systemName: "xmark.octagon")
                         .font(.system(size: 35))
-                        .foregroundStyle(.aiCoNeutral)
+                        .foregroundStyle(.iCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackgroundWhite)
+                        .background(.iCoBackgroundWhite)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
                         .font(.system(size: 35))
-                        .foregroundStyle(.aiCoNeutral)
+                        .foregroundStyle(.iCoNeutral)
                         .padding(8)
-                        .background(.aiCoBackgroundWhite)
+                        .background(.iCoBackgroundWhite)
                 }
             }
             .clipShape(.circle)
@@ -82,7 +82,7 @@ struct DefaultProgressView: View {
             
             Text(message)
                 .font(.system(size: 14))
-                .foregroundColor(.aiCoLabel)
+                .foregroundColor(.iCoLabel)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
                 .padding(.bottom, 10)

@@ -32,19 +32,19 @@ struct RecommendCardView: View {
                     Text(recommendCoin.name)
                         .font(.system(size: 17))
                         .bold()
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
 
                     Text(recommendCoin.id)
                         .font(.system(size: 12))
                         .fontWeight(.semibold)
-                        .foregroundStyle(.aiCoLabelSecondary)
+                        .foregroundStyle(.iCoLabelSecondary)
                 }
                 .padding(.top, 4)
 
                 HStack(spacing: 4) {
                     Text("현재가")
                         .font(.system(size: 14))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
 
                     Text(recommendCoin.tradePrice.formatKRW)
                         .font(.system(size: 14))
@@ -56,7 +56,7 @@ struct RecommendCardView: View {
                 HStack(spacing: 4) {
                     Text("전일대비")
                         .font(.system(size: 14))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
 
                     HStack(spacing: 0) {
                         Group {
@@ -75,7 +75,7 @@ struct RecommendCardView: View {
                 Text(recommendCoin.comment.byCharWrapping)
                     .font(.system(size: 14))
                     .lineSpacing(6)
-                    .foregroundStyle(.aiCoLabel)
+                    .foregroundStyle(.iCoLabel)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .padding(.top, 32)
@@ -84,7 +84,7 @@ struct RecommendCardView: View {
         .background(
             ZStack {
                 Rectangle().fill(.ultraThinMaterial)
-                Color.aiCoBackgroundWhite.opacity(0.9)
+                Color.iCoBackgroundWhite.opacity(0.9)
             }
         )
         .clipShape(RoundedRectangle(cornerRadius: 24))

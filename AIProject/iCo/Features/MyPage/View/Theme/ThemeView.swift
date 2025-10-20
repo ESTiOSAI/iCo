@@ -36,7 +36,7 @@ struct ThemeView: View {
             
             /// 미리보기 차트 섹션
             VStack(alignment: .leading, spacing: 16) {
-                SubheaderView(imageName: "chart.xyaxis.line", subheading: "차트 색상 미리보기", imageColor: .aiCoLabelSecondary)
+                SubheaderView(imageName: "chart.xyaxis.line", subheading: "차트 색상 미리보기", imageColor: .iCoLabelSecondary)
                     .padding(.bottom, 4)
                 
                 CandlestickPreviewView()

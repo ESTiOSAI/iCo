@@ -57,7 +57,7 @@ struct DashboardView: View {
                 .background(alignment: .top) {
                     // 메인 그레디언트 배경
                     LinearGradient(
-                        colors: [.aiCoBackgroundGradientLight, .aiCoBackgroundGradientProminent],
+                        colors: [.iCoBackgroundGradientLight, .iCoBackgroundGradientProminent],
                         startPoint: .topLeading,
                         endPoint: .bottom
                     )
@@ -89,7 +89,7 @@ struct DashboardView: View {
         let defaultHeight = 44.0
         
         var body: some View {
-            Color.aiCoBackgroundWhite.opacity(0.5) // .ultraThinMaterial이 너무 어두워 하얀색 섞기
+            Color.iCoBackgroundWhite.opacity(0.5) // .ultraThinMaterial이 너무 어두워 하얀색 섞기
                 .ignoresSafeArea()
                 .containerRelativeFrame(.horizontal)
                 .frame(height: defaultHeight)
@@ -97,7 +97,7 @@ struct DashboardView: View {
                 .overlay(alignment: .center) {
                     Text("대시보드")
                         .font(.system(size: 18, weight: .black))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
 						.offset(y: -5) // 텍스트가 네비게이션바 중앙에 오도록 위치 조정하기
                 }
                 .overlay(alignment: .bottom) { // 네비게이션바 하단에 구분선 추가하기

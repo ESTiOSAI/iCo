@@ -34,7 +34,7 @@ struct ContentSection: View {
                                 DefaultProgressView(status: .loading, message: "아이코가 이미지를 분석하고 있어요") {
                                     vm.cancelTask()
                                 }
-                                .background(.aiCoBackgroundWhite)
+                                .background(.iCoBackgroundWhite)
                             }
                         }
                     }
@@ -47,7 +47,7 @@ struct ContentSection: View {
             VStack(spacing: 10) {
                 Text("ⓘ 코인 이름을 제외한 모든 정보는 기기 내에서 안전하게 처리됩니다")
                     .font(.footnote)
-                    .foregroundStyle(.aiCoAccent)
+                    .foregroundStyle(.iCoAccent)
                     .multilineTextAlignment(.center)
                 
                 PhotosPicker(

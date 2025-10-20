@@ -24,13 +24,13 @@ struct RoundedButton: View {
                 if let title {
                     Text(title)
                         .font(.system(size: 12, weight: .regular))
-                        .tint(foregroundColor ?? .aiCoLabel)
+                        .tint(foregroundColor ?? .iCoLabel)
                 }
                 
                 if let imageName {
                     Image(systemName: imageName)
                         .font(.system(size: 10))
-                        .tint(foregroundColor ?? .aiCoLabel)
+                        .tint(foregroundColor ?? .iCoLabel)
                         
                 }
             }
@@ -39,7 +39,7 @@ struct RoundedButton: View {
             .frame(width: title != nil ? nil : 24, height: title != nil ? nil : 24)
             .background(
                 Capsule()
-                    .fill(.aiCoBackgroundWhite)
+                    .fill(.iCoBackgroundWhite)
             )
             .overlay {
                 Capsule()
@@ -57,5 +57,5 @@ struct RoundedButton: View {
         RoundedButton(title: nil, imageName: "xmark", action: { })
     }
     .padding()
-    .background(.aiCoBackground)
+    .background(.iCoBackground)
 }

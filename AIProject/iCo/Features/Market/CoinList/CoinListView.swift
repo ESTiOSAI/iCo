@@ -43,7 +43,7 @@ struct CoinListView: View {
         }
         .background {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.aiCoBackground)
+                .fill(.iCoBackground)
         }
         .clipShape(.rect(cornerRadius: 16))
         .onChange(of: scenePhase, { _, newValue in
@@ -91,7 +91,7 @@ struct CoinListView: View {
                     CoinCell(coin: meta, store: ticker, searchTerm: searchText)
                         .listRowSeparator(.hidden)
                         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                        .listRowBackground(selectedCoinID == id && isIpad ? Color.aiCoBackgroundAccent : Color.clear)
+                        .listRowBackground(selectedCoinID == id && isIpad ? Color.iCoBackgroundAccent : Color.clear)
                         .overlay(
                             LinearGradient.defaultGradient.frame(height: 0.5),
                             alignment: .bottom

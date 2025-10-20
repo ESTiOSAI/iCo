@@ -16,7 +16,7 @@ struct SearchBarView: View {
         HStack(spacing: 0) {
             HStack {
                 Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.aiCoLabel)
+                    .foregroundStyle(.iCoLabel)
 
                 TextField("코인 이름으로 검색하세요", text: $searchText)
                     .keyboardType(.webSearch)
@@ -40,7 +40,7 @@ struct SearchBarView: View {
             .padding(.vertical, 14)
             .background {
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(showCancel ? .aiCoBackgroundBlue : .aiCoBackground)
+                    .fill(showCancel ? .iCoBackgroundBlue : .iCoBackground)
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 15)
@@ -52,7 +52,7 @@ struct SearchBarView: View {
                     searchText = ""
             } label: {
                 Text("취소")
-                    .foregroundStyle(.aiCoNegative)
+                    .foregroundStyle(.iCoNegative)
                     .font(.system(size: 13))
             }
             .opacity(showCancel ? 1 : 0)

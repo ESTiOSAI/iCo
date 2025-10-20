@@ -21,7 +21,7 @@ enum Sentiment: String {
         switch self {
         case .positive: return theme.positiveColor
         case .negative: return theme.negativeColor
-        case .neutral: return .aiCoNeutral
+        case .neutral: return .iCoNeutral
         }
     }
 }

@@ -26,7 +26,7 @@ struct RecentCoinSectionView: View {
                             Image(systemName: "xmark")
                                 .resizable()
                                 .frame(width: 10, height: 10)
-                                .foregroundStyle(.aiCoLabelSecondary)
+                                .foregroundStyle(.iCoLabelSecondary)
                         }
                     }
                     .padding(.vertical, 8)

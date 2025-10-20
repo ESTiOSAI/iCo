@@ -31,7 +31,7 @@ struct HighlightedText: View {
         while let range = lowercasedText.range(of: lowercasedSearch, range: searchRange) {
             let nsRange = NSRange(range, in: text)
             if let attributedRange = Range(nsRange, in: attributed) {
-                attributed[attributedRange].foregroundColor = .aiCoAccent
+                attributed[attributedRange].foregroundColor = .iCoAccent
             }
             
             // 다음 검색 시작 위치 이동

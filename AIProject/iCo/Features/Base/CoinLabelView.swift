@@ -10,7 +10,7 @@ import SwiftUI
 /// 재사용 가능한 라벨 뱃지 (ex: 코인 심볼)
 struct CoinLabelView: View {
     let text: String
-    let foregroundColor: Color = .aiCoLabelSecondary
+    let foregroundColor: Color = .iCoLabelSecondary
     // let backgroundColor: Color
     
     var body: some View {

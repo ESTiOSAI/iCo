@@ -28,7 +28,7 @@ struct ThemeRow: View {
                 Text(title)
                     .frame(height: 36)
                     .font(.system(size: 14, weight: !isSelected ? .regular : .medium))
-                    .foregroundStyle(!isSelected ? .aiCoLabel : .aiCoAccent)
+                    .foregroundStyle(!isSelected ? .iCoLabel : .iCoAccent)
                 
                 Spacer()
                 
@@ -42,7 +42,7 @@ struct ThemeRow: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
-            .background(!isSelected ? .aiCoBackground : .aiCoBackgroundAccent)
+            .background(!isSelected ? .iCoBackground : .iCoBackgroundAccent)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)

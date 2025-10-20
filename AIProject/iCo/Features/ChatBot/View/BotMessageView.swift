@@ -23,7 +23,7 @@ struct BotMessageView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 34)
-                    .foregroundColor(colorScheme == .light ? .aiCoAccent : .aiCoLabel)
+                    .foregroundColor(colorScheme == .light ? .iCoAccent : .iCoLabel)
                     .opacity(0.8)
                     .padding(12)
                     .overlay {
@@ -32,7 +32,7 @@ struct BotMessageView: View {
                     }
                     .background {
                         Circle()
-                            .fill(.aiCoBackgroundBlue)
+                            .fill(.iCoBackgroundBlue)
                     }
                 Spacer()
             }
@@ -47,14 +47,14 @@ struct BotMessageView: View {
                     Text(message.content)
                 }
             }
-            .foregroundStyle(.aiCoLabel)
+            .foregroundStyle(.iCoLabel)
             .font(.system(size: 14))
             .lineSpacing(6)
             .padding(.vertical, 15)
             .padding(.horizontal, 18)
             .background {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)
-                    .fill(.aiCoBackgroundBlue)
+                    .fill(.iCoBackgroundBlue)
             }
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 16, bottomTrailingRadius: 16, topTrailingRadius: 16)

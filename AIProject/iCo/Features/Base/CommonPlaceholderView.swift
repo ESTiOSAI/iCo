@@ -24,9 +24,9 @@ struct CommonPlaceholderView: View {
                 .scaledToFit()
                 .frame(width: hSizeClass == .regular ? 200 : 130)
                 .padding(50)
-                .foregroundStyle(.aiCoLabelSecondary.opacity(colorScheme == .light ? 0.1 : 0.5))
+                .foregroundStyle(.iCoLabelSecondary.opacity(colorScheme == .light ? 0.1 : 0.5))
                 .opacity(showLogo && colorScheme == .dark ? 1 : 0.8)
-                .background(.aiCoBackground)
+                .background(.iCoBackground)
                 .clipShape(.circle)
                 .overlay {
                     Circle()
@@ -36,7 +36,7 @@ struct CommonPlaceholderView: View {
             
             Text(text)
                 .font(.system(size: 14))
-                .foregroundStyle(.aiCoLabelSecondary)
+                .foregroundStyle(.iCoLabelSecondary)
                 .lineSpacing(6)
         }
     }

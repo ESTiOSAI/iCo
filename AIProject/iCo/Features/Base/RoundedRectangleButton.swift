@@ -32,18 +32,18 @@ struct RoundedRectangleButton: View {
                         .resizable()
                         .scaledToFit()
                         .frame(height: 16)
-                        .foregroundStyle(.aiCoLabelSecondary)
+                        .foregroundStyle(.iCoLabelSecondary)
                         .fontWeight(.light)
                         .offset(y: -1)
                 }
                 
                 Text(title)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(isActive ? .aiCoAccent : .aiCoLabel)
+                    .foregroundStyle(isActive ? .iCoAccent : .iCoLabel)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(isActive ? .aiCoBackgroundAccent : .aiCoBackground)
+            .background(isActive ? .iCoBackgroundAccent : .iCoBackground)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: cornerRadius)

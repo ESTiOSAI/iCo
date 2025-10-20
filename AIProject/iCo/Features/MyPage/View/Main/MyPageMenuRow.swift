@@ -16,12 +16,12 @@ struct MyPageMenuRow: View {
             CircleIconView(imageName: imageName)
             
             Text(title)
-                .foregroundStyle(.aiCoLabel)
+                .foregroundStyle(.iCoLabel)
             
             Spacer()
             
             Image(systemName: "chevron.right")
-                .foregroundStyle(.aiCoLabelSecondary)
+                .foregroundStyle(.iCoLabelSecondary)
         }
     }
 }

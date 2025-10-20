@@ -122,10 +122,10 @@ struct BookmarkView: View {
                     }
                     .padding(20)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(.aiCoLabel)
+                    .foregroundColor(.iCoLabel)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.aiCoBackgroundAccent)
+                            .fill(Color.iCoBackgroundAccent)
                             .overlay(RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(.accentGradient, lineWidth: 0.5))
                     )
@@ -134,7 +134,7 @@ struct BookmarkView: View {
 
                     Text(String.aiGeneratedContentNotice)
                         .font(.system(size: 11))
-                        .foregroundColor(.aiCoNeutral)
+                        .foregroundColor(.iCoNeutral)
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 10)

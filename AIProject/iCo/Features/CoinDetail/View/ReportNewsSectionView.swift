@@ -30,14 +30,14 @@ struct ReportNewsSectionView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.aiCoAccent)
+                .foregroundStyle(.iCoAccent)
             
             ForEach(displayedArticles, id: \.id) { article in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(article.title.byCharWrapping)
                             .font(.system(size: 15, weight: .bold))
-                            .foregroundStyle(.aiCoLabel)
+                            .foregroundStyle(.iCoLabel)
                             .lineLimit(1)
                         
                         Spacer()
@@ -51,7 +51,7 @@ struct ReportNewsSectionView: View {
                     
                     Text(article.summary.byCharWrapping)
                         .font(.system(size: 14))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -60,7 +60,7 @@ struct ReportNewsSectionView: View {
                 .overlay(alignment: .bottom) {
                     Rectangle()
                         .frame(height: 1)
-                        .foregroundStyle(.aiCoBorderGray)
+                        .foregroundStyle(.iCoBorderGray)
                         .padding(.leading, 0)
                 }
             }
@@ -71,7 +71,7 @@ struct ReportNewsSectionView: View {
         .padding(.horizontal, 22)
         .padding(.top, 20)
         .padding(.bottom, 20)
-        .background(.aiCoBackgroundBlue)
+        .background(.iCoBackgroundBlue)
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: Self.cornerRadius)

@@ -42,7 +42,7 @@ struct ExportReportView: View {
                     .padding(16)
                     .background(
                         RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.aiCoBackgroundAccent)
+                            .fill(Color.iCoBackgroundAccent)
                             .overlay(RoundedRectangle(cornerRadius: 20)
                                 .strokeBorder(.accentGradient, lineWidth: 0.5))
                     )

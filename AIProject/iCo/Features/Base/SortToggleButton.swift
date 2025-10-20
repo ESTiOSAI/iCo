@@ -49,7 +49,7 @@ struct SortToggleButton: View {
         HStack {
             Text(title)
                 .font(.system(size: 11))
-                .foregroundStyle(.aiCoLabel)
+                .foregroundStyle(.iCoLabel)
             RoundedButton(imageName: sortOrder.iconName) {
                 if currentCategory == sortCategory {
                     sortOrder.toggle()

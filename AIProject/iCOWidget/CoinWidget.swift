@@ -164,7 +164,7 @@ struct CoinWidgetEntryView: View {
 
                     if entry.coins.count > 1 {
                         Divider()
-                            .background(Color.aiCoBorderGray)
+                            .background(Color.iCoBorderGray)
                             .padding(.vertical, 8)
                         CoinCardView(coin: entry.coins[1], date: entry.date)
                     }
@@ -176,13 +176,13 @@ struct CoinWidgetEntryView: View {
                 } else { emptyView }
             }
         }
-        .containerBackground(.aiCoBackground, for: .widget)
+        .containerBackground(.iCoBackground, for: .widget)
     }
 
     private var emptyView: some View {
         Text("선택된 코인 없음")
             .font(.system(size: 10))
-            .foregroundColor(.aiCoLabelSecondary)
+            .foregroundColor(.iCoLabelSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -218,11 +218,11 @@ struct CoinCardView: View {
                 VStack(alignment: .leading) {
                     Text(coin.koreanName)
                         .font(.system(size: isSmall ? 10 : 12, weight: .semibold))
-                        .foregroundColor(.aiCoLabel)
+                        .foregroundColor(.iCoLabel)
 
                     Text(coin.symbol)
                         .font(.system(size: isSmall ? 10 : 12))
-                        .foregroundColor(.aiCoLabelSecondary)
+                        .foregroundColor(.iCoLabelSecondary)
                 }
 
                 HStack(spacing: 0) {
@@ -233,7 +233,7 @@ struct CoinCardView: View {
                     Text(date.formatted(date: .omitted, time: .shortened))
                         .font(.system(size: isSmall ? 8 : 10))
                 }
-                .foregroundColor(.aiCoLabelSecondary)
+                .foregroundColor(.iCoLabelSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
             }
@@ -244,12 +244,12 @@ struct CoinCardView: View {
             HStack {
                 Text(coin.price.formatKRW)
                     .font(.system(size: 10))
-                    .foregroundColor(.aiCoLabel)
+                    .foregroundColor(.iCoLabel)
                 Spacer()
 
                 Text("\(coin.change, specifier: "%.2f")%")
                     .font(.system(size: 10)).bold()
-                    .foregroundColor(coin.change >= 0 ? .aiCoPositive : .aiCoNegative)
+                    .foregroundColor(coin.change >= 0 ? .iCoPositive : .iCoNegative)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -289,7 +289,7 @@ struct SparklineView: View {
                             }
                         }
                     }
-                    .stroke(Color.aiCoAccent, style: StrokeStyle(lineWidth: 2, lineJoin: .round))
+                    .stroke(Color.iCoAccent, style: StrokeStyle(lineWidth: 2, lineJoin: .round))
 
                     if let last = normalized.last {
                         let x = geo.size.width

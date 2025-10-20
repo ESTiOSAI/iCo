@@ -66,7 +66,7 @@ struct ChartView: View {
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.aiCoBackground)
+                .fill(Color.iCoBackground)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -112,12 +112,12 @@ struct ChartView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(lastUpdatedText)
                         .font(.system(size: 10, weight: .regular))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
                         .lineLimit(1)
                     
                     Text(viewModel.displayLastPrice.formatKRW)
                         .font(.system(size: 20, weight: .bold))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
                         .lineLimit(1)
                     
                     Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
@@ -127,7 +127,7 @@ struct ChartView: View {
                     
                     Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.aiCoLabelSecondary)
+                        .foregroundStyle(.iCoLabelSecondary)
                         .lineLimit(1)
                 }
                 

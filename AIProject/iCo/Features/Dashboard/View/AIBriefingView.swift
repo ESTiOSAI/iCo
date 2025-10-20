@@ -32,7 +32,7 @@ struct AIBriefingView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text(String.aiGeneratedContentNotice)
                 .font(.system(size: 11))
-                .foregroundStyle(.aiCoNeutral)
+                .foregroundStyle(.iCoNeutral)
                 .lineSpacing(5)
             
             VStack(spacing: 16) {
