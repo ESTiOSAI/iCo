@@ -20,12 +20,12 @@ struct CoinRowView: View {
 
            	HStack(spacing: 8) {
                 Text(coin.coinKoreanName)
-                    .font(AppFont.dynamic(size: 15, weight: .semibold))
+                    .font(.ico15Sb)
                     .lineLimit(1)
                     .foregroundColor(.primary)
 
                 Text(coin.coinSymbol)
-                    .font(AppFont.dynamic(size: 12))
+                    .font(.ico12)
                     .foregroundColor(.secondary)
             }
 
