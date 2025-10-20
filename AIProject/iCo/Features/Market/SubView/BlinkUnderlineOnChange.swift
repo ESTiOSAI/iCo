@@ -11,7 +11,7 @@ import SwiftUI
 struct BlinkUnderlineOnChange<Value: Equatable>: ViewModifier {
     let trigger: Value
     var duration: Duration = .seconds(2)
-    var color: Color = .aiCoLabel
+    var color: Color = .iCoLabel
     var lineWidth: CGFloat = 2
     
     @State private var animating = false
@@ -58,7 +58,7 @@ extension View {
     func blinkUnderlineOnChange<Value: Equatable>(
         _ trigger: Value,
         duration: Duration = .seconds(1),
-        color: Color = .aiCoLabel
+        color: Color = .iCoLabel
     ) -> some View {
         modifier(
             BlinkUnderlineOnChange(

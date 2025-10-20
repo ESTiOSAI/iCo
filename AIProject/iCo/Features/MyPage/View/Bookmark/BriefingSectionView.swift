@@ -15,7 +15,7 @@ struct BriefingSectionView: View {
             Text("분석 결과")
                 .font(.system(size: 14))
                 .fontWeight(.semibold)
-                .foregroundColor(Color(.aiCoAccent))
+                .foregroundColor(Color(.iCoAccent))
             
             briefing.briefing
                 .byCharWrapping
@@ -29,7 +29,7 @@ struct BriefingSectionView: View {
             Text("전략 제안")
                 .font(.system(size: 14))
                 .fontWeight(.semibold)
-                .foregroundColor(Color(.aiCoAccent))
+                .foregroundColor(Color(.iCoAccent))
             
             briefing.strategy
                 .byCharWrapping

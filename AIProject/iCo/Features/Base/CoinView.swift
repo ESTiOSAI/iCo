@@ -26,9 +26,9 @@ struct CoinView: View {
                 CachedAsyncImage(resource: .symbol(symbol)) {
                     Text(String(symbol.prefix(1)))
                         .font(.system(size: size / 2))
-                        .foregroundStyle(.aiCoAccent)
+                        .foregroundStyle(.iCoAccent)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.aiCoBackgroundAccent)
+                        .background(.iCoBackgroundAccent)
                         .overlay(
                             Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
                         )

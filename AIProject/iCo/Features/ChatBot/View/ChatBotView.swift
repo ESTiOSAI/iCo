@@ -49,7 +49,7 @@ struct ChatBotView: View {
                         .frame(maxWidth: isPortrait && isPad ? proxy.size.width * 0.6 : .infinity)
                         .padding(.horizontal, isPortrait && isPad ? 0 : 16)
                 }
-                .background(.aiCoBackground.opacity(colorScheme == .light ? 1 : 0.5))
+                .background(.iCoBackground.opacity(colorScheme == .light ? 1 : 0.5))
             }
             .frame(maxWidth: .infinity)
             .background(

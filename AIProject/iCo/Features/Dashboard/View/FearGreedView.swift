@@ -21,11 +21,11 @@ struct FearGreedView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("공포 & 탐욕 지수")
                     .font(.system(size: 19, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
+                    .foregroundStyle(.iCoLabel)
                 
                 Text("ⓘ Fear & Greed 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
                     .font(.system(size: 11))
-                    .foregroundStyle(.aiCoLabelSecondary)
+                    .foregroundStyle(.iCoLabelSecondary)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -73,7 +73,7 @@ extension FearGreedView {
                 ZStack {
                     Circle()
                         .trim(from: 0.0, to: Self.gaugeTrim)
-                        .stroke(Color.aiCoBackground, style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
+                        .stroke(Color.iCoBackground, style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
                         .rotationEffect(.degrees(Self.rotationDegrees))
                     
                     Circle()
@@ -84,7 +84,7 @@ extension FearGreedView {
                     VStack(spacing: size.height * 0.15) {
                         Text("\(Int(viewModel.indexValue))")
                             .font(.system(size: size.width * 0.3, weight: .bold))
-                            .foregroundColor(.aiCoLabel)
+                            .foregroundColor(.iCoLabel)
                             .minimumScaleFactor(0.5)
                         
                         Text(viewModel.classification)

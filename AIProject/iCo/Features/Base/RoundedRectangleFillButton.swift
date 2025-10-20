@@ -47,7 +47,7 @@ struct RoundedRectangleFillButtonView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(height: 16)
-                    .tint(!isHighlighted ? .aiCoLabelSecondary : .aiCoAccent)
+                    .tint(!isHighlighted ? .iCoLabelSecondary : .iCoAccent)
                     .fontWeight(!isHighlighted ? .light : .regular)
                     .offset(y: -1) // 아이콘 위치 조정하기
             }
@@ -55,12 +55,12 @@ struct RoundedRectangleFillButtonView: View {
             Text(title)
                 .frame(height: 36)
                 .font(.system(size: 14, weight: !isHighlighted ? .regular : .medium))
-                .tint(!isHighlighted ? .aiCoLabel : .aiCoAccent)
+                .tint(!isHighlighted ? .iCoLabel : .iCoAccent)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity)
-        .background(!isHighlighted ? .aiCoBackground : .aiCoBackgroundAccent)
+        .background(!isHighlighted ? .iCoBackground : .iCoBackgroundAccent)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)

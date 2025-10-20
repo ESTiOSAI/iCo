@@ -21,10 +21,10 @@ struct CircleIconView: View {
                 .scaledToFit()
                 .frame(height: 16)
                 .fontWeight(.regular)
-                .foregroundStyle(.aiCoAccent)
+                .foregroundStyle(.iCoAccent)
         }
         .frame(width: 36, height: 36)
-        .background(.aiCoBackgroundAccent)
+        .background(.iCoBackgroundAccent)
         .clipShape(Circle())
         .overlay(Circle().strokeBorder(.accentGradient, lineWidth: 0.5))
     }

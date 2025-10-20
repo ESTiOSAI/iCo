@@ -70,11 +70,11 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             HStack {
                 Image(systemName: data.icon)
                     .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.aiCoAccent)
+                    .foregroundStyle(.iCoAccent)
                 
                 Text(data.title)
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.aiCoLabel)
+                    .foregroundStyle(.iCoLabel)
                 
                 Spacer()
                 
@@ -93,7 +93,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 case .success(let value):
                     content(value)
                         .font(.system(size: 14))
-                        .foregroundStyle(.aiCoLabel)
+                        .foregroundStyle(.iCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxHeight: .infinity, alignment: .top)
@@ -116,7 +116,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
-        .background(.aiCoBackground)
+        .background(.iCoBackground)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)

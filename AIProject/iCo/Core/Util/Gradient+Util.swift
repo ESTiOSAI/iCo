@@ -20,9 +20,9 @@ extension Gradient {
         var colors: [Color] {
             switch self {
             case .default:
-                return [.aiCoGradientDefaultLight, .aiCoGradientDefaultProminent, .aiCoGradientDefaultLight]
+                return [.iCoGradientDefaultLight, .iCoGradientDefaultProminent, .iCoGradientDefaultLight]
             case .accent:
-                return [.aiCoGradientAccentLight, .aiCoGradientAccentProminent, .aiCoGradientAccentLight]
+                return [.iCoGradientAccentLight, .iCoGradientAccentProminent, .iCoGradientAccentLight]
             }
         }
     }

@@ -55,7 +55,7 @@ fileprivate struct CoinMetaView: View {
         }
         .font(.system(size: 12))
         .fontWeight(.medium)
-        .foregroundStyle(.aiCoLabel)
+        .foregroundStyle(.iCoLabel)
     }
 }
 
@@ -79,7 +79,7 @@ fileprivate struct CoinPriceView: View {
     private var changeColor: Color {
         switch ticker.snapshot.change {
         case .rise: return themeManager.selectedTheme.positiveColor
-        case .even: return .aiCoLabel
+        case .even: return .iCoLabel
         case .fall: return themeManager.selectedTheme.negativeColor
         }
     }
@@ -106,7 +106,7 @@ fileprivate struct CoinPriceView: View {
         }
         .font(.system(size: 12))
         .fontWeight(.medium)
-        .foregroundStyle(.aiCoLabel)
+        .foregroundStyle(.iCoLabel)
         .background {
             VStack {
                 ZStack {

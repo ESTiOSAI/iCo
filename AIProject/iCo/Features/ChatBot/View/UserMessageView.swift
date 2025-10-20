@@ -17,12 +17,12 @@ struct UserMessageView: View {
             Text(content)
                 .font(.system(size: 14))
                 .lineSpacing(6)
-                .foregroundStyle(.aiCoLabel)
+                .foregroundStyle(.iCoLabel)
                 .padding(.vertical, 15)
                 .padding(.horizontal, 18)
                 .background {
                     UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 16, bottomTrailingRadius: 16)
-                        .fill(Color.aiCoBackgroundWhite)
+                        .fill(Color.iCoBackgroundWhite)
                 }
                 .overlay {
                     UnevenRoundedRectangle(topLeadingRadius: 16, bottomLeadingRadius: 16, bottomTrailingRadius: 16)

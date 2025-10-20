@@ -18,20 +18,20 @@ struct ChatInputView: View {
             TextField("무엇이든 물어보세요.", text: $viewModel.searchText, axis: .vertical)
                 .lineLimit(1...3)
                 .font(.system(size: 14))
-                .foregroundStyle(.aiCoLabel)
+                .foregroundStyle(.iCoLabel)
                 .focused($isFocused)
 
             Button {
                 Task { await viewModel.sendMessage(message: viewModel.searchText) }
             } label: {
                 Image(systemName: viewModel.isStreaming ? "square.fill" : "arrow.up")
-                    .foregroundStyle(viewModel.isEditable && !viewModel.isStreaming ? .aiCoAccent : .aiCoNeutral)
+                    .foregroundStyle(viewModel.isEditable && !viewModel.isStreaming ? .iCoAccent : .iCoNeutral)
                     .padding(10)
             }
             .frame(width: 30, height: 30)
             .background {
                 Circle()
-                    .fill(viewModel.isEditable && !viewModel.isStreaming ? .aiCoBackgroundAccent : .aiCoBackgroundWhite)
+                    .fill(viewModel.isEditable && !viewModel.isStreaming ? .iCoBackgroundAccent : .iCoBackgroundWhite)
             }
             .onChange(of: viewModel.isTapped) {
                 isFocused = false
@@ -50,7 +50,7 @@ struct ChatInputView: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 30)
-                .fill(.aiCoBackgroundWhite)
+                .fill(.iCoBackgroundWhite)
         )
         .overlay {
             RoundedRectangle(cornerRadius: 30)

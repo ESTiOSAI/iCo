@@ -16,22 +16,22 @@ enum Theme: String, CaseIterable {
     /// 선택된 테마에 대응하는 상승 색상
     var positiveColor: Color {
         switch self {
-        case .basic: return .aiCoPositive
-        case .pop: return .aiCoPositivePop
-        case .classic: return .aiCoPositiveClassic
+        case .basic: return .iCoPositive
+        case .pop: return .iCoPositivePop
+        case .classic: return .iCoPositiveClassic
         }
     }
     
     /// 선택된 테마에 대응하는 하락 색상
     var negativeColor: Color {
         switch self {
-        case .basic: return .aiCoNegative
-        case .pop: return .aiCoNegativePop
-        case .classic: return .aiCoNegativeClassic
+        case .basic: return .iCoNegative
+        case .pop: return .iCoNegativePop
+        case .classic: return .iCoNegativeClassic
         }
     }
     
-    var neutral: Color { .aiCoNeutral }
+    var neutral: Color { .iCoNeutral }
 }
 
 extension Theme {

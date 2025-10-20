@@ -39,7 +39,7 @@ struct CoinListSectionView: View {
             .padding(.horizontal, 16)
             .fontWeight(.regular)
             .font(.system(size: 12))
-            .foregroundStyle(.aiCoLabel)
+            .foregroundStyle(.iCoLabel)
 
             ForEach(sortedCoins, id: \.coinID) { coin in
                 if let meta = coinStore.coins[coin.coinID] {
@@ -66,10 +66,10 @@ struct CoinListSectionView: View {
         }
         .padding(.top, 16)
         .padding(.bottom, 16)
-        .background(.aiCoBackground.opacity(0.7))
+        .background(.iCoBackground.opacity(0.7))
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.aiCoBackground)
+                .fill(Color.iCoBackground)
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
                         .strokeBorder(.defaultGradient, lineWidth: 0.5)

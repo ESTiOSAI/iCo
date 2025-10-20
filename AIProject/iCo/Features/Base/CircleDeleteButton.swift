@@ -20,11 +20,11 @@ struct CircleDeleteButton: View {
         } label: {
             Image(systemName: "xmark")
                 .font(.system(size: fontSize))
-                .foregroundStyle(.aiCoLabelSecondary)
+                .foregroundStyle(.iCoLabelSecondary)
                 .padding(5)
                 .background {
                     Circle()
-                        .fill(.aiCoBackgroundWhite)
+                        .fill(.iCoBackgroundWhite)
                 }
                 .overlay {
                     Circle()

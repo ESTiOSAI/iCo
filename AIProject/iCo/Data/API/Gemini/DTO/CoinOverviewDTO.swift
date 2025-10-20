@@ -30,7 +30,7 @@ extension CoinOverviewDTO {
             let prefix = AttributedString("- 웹사이트: ")
             var link = AttributedString(URL(string: urlString)?.host ?? urlString)
             link.link = url
-            link.foregroundColor = .aiCoAccent
+            link.foregroundColor = .iCoAccent
             link.underlineStyle = .single
             overview.append(prefix)
             overview.append(link)
