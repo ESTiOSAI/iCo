@@ -6,7 +6,7 @@ on:
       - "Release-*"
 
 jobs:
-  testflight:
+  release:
 
     runs-on: macos-latest
 
