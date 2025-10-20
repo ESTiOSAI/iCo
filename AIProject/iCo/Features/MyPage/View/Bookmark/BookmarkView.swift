@@ -133,7 +133,7 @@ struct BookmarkView: View {
                     .padding(.horizontal, 16)
 
                     Text(String.aiGeneratedContentNotice)
-                        .font(.system(size: 11))
+                        .font(.ico11)
                         .foregroundColor(.iCoNeutral)
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
