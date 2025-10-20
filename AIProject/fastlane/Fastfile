@@ -21,7 +21,14 @@ platform :ios do
         lock_when_sleeps: false
     )
 
-    increment_build_number
+    latest = latest_testflight_build_number(
+      app_identifier: "com.est.ico",
+      version: version
+    )
+
+    increment_build_number(
+      build_number: latest + 1
+    )
 
     match(
       type: "appstore",
@@ -76,7 +83,7 @@ platform :ios do
         lock_when_sleeps: false
     )
 
-    increment_build_number
+    increment_build_number    
 
     match(
       type: "appstore",
