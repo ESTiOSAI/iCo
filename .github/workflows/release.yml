@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - "Release-*"
 
 jobs:
   testflight:
@@ -18,7 +18,7 @@ jobs:
     # 태그 번호 가져오기
     - name: Extract version from tag
       id: ver
-      run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+      run: echo "VERSION=${GITHUB_REF_NAME#Release-}" >> $GITHUB_OUTPUT
 
     # 태그 번호 가져오기
     - name: Print version
