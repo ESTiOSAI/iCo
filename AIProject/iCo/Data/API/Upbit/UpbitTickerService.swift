@@ -9,23 +9,17 @@ import Foundation
 
 /// 업비트 실시간 코인 시세 웹소켓 서비스
 final class UpbitTickerService: RealTimeTickerProvider {
-    private let client: any SocketEngine
+    private let client: ReconnectableWebSocketClient<BaseWebSocketClient>
     
     /// 소켓 상태 stream
     private var stateStreamTask: Task<Void, Never>?
     
-    init(
-        client: any SocketEngine =
-        ReconnectableWebSocketClient {
-        BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
-        }
-    ) {
+    init(client: ReconnectableWebSocketClient<BaseWebSocketClient> = ReconnectableWebSocketClient { BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!) }) {
         self.client = client
     }
     
     func connect() async {
         await client.connect()
-        streamingState()
     }
     
     func disconnect() async {
@@ -37,7 +31,8 @@ final class UpbitTickerService: RealTimeTickerProvider {
     func subscribeTickerStream() -> AsyncStream<TickerValue> {
         AsyncStream<TickerValue> { continuation in
             Task {
-                for await message in client.incoming {
+                guard let stream = client.stream else { return }
+                for await message in stream {
                     switch message {
                     case .success(let data):
                         if let ticker = mapTicker(data) {
@@ -78,18 +73,6 @@ final class UpbitTickerService: RealTimeTickerProvider {
                 debugPrint(error)
             }
             return nil
-        }
-    }
-    
-    
-    /// 소켓 상태를 구독합니다.
-    private func streamingState() {
-        self.stateStreamTask?.cancel()
-        
-        self.stateStreamTask = Task {
-            for await state in client.state {
-                debugPrint("client State: \(state)")
-            }
         }
     }
 }
