@@ -127,7 +127,7 @@ public final class BaseWebSocketClient: NSObject {
         await stateChannel.send(.closed(code: code, reason: reason))
         
         Task.detached { [weak self] in
-            await self?.release()
+            self?.release()
         }
     }
     
@@ -165,12 +165,12 @@ public final class BaseWebSocketClient: NSObject {
             task.sendPing { [weak self] error in
                 Task {
                     if let error {
-                        await self?.pongContinuation?.resume(throwing: error)
+                        self?.pongContinuation?.resume(throwing: error)
                         await self?.releaseCont()
                         debugPrint("Ping Failed: \(error)")
                         return
                     }
-                    await self?.pongContinuation?.resume()
+                    self?.pongContinuation?.resume()
                     await self?.releaseCont()
                 }
             }

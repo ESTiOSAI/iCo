@@ -16,9 +16,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     /// SocketEngine Protocol
     private var base: Base?
     
-    /// Socket 상태와 메세지를 forwarding
-    private var forwardIncomingTask: Task<Void, Never>?
-    
     /// 소켓 상태 재연결하기 위한 Loop
     private var loopTask: Task<Void, Never>?
     
@@ -46,12 +43,12 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
         guard loopTask == nil else { return }
         isClosed = false
         loopTask?.cancel()
-        loopTask = Task { [weak self] in
+        loopTask = Task {
             do {
-               try await self?.runLoop()
+               try await runLoop()
             } catch {
-                await self?.loopTask?.cancel()
-                await self?.close()
+                loopTask?.cancel()
+                await close()
             }
         }
     }
@@ -70,6 +67,7 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     
     deinit {
         debugPrint(String(describing: Self.self), #function)
+
         base = nil
         loopTask?.cancel()
         loopTask = nil
