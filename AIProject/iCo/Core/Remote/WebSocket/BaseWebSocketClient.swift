@@ -197,21 +197,20 @@ public final class BaseWebSocketClient: NSObject {
 
 // MARK: 웹 소켓 Delegate로 소켓 응답 및 종료 event를 받아 처리합니다.
 extension BaseWebSocketClient: URLSessionWebSocketDelegate {
-    public nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         debugPrint("didOpen")
         Task {
             await handleConnect()
         }
     }
     
-    public nonisolated func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+    public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         debugPrint("didClose")
         Task {
             await handleClose(code: closeCode, reason: reason)
         }
     }
-}
-
+    
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         debugPrint("didCompleteWithError")
         
