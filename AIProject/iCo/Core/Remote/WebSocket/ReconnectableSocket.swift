@@ -9,10 +9,7 @@ import Foundation
 import AsyncAlgorithms
 
 /// Socket을 상태와 메세지를 포워딩하고 재연결을 책임집니다.
-public actor ReconnectableWebSocketClient<Base: SocketEngine>: SocketEngine {
-    private var stateChannel: AsyncChannel<WebSocket.State>
-    private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
-    
+public class ReconnectableWebSocketClient<Base: SocketEngine> {
     /// 시도한 횟수
     private var attempts: Int = 0
     
