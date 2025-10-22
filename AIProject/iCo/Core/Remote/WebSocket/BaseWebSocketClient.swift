@@ -8,6 +8,8 @@
 import Foundation
 import AsyncAlgorithms
 
+var flag = true
+
 /// 웹소켓 client입니다. 메세지와 연결 상태 stream, 연결, 해제를 책임집니다.
 public final actor BaseWebSocketClient: NSObject, SocketEngine {
     
