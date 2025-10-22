@@ -14,10 +14,10 @@ var flag = true
 public final class BaseWebSocketClient: NSObject {
     
     /// 소켓 상태 채널
-    private var stateChannel: AsyncChannel<WebSocket.State>
+    public var stateChannel: AsyncChannel<WebSocket.State>
     
     /// 메세지 채널
-    private var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
+    public var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>>
     
     private let url: URL
     private let session: URLSession
