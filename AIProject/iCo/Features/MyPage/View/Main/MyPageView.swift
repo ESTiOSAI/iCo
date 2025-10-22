@@ -32,6 +32,8 @@ struct MyPageView: View {
                         switch selection {
                         case .bookmark:
                             BookmarkView(coinStore: coinStore)
+                        case .updateRiskTolerance:
+                            UpdateRiskToleranceView()
                         case .themeSet:
                             ThemeView()
                         case .feedback:
@@ -58,7 +60,7 @@ struct MyPageView: View {
             List(selection: $selection) {
                 VStack {
                     Section {
-                        ForEach([MyPageMenu.bookmark, .themeSet]) { menu in
+                        ForEach([MyPageMenu.bookmark, .updateRiskTolerance, .themeSet]) { menu in
                             MyPageMenuRow(title: menu.title, imageName: menu.icon)
                                 .contentShape(.rect)
                                 .onTapGesture {

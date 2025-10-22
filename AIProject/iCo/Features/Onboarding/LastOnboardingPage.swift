@@ -19,8 +19,6 @@ import SwiftUI
 ///   - isLandscape: 가로/세로 레이아웃 여부를 나타내는 바인딩 값
 ///   - onFinish: 온보딩 완료 시 호출되는 콜백
 struct LastOnboardingPage: View {
-    @EnvironmentObject var recommendCoinViewModel: RecommendCoinViewModel
-    
     @AppStorage(AppStorageKey.investmentType) private var storedInvestmentType: String = ""
     
     @State private var selectedType: RiskTolerance?
@@ -74,5 +72,4 @@ struct LastOnboardingPage: View {
 
 #Preview {
     LastOnboardingPage(isLandscape: .constant(true), onFinish: { })
-        .environmentObject(RecommendCoinViewModel())
 }
