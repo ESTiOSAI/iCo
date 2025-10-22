@@ -43,7 +43,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
         self.stateChannel = .init()
         self.incomingChannel = .init()
         
-        debugPrint(String(describing: Self.self), "init")
     }
     
     /// 소켓 연결 및 재연결 loop 실행
@@ -134,7 +133,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
                 let delay = backoff.next()
                 print(backoff.attempt)
                 attempts += 1
-                print("object's attemps: \(attempts) after \(delay) sec.")
                 await stateChannel.send(.reconnecting(nextAttempsIn: delay))
                 try await Task.sleep(for: delay)
             }
@@ -149,9 +147,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     /// - Returns: 에러타입 반환 예) retryable , closed, nonRetryable
     private func classify(closeCode: URLSessionWebSocketTask.CloseCode?,
                           error: Error?) -> WebSocket.Failure {
-//        if closeCode == nil, error == nil {
-//            return .closed(code: .normalClosure, reason: nil)
-//        }
         if let code = closeCode {
             switch code {
                 // 일시적 - 재시도
@@ -224,7 +219,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
                 if let reason, let text = String(data: reason, encoding: .utf8) {
                     reasonString = text
                 }
-                debugPrint(reasonString)
                 return (code, nil)
             default: continue
             }

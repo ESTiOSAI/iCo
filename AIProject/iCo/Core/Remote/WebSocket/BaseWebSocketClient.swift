@@ -37,7 +37,6 @@ public final class BaseWebSocketClient: NSObject {
         incomingChannel = AsyncChannel<Result<Data, WebSocket.MessageFailure>>()
         
         super.init()
-        debugPrint(String(describing: Self.self), #function)
     }
     
     /// 채널을 새로 개설하고 소켓을 엽니다.
@@ -163,7 +162,6 @@ public final class BaseWebSocketClient: NSObject {
         
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             self.pongContinuation = continuation
-            debugPrint("Send Ping")
             task.sendPing { [weak self] error in
                 Task {
                     if let error {
@@ -172,7 +170,6 @@ public final class BaseWebSocketClient: NSObject {
                         debugPrint("Ping Failed: \(error)")
                         return
                     }
-                    debugPrint("Received Pong")
                     await self?.pongContinuation?.resume()
                     await self?.releaseCont()
                 }
