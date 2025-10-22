@@ -31,11 +31,18 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     /// 소켓은 재사용하기 어렵기 때문에 closure로 캡처하여 재연결 시 사용
     private let makeBase: () -> Base
     
+    typealias IncomeStream = AsyncStream<Result<Data, WebSocket.MessageFailure>>
+    var stream: IncomeStream?
+    var incomeContinuation: IncomeStream.Continuation?
+
     public init(makeBase: @escaping () -> Base, policy: ReconnectPolicy = .defaultPolicy()) {
         self.makeBase = makeBase
         self.policy = policy
         self.backoff = ExponentialBackoff(policy: policy)
         
+        stream = IncomeStream { continuation in
+            incomeContinuation = continuation
+        }
     }
     
     /// 소켓 연결 및 재연결 loop 실행
@@ -81,6 +88,8 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
             self.base = base
             await base.connect()
             
+            Task { await observeData() }
+                
             // 소켓이 종료될 때 까지 대기 및 종료 원인 응답 대기
             let terminal = await waitTerminalEvent(from: base)
             
@@ -91,24 +100,25 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
             
             // 종료 원인 분기
             switch classify(closeCode: terminal.closeCode, error: terminal.error) {
-            case let .closed(code, reason):
-                await stateChannel.send(.closed(code: code, reason: reason))
+            case .closed:
                 release()
                 return
-            case .nonRetryable(let error):
-                await stateChannel.send(.failed(error ?? URLError(.networkConnectionLost)))
+            case .nonRetryable:
                 release()
                 return
             case .retryable:
-                
-                // 재시도 가능한 에러이면 재시도
-                // 재연결 시간 정책 반영하여 계산
                 let delay = backoff.next()
-                print(backoff.attempt)
                 attempts += 1
-                await stateChannel.send(.reconnecting(nextAttempsIn: delay))
                 try await Task.sleep(for: delay)
             }
+        }
+    }
+    
+    private func observeData() async {
+        guard let base else { return }
+        
+        for await value in base.incomingChannel {
+            incomeContinuation?.yield(value)
         }
     }
     
@@ -159,17 +169,15 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     }
     
     private func waitTerminalEvent(from base: Base) async -> (closeCode: URLSessionWebSocketTask.CloseCode?, error: Error?) {
-        for await _state in base.state {
-            switch _state {
+        for await state in base.stateChannel {
+            print(#function, state)
+            switch state {
             case .failed(let error):
                 return (nil, error)
-            case .closed(let code, let reason):
-                var reasonString: String = "내용 없음"
-                if let reason, let text = String(data: reason, encoding: .utf8) {
-                    reasonString = text
-                }
+            case .closed(let code, _):
                 return (code, nil)
-            default: continue
+            default:
+                continue
             }
         }
         
