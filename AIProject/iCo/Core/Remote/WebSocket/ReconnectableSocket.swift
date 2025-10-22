@@ -17,7 +17,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     private var base: Base?
     
     /// Socket 상태와 메세지를 forwarding
-    private var forwardStateTask: Task<Void, Never>?
     private var forwardIncomingTask: Task<Void, Never>?
     
     /// 소켓 상태 재연결하기 위한 Loop
@@ -40,9 +39,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
         self.policy = policy
         self.backoff = ExponentialBackoff(policy: policy)
         
-        self.stateChannel = .init()
-        self.incomingChannel = .init()
-        
     }
     
     /// 소켓 연결 및 재연결 loop 실행
@@ -62,10 +58,8 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     
     public func close() async {
         isClosed = true
-        forwardIncomingTask?.cancel()
         await base?.close()
         base = nil
-        forwardStateTask?.cancel()
         
         release()
     }
@@ -76,13 +70,7 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     
     deinit {
         debugPrint(String(describing: Self.self), #function)
-        forwardStateTask?.cancel()
-        forwardIncomingTask?.cancel()
-            
         base = nil
-        
-        stateChannel.finish()
-        incomingChannel.finish()
         loopTask?.cancel()
         loopTask = nil
     }
@@ -93,19 +81,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
         while !isClosed {
             let base = makeBase()
             self.base = base
-            
-            // 채널 재생성 및 기존 포워딩 task 취소
-            self.stateChannel = .init()
-            self.incomingChannel = .init()
-            
-            forwardStateTask?.cancel()
-            forwardIncomingTask?.cancel()
-            
-            // forwarding 채널 시작
-            forwardStateTask = Task { [weak self] in await self?.forwardState(from: base) }
-            
-            forwardIncomingTask = Task { [weak self] in await self?.forwardIncoming(from: base) }
-            
             await base.connect()
             
             // 소켓이 종료될 때 까지 대기 및 종료 원인 응답 대기
@@ -185,30 +160,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
         return .retryable(underlying: error)
     }
     
-    private func forwardState(from base: Base) async {
-        for await _state in base.state {
-            switch _state {
-            case .connecting:
-                await stateChannel.send(.connecting)
-            case .connected:
-                backoff.reset()
-                await stateChannel.send(.connected)
-            case .failed(let error):
-                await stateChannel.send(.failed(error))
-            case .closed(let code, let reason):
-                await stateChannel.send(.closed(code: code, reason: reason))
-            case .reconnecting:
-                break
-            }
-        }
-    }
-    
-    private func forwardIncoming(from base: Base) async {
-        for await message in base.incoming {
-            await incomingChannel.send(message)
-        }
-    }
-    
     private func waitTerminalEvent(from base: Base) async -> (closeCode: URLSessionWebSocketTask.CloseCode?, error: Error?) {
         for await _state in base.state {
             switch _state {
@@ -228,13 +179,7 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     }
     
     private func release() {
-        forwardStateTask?.cancel()
-        forwardIncomingTask?.cancel()
-        
         base = nil
-        
-        stateChannel.finish()
-        incomingChannel.finish()
         loopTask?.cancel()
         loopTask = nil
     }
