@@ -215,15 +215,6 @@ extension BaseWebSocketClient: URLSessionWebSocketDelegate {
     }
 }
 
-extension AsyncChannel {
-    public func makeStream() -> AsyncStream<Element> {
-        AsyncStream<Element> { continuation in
-            Task {
-                for await value in self {
-                    continuation.yield(value)
-                }
-                continuation.finish()
-            }
         }
     }
 }
