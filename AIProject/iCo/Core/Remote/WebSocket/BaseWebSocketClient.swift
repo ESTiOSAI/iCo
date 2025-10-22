@@ -42,6 +42,13 @@ public final class BaseWebSocketClient: NSObject {
     /// 채널을 새로 개설하고 소켓을 엽니다.
     /// 핑을 보내는 이유는 연결된 상태를 확정적으로 기다리기 위해서입니다.
     public func connect() async {
+        if flag {
+            Task {
+                try await Task.sleep(for: .seconds(5))
+                task?.cancel(with: .goingAway, reason: nil)
+                flag = false
+            }
+        }
         
         stateChannel = .init()
         incomingChannel = .init()
