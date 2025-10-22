@@ -28,28 +28,6 @@ public final class BaseWebSocketClient: NSObject {
     /// 핑 전송 task
     private var healthCheck: Task<Void, Never>?
     
-    public nonisolated var state: AsyncStream<WebSocket.State> {
-        AsyncStream { continuation in
-            Task {
-                for await state in await stateChannel {
-                    continuation.yield(state)
-                }
-                continuation.finish()
-            }
-        }
-    }
-    
-    public nonisolated var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> {
-        AsyncStream { continuation in
-            Task {
-                for await message in await incomingChannel {
-                    continuation.yield(message)
-                }
-                continuation.finish()
-            }
-        }
-    }
-    
     public init(url: URL, session: URLSession = .shared) {
         
         self.url = url

@@ -35,28 +35,6 @@ public class ReconnectableWebSocketClient<Base: SocketEngine> {
     /// 소켓은 재사용하기 어렵기 때문에 closure로 캡처하여 재연결 시 사용
     private let makeBase: () -> Base
     
-    public nonisolated var state: AsyncStream<WebSocket.State> {
-        AsyncStream { continuation in
-            Task {
-                for await state in await stateChannel {
-                    continuation.yield(state)
-                }
-                continuation.finish()
-            }
-        }
-    }
-    
-    public nonisolated var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> {
-        AsyncStream { continuation in
-            Task {
-                for await message in await incomingChannel {
-                    continuation.yield(message)
-                }
-                continuation.finish()
-            }
-        }
-    }
-    
     public init(makeBase: @escaping () -> Base, policy: ReconnectPolicy = .defaultPolicy()) {
         self.makeBase = makeBase
         self.policy = policy
