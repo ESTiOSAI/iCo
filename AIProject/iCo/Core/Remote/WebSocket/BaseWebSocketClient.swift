@@ -215,6 +215,14 @@ extension BaseWebSocketClient: URLSessionWebSocketDelegate {
     }
 }
 
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+        debugPrint("didCompleteWithError")
+        
+        guard let error else {
+            Task { await handleClose(code: .goingAway, reason: nil)}
+            return
         }
+        
+        Task { await handleClose(with: error) }
     }
 }
