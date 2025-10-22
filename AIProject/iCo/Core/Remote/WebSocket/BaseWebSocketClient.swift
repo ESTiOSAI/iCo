@@ -46,7 +46,7 @@ public final class BaseWebSocketClient: NSObject {
         stateChannel = .init()
         incomingChannel = .init()
         
-        await stateChannel.send(.connecting)
+        Task { await stateChannel.send(.connecting) }
         
         self.task = session.webSocketTask(with: url)
         task?.delegate = self
