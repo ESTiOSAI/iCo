@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import AsyncAlgorithms
 
 public protocol SocketEngine {
-    var state: AsyncStream<WebSocket.State> { get }
-    var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> { get }
+    var stateChannel: AsyncChannel<WebSocket.State> { get set }
+    var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>> { get set }
     func connect() async
     func send(_ data: Data) async throws
     func close() async
