@@ -237,8 +237,8 @@ struct CoinCardView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
             }
-
-            SparklineView(prices: coin.history)
+            
+            LineChartView(values: coin.history)
                 .padding(8)
 
             HStack {
@@ -253,56 +253,5 @@ struct CoinCardView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-struct SparklineView: View {
-    let prices: [Double]
-
-    private var normalized: [CGFloat] {
-        guard prices.count > 1 else { return [] }
-        guard let min = prices.min(), let max = prices.max(), min != max else {
-            return Array(repeating: 0.5, count: prices.count)
-        }
-        return prices.map { CGFloat(($0 - min) / (max - min)) }
-    }
-
-    var body: some View {
-        GeometryReader { geo in
-            if normalized.isEmpty {
-                Path { path in
-                    let midY = geo.size.height / 2
-                    path.move(to: CGPoint(x: 0, y: midY))
-                    path.addLine(to: CGPoint(x: geo.size.width, y: midY))
-                }
-                .stroke(Color.gray.opacity(0.4), lineWidth: 1)
-            } else {
-                ZStack {
-                    Path { path in
-                        for (index, value) in normalized.enumerated() {
-                            let x = geo.size.width * CGFloat(index) / CGFloat(normalized.count - 1)
-                            let y = geo.size.height * (1 - value)
-                            if index == 0 {
-                                path.move(to: CGPoint(x: x, y: y))
-                            } else {
-                                path.addLine(to: CGPoint(x: x, y: y))
-                            }
-                        }
-                    }
-                    .stroke(Color.iCoAccent, style: StrokeStyle(lineWidth: 2, lineJoin: .round))
-
-                    if let last = normalized.last {
-                        let x = geo.size.width
-                        let y = geo.size.height * (1 - last)
-
-                        Circle()
-                            .fill(Color.blue)
-                            .frame(width: 6, height: 6)
-                            .position(x: x, y: y)
-                    }
-                }
-            }
-        }
-        //.frame(height: 36)
     }
 }
