@@ -8,6 +8,12 @@
 import SwiftUI
 
 /// 공통으로 사용할 수 있는 라인 차트(미니 차트) 컴포넌트
+///
+/// - Parameters:
+///   - values: 차트에 표시할 값 목록 (예: 가격 데이터)
+///   - lineColor: 차트 선 색상 (기본값은 `Color.iCoAccent`)
+///   - showsLastDot: 마지막 지점(최근 데이터)에 점을 표시할지 여부 (`true` 시 표시)
+///   - lineWidth: 선의 두께 (기본값: `2`)
 struct LineChartView: View {
     /// 차트에 표시할 값 목록 (예: 가격 데이터)
     let values: [Double]
