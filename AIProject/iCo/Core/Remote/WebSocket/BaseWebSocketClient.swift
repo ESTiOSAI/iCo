@@ -124,14 +124,14 @@ public final class BaseWebSocketClient: NSObject {
     private func handleClose(with error: Error) async {
         guard task != nil else { return }
         
-        await stateChannel.send(.failed(error))
+        await stateChannel.send(.failed)
         release()
     }
     
     private func handleClose(code: URLSessionWebSocketTask.CloseCode, reason: Data?) async {
         guard task != nil else { return }
         
-        await stateChannel.send(.closed(code: code, reason: reason))
+        await stateChannel.send(.closed)
         
         Task.detached { [weak self] in
             self?.release()

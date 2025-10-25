@@ -124,9 +124,6 @@ extension MarketView {
 #Preview {
     MarketView(
         coinService: UpBitAPIService(),
-        tickerService: UpbitTickerService(client:
-                                            ReconnectableWebSocketClient {
-                                                BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
-                                            })
+        tickerService: UpbitTickerService(client: BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!))
     )
 }

@@ -19,8 +19,8 @@ public protocol SocketEngine {
 public enum WebSocket {
     public enum State: Sendable {
         case connecting, connected
-        case failed(Error)
-        case closed(code: URLSessionWebSocketTask.CloseCode, reason: Data?)
+        case failed
+        case closed
         case reconnecting(nextAttempsIn: Duration)
     }
     
@@ -51,10 +51,6 @@ extension WebSocket.State: Equatable {
             return true
         case (.connected, .connected):
             return true
-        case (.failed(let lhsError), .failed(let rhsError)):
-            return lhsError as NSError == rhsError as NSError
-        case (.closed(let lhsCode, let lhsReason), .closed(let rhsCode, let rhsReason)):
-            return lhsCode == rhsCode && lhsReason == rhsReason
         case (.reconnecting(let lhsDelay), .reconnecting(let rhsDelay)):
             return lhsDelay == rhsDelay
         default:
