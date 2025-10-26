@@ -4,10 +4,10 @@ import AsyncAlgorithms
 public final class WebSocketClient: NSObject {
     /// 소켓 상태 채널
     private var stateStream: AsyncStream<WebSocket.State>
-    
+    /// WebSocket의 상태 변화를 여러 Consumer에게 동시에 전달하는 브로드캐스터
+    public var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> = .init()
     /// 메세지 채널
     public var incomingChannel: AsyncChannel<URLSessionWebSocketTask.Message>
-    public var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> = .init()
     
     private let url: URL
     private let session: URLSession
@@ -32,8 +32,7 @@ public final class WebSocketClient: NSObject {
         observeState()
     }
     
-    /// 채널을 새로 개설하고 소켓을 엽니다.
-    /// 핑을 보내는 이유는 연결된 상태를 확정적으로 기다리기 위해서입니다.
+    /// 웹소켓 세션을 연결하고 작업을 생성합니다.
     public func connect() async {
         await stateBroadCaster.send(.connecting)
         self.task = session.webSocketTask(with: url)
@@ -48,14 +47,19 @@ public final class WebSocketClient: NSObject {
         }
     }
     
+    /// 명시적으로 현재 WebSocket 연결을 정상적으로 종료합니다.
+    ///
+    /// 이 메서드는 서버와의 WebSocket 연결을 `normalClosure` 코드로 닫습니다.
     public func disconnect() async {
         task?.cancel(with: .normalClosure, reason: nil)
     }
 
+    /// 텍스트 형태의 메시지를 WebSocket 서버로 전송합니다.
     public func send(text: String) async throws {
         try await task?.send(.string(text))
     }
     
+    /// 바이너리(Data) 형태의 메시지를 WebSocket 서버로 전송합니다.
     public func send(data: Data) async throws {
         try await task?.send(.data(data))
     }
@@ -70,6 +74,7 @@ public final class WebSocketClient: NSObject {
 }
 
 // MARK: - Test용 메소드
+// TODO: Deprecated 예정입니다.
 extension WebSocketClient {
     public func sendState(with state: WebSocket.State) async {
         await stateBroadCaster.send(state)
@@ -88,6 +93,7 @@ extension WebSocketClient {
 
 // MARK: - Private
 extension WebSocketClient {
+    /// 서버로 Ping 프레임을 전송하여 연결 상태를 확인합니다.
     private func sendPing() async throws {
         return try await withCheckedThrowingContinuation { continuation in
             task?.sendPing { error in
@@ -104,6 +110,7 @@ extension WebSocketClient {
         }
     }
     
+    /// WebSocket의 상태 변화를 관찰하고 각 상태에 맞는 동작을 수행합니다.
     private func observeState() {
         stateTask = Task {
             for await state in stateStream {
@@ -127,6 +134,7 @@ extension WebSocketClient {
     }
     
     // FIXME: 개선이 필요한지 한 번 더 생각해보기
+    /// 서버로부터 WebSocket 메시지를 지속적으로 수신합니다.
     private func receive() {
         receiveTask?.cancel()
         
@@ -142,6 +150,7 @@ extension WebSocketClient {
         }
     }
     
+    /// 주기적으로 Ping을 전송하여 WebSocket 연결 상태를 점검합니다.
     private func checkingAlive() {
         healthCheck?.cancel()
         
@@ -159,6 +168,7 @@ extension WebSocketClient {
         }
     }
     
+    /// WebSocket 연결 종료 시 상태를 처리합니다.
     private func handleDisconnected(_ userClose: Bool) async {
         if userClose {
             await stateBroadCaster.send(.closed)
@@ -167,6 +177,7 @@ extension WebSocketClient {
         }
     }
     
+    /// WebSocket 재연결을 시도합니다.
     private func reconnect() async {
         guard task?.state != .running else {
             return
@@ -175,6 +186,7 @@ extension WebSocketClient {
         await connect()
     }
     
+    /// WebSocket 클라이언트의 모든 비동기 작업과 연결을 종료하고 리소스를 정리합니다.
     private func release() {
         receiveTask?.cancel()
         receiveTask = nil
