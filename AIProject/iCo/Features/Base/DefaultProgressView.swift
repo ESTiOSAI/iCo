@@ -61,13 +61,13 @@ struct DefaultProgressView: View {
                         .background(.iCoBackgroundAccent)
                 case .failure:
                     Image(systemName: "xmark.octagon")
-                        .font(.system(size: 35))
+                        .font(.ico35)
                         .foregroundStyle(.iCoNeutral)
                         .padding(8)
                         .background(.iCoBackgroundWhite)
                 case .cancel:
                     Image(systemName: "exclamationmark.octagon")
-                        .font(.system(size: 35))
+                        .font(.ico35)
                         .foregroundStyle(.iCoNeutral)
                         .padding(8)
                         .background(.iCoBackgroundWhite)
@@ -81,7 +81,7 @@ struct DefaultProgressView: View {
             .padding(.bottom, 18)
             
             Text(message)
-                .font(.system(size: 14))
+                .font(.ico14)
                 .foregroundColor(.iCoLabel)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)

@@ -48,7 +48,7 @@ struct SortToggleButton: View {
 
         HStack {
             Text(title)
-                .font(.system(size: 11))
+                .font(.ico11)
                 .foregroundStyle(.iCoLabel)
             RoundedButton(imageName: sortOrder.iconName) {
                 if currentCategory == sortCategory {

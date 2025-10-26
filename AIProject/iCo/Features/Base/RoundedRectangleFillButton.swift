@@ -54,7 +54,7 @@ struct RoundedRectangleFillButtonView: View {
             
             Text(title)
                 .frame(height: 36)
-                .font(.system(size: 14, weight: !isHighlighted ? .regular : .medium))
+                .font(!isHighlighted ? .ico14 : .ico14M)
                 .tint(!isHighlighted ? .iCoLabel : .iCoAccent)
         }
         .padding(.horizontal, 14)
