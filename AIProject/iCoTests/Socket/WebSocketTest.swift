@@ -50,8 +50,7 @@ final class WebSocketTest: XCTestCase {
         try await Task.sleep(for: .seconds(3))
         
         sut.cancel()
-        
-        // TODO: Connected를 기다리지 않으면 아래 Send를 해도 데이터가 들어오지 않음.
+
         try await Task.sleep(for: .seconds(3))
         try await sut.send(text: requestFormat)
         try await Task.sleep(for: .seconds(10))
