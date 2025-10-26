@@ -72,13 +72,13 @@ struct HeaderView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .center, spacing: 4) {
                         Text(heading)
-                            .font(.system(size: heading.count < 11 ? 21 : 18, weight: .black))
+                            .font(heading.count < 11 ? .ico21B : .ico18B)
                             .foregroundStyle(.iCoLabel)
                             .lineLimit(2)
                         
                         if showNewBadge {
                             Text("N")
-                                .font(.system(size: 12, weight: .heavy))
+                                .font(.ico12H)
                                 .foregroundStyle(.white)
                                 .padding(4)
                                 .background(Circle().foregroundStyle(.iCoAccent))
@@ -86,14 +86,14 @@ struct HeaderView: View {
                     }
                     
                     Text(coin)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.ico14B)
                         .foregroundStyle(.iCoLabelSecondary)
                 }
             }
         } else {
             HStack(alignment: .center, spacing: 8) {
                 Text(heading)
-                    .font(.system(size: 24, weight: .black))
+                    .font(.ico24B)
                     .foregroundStyle(headingColor)
                     .lineLimit(2)
                     .multilineTextAlignment(showBackButton ? .center : .leading)

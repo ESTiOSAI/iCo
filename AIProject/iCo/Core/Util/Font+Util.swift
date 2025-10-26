@@ -133,6 +133,15 @@ extension Font {
     static var ico20H  = Font.dynamic(size: 20, weight: .heavy)
     static var ico20Bl = Font.dynamic(size: 20, weight: .black)
     
+    // 21pt
+    static var ico21   = Font.dynamic(size: 21, weight: .regular)
+    static var ico21L  = Font.dynamic(size: 21, weight: .light)
+    static var ico21M  = Font.dynamic(size: 21, weight: .medium)
+    static var ico21Sb = Font.dynamic(size: 21, weight: .semibold)
+    static var ico21B  = Font.dynamic(size: 21, weight: .bold)
+    static var ico21H  = Font.dynamic(size: 21, weight: .heavy)
+    static var ico21Bl = Font.dynamic(size: 21, weight: .black)
+    
     // 24pt
     static var ico24   = Font.dynamic(size: 24, weight: .regular)
     static var ico24L  = Font.dynamic(size: 24, weight: .light)

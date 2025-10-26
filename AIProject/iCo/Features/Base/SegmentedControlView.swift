@@ -36,7 +36,7 @@ struct SegmentedControlView: View {
                     }
                 } label: {
                     Text(tabTitles[idx])
-                        .font(.system(size: 15, weight: selection == idx ? .bold : .regular))
+                        .font(selection == idx ? .ico15B : .ico15)
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)

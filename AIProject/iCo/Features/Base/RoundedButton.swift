@@ -23,13 +23,13 @@ struct RoundedButton: View {
             HStack(spacing: 4) {
                 if let title {
                     Text(title)
-                        .font(.system(size: 12, weight: .regular))
+                        .font(.ico12)
                         .tint(foregroundColor ?? .iCoLabel)
                 }
                 
                 if let imageName {
                     Image(systemName: imageName)
-                        .font(.system(size: 10))
+                        .font(.ico10)
                         .tint(foregroundColor ?? .iCoLabel)
                         
                 }

@@ -24,7 +24,7 @@ struct TimestampWithRefreshButtonView: View {
             Spacer()
             
             Text("\(formattedTime) 기준")
-                .font(.system(size: 11))
+                .font(.ico11)
                 .foregroundStyle(.iCoLabelSecondary)
                 .contentTransition(.numericText(countsDown: true))
             

@@ -38,7 +38,7 @@ struct RoundedRectangleButton: View {
                 }
                 
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.ico14Sb)
                     .foregroundStyle(isActive ? .iCoAccent : .iCoLabel)
             }
             .padding(.horizontal, 14)
