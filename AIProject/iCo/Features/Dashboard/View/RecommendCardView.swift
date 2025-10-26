@@ -30,12 +30,12 @@ struct RecommendCardView: View {
 
                 HStack(spacing: 10) {
                     Text(recommendCoin.name)
-                        .font(.system(size: 17))
+                        .font(.ico17)
                         .bold()
                         .foregroundStyle(.iCoLabel)
 
                     Text(recommendCoin.id)
-                        .font(.system(size: 12))
+                        .font(.ico12)
                         .fontWeight(.semibold)
                         .foregroundStyle(.iCoLabelSecondary)
                 }
@@ -43,11 +43,11 @@ struct RecommendCardView: View {
 
                 HStack(spacing: 4) {
                     Text("현재가")
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .foregroundStyle(.iCoLabel)
 
                     Text(recommendCoin.tradePrice.formatKRW)
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .bold()
                         .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                 }
@@ -55,14 +55,14 @@ struct RecommendCardView: View {
 
                 HStack(spacing: 4) {
                     Text("전일대비")
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .foregroundStyle(.iCoLabel)
 
                     HStack(spacing: 0) {
                         Group {
                             Text("\(recommendCoin.changeType.code)\(recommendCoin.changeRate.formatRate)")
                         }
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .bold()
                         .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                     }
@@ -73,7 +73,7 @@ struct RecommendCardView: View {
 
             VStack {
                 Text(recommendCoin.comment.byCharWrapping)
-                    .font(.system(size: 14))
+                    .font(.ico14)
                     .lineSpacing(6)
                     .foregroundStyle(.iCoLabel)
             }
@@ -107,6 +107,7 @@ struct RecommendCardView: View {
             changeType: .rise
         )
     )
+    .environmentObject(ThemeManager())
 }
 
 
