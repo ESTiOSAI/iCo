@@ -3,17 +3,17 @@ import AsyncAlgorithms
 
 public final class WebSocketClient: NSObject {
     /// 소켓 상태 채널
-    public var stateChannel: AsyncChannel<WebSocket.State>
+    private var stateStream: AsyncStream<WebSocket.State>
     
     /// 메세지 채널
     public var incomingChannel: AsyncChannel<URLSessionWebSocketTask.Message>
+    public var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> = .init()
     
     private let url: URL
     private let session: URLSession
     private var task: URLSessionWebSocketTask?
     
     private var stateTask: Task<Void, Error>?
-    private var incomingTask: Task<Void, Error>?
     private var receiveTask: Task<Void, Error>?
     
     /// 핑 전송 task
@@ -25,18 +25,17 @@ public final class WebSocketClient: NSObject {
         self.url = url
         self.session = session
         
-        stateChannel = AsyncChannel<WebSocket.State>()
+        stateStream = stateBroadCaster.stream()
         incomingChannel = AsyncChannel<URLSessionWebSocketTask.Message>()
         
         super.init()
-        
-        configureTask()
+        observeState()
     }
     
     /// 채널을 새로 개설하고 소켓을 엽니다.
     /// 핑을 보내는 이유는 연결된 상태를 확정적으로 기다리기 위해서입니다.
     public func connect() async {
-        //await stateChannel.send(.connecting)
+        await stateBroadCaster.send(.connecting)
         self.task = session.webSocketTask(with: url)
         task?.delegate = self
         task?.resume()
@@ -45,8 +44,12 @@ public final class WebSocketClient: NSObject {
         do {
             try await performWithTimeout(sendPing, at: pingTimeout)
         } catch {
-            await stateChannel.send(.reconnecting(nextAttempsIn: .seconds(2)))
+            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
         }
+    }
+    
+    public func disconnect() async {
+        task?.cancel(with: .normalClosure, reason: nil)
     }
 
     public func send(text: String) async throws {
@@ -61,7 +64,7 @@ public final class WebSocketClient: NSObject {
         debugPrint(String(describing: Self.self), #function)
         task?.cancel()
         task = nil
-        stateChannel.finish()
+        stateBroadCaster.finish()
         incomingChannel.finish()
     }
 }
@@ -69,7 +72,7 @@ public final class WebSocketClient: NSObject {
 // MARK: - Test용 메소드
 extension WebSocketClient {
     public func sendState(with state: WebSocket.State) async {
-        await stateChannel.send(state)
+        await stateBroadCaster.send(state)
     }
     
     public func cancel(with code: URLSessionWebSocketTask.CloseCode) {
@@ -101,33 +104,29 @@ extension WebSocketClient {
         }
     }
     
-    private func configureTask() {
+    private func observeState() {
         stateTask = Task {
-            for await state in stateChannel {
+            for await state in stateStream {
                 switch state {
                 case .connecting:
-                    print("Connecting")
+                    debugPrint("Connecting")
                     continue
                 case .connected:
-                    print("Connected")
+                    debugPrint("Connected")
                     receive()
                     checkingAlive()
                 case .failed, .closed:
+                    debugPrint("Closed")
                     release()
                 case .reconnecting:
-                    print("Reconnecting")
+                    debugPrint("Reconnecting")
                     await reconnect()
                 }
             }
         }
-        
-        incomingTask = Task {
-            for await value in incomingChannel {
-                print(value)
-            }
-        }
     }
     
+    // FIXME: 개선이 필요한지 한 번 더 생각해보기
     private func receive() {
         receiveTask?.cancel()
         
@@ -155,33 +154,32 @@ extension WebSocketClient {
             } catch is CancellationError {
                 debugPrint("작업이 취소되었습니다.")
             } catch {
-                // TODO: 정말 필요한 코드일까?
-                await stateChannel.send(.reconnecting(nextAttempsIn: .seconds(2)))
+                await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
             }
         }
     }
     
     private func handleDisconnected(_ userClose: Bool) async {
         if userClose {
-            await stateChannel.send(.closed)
+            await stateBroadCaster.send(.closed)
         } else {
-            await stateChannel.send(.reconnecting(nextAttempsIn: .seconds(2)))
+            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
         }
     }
     
     private func reconnect() async {
+        guard task?.state != .running else {
+            return
+        }
+        
         await connect()
     }
     
     private func release() {
-        stateTask?.cancel()
-        stateTask = nil
         receiveTask?.cancel()
         receiveTask = nil
         healthCheck?.cancel()
         healthCheck = nil
-        incomingTask?.cancel()
-        incomingTask = nil
         
         if task?.state == .running {
             task?.cancel(with: .goingAway, reason: nil)
@@ -194,25 +192,20 @@ extension WebSocketClient {
 // MARK: 웹 소켓 Delegate로 소켓 응답 및 종료 event를 받아 처리합니다.
 extension WebSocketClient: URLSessionWebSocketDelegate {
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
-        debugPrint("didOpen")
-        
-        Task { await stateChannel.send(.connected) }
+        Task { await stateBroadCaster.send(.connected) }
     }
     
     // 웹소켓으로부터 Close Code를 받았을 때. (정상 종료로 닫혔을 때)
     public func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
-        debugPrint("didClose")
-        
         Task { await handleDisconnected(closeCode == .normalClosure) }
     }
     
     // 세션 레벨에서 작업이 완전히 종료됐을 때.
     // 1. 네트워크 닫힘, 2. 에러로 종료, 3. 정상적으로 완료
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-        debugPrint("didCompleteWithError")
-        
-        if let error {
-            Task { await stateChannel.send(.reconnecting(nextAttempsIn: .seconds(2))) }
+        if let _ = error {
+            Task { await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2))) }
         }
     }
 }
+
