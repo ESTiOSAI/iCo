@@ -113,6 +113,8 @@ class MarketStore {
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService
+        
+        Task { await observeState() }
     }
 }
 
@@ -275,14 +277,6 @@ extension MarketStore {
         
         // service 연결
         await tickerService.connect()
-        if !subscriptionSnapshot.isEmpty {
-            await sendTicket(subscriptionSnapshot)
-        }
-        
-        // 시세가
-        self.tickerStreamTask = Task {
-            await consume()
-        }
     }
     
     /// 서비스 연결 해제
@@ -306,7 +300,6 @@ extension MarketStore {
     private func ticketStream() async {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
-            .removeDuplicates()
             .debounce(for: .milliseconds(300))
         for await visibleCoin in stream {
             self.subscriptionSnapshot = visibleCoin
@@ -326,7 +319,22 @@ extension MarketStore {
         store.apply(ticker)
     }
     
-    
+    private func observeState() async {
+        for await state in tickerService.subscribeStateStream() {
+            // TODO: 여러 번 호출되는 이유 찾기
+            print(#function, state)
+            if case .connected = state {
+                if !subscriptionSnapshot.isEmpty {
+                    await sendTicket(subscriptionSnapshot)
+                }
+                
+                // 시세가
+                self.tickerStreamTask = Task {
+                    await consume()
+                }
+            }
+        }
+    }
 }
 
 extension MarketStore {

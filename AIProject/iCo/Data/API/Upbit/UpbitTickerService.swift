@@ -9,12 +9,12 @@ import Foundation
 
 /// 업비트 실시간 코인 시세 웹소켓 서비스
 final class UpbitTickerService: RealTimeTickerProvider {
-    private let client: BaseWebSocketClient
+    private let client: WebSocketClient
     
     /// 소켓 상태 stream
     private var stateStreamTask: Task<Void, Never>?
     
-    init(client: BaseWebSocketClient = BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)) {
+    init(client: WebSocketClient = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)) {
         self.client = client
     }
     
@@ -23,7 +23,7 @@ final class UpbitTickerService: RealTimeTickerProvider {
     }
     
     func disconnect() async {
-        await client.close()
+        await client.disconnect()
     }
     
     /// 업비트의 코인 시세 stream을 가져와 디코딩하여 Model로 만들고 forwarding
@@ -32,19 +32,23 @@ final class UpbitTickerService: RealTimeTickerProvider {
         AsyncStream<TickerValue> { continuation in
             Task {
                 for await message in client.incomingChannel {
-
                     switch message {
-                    case .success(let data):
+                    case .data(let data):
                         if let ticker = mapTicker(data) {
                             continuation.yield(ticker)
                         }
-                    case .failure(let error):
-                        debugPrint(error)
+                    case .string(let string):
+                        print(string)
                     }
                 }
+                
                 continuation.finish()
             }
         }
+    }
+    
+    func subscribeStateStream() -> AsyncStream<WebSocket.State> {
+        client.stateBroadCaster.stream()
     }
     
     /// 티켓과 코인 ID를 가지고 업비트에 코인 시세를 구독합니다.
@@ -56,7 +60,7 @@ final class UpbitTickerService: RealTimeTickerProvider {
         
         do {
             let ticketData = try JSONEncoder().encode(SubscribeRequest.ticker(ticket: ticket, codes: coins))
-            try await client.send(ticketData)
+            try await client.send(data: ticketData)
         } catch {
             debugPrint(error)
         }
@@ -76,3 +80,4 @@ final class UpbitTickerService: RealTimeTickerProvider {
         }
     }
 }
+
