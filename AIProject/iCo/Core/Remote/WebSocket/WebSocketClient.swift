@@ -141,7 +141,7 @@ extension WebSocketClient {
                 await incomingChannel.send(message)
                 receive()
             } catch {
-                print("Receive Error!!!!!")
+                print("종료되어 더 이상 웹소켓 데이터를 받지 않습니다.")
             }
         }
     }
@@ -179,6 +179,7 @@ extension WebSocketClient {
             return
         }
         
+        try? await Task.sleep(for: .seconds(2))
         await connect()
     }
     

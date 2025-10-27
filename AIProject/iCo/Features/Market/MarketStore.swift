@@ -322,7 +322,6 @@ extension MarketStore {
     private func observeState() async {
         for await state in tickerService.subscribeStateStream() {
             // TODO: 여러 번 호출되는 이유 찾기
-            print(#function, state)
             if case .connected = state {
                 if !subscriptionSnapshot.isEmpty {
                     await sendTicket(subscriptionSnapshot)
