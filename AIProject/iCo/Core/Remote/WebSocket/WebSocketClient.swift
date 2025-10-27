@@ -40,11 +40,7 @@ public final class WebSocketClient: NSObject {
         task?.resume()
         
         // 핑 응답은 연결 후에 오기 때문에 connected 시점을 캐치할 수 있음
-        do {
-            try await performWithTimeout(sendPing, at: pingTimeout)
-        } catch {
-            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
-        }
+        try? await performWithTimeout(sendPing, at: pingTimeout)
     }
     
     /// 명시적으로 현재 WebSocket 연결을 정상적으로 종료합니다.
