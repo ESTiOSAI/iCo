@@ -70,7 +70,6 @@ public final class WebSocketClient: NSObject {
         task = nil
         stateBroadCaster.finish()
         incomingChannel.finish()
-        stateBroadCaster.finish()
     }
 }
 
