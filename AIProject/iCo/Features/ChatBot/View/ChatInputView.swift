@@ -17,7 +17,7 @@ struct ChatInputView: View {
         HStack {
             TextField("무엇이든 물어보세요.", text: $viewModel.searchText, axis: .vertical)
                 .lineLimit(1...3)
-                .font(.system(size: 14))
+                .font(.ico14)
                 .foregroundStyle(.iCoLabel)
                 .focused($isFocused)
 
@@ -25,6 +25,8 @@ struct ChatInputView: View {
                 Task { await viewModel.sendMessage(message: viewModel.searchText) }
             } label: {
                 Image(systemName: viewModel.isStreaming ? "square.fill" : "arrow.up")
+                    .resizable()
+                    .frame(width: 16, height: 16)
                     .foregroundStyle(viewModel.isEditable && !viewModel.isStreaming ? .iCoAccent : .iCoNeutral)
                     .padding(10)
             }
