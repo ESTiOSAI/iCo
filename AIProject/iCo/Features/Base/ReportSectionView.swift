@@ -69,11 +69,11 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             // Header
             HStack {
                 Image(systemName: data.icon)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.ico14B)
                     .foregroundStyle(.iCoAccent)
                 
                 Text(data.title)
-                    .font(.system(size: 16, weight: .bold))
+                    .font(.ico16B)
                     .foregroundStyle(.iCoLabel)
                 
                 Spacer()
@@ -92,7 +92,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                     }
                 case .success(let value):
                     content(value)
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .foregroundStyle(.iCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
@@ -151,7 +151,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 trailing: { value in
                     Button(action: { UIPasteboard.general.string = value }) {
                         Image(systemName: "doc.on.doc")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.ico14Sb)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("내용 복사")
@@ -175,7 +175,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 trailing: { value in
                     Button(action: { UIPasteboard.general.string = value }) {
                         Image(systemName: "doc.on.doc")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.ico14Sb)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("내용 복사")
@@ -218,7 +218,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             trailing: { value in
                 Button(action: { UIPasteboard.general.string = value }) {
                     Image(systemName: "doc.on.doc")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.ico14Sb)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("내용 복사")

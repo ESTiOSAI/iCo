@@ -31,7 +31,7 @@ struct AIBriefingView: View {
         
         VStack(alignment: .leading, spacing: 20) {
             Text(String.aiGeneratedContentNotice)
-                .font(.system(size: 11))
+                .font(.ico11)
                 .foregroundStyle(.iCoNeutral)
                 .lineSpacing(5)
             
@@ -66,7 +66,7 @@ struct AIBriefingView: View {
                 data: data,
                 trailing: {
                     Text($0.sentiment.rawValue)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.ico16B)
                         .foregroundStyle($0.sentiment.color(for: themeManager.selectedTheme))
                 },
                 content: { Text($0.summary.byCharWrapping) }

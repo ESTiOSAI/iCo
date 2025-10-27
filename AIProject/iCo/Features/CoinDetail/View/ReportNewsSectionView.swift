@@ -29,14 +29,14 @@ struct ReportNewsSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(title)
-                .font(.system(size: 13, weight: .bold))
+                .font(.ico13B)
                 .foregroundStyle(.iCoAccent)
             
             ForEach(displayedArticles, id: \.id) { article in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(article.title.byCharWrapping)
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.ico15B)
                             .foregroundStyle(.iCoLabel)
                             .lineLimit(1)
                         
@@ -50,7 +50,7 @@ struct ReportNewsSectionView: View {
                     }
                     
                     Text(article.summary.byCharWrapping)
-                        .font(.system(size: 14))
+                        .font(.ico14)
                         .foregroundStyle(.iCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
