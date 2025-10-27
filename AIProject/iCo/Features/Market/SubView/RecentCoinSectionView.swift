@@ -18,7 +18,7 @@ struct RecentCoinSectionView: View {
                 ForEach(coins) { coin in
                     HStack(spacing: 8) {
                         Text(coin.koreanName)
-                            .font(.system(size: 14))
+                            .font(.ico14)
 
                         Button {
                             deleteAction(coin)
