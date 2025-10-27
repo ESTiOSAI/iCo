@@ -20,11 +20,11 @@ struct FearGreedView: View {
         HStack(alignment: .center, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("공포 & 탐욕 지수")
-                    .font(.system(size: 19, weight: .bold))
+                    .font(.ico19B)
                     .foregroundStyle(.iCoLabel)
                 
                 Text("ⓘ Fear & Greed 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
-                    .font(.system(size: 11))
+                    .font(.ico11)
                     .foregroundStyle(.iCoLabelSecondary)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -83,12 +83,12 @@ extension FearGreedView {
                     
                     VStack(spacing: size.height * 0.15) {
                         Text("\(Int(viewModel.indexValue))")
-                            .font(.system(size: size.width * 0.3, weight: .bold))
+                            .font(.dynamic(size: size.width * 0.3, weight: .bold))
                             .foregroundColor(.iCoLabel)
                             .minimumScaleFactor(0.5)
                         
                         Text(viewModel.classification)
-                            .font(.system(size: size.width * 0.15, weight: .semibold))
+                            .font(.dynamic(size: size.width * 0.15, weight: .semibold))
                             .foregroundStyle(viewModel.fearGreed.color)
                             .padding(.top, size.height * 0.01)
                             .frame(maxWidth: size.width * 0.6)
