@@ -12,12 +12,14 @@ import SwiftUI
 /// 컨텐츠 뷰에 코인 추천 상태별로 알맞은 뷰를 뿌려줍니다.
 struct RecommendCoinView: View {
     @StateObject private var viewModel = RecommendCoinViewModel()
+    
+    let headerHeight: CGFloat
 
     var body: some View {
         ZStack(alignment: .top) {
             VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
                 RecommendHeaderView()
-                    .frame(height: CardConst.headerHeight)
+                    .frame(height: headerHeight)
                 
                 recommendContentView()
                     .frame(minHeight: CardConst.cardHeight)
@@ -70,7 +72,7 @@ struct RecommendCoinView: View {
 }
 
 #Preview {
-    RecommendCoinView()
+    RecommendCoinView(headerHeight: 140)
         .environmentObject(RecommendCoinViewModel())
 }
 

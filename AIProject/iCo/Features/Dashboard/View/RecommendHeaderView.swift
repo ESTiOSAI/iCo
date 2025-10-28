@@ -24,7 +24,7 @@ struct RecommendHeaderView: View {
 }
 
 #Preview() {
-    RecommendCoinView()
+    RecommendCoinView(headerHeight: 140)
         .environmentObject(RecommendCoinViewModel())
         .environmentObject(ThemeManager())
         .background(.black.opacity(0.2))
