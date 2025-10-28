@@ -112,12 +112,6 @@ struct DashboardView: View {
     }
 }
 
-#Preview {
-    DashboardView()
-        .environmentObject(ThemeManager())
-        .environmentObject(RecommendCoinViewModel())
-}
-
 /// scrollOffset을 구하기 위한 PreferenceKey
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat { .zero }
@@ -125,4 +119,10 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value += nextValue()
     }
+}
+
+#Preview {
+    DashboardView()
+        .environmentObject(ThemeManager())
+        .environmentObject(RecommendCoinViewModel())
 }

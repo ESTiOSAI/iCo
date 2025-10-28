@@ -19,14 +19,13 @@ struct RecommendHeaderView: View {
                 imageColor: .white,
                 fontColor: .white
             )
-            
-            Spacer()
         }
-        .frame(height: CardConst.headerHeight)
     }
 }
 
 #Preview() {
     RecommendCoinView()
         .environmentObject(RecommendCoinViewModel())
+        .environmentObject(ThemeManager())
+        .background(.black.opacity(0.2))
 }

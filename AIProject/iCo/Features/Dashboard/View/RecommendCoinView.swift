@@ -17,6 +17,7 @@ struct RecommendCoinView: View {
         ZStack(alignment: .top) {
             VStack(alignment: .center, spacing: CardConst.headerContentSpacing) {
                 RecommendHeaderView()
+                    .frame(height: CardConst.headerHeight)
                 
                 recommendContentView()
                     .frame(minHeight: CardConst.cardHeight)
