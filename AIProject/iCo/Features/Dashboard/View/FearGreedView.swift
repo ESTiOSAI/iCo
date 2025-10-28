@@ -13,27 +13,51 @@ import SwiftUI
 struct FearGreedView: View {
     @Environment(\.colorScheme) private var colorScheme
     @StateObject private var viewModel: FearGreedViewModel = FearGreedViewModel()
+    @State private var showFearGreedDescription: Bool = false
     
     private static let cornerRadius: CGFloat = 20
     
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("공포 & 탐욕 지수")
-                    .font(.ico19B)
+        VStack {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Group {
+                        Text("지금 시장은")
+                        
+                        HStack(spacing: 4) {
+                            Text(viewModel.classification)
+                                .foregroundStyle(viewModel.fearGreed.color)
+                            
+                            Text("상태에요")
+                        }
+                    }
+                    .font(.ico16B)
                     .foregroundStyle(.iCoLabel)
-                
-                Text("ⓘ Fear & Greed 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
-                    .font(.ico11)
-                    .foregroundStyle(.iCoLabelSecondary)
-                    .lineSpacing(3)
+                    
+                    RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
+                        showFearGreedDescription.toggle()
+                    }
                     .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, .spacingXSmall)
+                    .offset(x: -4)
+                }
+                
+                Spacer()
+                
+                ChartView(viewModel: viewModel)
+                    .frame(width: 90, height: 90)
             }
             
-            Spacer()
-            
-            ChartView(viewModel: viewModel)
-                .frame(width: 90, height: 90)
+            if showFearGreedDescription {
+                Text("공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
+                    .font(.ico11)
+                    .foregroundStyle(.iCoLabel)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 8)
+                    .opacity(!showFearGreedDescription ? 0 : 1)
+                    .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
+            }
         }
         .padding(.horizontal, 22)
         .padding(.vertical, 20)
@@ -43,6 +67,7 @@ struct FearGreedView: View {
             RoundedRectangle(cornerRadius: Self.cornerRadius)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
+        .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
     }
 }
 
@@ -104,4 +129,7 @@ extension FearGreedView {
 
 #Preview {
     FearGreedView()
+        .environmentObject(ThemeManager())
+    
+    Spacer()
 }

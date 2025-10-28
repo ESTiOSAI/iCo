@@ -26,10 +26,12 @@ struct AIBriefingView: View {
     }
     
     var body: some View {
-        SubheaderView(subheading: "새로운 소식들이 있어요")
+        SubheaderView(subheading: "시장 한눈에 보기")
             .padding(.bottom, 4)
         
         VStack(alignment: .leading, spacing: 20) {
+            FearGreedView()
+            
             Text(String.aiGeneratedContentNotice)
                 .font(.ico11)
                 .foregroundStyle(.iCoNeutral)
@@ -51,8 +53,6 @@ struct AIBriefingView: View {
                         maxHeight = value
                     }
                 }
-                
-                FearGreedView()
             }
         }
         .padding(.horizontal, 16)
