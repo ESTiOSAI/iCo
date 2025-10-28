@@ -19,24 +19,19 @@ final class WebSocketTest: XCTestCase {
     }
 
     func testExample() async throws {
-        let sut = WebSocketClient(url: URL(string: "wss://echo.websocket.org")!)
-        
+        let sut = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
         await sut.connect()
-        
-        try await sut.send(text: "hi")
+        try await sut.send(text: "[{ticket:test},{type:ticker,codes:[KRW-BTC]}]")
     }
     
     func testReconnenctWhenAbnormalClose() async throws {
-        let sut = WebSocketClient(url: URL(string: "wss://echo.websocket.org")!)
+        let sut = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
         
         await sut.connect()
         
         try await Task.sleep(for: .seconds(2))
-        
         sut.cancel(with: .abnormalClosure)
-        
         try await Task.sleep(for: .seconds(2))
-        
         // connecting -> connected -> abnormal close -> handleDisconnect -> reconnect
         //  .... -> abnormal close -> didCompletWithError -> reconnect
     }
@@ -57,13 +52,13 @@ final class WebSocketTest: XCTestCase {
     }
     
     func testUserClose() async throws {
-        let sut = WebSocketClient(url: URL(string: "wss://echo.websocket.org")!)
-        
+        let sut = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
         await sut.connect()
-        
         try await Task.sleep(for: .seconds(2))
-        sut.cancel()
+        await sut.disconnect()
         try await Task.sleep(for: .seconds(2))
+        await sut.connect()
+        try await Task.sleep(for: .seconds(10))
     }
 
     func testPerformanceExample() throws {
