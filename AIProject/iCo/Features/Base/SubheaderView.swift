@@ -40,6 +40,7 @@ struct SubheaderView: View {
                     .font(.ico15)
                     .foregroundStyle(fontColor)
                     .lineSpacing(6)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
