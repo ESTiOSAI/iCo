@@ -22,15 +22,15 @@ enum FearGreed: String {
     var color: Color {
         switch self {
         case .extremeFear:
-            return .red
+            return .iCoNegative
         case .fear:
-            return .orange
+            return .iCoNegative2
         case .neutral:
-            return .yellow
+            return .iCoNeutral2
         case .greed:
-            return .green
+            return .iCoPositive2
         case .extremeGreed:
-            return .mint
+            return .iCoPositive
         }
     }
     
