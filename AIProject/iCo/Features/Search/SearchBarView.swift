@@ -11,27 +11,28 @@ struct SearchBarView: View {
     @Binding var searchText: String
     @FocusState private var isFocused: Bool
     @State private var showCancel: Bool = false
-
+    
     var body: some View {
         HStack(spacing: 0) {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.iCoLabel)
-
+                
                 TextField("코인 이름으로 검색하세요", text: $searchText)
                     .keyboardType(.webSearch)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
                     .padding(.horizontal, 8)
                     .submitLabel(.search)
-                    .font(.system(size: 14))
+                    .font(.ico14)
                     .focused($isFocused)
                     .onChange(of: isFocused) {
                         showCancel = isFocused
                     }
-
+                
                 if !searchText.isEmpty {
                     CircleDeleteButton(fontSize: 9) {
+                        print("Tapped")
                         searchText = ""
                     }
                 }
@@ -48,19 +49,25 @@ struct SearchBarView: View {
             }
             
             Button {
-                    isFocused = false
-                    searchText = ""
+                isFocused = false
+                searchText = ""
             } label: {
                 Text("취소")
                     .foregroundStyle(.iCoNegative)
-                    .font(.system(size: 13))
+                    .font(.ico13)
             }
             .opacity(showCancel ? 1 : 0)
             .frame(width: showCancel ? 40 : 0, alignment: .trailing)
-            .animation(nil, value: showCancel)
         }
         .onTapGesture {
             isFocused = true
         }
     }
+}
+
+#Preview(traits: .sizeThatFitsLayout) {
+    @Previewable @State var searchText: String = "key"
+    SearchBarView(searchText: $searchText)
+        .padding()
+        .frame(width:.infinity, height: 100)
 }
