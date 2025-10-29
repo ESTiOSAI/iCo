@@ -141,15 +141,15 @@ extension InsightViewModel {
 extension InsightViewModel {
     var sectionDataSource: [ReportSectionData<Insight>] {
         [
-            ReportSectionData(
-                id: "overall",
-                icon: "bitcoinsign.bank.building",
-                title: "전반적인 시장의 분위기",
-                state: overall,
-                timestamp: Date.dateAndTimeFormatter.date(from: cacheBriefTodayTimestamp),
-                onCancel: { [weak self] in self?.cancelOverall() },
-                onRetry: { [weak self] in self?.retryOverall() }
-            ),
+//            ReportSectionData(
+//                id: "overall",
+//                icon: "bitcoinsign.bank.building",
+//                title: "전반적인 시장의 분위기",
+//                state: overall,
+//                timestamp: Date.dateAndTimeFormatter.date(from: cacheBriefTodayTimestamp),
+//                onCancel: { [weak self] in self?.cancelOverall() },
+//                onRetry: { [weak self] in self?.retryOverall() }
+//            ),
             ReportSectionData(
                 id: "community",
                 icon: "shareplay",

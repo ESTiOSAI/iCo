@@ -32,11 +32,6 @@ struct AIBriefingView: View {
         VStack(alignment: .leading, spacing: 20) {
             FearGreedView()
             
-            Text(String.aiGeneratedContentNotice)
-                .font(.ico11)
-                .foregroundStyle(.iCoNeutral)
-                .lineSpacing(5)
-            
             VStack(spacing: 16) {
                 if isPadLayout {
                     HStack(spacing: 16) {

@@ -91,6 +91,11 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                         data.onCancel()
                     }
                 case .success(let value):
+                    Text(String.aiGeneratedContentNotice)
+                        .font(.ico11)
+                        .foregroundStyle(.iCoNeutral)
+                        .lineSpacing(5)
+                    
                     content(value)
                         .font(.ico14)
                         .foregroundStyle(.iCoLabel)
