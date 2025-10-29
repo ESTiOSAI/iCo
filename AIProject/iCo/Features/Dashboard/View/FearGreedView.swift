@@ -13,6 +13,7 @@ import SwiftUI
 struct FearGreedView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dynamicTypeSize) var typeSize
+    @Environment(\.horizontalSizeClass) var hSizeClass
     
     @StateObject private var viewModel: FearGreedViewModel = FearGreedViewModel()
     @State private var showFearGreedDescription: Bool = false
@@ -35,24 +36,17 @@ struct FearGreedView: View {
         VStack {
             HStack(alignment: .center, spacing: 0) {
                 headerSection
-                    .frame(maxWidth: .infinity)
                 
                 Spacer()
                 
                 chartSection
                     .fixedSize(horizontal: true, vertical: false)
-                    .frame(maxWidth: .infinity)
             }
             
             if showFearGreedDescription {
-                Text("공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
-                    .font(.ico11)
-                    .padding(.top, 4)
-                    .foregroundStyle(.iCoLabel)
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                fearGreedDescription
                     .opacity(!showFearGreedDescription ? 0 : 1)
-                    .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
+                    .animation(.snappy(duration: 0.3), value: showFearGreedDescription)
             }
         }
         .padding(.horizontal, 22)
@@ -68,27 +62,50 @@ struct FearGreedView: View {
     
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Group {
-                Text("지금 시장은")
-                
+            if hSizeClass == .compact {
+                VStack(alignment: .leading, spacing: 4) {
+                    Group {
+                        Text("지금 시장은")
+                        
+                        HStack(spacing: 4) {
+                            Text(viewModel.classification)
+                                .foregroundStyle(viewModel.fearGreed.color)
+                            
+                            Text("상태에요")
+                            
+                            Spacer()
+                        }
+                    }
+                    .font(.ico16B)
+                    .foregroundStyle(.iCoLabel)
+                }
+            } else {
                 HStack(spacing: 4) {
-                    Text(viewModel.classification)
-                        .foregroundStyle(viewModel.fearGreed.color)
-                    
-                    Text("상태에요")
-                    
-                    Spacer()
+                    Group {
+                        Text("지금 시장은")
+                        
+                        Text(viewModel.classification)
+                            .foregroundStyle(viewModel.fearGreed.color)
+                        
+                        Text("상태에요")
+                        
+                        Spacer()
+                    }
+                    .font(.ico16B)
+                    .foregroundStyle(.iCoLabel)
                 }
             }
-            .font(.ico16B)
-            .foregroundStyle(.iCoLabel)
             
-            RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
-                showFearGreedDescription.toggle()
+            if hSizeClass == .compact {
+                RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
+                    showFearGreedDescription.toggle()
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .padding(.top, 8)
+                .offset(x: -4)
+            } else {
+                fearGreedDescription
             }
-            .fixedSize(horizontal: true, vertical: false)
-            .padding(.top, 8)
-            .offset(x: -4)
         }
     }
     
@@ -107,6 +124,15 @@ struct FearGreedView: View {
             .font(.ico10M)
             .foregroundStyle(.secondary)
         }
+    }
+    
+    var fearGreedDescription: some View {
+        Text("ⓘ 공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
+            .font(.ico11)
+            .padding(.top, 4)
+            .foregroundStyle(.iCoNeutral)
+            .lineSpacing(5)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
