@@ -66,7 +66,7 @@ struct FearGreedView: View {
                         Text("0")
                             .offset(y: 4)
 
-                        ChartView(viewModel: viewModel)
+                        ChartView(viewModel: viewModel, chartWidth: chartWidth)
                             .frame(width: chartWidth, height: chartWidth / 2)
                         
                         Text("100")
@@ -117,43 +117,45 @@ extension FearGreedView {
         private static let lineWidth: CGFloat = 13
         private static let rotationDegrees: Double = 180
         
-        init(viewModel: FearGreedViewModel) {
+        let chartWidth: CGFloat
+        let chartHeight: CGFloat
+        
+        init(viewModel: FearGreedViewModel, chartWidth: CGFloat) {
             self._viewModel = ObservedObject(wrappedValue: viewModel)
+            self.chartWidth = chartWidth
+            self.chartHeight = chartWidth / 2
         }
         
         var body: some View {
-            GeometryReader { geometry in
-                let size = geometry.size
+            ZStack {
+                Circle()
+                    .trim(from: 0.0, to: Self.gaugeTrim)
+                    .stroke(Color(uiColor: UIColor.systemBackground),
+                            style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
+                    .rotationEffect(.degrees(Self.rotationDegrees))
+                    .frame(height: chartHeight * 2)
+                    .shadow(color: .iCoLabel.opacity(0.1), radius: 10)
                 
-                ZStack {
-                    Circle()
-                        .trim(from: 0.0, to: Self.gaugeTrim)
-                        .stroke(Color(uiColor: UIColor.systemBackground),
-                                style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(Self.rotationDegrees))
-                        .frame(height: size.height * 2)
-                        .shadow(color: .iCoLabel.opacity(0.1), radius: 10)
-                    
-                    Circle()
-                        .trim(from: 0.0, to: Self.gaugeTrim * viewModel.indexValue / 100)
-                        .stroke(
-                            LinearGradient(
-                                colors: [FearGreed.extremeFear.color, FearGreed.neutral.color, FearGreed.extremeGreed.color],
-                                startPoint: .trailing,
-                                endPoint: .leading
-                            ),
-                            style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(Self.rotationDegrees))
-                    
-                    Text("\(Int(viewModel.indexValue))")
-                        .font(.dynamic(size: size.width * 0.3, weight: .bold))
-                        .foregroundColor(.iCoLabel)
-                        .minimumScaleFactor(0.5)
-                        .offset(y: -size.height * 0.15)
-                }
+                Circle()
+                    .trim(from: 0.0, to: Self.gaugeTrim * viewModel.indexValue / 100)
+                    .stroke(
+                        LinearGradient(
+                            colors: [FearGreed.extremeFear.color, FearGreed.neutral.color, FearGreed.extremeGreed.color],
+                            startPoint: .trailing,
+                            endPoint: .leading
+                        ),
+                        style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(Self.rotationDegrees))
+                    .frame(height: chartHeight * 2)
+                
+                Text("\(Int(viewModel.indexValue))")
+                    .font(.dynamic(size: chartWidth * 0.3, weight: .bold))
+                    .foregroundColor(.iCoLabel)
+                    .minimumScaleFactor(0.5)
+                    .offset(y: -chartHeight * 0.2)
             }
+            .offset(y: chartHeight / 2)
         }
     }
 }
