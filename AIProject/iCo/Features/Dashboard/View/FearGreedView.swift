@@ -19,7 +19,7 @@ struct FearGreedView: View {
     
     var body: some View {
         VStack {
-            HStack(alignment: .center, spacing: 16) {
+            HStack(alignment: .center, spacing: 0) {
                 VStack(alignment: .leading, spacing: 4) {
                     Group {
                         Text("지금 시장은")
@@ -29,6 +29,8 @@ struct FearGreedView: View {
                                 .foregroundStyle(viewModel.fearGreed.color)
                             
                             Text("상태에요")
+                            
+                            Spacer()
                         }
                     }
                     .font(.ico16B)
@@ -37,15 +39,30 @@ struct FearGreedView: View {
                     RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
                         showFearGreedDescription.toggle()
                     }
-                    .fixedSize(horizontal: false, vertical: true)
+                    .fixedSize(horizontal: true, vertical: false)
                     .padding(.top, .spacingXSmall)
                     .offset(x: -4)
                 }
+                .frame(maxWidth: .infinity)
                 
                 Spacer()
                 
-                ChartView(viewModel: viewModel)
-                    .frame(width: 90, height: 90)
+                HStack(alignment: .bottom, spacing: .spacingSmall) {
+                    Group {
+                        Text("0")
+                            .offset(y: 4)
+
+                        ChartView(viewModel: viewModel)
+                            .frame(width: 100, height: 50)
+
+                        Text("100")
+                            .offset(y: 6)
+                    }
+                    .font(.ico10M)
+                    .foregroundStyle(.secondary)
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(maxWidth: .infinity)
             }
             
             if showFearGreedDescription {
@@ -54,7 +71,6 @@ struct FearGreedView: View {
                     .foregroundStyle(.iCoLabel)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 8)
                     .opacity(!showFearGreedDescription ? 0 : 1)
                     .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
             }
@@ -83,9 +99,9 @@ extension FearGreedView {
     fileprivate struct ChartView: View {
         @ObservedObject private var viewModel: FearGreedViewModel
         
-        private static let gaugeTrim: CGFloat = 0.75
+        private static let gaugeTrim: CGFloat = 0.5
         private static let lineWidth: CGFloat = 13
-        private static let rotationDegrees: Double = 135
+        private static let rotationDegrees: Double = 180
         
         init(viewModel: FearGreedViewModel) {
             self._viewModel = ObservedObject(wrappedValue: viewModel)
@@ -98,29 +114,30 @@ extension FearGreedView {
                 ZStack {
                     Circle()
                         .trim(from: 0.0, to: Self.gaugeTrim)
-                        .stroke(Color.iCoBackground, style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
+                        .stroke(Color(uiColor: UIColor.systemBackground),
+                                style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
+                        )
                         .rotationEffect(.degrees(Self.rotationDegrees))
+                        .frame(height: size.height * 2)
+                        .shadow(color: .iCoLabel.opacity(0.1), radius: 10)
                     
                     Circle()
                         .trim(from: 0.0, to: Self.gaugeTrim * viewModel.indexValue / 100)
-                        .stroke(viewModel.fearGreed.color, style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
+                        .stroke(
+                            LinearGradient(
+                                colors: [FearGreed.extremeFear.color, FearGreed.neutral.color, FearGreed.extremeGreed.color],
+                                startPoint: .trailing,
+                                endPoint: .leading
+                            ),
+                            style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round)
+                        )
                         .rotationEffect(.degrees(Self.rotationDegrees))
                     
-                    VStack(spacing: size.height * 0.15) {
-                        Text("\(Int(viewModel.indexValue))")
-                            .font(.dynamic(size: size.width * 0.3, weight: .bold))
-                            .foregroundColor(.iCoLabel)
-                            .minimumScaleFactor(0.5)
-                        
-                        Text(viewModel.classification)
-                            .font(.dynamic(size: size.width * 0.15, weight: .semibold))
-                            .foregroundStyle(viewModel.fearGreed.color)
-                            .padding(.top, size.height * 0.01)
-                            .frame(maxWidth: size.width * 0.6)
-                            .multilineTextAlignment(.center)
-                            .minimumScaleFactor(0.5)
-                    }
-                    .offset(y: size.height * 0.15)
+                    Text("\(Int(viewModel.indexValue))")
+                        .font(.dynamic(size: size.width * 0.3, weight: .bold))
+                        .foregroundColor(.iCoLabel)
+                        .minimumScaleFactor(0.5)
+                        .offset(y: -size.height * 0.15)
                 }
             }
         }
@@ -130,6 +147,7 @@ extension FearGreedView {
 #Preview {
     FearGreedView()
         .environmentObject(ThemeManager())
+        .padding(16)
     
     Spacer()
 }
