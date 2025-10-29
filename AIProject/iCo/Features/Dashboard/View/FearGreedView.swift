@@ -19,7 +19,7 @@ struct FearGreedView: View {
     
     private static let cornerRadius: CGFloat = 20
     private var chartWidth: CGFloat {
-        let baseWidth: CGFloat = 100
+        let baseWidth: CGFloat = 110
         
         switch typeSize {
         case .xSmall, .small, .medium, .large:
@@ -54,7 +54,7 @@ struct FearGreedView: View {
                         showFearGreedDescription.toggle()
                     }
                     .fixedSize(horizontal: true, vertical: false)
-                    .padding(.top, .spacingXSmall)
+                    .padding(.top, 8)
                     .offset(x: -4)
                 }
                 .frame(maxWidth: .infinity)
@@ -82,6 +82,7 @@ struct FearGreedView: View {
             if showFearGreedDescription {
                 Text("공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
                     .font(.ico11)
+                    .padding(.top, 4)
                     .foregroundStyle(.iCoLabel)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -114,7 +115,7 @@ extension FearGreedView {
         @ObservedObject private var viewModel: FearGreedViewModel
         
         private static let gaugeTrim: CGFloat = 0.5
-        private static let lineWidth: CGFloat = 13
+        private static let lineWidth: CGFloat = 10
         private static let rotationDegrees: Double = 180
         
         let chartWidth: CGFloat
@@ -134,7 +135,7 @@ extension FearGreedView {
                             style: StrokeStyle(lineWidth: Self.lineWidth, lineCap: .round))
                     .rotationEffect(.degrees(Self.rotationDegrees))
                     .frame(height: chartHeight * 2)
-                    .shadow(color: .iCoLabel.opacity(0.1), radius: 10)
+                    .shadow(color: .black.opacity(0.15), radius: 5)
                 
                 Circle()
                     .trim(from: 0.0, to: Self.gaugeTrim * viewModel.indexValue / 100)
@@ -150,7 +151,7 @@ extension FearGreedView {
                     .frame(height: chartHeight * 2)
                 
                 Text("\(Int(viewModel.indexValue))")
-                    .font(.dynamic(size: chartWidth * 0.3, weight: .bold))
+                    .font(.ico24B)
                     .foregroundColor(.iCoLabel)
                     .minimumScaleFactor(0.5)
                     .offset(y: -chartHeight * 0.2)
