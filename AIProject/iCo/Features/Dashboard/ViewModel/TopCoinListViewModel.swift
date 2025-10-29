@@ -34,14 +34,31 @@ final class TopCoinListViewModel: ObservableObject {
             let tickers = try await api.fetchTicker(by: "KRW")
             self.tickers = tickers
             
-            let topMarkets = tickers
+            let topVolumeIDs = tickers
                 .sorted { $0.volume > $1.volume }
-                .prefix(10)
+                .prefix(5)
                 .map { $0.id }
             
-            for id in topMarkets {
-                let candles = try await api.fetchCandles(id: id, count: 10)
-                self.candles[id] = candles.map { $0.tradePrice }.reversed()
+            let topRateIDs = tickers
+                .sorted { $0.signedRate > $1.signedRate }
+                .prefix(5)
+                .map { $0.id }
+            
+            let targetIDs = Array(Set(topVolumeIDs + topRateIDs))
+            
+            await withTaskGroup(of: Void.self) { group in
+                for id in targetIDs {
+                    group.addTask {
+                        do {
+                            let candleData = try await self.api.fetchCandles(id: id, count: 10)
+                            await MainActor.run {
+                                self.candles[id] = candleData.map { $0.tradePrice }.reversed()
+                            }
+                        } catch {
+                            print("Candle fetch failed for \(id):", error)
+                        }
+                    }
+                }
             }
         } catch {
             print("Fetch Error:", error)
