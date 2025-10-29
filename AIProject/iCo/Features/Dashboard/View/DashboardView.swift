@@ -12,17 +12,25 @@ import SwiftUI
 /// 관심 코인 기반 추천, AI 브리핑으로 구성합니다.
 struct DashboardView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
+    @Environment(\.dynamicTypeSize) var typeSize
     
     @Namespace var coordinateSpaceName: Namespace.ID
     /// 스크롤의 위치를 저장하는 상태 변수
     @State var scrollOffset: CGFloat = 0
     /// 상단 여백을 저장하는 상태 변수: onAppear에서 실제 높이를 계산함
     @State var topInset: CGFloat = 0
+    @State var currentTypeSize: DynamicTypeSize = .medium
     
-    /// 배경색의 높이를 저장하는 계산 속성: 헤더의 높이 + 여백 + 카드의 높이 / 2 + 상단 여백
-    /// 배경이 카드의 중앙까지만 깔리게 해야 하는데 뷰가 여러 계층으로 나눠져있어서 각 컴포넌트의 높이를 계산해서 사용함
-    var gradientHeight: CGFloat {
-        CardConst.headerHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + topInset
+    /// 다이나믹 폰트 적용 후 헤더 컨텐츠 크기가 커질 때
+    /// 헤더 사이즈를 유동적으로 조정하기 위해 사용하는 계산 속성
+    /// 헤더뷰와 배경 그래디언트 크기에도 영향을 주기 때문에
+    /// 여기에서 계산 후 헤더뷰에게 전파
+    var dynamicHeaderHeight: CGFloat {
+        switch typeSize {
+        case .xSmall, .small, .medium: CardConst.headerHeight
+        case .large, .xLarge, .xxLarge, .xxxLarge: CardConst.headerHeight * 1.1
+        default: CardConst.headerHeight * 1.4
+        }
     }
     
     var body: some View {
@@ -30,11 +38,17 @@ struct DashboardView: View {
         /// 쫀득한 효과를 더 드라마틱하게 보여주기 위해 스크롤 위치의 1.2배만큼 늘리기
         let extraHeight = max(0, -scrollOffset * 1.2)
         
+        /// 배경색의 높이를 저장하는 계산 속성: 헤더의 높이 + 여백 + 카드의 높이 / 2 + 상단 여백
+        /// 배경이 카드의 중앙까지만 깔리게 해야 하는데 뷰가 여러 계층으로 나눠져있어서 각 컴포넌트의 높이를 계산해서 사용함
+        var gradientHeight: CGFloat {
+            dynamicHeaderHeight + CardConst.headerContentSpacing + (CardConst.cardHeight / 2) + topInset
+        }
+        
         GeometryReader { outerProxy in
             NavigationStack {
                 ScrollView {
                     VStack {
-                        RecommendCoinView()
+                        RecommendCoinView(headerHeight: dynamicHeaderHeight)
                         AIBriefingView()
                     }
                     .padding(.top, topInset)
@@ -112,12 +126,6 @@ struct DashboardView: View {
     }
 }
 
-#Preview {
-    DashboardView()
-        .environmentObject(ThemeManager())
-        .environmentObject(RecommendCoinViewModel())
-}
-
 /// scrollOffset을 구하기 위한 PreferenceKey
 private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat { .zero }
@@ -125,4 +133,10 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value += nextValue()
     }
+}
+
+#Preview {
+    DashboardView()
+        .environmentObject(ThemeManager())
+        .environmentObject(RecommendCoinViewModel())
 }

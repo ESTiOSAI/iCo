@@ -233,6 +233,6 @@ extension CoinCarouselView {
 }
 
 #Preview {
-    RecommendCoinView()
+    RecommendCoinView(headerHeight: 140)
         .environmentObject(RecommendCoinViewModel())
 }
