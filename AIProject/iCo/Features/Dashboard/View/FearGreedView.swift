@@ -34,49 +34,14 @@ struct FearGreedView: View {
     var body: some View {
         VStack {
             HStack(alignment: .center, spacing: 0) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Group {
-                        Text("지금 시장은")
-                        
-                        HStack(spacing: 4) {
-                            Text(viewModel.classification)
-                                .foregroundStyle(viewModel.fearGreed.color)
-                            
-                            Text("상태에요")
-                            
-                            Spacer()
-                        }
-                    }
-                    .font(.ico16B)
-                    .foregroundStyle(.iCoLabel)
-                    
-                    RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
-                        showFearGreedDescription.toggle()
-                    }
-                    .fixedSize(horizontal: true, vertical: false)
-                    .padding(.top, 8)
-                    .offset(x: -4)
-                }
-                .frame(maxWidth: .infinity)
+                headerSection
+                    .frame(maxWidth: .infinity)
                 
                 Spacer()
                 
-                HStack(alignment: .bottom, spacing: .spacingSmall) {
-                    Group {
-                        Text("0")
-                            .offset(y: 4)
-
-                        ChartView(viewModel: viewModel, chartWidth: chartWidth)
-                            .frame(width: chartWidth, height: chartWidth / 2)
-                        
-                        Text("100")
-                            .offset(y: 6)
-                    }
-                    .font(.ico10M)
-                    .foregroundStyle(.secondary)
-                }
-                .fixedSize(horizontal: true, vertical: false)
-                .frame(maxWidth: .infinity)
+                chartSection
+                    .fixedSize(horizontal: true, vertical: false)
+                    .frame(maxWidth: .infinity)
             }
             
             if showFearGreedDescription {
@@ -99,6 +64,49 @@ struct FearGreedView: View {
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
         .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
+    }
+    
+    var headerSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Group {
+                Text("지금 시장은")
+                
+                HStack(spacing: 4) {
+                    Text(viewModel.classification)
+                        .foregroundStyle(viewModel.fearGreed.color)
+                    
+                    Text("상태에요")
+                    
+                    Spacer()
+                }
+            }
+            .font(.ico16B)
+            .foregroundStyle(.iCoLabel)
+            
+            RoundedButton(title: "공포 탐욕 지수란?", imageName: "chevron.down", rotatingAnimation: true) {
+                showFearGreedDescription.toggle()
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .padding(.top, 8)
+            .offset(x: -4)
+        }
+    }
+    
+    var chartSection: some View {
+        HStack(alignment: .bottom, spacing: .spacingSmall) {
+            Group {
+                Text("0")
+                    .offset(y: 4)
+                
+                ChartView(viewModel: viewModel, chartWidth: chartWidth)
+                    .frame(width: chartWidth, height: chartWidth / 2)
+                
+                Text("100")
+                    .offset(y: 6)
+            }
+            .font(.ico10M)
+            .foregroundStyle(.secondary)
+        }
     }
 }
 
