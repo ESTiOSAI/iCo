@@ -12,10 +12,24 @@ import SwiftUI
 /// 왼쪽에는 지표 설명 텍스트를, 오른쪽에는 `ChartView`를 배치합니다.
 struct FearGreedView: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dynamicTypeSize) var typeSize
+    
     @StateObject private var viewModel: FearGreedViewModel = FearGreedViewModel()
     @State private var showFearGreedDescription: Bool = false
     
     private static let cornerRadius: CGFloat = 20
+    private var chartWidth: CGFloat {
+        let baseWidth: CGFloat = 100
+        
+        switch typeSize {
+        case .xSmall, .small, .medium, .large:
+            return baseWidth
+        case .xLarge, .xxLarge, .xxxLarge:
+            return baseWidth * 0.9
+        default:
+            return baseWidth * 0.7
+        }
+    }
     
     var body: some View {
         VStack {
@@ -53,8 +67,8 @@ struct FearGreedView: View {
                             .offset(y: 4)
 
                         ChartView(viewModel: viewModel)
-                            .frame(width: 100, height: 50)
-
+                            .frame(width: chartWidth, height: chartWidth / 2)
+                        
                         Text("100")
                             .offset(y: 6)
                     }
