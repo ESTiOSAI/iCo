@@ -1,0 +1,112 @@
+//
+//  TopCoinListView.swift
+//  iCo
+//
+//  Created by 백현진 on 10/28/25.
+//
+
+import SwiftUI
+
+struct TopCoinListView: View {
+    @StateObject private var viewModel = TopCoinListViewModel()
+    
+    var body: some View {
+        VStack(alignment: .leading ,spacing: 16) {
+            HStack {
+                Image(systemName: "bitcoinsign.bank.building")
+                    .foregroundStyle(.iCoAccent)
+                
+                Text("주목할 만한 코인 TOP5")
+            }
+            .font(.ico16B)
+            .padding(.horizontal, 22)
+            .padding(.top, 20)
+            
+            Picker("Segment", selection: $viewModel.selectedSegment) {
+                ForEach(TopCoinListViewModel.SegmentType.allCases) { segment in
+                    Text(segment.rawValue).tag(segment)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            
+            if viewModel.isLoading {
+                DefaultProgressView(status: .loading, message: "시세 불러오는중")
+            } else {
+                VStack {
+                    ForEach(Array(viewModel.topCoins.enumerated()), id: \.element.id) { index, coin in
+                        HStack {
+                            Text("\(index + 1)")
+                                .font(.ico14B)
+                                .foregroundColor(.iCoAccent)
+                                .padding(.trailing, 16)
+
+                            CachedAsyncImage(resource: .symbol(coin.coinSymbol)) {
+                                Text(String(coin.coinSymbol.prefix(1)))
+                                    .font(.ico15Sb)
+                                    .foregroundStyle(.iCoAccent)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .background(.iCoBackgroundAccent)
+                                    .overlay(
+                                        Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
+                                    )
+                            }
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                            .contentShape(Circle())
+                            .padding(.trailing, 8)
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(viewModel.koreanName(for: coin.id))
+                                    .font(.ico15)
+
+                                if viewModel.selectedSegment == .volume {
+                                    Text(coin.formatedVolume)
+                                        .font(.ico12)
+                                        .foregroundColor(.iCoLabelSecondary)
+                                } else {
+                                    Text(coin.formatedRate)
+                                        .font(.ico12)
+                                        .foregroundColor(
+                                            coin.change == .rise ? .iCoPositive :
+                                            (coin.change == .fall ? .iCoNegative : .iCoNeutral)
+                                        )
+                                }
+                            }
+
+                            Spacer()
+
+                            if let values = viewModel.candles[coin.id] {
+                                LineChartView(
+                                    values: values,
+                                    lineColor: coin.change == .fall ? .iCoNegative : .iCoPositive
+                                )
+                                .frame(width: 100, height: 40)
+                            } else {
+                                ProgressView()
+                                    .frame(width: 100, height: 40)
+                            }
+                        }
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 22)
+                    }
+                }
+                .background(.clear)
+            }
+        }
+        .background(.iCoBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .strokeBorder(.defaultGradient, lineWidth: 0.5)
+        )
+        .padding(.horizontal, 16)
+        .task {
+            await viewModel.fetchData()
+        }
+    }
+}
+
+#Preview {
+    TopCoinListView()
+}
