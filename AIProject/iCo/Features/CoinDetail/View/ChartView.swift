@@ -111,22 +111,22 @@ struct ChartView: View {
                 /// 기준 시간 / 현재가 / 등락가, 등락률 / 거래대금
                 VStack(alignment: .leading, spacing: 8) {
                     Text(lastUpdatedText)
-                        .font(.system(size: 10, weight: .regular))
+                        .font(.ico10)
                         .foregroundStyle(.iCoLabel)
                         .lineLimit(1)
                     
                     Text(viewModel.displayLastPrice.formatKRW)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.ico20B)
                         .foregroundStyle(.iCoLabel)
                         .lineLimit(1)
                     
                     Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.ico16M)
                         .foregroundStyle(headerColor)
                         .lineLimit(1)
                     
                     Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.ico12M)
                         .foregroundStyle(.iCoLabelSecondary)
                         .lineLimit(1)
                 }
