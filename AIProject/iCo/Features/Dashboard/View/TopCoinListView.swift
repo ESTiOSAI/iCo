@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TopCoinListView: View {
     @StateObject private var viewModel = TopCoinListViewModel()
+    @State private var selectedTab = 0
     
     var body: some View {
         VStack(alignment: .leading ,spacing: 16) {
@@ -21,13 +22,19 @@ struct TopCoinListView: View {
             .font(.ico16B)
             .padding(.horizontal, 22)
             .padding(.top, 20)
-            
-            Picker("Segment", selection: $viewModel.selectedSegment) {
-                ForEach(TopCoinListViewModel.SegmentType.allCases) { segment in
-                    Text(segment.rawValue).tag(segment)
-                }
-            }
-            .pickerStyle(.segmented)
+
+            SegmentedControlView(
+                selection: Binding(
+                    get: {
+                        viewModel.selectedSegment.index
+                    },
+                    set: { newIndex in
+                        viewModel.selectedSegment = TopCoinListViewModel.SegmentType.allCases[newIndex]
+                    }
+                ),
+                tabTitles: TopCoinListViewModel.SegmentType.allCases.map { $0.rawValue },
+                width: .infinity
+            )
             .padding(.horizontal)
             
             if viewModel.isLoading {

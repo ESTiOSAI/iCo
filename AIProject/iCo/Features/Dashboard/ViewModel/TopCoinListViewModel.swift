@@ -21,6 +21,10 @@ final class TopCoinListViewModel: ObservableObject {
         case volume = "거래대금 Top5"
         case rate = "상승률 Top5"
         var id: String { rawValue }
+        
+        var index: Int {
+            Self.allCases.firstIndex(of: self) ?? 0
+        }
     }
     
     func fetchData() async {
