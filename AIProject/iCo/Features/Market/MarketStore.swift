@@ -16,8 +16,7 @@ enum CoinFilter: Int, Equatable {
 /// 마켓 이벤트 처리를 담당
 /// 검색 / 시세 정보 / 웹소켓 상태 / 정렬 / 필터링 이벤트 처리
 @MainActor
-@Observable
-class MarketStore {
+final class MarketStore: ObservableObject {
     
     /// 최초 한 번만 로드하기 위한 flag
     private var hasLoaded = false
@@ -28,11 +27,12 @@ class MarketStore {
     private let coinService: UpBitAPIService
     private let tickerService: RealTimeTickerProvider
     private let searchRecordManager: SearchRecordManaging = SearchRecordManager()
+    private var stateTask: Task<Void, Never>?
     
     private(set) var errorMessage: String?
     
     /// 변동성이 적은 메타 정보
-    private(set) var coinMeta: [CoinID: Coin] = [:]
+    @Published private(set) var coinMeta: [CoinID: Coin] = [:]
     
     /// 변동성이 큰 시세 정보
     private var ticker: [CoinID: TickerStore] = [:]
@@ -113,6 +113,8 @@ class MarketStore {
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
         self.coinService = coinService
         self.tickerService = tickerService
+        
+        Task { await observeState() }
     }
 }
 
@@ -275,14 +277,6 @@ extension MarketStore {
         
         // service 연결
         await tickerService.connect()
-        if !subscriptionSnapshot.isEmpty {
-            await sendTicket(subscriptionSnapshot)
-        }
-        
-        // 시세가
-        self.tickerStreamTask = Task {
-            await consume()
-        }
     }
     
     /// 서비스 연결 해제
@@ -306,7 +300,6 @@ extension MarketStore {
     private func ticketStream() async {
         let stream = visibleCoinsChannel
             .filter { !$0.isEmpty }
-            .removeDuplicates()
             .debounce(for: .milliseconds(300))
         for await visibleCoin in stream {
             self.subscriptionSnapshot = visibleCoin
@@ -326,7 +319,24 @@ extension MarketStore {
         store.apply(ticker)
     }
     
-    
+    private func observeState() async {
+        stateTask?.cancel()
+        
+        stateTask = Task {
+            for await state in tickerService.subscribeStateStream() {
+                if case .connected = state {
+                    if !subscriptionSnapshot.isEmpty {
+                        await sendTicket(subscriptionSnapshot)
+                    }
+                    
+                    // 시세가
+                    self.tickerStreamTask = Task {
+                        await consume()
+                    }
+                }
+            }
+        }
+    }
 }
 
 extension MarketStore {

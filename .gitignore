@@ -68,3 +68,5 @@ AIProject/iCo/App/Resource/GoogleService-Info.plist
 AIProject/fastlane/.env
 AIProject/fastlane/.env
 AIProject/fastlane/report.xml
+
+AIProject/build

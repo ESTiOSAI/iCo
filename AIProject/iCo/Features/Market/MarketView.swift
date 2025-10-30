@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MarketView: View {
     
-    @State var store: MarketStore
+    @StateObject var store: MarketStore
     
     @State private var searchText: String = ""
     @State private var selectedCoinID: CoinID?
@@ -25,7 +25,7 @@ struct MarketView: View {
     @State private var showNewBadge: Bool = false
     
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
-        store = MarketStore(coinService: coinService, tickerService: tickerService)
+        _store = StateObject(wrappedValue: MarketStore(coinService: coinService, tickerService: tickerService))
     }
     
     var body: some View {
@@ -124,9 +124,6 @@ extension MarketView {
 #Preview {
     MarketView(
         coinService: UpBitAPIService(),
-        tickerService: UpbitTickerService(client:
-                                            ReconnectableWebSocketClient {
-                                                BaseWebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)
-                                            })
+        tickerService: UpbitTickerService(client: WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!))
     )
 }

@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import AsyncAlgorithms
 
 public protocol SocketEngine {
-    var state: AsyncStream<WebSocket.State> { get }
-    var incoming: AsyncStream<Result<Data, WebSocket.MessageFailure>> { get }
+    var stateChannel: AsyncChannel<WebSocket.State> { get set }
+    var incomingChannel: AsyncChannel<Result<Data, WebSocket.MessageFailure>> { get set }
     func connect() async
     func send(_ data: Data) async throws
     func close() async
@@ -18,8 +19,8 @@ public protocol SocketEngine {
 public enum WebSocket {
     public enum State: Sendable {
         case connecting, connected
-        case failed(Error)
-        case closed(code: URLSessionWebSocketTask.CloseCode, reason: Data?)
+        case failed
+        case closed
         case reconnecting(nextAttempsIn: Duration)
     }
     
@@ -50,10 +51,6 @@ extension WebSocket.State: Equatable {
             return true
         case (.connected, .connected):
             return true
-        case (.failed(let lhsError), .failed(let rhsError)):
-            return lhsError as NSError == rhsError as NSError
-        case (.closed(let lhsCode, let lhsReason), .closed(let rhsCode, let rhsReason)):
-            return lhsCode == rhsCode && lhsReason == rhsReason
         case (.reconnecting(let lhsDelay), .reconnecting(let rhsDelay)):
             return lhsDelay == rhsDelay
         default:
