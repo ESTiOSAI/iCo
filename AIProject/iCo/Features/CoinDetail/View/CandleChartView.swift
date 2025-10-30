@@ -16,6 +16,10 @@ struct CandleChartView: View {
     @State private var candleWidth: CGFloat = 4
     /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
     @State private var centerOfVisibleXRange: Date = Date()
+    /// X축 우측 경계 라벨이 띄워지는 데 걸리는 시간
+    @State private var rightLabelGuardSec: TimeInterval = 180 // 초기값 3분
+    /// 차트 오른쪽 여백
+    @State private var trailingPlotPadding: CGFloat = 20
     /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
     @State private var dynamicVisibleYDomain: ClosedRange<Double>? = nil
     /// 디바운스용 워크아이템 (중복 실행 / 레이스 방지)
@@ -68,15 +72,12 @@ struct CandleChartView: View {
 
         // X축 틱: 00/15/30/45만 생성
         let rawTicks = quarterTicksStrict(in: xDomain, calendar: calendar)
-
-        // 우측 경계 버퍼 (경계 3분 내 라벨 숨김)
-        let step: TimeInterval = 15 * 60
-        let buffer = step * 0.2 // 15분의 20% = 3분
         
         // 라벨 기준: 눈에 실제 보이는 오른쪽 (마지막 캔들 시각)
         let visibleRight = data.last?.date ?? xDomain.upperBound
-        // 3분 버퍼 이내(경계 근접) 라벨은 숨김
-        let ticks = rawTicks.filter { $0.addingTimeInterval(buffer) <= visibleRight }
+        
+        // 우측 경계 라벨 숨김
+        let ticks = rawTicks.filter { $0.addingTimeInterval(rightLabelGuardSec) <= visibleRight}
         
         // Y 라벨 포맷 범위
         let yLablesDomain = dynamicVisibleYDomain ?? yRange
@@ -111,10 +112,12 @@ struct CandleChartView: View {
           GeometryReader { _ in
             Color.clear
                   .onAppear {
+                      updateRightEdgeGuard(proxy)
                       recalcWidth(proxy)
                       plotHeight = max(1, proxy.plotSize.height)
                   }
                   .onChange(of: proxy.plotSize) { _, newSize in
+                      updateRightEdgeGuard(proxy)
                       recalcWidth(proxy)
                       plotHeight = max(1, newSize.height)
                       // 플롯 크기 변경 → 픽셀 가드 환산값도 변하므로 재계산
@@ -126,7 +129,7 @@ struct CandleChartView: View {
         .chartXScale(domain: xDomain)
         .chartScrollPosition(x: $centerOfVisibleXRange)
         .chartScrollableAxes(.horizontal)
-        .chartXVisibleDomain(length: visibleLengthInSeconds)
+        .chartXVisibleDomain(length: visibleLength)
 
         // Y축: 동적 도메인(없으면 yRange)
         .chartYScale(domain: dynamicVisibleYDomain ?? yRange)
@@ -137,7 +140,7 @@ struct CandleChartView: View {
                 AxisTick()
                 if let date = value.as(Date.self) {
                     AxisValueLabel { Text(timeFormatter.string(from: date)) } // 00/15/30/45분에만 노출
-                    if calendar.component(.minute, from: date) == 0 { AxisGridLine() } // 00분에만 세로 선
+                    if calendar.component(.minute, from: date) == 0 { AxisGridLine() } // 정시에만 세로 선
                 }
             }
         }
@@ -162,7 +165,7 @@ struct CandleChartView: View {
         
         // 플롯 여백: 라벨/상단 시각적 여유
         .chartPlotStyle { plot in
-            plot.padding(.trailing, 20)
+            plot.padding(.trailing, trailingPlotPadding)
                 .padding(.top, 6)
                 .padding(.bottom, 8)
         }
@@ -192,6 +195,32 @@ struct CandleChartView: View {
             yAxisRecalcWorkItem?.cancel()
             yAxisRecalcWorkItem = nil
         }
+    }
+    
+    /// X축의 오른쪽 경계 라벨이  잘리지 않도록 여백(guard)을 계산
+    /// - 다이내믹 폰트 크기에 따라 라벨 폭을 측정해 가변 여백을 반영
+    private func updateRightEdgeGuard(_ proxy: ChartProxy) {
+        guard
+            let last = data.last?.date,
+            let prev = Calendar.current.date(byAdding: .minute, value: -1, to: last),
+            let x2 = proxy.position(forX: last),
+            let x1 = proxy.position(forX: prev)
+        else { return }
+        
+        // 1초가 몇 pt인지
+        let ptPerSec = max(0.001, (x2 - x1) / 60.0)
+        
+        // 다이내믹 폰트를 반영한 라벨 폭 측정
+        let baseFont = UIFont.systemFont(ofSize: 10, weight: .regular)
+        let scaledFont = UIFontMetrics(forTextStyle: .body).scaledFont(for: baseFont) // 다이내믹 타입 반영
+        let labelWidth = ("23:59" as NSString).size(withAttributes: [.font: scaledFont]).width // 가장 넓은 시간 문자열 기준
+        
+        // 라벨 폭(pt)을 시간(초) 단위로 환산해 오른쪽 경계 가드 계산
+        let guardPt = labelWidth / 2 + 6
+        rightLabelGuardSec = max(180, TimeInterval(guardPt / ptPerSec)) // 최소 3분 보장
+            
+        // 차트 오른쪽 여백도 라벨 반폭만큼 늘려서 잘림(클리핑) 방지
+        trailingPlotPadding = max(20, guardPt)
     }
     
     /// 초기 스크롤 중심 계산
