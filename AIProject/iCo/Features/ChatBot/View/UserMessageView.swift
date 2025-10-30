@@ -15,7 +15,7 @@ struct UserMessageView: View {
         HStack {
             Spacer()
             Text(content)
-                .font(.system(size: 14))
+                .font(.ico14)
                 .lineSpacing(6)
                 .foregroundStyle(.iCoLabel)
                 .padding(.vertical, 15)

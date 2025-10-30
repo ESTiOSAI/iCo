@@ -48,7 +48,7 @@ struct BotMessageView: View {
                 }
             }
             .foregroundStyle(.iCoLabel)
-            .font(.system(size: 14))
+            .font(.ico14)
             .lineSpacing(6)
             .padding(.vertical, 15)
             .padding(.horizontal, 18)
