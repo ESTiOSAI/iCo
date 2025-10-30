@@ -27,7 +27,7 @@ struct ThemeRow: View {
             HStack(spacing: 8) {
                 Text(title)
                     .frame(height: 36)
-                    .font(.system(size: 14, weight: !isSelected ? .regular : .medium))
+                    .font(isSelected ? .ico14M : .ico14)
                     .foregroundStyle(!isSelected ? .iCoLabel : .iCoAccent)
                 
                 Spacer()
