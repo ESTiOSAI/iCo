@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MarketView: View {
     
-    @State var store: MarketStore
+    @StateObject var store: MarketStore
     
     @State private var searchText: String = ""
     @State private var selectedCoinID: CoinID?
@@ -25,7 +25,7 @@ struct MarketView: View {
     @State private var showNewBadge: Bool = false
     
     init(coinService: UpBitAPIService, tickerService: RealTimeTickerProvider) {
-        store = MarketStore(coinService: coinService, tickerService: tickerService)
+        _store = StateObject(wrappedValue: MarketStore(coinService: coinService, tickerService: tickerService))
     }
     
     var body: some View {

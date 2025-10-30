@@ -16,8 +16,7 @@ enum CoinFilter: Int, Equatable {
 /// 마켓 이벤트 처리를 담당
 /// 검색 / 시세 정보 / 웹소켓 상태 / 정렬 / 필터링 이벤트 처리
 @MainActor
-@Observable
-class MarketStore {
+final class MarketStore: ObservableObject {
     
     /// 최초 한 번만 로드하기 위한 flag
     private var hasLoaded = false
@@ -28,11 +27,12 @@ class MarketStore {
     private let coinService: UpBitAPIService
     private let tickerService: RealTimeTickerProvider
     private let searchRecordManager: SearchRecordManaging = SearchRecordManager()
+    private var stateTask: Task<Void, Never>?
     
     private(set) var errorMessage: String?
     
     /// 변동성이 적은 메타 정보
-    private(set) var coinMeta: [CoinID: Coin] = [:]
+    @Published private(set) var coinMeta: [CoinID: Coin] = [:]
     
     /// 변동성이 큰 시세 정보
     private var ticker: [CoinID: TickerStore] = [:]
@@ -320,16 +320,19 @@ extension MarketStore {
     }
     
     private func observeState() async {
-        for await state in tickerService.subscribeStateStream() {
-            // TODO: 여러 번 호출되는 이유 찾기
-            if case .connected = state {
-                if !subscriptionSnapshot.isEmpty {
-                    await sendTicket(subscriptionSnapshot)
-                }
-                
-                // 시세가
-                self.tickerStreamTask = Task {
-                    await consume()
+        stateTask?.cancel()
+        
+        stateTask = Task {
+            for await state in tickerService.subscribeStateStream() {
+                if case .connected = state {
+                    if !subscriptionSnapshot.isEmpty {
+                        await sendTicket(subscriptionSnapshot)
+                    }
+                    
+                    // 시세가
+                    self.tickerStreamTask = Task {
+                        await consume()
+                    }
                 }
             }
         }

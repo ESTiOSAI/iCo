@@ -9,7 +9,7 @@ import SwiftUI
 import AsyncAlgorithms
 
 struct CoinListView: View {
-    @Bindable var store: MarketStore
+    @ObservedObject var store: MarketStore
     
     @State private var visibleCoins: Set<CoinID> = []
     @State private var isActive: Bool = false
