@@ -50,8 +50,13 @@ struct TopCoinListView: View {
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
         .padding(.horizontal, 16)
-        .task {
-            await viewModel.fetchData()
+        .onAppear {
+            Task {
+                await viewModel.fetchData()
+            }
+        }
+        .onDisappear {
+            viewModel.cancelFetch()
         }
     }
 }

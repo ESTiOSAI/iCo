@@ -17,6 +17,8 @@ final class TopCoinListViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var selectedSegment: SegmentType = .volume
     
+    private var fetchTask: Task<Void, Never>?
+    
     enum SegmentType: String, CaseIterable, Identifiable {
         case volume = "거래대금 Top5"
         case rate = "상승률 Top5"
@@ -28,45 +30,63 @@ final class TopCoinListViewModel: ObservableObject {
     }
     
     func fetchData() async {
-        isLoading = true
-        defer { isLoading = false }
+        if fetchTask != nil { return }
         
-        do {
-            let coins = try await api.fetchMarkets()
-            self.coins = coins
+        fetchTask = Task {
+            isLoading = true
+            defer {
+                isLoading = false
+                fetchTask = nil
+            }
             
-            let tickers = try await api.fetchTicker(by: "KRW")
-            self.tickers = tickers
-            
-            let topVolumeIDs = tickers
-                .sorted { $0.volume > $1.volume }
-                .prefix(5)
-                .map { $0.id }
-            
-            let topRateIDs = tickers
-                .sorted { $0.signedRate > $1.signedRate }
-                .prefix(5)
-                .map { $0.id }
-            
-            let targetIDs = Array(Set(topVolumeIDs + topRateIDs))
-            
-            await withTaskGroup(of: Void.self) { group in
-                for id in targetIDs {
-                    group.addTask {
-                        do {
-                            let candleData = try await self.api.fetchCandles(id: id, count: 10)
-                            await MainActor.run {
-                                self.candles[id] = candleData.map { $0.tradePrice }.reversed()
+            do {
+                guard !Task.isCancelled else { return }
+                let coins = try await api.fetchMarkets()
+                self.coins = coins
+                
+                let tickers = try await api.fetchTicker(by: "KRW")
+                self.tickers = tickers
+                
+                let topVolumeIDs = tickers
+                    .sorted { $0.volume > $1.volume }
+                    .prefix(5)
+                    .map { $0.id }
+                
+                let topRateIDs = tickers
+                    .sorted { $0.signedRate > $1.signedRate }
+                    .prefix(5)
+                    .map { $0.id }
+                
+                let targetIDs = Array(Set(topVolumeIDs + topRateIDs))
+                
+                guard !Task.isCancelled else { return }
+                
+                await withTaskGroup(of: Void.self) { group in
+                    for id in targetIDs {
+                        group.addTask {
+                            do {
+                                let candleData = try await self.api.fetchCandles(id: id, count: 10)
+                                await MainActor.run {
+                                    self.candles[id] = candleData.map { $0.tradePrice }.reversed()
+                                }
+                            } catch {
+                                print("Candle fetch failed for \(id):", error)
                             }
-                        } catch {
-                            print("Candle fetch failed for \(id):", error)
                         }
                     }
                 }
+            } catch {
+                print("Fetch Error:", error)
             }
-        } catch {
-            print("Fetch Error:", error)
         }
+        
+        await fetchTask?.value
+    }
+    
+    func cancelFetch() {
+        fetchTask?.cancel()
+        fetchTask = nil
+        isLoading = false
     }
     
     var topCoins: [TickerValue] {
