@@ -50,6 +50,7 @@ struct LineChartView: View {
                             endPoint: .bottom
                         )
                     )
+                    .interpolationMethod(.catmullRom)
                 }
             }
             .chartXAxis(.hidden)
