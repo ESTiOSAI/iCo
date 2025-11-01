@@ -50,7 +50,6 @@ struct DashboardView: View {
                     VStack {
                         RecommendCoinView(headerHeight: dynamicHeaderHeight)
                         AIBriefingView()
-                        TopCoinListView()
                     }
                     .padding(.top, topInset)
                     .background {
