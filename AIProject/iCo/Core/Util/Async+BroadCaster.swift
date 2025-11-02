@@ -8,8 +8,8 @@
 import Foundation
 
 @globalActor
-actor BroadCaster {
-    static let shared = BroadCaster()
+public actor BroadCaster {
+    public static let shared = BroadCaster()
     
     private init() {}
 }
@@ -46,13 +46,14 @@ public class AsyncStreamBroadcaster<Element> {
     }
 
     
-    /// 구독을 해제하고 스트림을 종료함
+    /// 전체 구독을 해제하고 스트림을 종료함
     public func finish() {
         for (_, c) in continuations {
             c.finish()
         }
     }
     
+    /// 일부 구독을 해제함
     private func finish(id: UUID) {
         continuations[id] = nil
     }
