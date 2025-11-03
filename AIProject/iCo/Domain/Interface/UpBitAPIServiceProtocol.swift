@@ -7,6 +7,7 @@
 
 import Foundation
 
-protocol UpBitApiServiceProtocol {
+protocol UpBitAPIServiceProtocol {
     func fetchQuotes(id: String) async throws -> [TickerDTO]
+    func fetchCandles(id: String, count: Int, to: Date?) async throws -> [MinuteCandleDTO]
 }

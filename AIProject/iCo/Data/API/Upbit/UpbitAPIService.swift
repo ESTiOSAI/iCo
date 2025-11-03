@@ -8,7 +8,7 @@
 import Foundation
 
 /// 업비트 API 관련 서비스를 제공합니다.
-final class UpBitAPIService: UpBitApiServiceProtocol {
+final class UpBitAPIService: UpBitAPIServiceProtocol {
     private let network: NetworkClient
 
     init(networkClient: NetworkClient = .init()) {
