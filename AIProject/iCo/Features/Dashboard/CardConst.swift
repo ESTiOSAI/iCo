@@ -11,7 +11,7 @@ enum CardConst {
     static let headerHeight: CGFloat = 140
     static let headerContentSpacing: CGFloat = 30
     
-    static let cardHeight: CGFloat = 326
+    static let cardHeight: CGFloat = 250
     static let cardHeightMultiplier: CGFloat = 0.9
     static let cardInnerPadding: CGFloat = 16
     
