@@ -41,4 +41,5 @@ struct RecommendCoin: Identifiable, Hashable {
     let tradePrice: Double
     let changeRate: Double
     let changeType: TickerChangeType
+    let candles: [Double]
 }
