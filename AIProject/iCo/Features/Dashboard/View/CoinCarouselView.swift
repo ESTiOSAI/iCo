@@ -127,7 +127,6 @@ struct CoinCarouselView: View {
             VStack(spacing: .spacing) {
                 CoinInfoView(recommendCoin: coin) {
                     selectedCoin = nil
-                    viewModel.startTimer()
                 }
                 
                 VStack(spacing: 4) {
@@ -170,6 +169,9 @@ struct CoinCarouselView: View {
                 }
             )
             .presentationDetents([detent])
+            .onDisappear {
+                viewModel.startTimer()
+            }
             .sheet(isPresented: $showDetails) {
                 ZStack(alignment: .center) {
                     HeaderView(
