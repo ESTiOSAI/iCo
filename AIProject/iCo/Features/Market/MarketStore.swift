@@ -59,7 +59,7 @@ final class MarketStore: ObservableObject {
         }
     }
     
-    var sortCategory: Market.SortCategory = .volume {
+    @Published var sortCategory: Market.SortCategory = .volume {
         didSet {
             Task {
                 await sortChannel.send(())
@@ -67,7 +67,7 @@ final class MarketStore: ObservableObject {
         }
     }
     
-    var volumeSortOrder: SortOrder = .descending {
+    @Published var volumeSortOrder: SortOrder = .descending {
         didSet {
             Task {
                 await sortChannel.send(())
@@ -75,7 +75,7 @@ final class MarketStore: ObservableObject {
         }
     }
     
-    var rateSortOrder: SortOrder = .none {
+    @Published var rateSortOrder: SortOrder = .none {
         didSet {
             Task {
                 await sortChannel.send(())
@@ -83,7 +83,7 @@ final class MarketStore: ObservableObject {
         }
     }
     
-    var filter: CoinFilter = .none {
+    @Published var filter: CoinFilter = .none {
         didSet {
             Task {
                 await sortChannel.send(())
@@ -91,7 +91,7 @@ final class MarketStore: ObservableObject {
         }
     }
 
-    var sortedCoinIDs: [CoinID] = []
+    @Published var sortedCoinIDs: [CoinID] = []
     
     /// 아래 멤버들은 View 갱신을 최소화하기 위해 사용
     /// 현재 보여지는 코인 구독 최적화를 위한 채널

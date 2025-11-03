@@ -43,18 +43,15 @@ fileprivate struct CoinMetaView: View {
             CoinView(symbol: symbol, size: 30)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(name.highlighted(searchTerm, font: .system(size: name.count < 8 ? 14 : 12, weight: .bold)))
+                Text(name.highlighted(searchTerm, font: name.count < 8 ? .ico14B : .ico12B))
                     .lineLimit(1)
-                    .font(.system(size: name.count < 8 ? 14 : 12))
-                    .fontWeight(.bold)
+                    .font(name.count < 8 ? .ico14B : .ico12B)
                 
                 Text(symbol.highlighted(searchTerm))
-                    .font(.system(size: 12))
                     .foregroundStyle(.secondary)
             }
         }
-        .font(.system(size: 12))
-        .fontWeight(.medium)
+        .font(.ico11M)
         .foregroundStyle(.iCoLabel)
     }
 }
@@ -92,31 +89,30 @@ fileprivate struct CoinPriceView: View {
                 
                 Text(ticker.snapshot.formatedPrice)
                     .frame(minWidth: priceWidth, alignment: .trailing)
-                    .font(.system(size: 15))
+                    .font(.ico15M)
                     .blinkUnderlineOnChange(ticker.snapshot.price)
             }
             .frame(alignment: .trailing)
             
             HStack(spacing: 0) {
                 Text("거래")
-                    .font(.system(size: 11))
+                    .font(.ico11M)
                 Text(ticker.snapshot.formatedVolume)
                     .frame(minWidth: volumeWidth, alignment: .trailing)
             }
         }
-        .font(.system(size: 12))
-        .fontWeight(.medium)
+        .font(.ico12M)
         .foregroundStyle(.iCoLabel)
         .background {
             VStack {
                 ZStack {
                     Text(ticker.snapshot.formatedPrice)
-                        .font(.system(size: 15))
+                        .font(.ico15M)
                         .measureWidth { w in
                             priceWidth = w + pricePadding
                         }
                     Text(ticker.snapshot.formatedVolume)
-                        .font(.system(size: 11))
+                        .font(.ico11M)
                         .measureWidth { w in
                             volumeWidth = w + pricePadding
                         }
