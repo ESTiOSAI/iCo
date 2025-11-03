@@ -20,6 +20,8 @@ public class AsyncStreamBroadcaster<Element> {
     /// 구독할 continuation 값들
     private var continuations: [UUID: AsyncStream<Element>.Continuation] = [:]
     
+    public init() {}
+    
     /// 구독 메서드로 stream을 반환
     /// - Returns: stream 반환
     public func stream() -> AsyncStream<Element> {

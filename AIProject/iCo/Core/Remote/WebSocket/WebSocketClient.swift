@@ -1,7 +1,26 @@
 import Foundation
 import AsyncAlgorithms
 
-public final class WebSocketClient: NSObject {
+public protocol WebSocketProvider {
+    var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> { get }
+    var incomingChannel: AsyncChannel<URLSessionWebSocketTask.Message> { get }
+    
+    /// 웹소켓 세션을 연결하고 작업을 생성합니다.
+    func connect() async
+    
+    /// 명시적으로 현재 WebSocket 연결을 정상적으로 종료합니다.
+    ///
+    /// 이 메서드는 서버와의 WebSocket 연결을 `normalClosure` 코드로 닫습니다.
+    func disconnect() async
+    
+    /// 텍스트 형태의 메시지를 WebSocket 서버로 전송합니다.
+    func send(text: String) async throws
+    
+    /// 바이너리(Data) 형태의 메시지를 WebSocket 서버로 전송합니다.
+    func send(data: Data) async throws
+}
+
+public final class WebSocketClient: NSObject, WebSocketProvider {
     /// 소켓 상태 채널
     private var stateStream: AsyncStream<WebSocket.State>
     /// WebSocket의 상태 변화를 여러 Consumer에게 동시에 전달하는 브로드캐스터
