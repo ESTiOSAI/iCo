@@ -123,7 +123,8 @@ struct ChartView: View {
                     Text("\(sign)\(absChange.formatKRW) (\(arrow)\(abs(viewModel.displayChangeRate).formatRate))")
                         .font(.ico16M)
                         .foregroundStyle(headerColor)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                     
                     Text("거래대금 \(viewModel.headerAccTradePrice.formatMillion)")
                         .font(.ico12M)
