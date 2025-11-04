@@ -42,9 +42,12 @@ struct CoinCarouselView: View {
     var tempCoinArray: [RecommendCoin] {
         wrappedCoins.flatMap { $0.map { $0 }}
     }
-    
     @State private var showNewBadge = false
-    
+    @State private var showDetailCoin: RecommendCoin?
+    @State private var measuredHeight: CGFloat = 0
+    private var detent: PresentationDetent { .height(measuredHeight) }
+    @State private var isSheetPresented = false
+
     var body: some View {
         /// 화면의 가로 크기에 따라 카드 갯수를 관리하는 computed property
         var numberOfColumn: Int { hSizeClass == .regular ? 2 : 1 }
@@ -59,7 +62,9 @@ struct CoinCarouselView: View {
                             width: nil,
                             height: CardConst.cardHeight
                         )
-                        .onTapGesture { selectedCoin = coin }
+                        .onTapGesture {
+                            selectedCoin = coin
+                        }
                         .scrollTransition(axis: .horizontal) { content, phase in // 활성화된 코인은 크게 보이게 하기
                             content.scaleEffect(
                                 y: phase.isIdentity ? 1 : CardConst.cardHeightMultiplier,
@@ -116,31 +121,6 @@ struct CoinCarouselView: View {
             else { return }
             handleManualScrolling(cardID: newValue)
         }
-        .sheet(item: $selectedCoin) { coin in
-            VStack(spacing: 0) {
-                ZStack(alignment: .center) {
-                    HeaderView(
-                        heading: coin.name,
-                        topPadding: 20,
-                        coinSymbol: coin.id,
-                        showBackButton: false,
-                        showNewBadge: showNewBadge
-                    )
-                    .toolbar(.hidden, for: .navigationBar)
-                    
-                    RoundedButton(imageName: "xmark") {
-                        selectedCoin = nil
-                    }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding()
-                }
-                
-                CoinDetailView(coin: Coin(id: "KRW-" + coin.id, koreanName: coin.name, imageURL: coin.imageURL))  { isNew in
-                    showNewBadge = isNew
-                }
-            }
-            .background(.background)
-        }
         .onAppear {
             // 무한 스크롤링 효과를 구현하기 위해 추천 코인 배열의 앞 뒤에 안전 코인을 붙이기
             wrappedCoins = [recommendedCoins, recommendedCoins, recommendedCoins]
@@ -160,6 +140,80 @@ struct CoinCarouselView: View {
             cardID = nil
             viewModel.stopTimer()
             wrappedCoins.removeAll()
+        }
+        .sheet(item: $selectedCoin) { coin in
+            VStack(spacing: .spacing) {
+                CoinInfoView(recommendCoin: coin) {
+                    selectedCoin = nil
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "sparkles")
+                            .font(.ico14B)
+                            .foregroundStyle(.iCoAccent)
+                        
+                        Text("아이코가 추천하는 이유")
+                            .font(.ico16B)
+                            .foregroundStyle(.iCoLabel)
+                    }
+                    
+                    Text(String.aiGeneratedContentNotice)
+                        .font(.ico11)
+                        .foregroundStyle(.iCoNeutral)
+                        .lineSpacing(5)
+                    
+                    Text(coin.comment.byCharWrapping)
+                        .font(.ico14)
+                        .lineSpacing(6)
+                        .foregroundStyle(.iCoLabel)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                
+                RoundedRectangleFillButton(title: "더 자세히 보러가기", imageName: "info.circle", isHighlighted: .constant(true)) {
+                    selectedCoin = nil
+                    showDetailCoin = coin
+                }
+            }
+            .padding(20)
+            .background(.background)
+            .background(
+                GeometryReader { geo in
+                    Color.clear
+                        .onAppear {
+                            measuredHeight = geo.size.height
+                        }
+                }
+            )
+            .presentationDetents([detent])
+        }
+        .onChange(of: selectedCoin) { _, newValue in
+            updateTimerState()
+        }
+        .sheet(item: $showDetailCoin) { detail in
+            ZStack(alignment: .center) {
+                HeaderView(
+                    heading: detail.name,
+                    topPadding: 20,
+                    coinSymbol: detail.id,
+                    showBackButton: false,
+                    showNewBadge: showNewBadge
+                )
+                .toolbar(.hidden, for: .navigationBar)
+                
+                RoundedButton(imageName: "xmark") {
+                    showDetailCoin = nil
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing)
+                .padding()
+            }
+            
+            CoinDetailView(coin: Coin(id: "KRW-" + detail.id, koreanName: detail.name, imageURL: detail.imageURL))  { isNew in
+                showNewBadge = isNew
+            }
+        }
+        .onChange(of: showDetailCoin) { _, newValue in
+            updateTimerState()
         }
     }
 }
@@ -228,6 +282,24 @@ extension CoinCarouselView {
             try? await Task.sleep(nanoseconds: 100_000_000)
             jump(to: currentID)
             viewModel.startTimer()
+        }
+    }
+    
+    /// sheet가 보여지고 있는 경우에는 스크롤 타이머가 멈출 수 있도록 합니다.
+    private func updateTimerState() {
+        let isPresented = selectedCoin != nil || showDetailCoin != nil
+        if isPresented {
+            if !isSheetPresented {
+                isSheetPresented = true
+                viewModel.stopTimer()
+                print("‼️stop")
+            }
+        } else {
+            if isSheetPresented {
+                isSheetPresented = false
+                viewModel.startTimer()
+                print("‼️start")
+            }
         }
     }
 }

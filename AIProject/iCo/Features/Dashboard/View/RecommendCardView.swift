@@ -8,77 +8,17 @@
 import SwiftUI
 
 struct RecommendCardView: View {
-    @EnvironmentObject var themeManager: ThemeManager
-    
     let recommendCoin: RecommendCoin
     
-    private func dynamicStatusColor(for type: RecommendCoin.TickerChangeType) -> Color {
-        switch type {
-        case .rise:
-            return themeManager.selectedTheme.positiveColor
-        case .even:
-            return themeManager.selectedTheme.neutral
-        case .fall:
-            return themeManager.selectedTheme.negativeColor
-        }
-    }
-    
     var body: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .leading) {
-                CoinView(symbol: recommendCoin.id, size: 50)
-
-                HStack(spacing: 10) {
-                    Text(recommendCoin.name)
-                        .font(.ico17)
-                        .bold()
-                        .foregroundStyle(.iCoLabel)
-
-                    Text(recommendCoin.id)
-                        .font(.ico12)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.iCoLabelSecondary)
-                }
-                .padding(.top, 4)
-
-                HStack(spacing: 4) {
-                    Text("현재가")
-                        .font(.ico14)
-                        .foregroundStyle(.iCoLabel)
-
-                    Text(recommendCoin.tradePrice.formatKRW)
-                        .font(.ico14)
-                        .bold()
-                        .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
-                }
-                .padding(.top, 1)
-
-                HStack(spacing: 4) {
-                    Text("전일대비")
-                        .font(.ico14)
-                        .foregroundStyle(.iCoLabel)
-
-                    HStack(spacing: 0) {
-                        Group {
-                            Text("\(recommendCoin.changeType.code)\(recommendCoin.changeRate.formatRate)")
-                        }
-                        .font(.ico14)
-                        .bold()
-                        .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
-                    }
-                }
-                .padding(.top, 0.2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            VStack {
-                Text(recommendCoin.comment.byCharWrapping)
-                    .font(.ico14)
-                    .lineSpacing(6)
-                    .foregroundStyle(.iCoLabel)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .padding(.top, 32)
+        VStack(alignment: .leading, spacing: 0) {
+            CoinInfoView(recommendCoin: recommendCoin)
+            
+            Text(recommendCoin.comment.byCharWrapping)
+                .font(.ico14)
+                .lineSpacing(6)
+                .foregroundStyle(.iCoLabel)
+                .padding(.top, 30)
         }
         .padding(24)
         .background(
@@ -99,15 +39,15 @@ struct RecommendCardView: View {
     RecommendCardView(
         recommendCoin: RecommendCoin(
             imageURL: nil,
-            comment: "좋다!",
-            coinID: "KRW-BTC",
-            name: "비트코인",
+            comment: "펏지펭귄은 활발한 커뮤니티와 밈 기반의 인기 덕분에 최근 주목받고 있어요. 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요. 소액으로 재미있게 투자하기 좋고, 성장 가능성도 보여 기대돼요.",
+            coinID: "BTC",
+            name: "월드리버티파이낸셜유에스디",
             tradePrice: 1600,
             changeRate: 4.27,
-            changeType: .rise
+            changeType: .rise,
+            candles: [1.0, 3.0, 2.0, 6.0, 5.0, 3.0, 7.0, 9.0, 6.0, 10.0]
         )
     )
-    .environmentObject(ThemeManager())
 }
 
 

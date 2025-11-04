@@ -16,7 +16,7 @@ final class RecommendCoinViewModel: ObservableObject {
     @Published var fetchTimestamp: Date?
 
     private var llmService: LLMRecommendCoinFetching
-    private var upbitService: UpBitApiServiceProtocol
+    private var upbitService: UpBitAPIServiceProtocol
 
     var task: Task<Void, Never>?
     let numberOfCoins: Int = 5
@@ -36,7 +36,7 @@ final class RecommendCoinViewModel: ObservableObject {
 
     init(
         llmService: LLMRecommendCoinFetching = LLMAPIService(),
-        upbitService: UpBitApiServiceProtocol = UpBitAPIService()
+        upbitService: UpBitAPIServiceProtocol = UpBitAPIService()
     ) {
         self.llmService = llmService
         self.upbitService = upbitService
@@ -108,6 +108,8 @@ final class RecommendCoinViewModel: ObservableObject {
                         guard let data = try await self.upbitService.fetchQuotes(id: "KRW-\(dto.symbol)").first else {
                             return nil
                         }
+                        
+                        let candleData = try await self.upbitService.fetchCandles(id: "KRW-\(dto.symbol)", count: 10, to: nil)
 
                         return RecommendCoin(
                             imageURL: nil,
@@ -116,7 +118,8 @@ final class RecommendCoinViewModel: ObservableObject {
                             name: dto.name,
                             tradePrice: data.tradePrice,
                             changeRate: data.changeRate * 100,
-                            changeType: RecommendCoin.TickerChangeType(rawValue: data.change)
+                            changeType: RecommendCoin.TickerChangeType(rawValue: data.change),
+                            candles: candleData.map { $0.tradePrice }.reversed()
                         )
                     } catch {
                         return nil
