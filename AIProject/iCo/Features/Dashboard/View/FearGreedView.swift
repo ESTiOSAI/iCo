@@ -63,18 +63,14 @@ struct FearGreedView: View {
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             if hSizeClass == .compact {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 0) {
                     Group {
                         Text("지금 시장은")
                         
-                        HStack(spacing: 4) {
-                            Text(viewModel.classification)
-                                .foregroundStyle(viewModel.fearGreed.color)
+                        Text(viewModel.classification)
+                            .foregroundStyle(viewModel.fearGreed.color)
                             
-                            Text("상태에요")
-                            
-                            Spacer()
-                        }
+                        + Text(" 상태예요")
                     }
                     .font(.ico16B)
                     .foregroundStyle(.iCoLabel)
@@ -87,9 +83,7 @@ struct FearGreedView: View {
                         Text(viewModel.classification)
                             .foregroundStyle(viewModel.fearGreed.color)
                         
-                        Text("상태에요")
-                        
-                        Spacer()
+                        + Text(" 상태예요")
                     }
                     .font(.ico16B)
                     .foregroundStyle(.iCoLabel)
