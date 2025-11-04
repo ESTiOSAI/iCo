@@ -189,9 +189,9 @@ extension FearGreedView {
                     .animation(.snappy, value: guageValue)
                 
                 Text(guageValue, format: .number)
-                    .font(.ico24B)
+                    .font(.dynamic(size: chartWidth / 5))
+                    .bold()
                     .foregroundColor(.iCoLabel)
-                    .minimumScaleFactor(0.5)
                     .offset(y: -chartHeight * 0.2)
                     .animation(.snappy, value: guageValue)
                     .contentTransition(.numericText(countsDown: true))
