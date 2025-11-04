@@ -16,8 +16,6 @@ struct CandleChartView: View {
     @State private var candleWidth: CGFloat = 4
     /// 현재 가시 X 구간의 중심(스크롤 위치 바인딩)
     @State private var centerOfVisibleXRange: Date = Date()
-    /// X축 우측 경계 라벨이 띄워지는 데 걸리는 시간
-    @State private var rightLabelGuardSec: TimeInterval = 180 // 초기값 3분
     /// 차트 오른쪽 여백
     @State private var trailingPlotPadding: CGFloat = 20
     /// 동적으로 계산된 Y 도메인 (없으면 yRange 폴백)
@@ -26,6 +24,8 @@ struct CandleChartView: View {
     @State private var yAxisRecalcWorkItem: DispatchWorkItem?
     /// 플롯 높이 (픽셀 → 데이터 단위 환산에 필요)
     @State private var plotHeight: CGFloat = 1
+    /// 최신 봉 자동 따라가기 플래그 (우측에 붙어 있을 때만 true)
+    @State private var followTail = true
 
     // MARK: - Constants
     /// 한 화면에 보여줄 X 구간 (초) -  48분
@@ -35,7 +35,9 @@ struct CandleChartView: View {
     /// Y 계산 시 우측 1분, 좌측 30초 만큼 구간 확장
     private let yLookahead: TimeInterval = 60
     private let yLookbehind: TimeInterval = 30
-    
+    /// 우측 끝에서 이 거리(초) 이내면 최신 봉 자동 추적 on
+    private let tailEpsilonSec: TimeInterval = 20
+
     // MARK: - Inputs
     let data: [CoinPrice]
     let xDomain: ClosedRange<Date>
@@ -76,8 +78,7 @@ struct CandleChartView: View {
         // 라벨 기준: 눈에 실제 보이는 오른쪽 (마지막 캔들 시각)
         let visibleRight = data.last?.date ?? xDomain.upperBound
         
-        // 우측 경계 라벨 숨김
-        let ticks = rawTicks.filter { $0.addingTimeInterval(rightLabelGuardSec) <= visibleRight}
+        let ticks = rawTicks
         
         // Y 라벨 포맷 범위
         let yLablesDomain = dynamicVisibleYDomain ?? yRange
@@ -112,15 +113,19 @@ struct CandleChartView: View {
           GeometryReader { _ in
             Color.clear
                   .onAppear {
+                      // 축 라벨 잘림 방지용 오른쪽 패딩 산출
                       updateRightEdgeGuard(proxy)
+                      // 1분 간격에 맞춘 캔들 폭 계산
                       recalcWidth(proxy)
                       plotHeight = max(1, proxy.plotSize.height)
                   }
                   .onChange(of: proxy.plotSize) { _, newSize in
+                      // 플롯 폭 변경 시 라벨 패딩 재산출
                       updateRightEdgeGuard(proxy)
+                      // 플롯 스케일 변동에 따른 캔들폭 재계산
                       recalcWidth(proxy)
                       plotHeight = max(1, newSize.height)
-                      // 플롯 크기 변경 → 픽셀 가드 환산값도 변하므로 재계산
+                      // 픽셀→데이터 환산치가 변하므로 Y 도메인 재계산
                       recalcVisibleYAxisDomain()
                   }
           }
@@ -139,8 +144,17 @@ struct CandleChartView: View {
             AxisMarks(values: ticks) { value in
                 AxisTick()
                 if let date = value.as(Date.self) {
-                    AxisValueLabel { Text(timeFormatter.string(from: date)) } // 00/15/30/45분에만 노출
                     if calendar.component(.minute, from: date) == 0 { AxisGridLine() } // 정시에만 세로 선
+                    if date <= visibleRight {
+                        AxisValueLabel {
+                            Text(timeFormatter.string(from: date))
+                                .font(.ico11)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                                .dynamicTypeSize(.xSmall ... .medium)
+                                .fixedSize(horizontal: true, vertical: false)
+                        }
+                    }
                 }
             }
         }
@@ -170,57 +184,71 @@ struct CandleChartView: View {
                 .padding(.bottom, 8)
         }
         
-        // 초기 Y 계산
-        .onAppear {
-            recalcVisibleYAxisDomain() // Y축 첫 계산
-        }
+        // MARK: - Lifecycle & Observers
         
-        // 초기 스크롤 중심 계산: 데이터/신규상장 여부(24h 미만) 기준으로 계산
+        // 최초 진입
         .onAppear {
-            centerOfVisibleXRange = initialCenter(for: data)
+            // (1) Y스케일 1회 계산
+            recalcVisibleYAxisDomain()
+
+            // (2) 최신 봉 우측 정렬
+            let last = data.last?.date ?? xDomain.upperBound
+            let span = xDomain.upperBound.timeIntervalSince(xDomain.lowerBound)
+            let vis  = min(visibleLengthInSeconds, max(60, span))
+            centerOfVisibleXRange = last.addingTimeInterval(-vis / 2)
         }
-        
-        // 스크롤(중심) 변경 → 디바운스 후 2회 확인샷
-        .onChange(of: centerOfVisibleXRange, initial: false) { _, _ in
+
+        // 스크롤 중심 변경: 사용자가 드래그로 우측 끝에서 벗어났는지 판정(+Y 재계산 디바운스)
+        .onChange(of: centerOfVisibleXRange, initial: false) { _, newCenter in
+            let last = data.last?.date ?? xDomain.upperBound
+            let vis  = currentVisibleLength(xDomain)
+            let rightAlignedCenter = last.addingTimeInterval(-vis / 2)
+            let diff = abs(newCenter.timeIntervalSince(rightAlignedCenter))
+
+            // 충분히 벗어나면 자동 따라가기 off, 다시 가까워지면 on
+            followTail = diff <= tailEpsilonSec
             scheduleYAxisRecalcDebounced()
         }
-        
-        // 데이터 최신 봉 갱신 → 즉시 재계산
-        .onChange(of: data.last?.date, initial: false) { _, _ in
+
+        // 최신 봉 업데이트
+        .onChange(of: data.last?.date, initial: true) { _, _ in
+            // (1) Y 즉시 재계산
             recalcVisibleYAxisDomain()
+            
+            // (2) followTail이면 최신에 우측 정렬
+            guard followTail else { return }
+            let last = data.last?.date ?? xDomain.upperBound
+            let vis  = currentVisibleLength(xDomain)
+            centerOfVisibleXRange = last.addingTimeInterval(-vis / 2)
         }
-        
-        // 뷰 소멸 시 디바운스 작업 정리(메모리/레이스 안전)
+
+        // 뷰 소멸 시 디바운스 작업 정리
         .onDisappear {
             yAxisRecalcWorkItem?.cancel()
             yAxisRecalcWorkItem = nil
         }
     }
     
-    /// X축의 오른쪽 경계 라벨이  잘리지 않도록 여백(guard)을 계산
+    // MARK: - Helpers
+    
+    /// 현재 도메인 길이에 맞춘 가시 길이(초) 계산
+    private func currentVisibleLength(_ domain: ClosedRange<Date>) -> TimeInterval {
+        let span = domain.upperBound.timeIntervalSince(domain.lowerBound)
+        return min(visibleLengthInSeconds, max(60, span))
+    }
+    
+    /// X축의 오른쪽 경계 라벨이 잘리지 않도록 여백을 계산
     /// - 다이내믹 폰트 크기에 따라 라벨 폭을 측정해 가변 여백을 반영
     private func updateRightEdgeGuard(_ proxy: ChartProxy) {
-        guard
-            let last = data.last?.date,
-            let prev = Calendar.current.date(byAdding: .minute, value: -1, to: last),
-            let x2 = proxy.position(forX: last),
-            let x1 = proxy.position(forX: prev)
-        else { return }
-        
-        // 1초가 몇 pt인지
-        let ptPerSec = max(0.001, (x2 - x1) / 60.0)
-        
-        // 다이내믹 폰트를 반영한 라벨 폭 측정
+        // 동적 타입 반영 라벨 폭 측정 (가장 넓은 케이스 "23:59" 기준)
         let baseFont = UIFont.systemFont(ofSize: 10, weight: .regular)
-        let scaledFont = UIFontMetrics(forTextStyle: .body).scaledFont(for: baseFont) // 다이내믹 타입 반영
-        let labelWidth = ("23:59" as NSString).size(withAttributes: [.font: scaledFont]).width // 가장 넓은 시간 문자열 기준
+        let scaledFont   = UIFontMetrics(forTextStyle: .footnote).scaledFont(for: baseFont)
+        let labelWidth = ("23:59" as NSString).size(withAttributes: [.font: scaledFont]).width
         
-        // 라벨 폭(pt)을 시간(초) 단위로 환산해 오른쪽 경계 가드 계산
-        let guardPt = labelWidth / 2 + 6
-        rightLabelGuardSec = max(180, TimeInterval(guardPt / ptPerSec)) // 최소 3분 보장
-            
-        // 차트 오른쪽 여백도 라벨 반폭만큼 늘려서 잘림(클리핑) 방지
-        trailingPlotPadding = max(20, guardPt)
+        // 라벨 폭 + 여유 8pt, 최소 12pt 보장 → 플롯 오른쪽 패딩으로만 처리
+        DispatchQueue.main.async {
+            self.trailingPlotPadding = max(12, labelWidth + 8)
+        }
     }
     
     /// 초기 스크롤 중심 계산
@@ -263,7 +291,8 @@ struct CandleChartView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
     }
     
-    // MARK: - Y 스케일 실제 재계산
+    /// 현재 가시 X 구간(중심±가시 길이/2) 내 캔들의 고저로 Y 도메인을 재계산하고
+    /// 꼭대기 잘림 방지를 위한 픽셀·상대 가드를 더해 여유를 둠
     private func recalcVisibleYAxisDomain() {
         guard !data.isEmpty else {
             dynamicVisibleYDomain = yRange
@@ -284,7 +313,10 @@ struct CandleChartView: View {
 
         guard let minPrice = visibleCandles.map(\.low).min(),
               let maxPrice = visibleCandles.map(\.high).max()
-        else { dynamicVisibleYDomain = yRange; return }
+        else {
+            dynamicVisibleYDomain = yRange
+            return
+        }
 
         // 여유 폭 계산
         let rawRange = maxPrice - minPrice // 보이는 캔들의 순수 고저 폭
@@ -308,7 +340,8 @@ struct CandleChartView: View {
         dynamicVisibleYDomain = nextLower ... nextUpper
     }
     
-    // MARK: - 캔들 폭 재계산
+    /// 현재 축 스케일에서 1분이 화면상 몇 pt인지 측정해, 막대 폭을 (간격의 60%)로 설정
+    /// - 최소 1pt, 최대 (간격-1pt)로 클램프하여 항상 여백 유지
     private func recalcWidth(_ proxy: ChartProxy) {
         // 현재 축 스케일에서 1분이 화면상 몇 pt 인지 측정
         guard let last = data.last?.date, // 마지막 캔들 시각
