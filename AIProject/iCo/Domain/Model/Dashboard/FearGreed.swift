@@ -24,11 +24,11 @@ enum FearGreed: String {
         case .extremeFear:
             return .iCoNegative
         case .fear:
-            return .iCoNegative2
+            return .iCoNegativeGradient
         case .neutral:
-            return .iCoNeutral2
+            return .iCoNeutralGradient
         case .greed:
-            return .iCoPositive2
+            return .iCoPositiveGradient
         case .extremeGreed:
             return .iCoPositive
         }
