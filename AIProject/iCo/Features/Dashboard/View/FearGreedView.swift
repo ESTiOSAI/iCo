@@ -151,6 +151,7 @@ extension FearGreedView {
         private static let gaugeTrim: CGFloat = 0.5
         private static let lineWidth: CGFloat = 10
         private static let rotationDegrees: Double = 180
+        @State private var guageValue: CGFloat = 0
         
         let chartWidth: CGFloat
         let chartHeight: CGFloat
@@ -163,6 +164,7 @@ extension FearGreedView {
         
         var body: some View {
             ZStack {
+                // 배경
                 Circle()
                     .trim(from: 0.0, to: Self.gaugeTrim)
                     .stroke(Color(uiColor: UIColor.systemBackground),
@@ -171,8 +173,9 @@ extension FearGreedView {
                     .frame(height: chartHeight * 2)
                     .shadow(color: .black.opacity(0.15), radius: 5)
                 
+                // 실제 게이지
                 Circle()
-                    .trim(from: 0.0, to: Self.gaugeTrim * viewModel.indexValue / 100)
+                    .trim(from: 0.0, to: Self.gaugeTrim * (guageValue / 100))
                     .stroke(
                         LinearGradient(
                             colors: [FearGreed.extremeFear.color, FearGreed.neutral.color, FearGreed.extremeGreed.color],
@@ -183,14 +186,23 @@ extension FearGreedView {
                     )
                     .rotationEffect(.degrees(Self.rotationDegrees))
                     .frame(height: chartHeight * 2)
+                    .animation(.snappy, value: guageValue)
                 
-                Text("\(Int(viewModel.indexValue))")
+                Text(guageValue, format: .number)
                     .font(.ico24B)
                     .foregroundColor(.iCoLabel)
                     .minimumScaleFactor(0.5)
                     .offset(y: -chartHeight * 0.2)
+                    .animation(.snappy, value: guageValue)
+                    .contentTransition(.numericText(countsDown: true))
             }
             .offset(y: chartHeight / 2)
+            .task {
+                Task {
+                    try await Task.sleep(for: .seconds(0.5))
+                    guageValue = viewModel.indexValue
+                }
+            }
         }
     }
 }
