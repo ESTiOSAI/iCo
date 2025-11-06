@@ -49,6 +49,13 @@ struct TopCoinListView: View {
             RoundedRectangle(cornerRadius: 20)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .preference(key: HeightPreferenceKey.self,
+                                value: geo.size.height)
+            }
+        )
         .onAppear {
             Task {
                 await viewModel.fetchData()
