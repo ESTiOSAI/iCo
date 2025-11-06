@@ -63,7 +63,7 @@ struct FearGreedView: View {
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             if hSizeClass == .compact {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
                     Group {
                         Text("지금 시장은")
                         
