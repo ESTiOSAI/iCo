@@ -36,6 +36,7 @@ struct AIBriefingView: View {
                 if isPadLayout {
                     HStack(spacing: 16) {
                         briefingView
+                        TopCoinListView()
                     }
                     .onPreferenceChange(HeightPreferenceKey.self) { value in
                         maxHeight = value
@@ -43,6 +44,7 @@ struct AIBriefingView: View {
                 } else {
                     VStack(spacing: 16) {
                         briefingView
+                        TopCoinListView()
                     }
                     .onPreferenceChange(HeightPreferenceKey.self) { value in
                         maxHeight = value
