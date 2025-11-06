@@ -63,7 +63,7 @@ struct AIBriefingView: View {
                 data: data,
                 trailing: {
                     Text($0.sentiment.rawValue)
-                        .font(.ico16B)
+                        .font(.ico18B)
                         .foregroundStyle($0.sentiment.color(for: themeManager.selectedTheme))
                 },
                 content: {

@@ -21,12 +21,12 @@ struct HeaderToggleButton: View {
         } label: {
             HStack {
                 Text(title)
-                    .font(.ico11)
+                    .font(.ico13)
                     .foregroundStyle(.iCoLabelSecondary)
                 
                 HStack(spacing: 4) {
                     Image(systemName: sortOrder.iconName)
-                        .font(.ico12)
+                        .font(.ico14)
                         .foregroundStyle(.iCoLabelSecondary)
                         .animation(nil, value: sortOrder)
                 }

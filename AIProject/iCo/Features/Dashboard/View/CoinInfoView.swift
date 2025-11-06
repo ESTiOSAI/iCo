@@ -31,12 +31,12 @@ struct CoinInfoView: View {
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(recommendCoin.name)
-                        .font(.ico17B)
+                        .font(.ico19B)
                         .bold()
                         .foregroundStyle(.iCoLabel)
                     
                     Text(recommendCoin.id)
-                        .font(.ico12Sb)
+                        .font(.ico14Sb)
                         .fontWeight(.semibold)
                         .foregroundStyle(.iCoLabelSecondary)
                 }
@@ -54,24 +54,24 @@ struct CoinInfoView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 4) {
                         Text("현재가")
-                            .font(.ico14)
+                            .font(.ico16)
                             .foregroundStyle(.iCoLabel)
                         
                         Text(recommendCoin.tradePrice.formatKRW)
-                            .font(.ico14B)
+                            .font(.ico16B)
                             .bold()
                             .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                     }
                     
                     HStack(spacing: 4) {
                         Text("전일대비")
-                            .font(.ico14)
+                            .font(.ico16)
                             .foregroundStyle(.iCoLabel)
                         
                         Group {
                             Text("\(recommendCoin.changeType.code)\(recommendCoin.changeRate.formatRate)")
                         }
-                        .font(.ico14B)
+                        .font(.ico16B)
                         .bold()
                         .foregroundStyle(dynamicStatusColor(for: recommendCoin.changeType))
                     }

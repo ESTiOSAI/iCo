@@ -27,17 +27,17 @@ struct SubheaderView: View {
             HStack(spacing: 4) {
                 if let imageName {
                     Image(systemName: imageName)
-                        .font(.ico19)
+                        .font(.ico21)
                         .foregroundStyle(imageColor)
                 }
                 
                 Text(subheading)
-                    .font(.ico20B)
+                    .font(.ico23B)
                     .foregroundStyle(fontColor)
             }
             if let description {
                 Text(description)
-                    .font(.ico15)
+                    .font(.ico17)
                     .foregroundStyle(fontColor)
                     .lineSpacing(6)
                     .fixedSize(horizontal: false, vertical: true)

@@ -142,6 +142,24 @@ extension Font {
     static var ico21H  = Font.dynamic(size: 21, weight: .heavy)
     static var ico21Bl = Font.dynamic(size: 21, weight: .black)
     
+    // 22pt
+    static var ico22   = Font.dynamic(size: 22, weight: .regular)
+    static var ico22L  = Font.dynamic(size: 22, weight: .light)
+    static var ico22M  = Font.dynamic(size: 22, weight: .medium)
+    static var ico22Sb = Font.dynamic(size: 22, weight: .semibold)
+    static var ico22B  = Font.dynamic(size: 22, weight: .bold)
+    static var ico22H  = Font.dynamic(size: 22, weight: .heavy)
+    static var ico22Bl = Font.dynamic(size: 22, weight: .black)
+    
+    // 23pt
+    static var ico23   = Font.dynamic(size: 23, weight: .regular)
+    static var ico23L  = Font.dynamic(size: 23, weight: .light)
+    static var ico23M  = Font.dynamic(size: 23, weight: .medium)
+    static var ico23Sb = Font.dynamic(size: 23, weight: .semibold)
+    static var ico23B  = Font.dynamic(size: 23, weight: .bold)
+    static var ico23H  = Font.dynamic(size: 23, weight: .heavy)
+    static var ico23Bl = Font.dynamic(size: 23, weight: .black)
+    
     // 24pt
     static var ico24   = Font.dynamic(size: 24, weight: .regular)
     static var ico24L  = Font.dynamic(size: 24, weight: .light)
@@ -150,6 +168,15 @@ extension Font {
     static var ico24B  = Font.dynamic(size: 24, weight: .bold)
     static var ico24H  = Font.dynamic(size: 24, weight: .heavy)
     static var ico24Bl = Font.dynamic(size: 24, weight: .black)
+    
+    // 26pt
+    static var ico26   = Font.dynamic(size: 26, weight: .regular)
+    static var ico26L  = Font.dynamic(size: 26, weight: .light)
+    static var ico26M  = Font.dynamic(size: 26, weight: .medium)
+    static var ico26Sb = Font.dynamic(size: 26, weight: .semibold)
+    static var ico26B  = Font.dynamic(size: 26, weight: .bold)
+    static var ico26H  = Font.dynamic(size: 26, weight: .heavy)
+    static var ico26Bl = Font.dynamic(size: 26, weight: .black)
     
     // 35pt
     static var ico35   = Font.dynamic(size: 35, weight: .regular)

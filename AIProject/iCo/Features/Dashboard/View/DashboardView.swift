@@ -110,7 +110,7 @@ struct DashboardView: View {
                 .background(.ultraThinMaterial)
                 .overlay(alignment: .center) {
                     Text("대시보드")
-                        .font(.ico18B)
+                        .font(.ico20B)
                         .foregroundStyle(.iCoLabel)
 						.offset(y: -5) // 텍스트가 네비게이션바 중앙에 오도록 위치 조정하기
                 }

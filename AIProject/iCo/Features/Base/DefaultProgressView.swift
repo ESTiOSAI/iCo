@@ -81,7 +81,7 @@ struct DefaultProgressView: View {
             .padding(.bottom, 18)
             
             Text(message)
-                .font(.ico14)
+                .font(.ico15)
                 .foregroundColor(.iCoLabel)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)

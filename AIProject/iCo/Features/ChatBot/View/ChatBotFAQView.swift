@@ -39,7 +39,7 @@ struct ChatBotFAQView: View {
                 VStack(spacing: 15) {
                     HStack {
                         Text("안녕하세요, 아이코 챗봇입니다.\n궁금하신 내용을 선택해주세요.")
-                            .font(.ico15)
+                            .font(.ico17)
                         Spacer()
                     }
                     
@@ -51,7 +51,7 @@ struct ChatBotFAQView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
-                        .font(.ico14)
+                        .font(.ico16)
                         .background(.iCoBackgroundAccent)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .overlay(RoundedRectangle(cornerRadius: 15).strokeBorder(.accentGradient, lineWidth: 0.5))
@@ -60,7 +60,7 @@ struct ChatBotFAQView: View {
                 }
             }
             .foregroundStyle(.iCoLabel)
-            .font(.ico14)
+            .font(.ico16)
             .lineSpacing(6)
             .padding(.vertical, 15)
             .padding(.horizontal, 18)

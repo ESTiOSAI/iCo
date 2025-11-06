@@ -37,7 +37,7 @@ struct CoinListSectionView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .font(.ico12)
+            .font(.ico14)
             .foregroundStyle(.iCoLabel)
 
             ForEach(sortedCoins, id: \.coinID) { coin in

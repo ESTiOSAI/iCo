@@ -150,21 +150,21 @@ struct CoinCarouselView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
-                            .font(.ico14B)
+                            .font(.ico16B)
                             .foregroundStyle(.iCoAccent)
                         
                         Text("아이코가 추천하는 이유")
-                            .font(.ico16B)
+                            .font(.ico18B)
                             .foregroundStyle(.iCoLabel)
                     }
                     
                     Text(String.aiGeneratedContentNotice)
-                        .font(.ico11)
+                        .font(.ico13)
                         .foregroundStyle(.iCoNeutral)
                         .lineSpacing(5)
                     
                     Text(coin.comment.byCharWrapping)
-                        .font(.ico14)
+                        .font(.ico16)
                         .lineSpacing(6)
                         .foregroundStyle(.iCoLabel)
                 }

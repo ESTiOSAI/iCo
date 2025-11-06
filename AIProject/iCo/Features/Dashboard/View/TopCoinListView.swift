@@ -19,7 +19,7 @@ struct TopCoinListView: View {
                 
                 Text("주목할 만한 코인 TOP5")
             }
-            .font(.ico16B)
+            .font(.ico18B)
             .padding(.horizontal, 22)
             .padding(.top, 20)
 
@@ -95,13 +95,13 @@ struct TopCoinListSection: View {
                 } label: {
                     HStack {
                         Text("\(index + 1)")
-                            .font(.ico14B)
+                            .font(.ico16B)
                             .foregroundColor(.iCoAccent)
                             .padding(.trailing, 16)
 
                         CachedAsyncImage(resource: .symbol(coin.coinSymbol)) {
                             Text(String(coin.coinSymbol.prefix(1)))
-                                .font(.ico15Sb)
+                                .font(.ico17Sb)
                                 .foregroundStyle(.iCoAccent)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .background(.iCoBackgroundAccent)
@@ -115,14 +115,14 @@ struct TopCoinListSection: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text(viewModel.koreanName(for: coin.id))
-                                .font(.ico15)
+                                .font(.ico17)
                             if viewModel.selectedSegment == .volume {
                                 Text(coin.formatedVolume)
-                                    .font(.ico12)
+                                    .font(.ico14)
                                     .foregroundColor(.iCoLabelSecondary)
                             } else {
                                 Text(coin.formatedRate)
-                                    .font(.ico12)
+                                    .font(.ico14)
                                     .foregroundColor(
                                         coin.change == .rise ? .iCoPositive :
                                         (coin.change == .fall ? .iCoNegative : .iCoNeutral)

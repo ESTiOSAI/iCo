@@ -72,7 +72,7 @@ struct FearGreedView: View {
                             
                         + Text(" 상태예요")
                     }
-                    .font(.ico16B)
+                    .font(.ico18B)
                     .foregroundStyle(.iCoLabel)
                 }
             } else {
@@ -85,7 +85,7 @@ struct FearGreedView: View {
                         
                         + Text(" 상태예요")
                     }
-                    .font(.ico16B)
+                    .font(.ico18B)
                     .foregroundStyle(.iCoLabel)
                 }
             }
@@ -115,14 +115,14 @@ struct FearGreedView: View {
                 Text("100")
                     .offset(y: 6)
             }
-            .font(.ico10M)
+            .font(.ico12M)
             .foregroundStyle(.secondary)
         }
     }
     
     var fearGreedDescription: some View {
         Text("ⓘ 공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
-            .font(.ico11)
+            .font(.ico13)
             .padding(.top, 4)
             .foregroundStyle(.iCoNeutral)
             .lineSpacing(5)

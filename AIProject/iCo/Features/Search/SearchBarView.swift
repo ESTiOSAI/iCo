@@ -36,7 +36,7 @@ struct SearchBarView: View {
                         .autocorrectionDisabled(true)
                         .padding(.horizontal, 8)
                         .submitLabel(.search)
-                        .font(.ico14)
+                        .font(.ico16)
                         .focused($isFocused)
                         .onChange(of: isFocused) {
                             showCancel = isFocused
@@ -67,7 +67,7 @@ struct SearchBarView: View {
                 } label: {
                     Text("취소")
                         .foregroundStyle(.iCoNegative)
-                        .font(.ico13)
+                        .font(.ico15)
                 }
                 .opacity(showCancel ? 1 : 0)
                 .frame(width: showCancel ? 40 : 0, alignment: .trailing)

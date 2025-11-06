@@ -15,7 +15,7 @@ struct RecommendCardView: View {
             CoinInfoView(recommendCoin: recommendCoin)
             
             Text(recommendCoin.comment.byCharWrapping)
-                .font(.ico14)
+                .font(.ico15)
                 .lineSpacing(6)
                 .foregroundStyle(.iCoLabel)
                 .padding(.top, 30)
