@@ -145,7 +145,7 @@ extension FearGreedView {
         private static let gaugeTrim: CGFloat = 0.5
         private static let lineWidth: CGFloat = 10
         private static let rotationDegrees: Double = 180
-        @State private var guageValue: CGFloat = 0
+        @State private var guageValue: CGFloat
         
         let chartWidth: CGFloat
         let chartHeight: CGFloat
@@ -154,6 +154,7 @@ extension FearGreedView {
             self._viewModel = ObservedObject(wrappedValue: viewModel)
             self.chartWidth = chartWidth
             self.chartHeight = chartWidth / 2
+            self.guageValue = viewModel.indexValue
         }
         
         var body: some View {
@@ -191,10 +192,10 @@ extension FearGreedView {
                     .contentTransition(.numericText(countsDown: true))
             }
             .offset(y: chartHeight / 2)
-            .task {
+            .onChange(of: viewModel.indexValue) { _, newValue in
                 Task {
                     try await Task.sleep(for: .seconds(0.5))
-                    guageValue = viewModel.indexValue
+                    guageValue = newValue
                 }
             }
         }
