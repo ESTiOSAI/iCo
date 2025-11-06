@@ -101,6 +101,7 @@ struct FearGreedView: View {
                 fearGreedDescription
             }
         }
+        .animation(.easeInOut, value: viewModel.classification)
     }
     
     var chartSection: some View {
