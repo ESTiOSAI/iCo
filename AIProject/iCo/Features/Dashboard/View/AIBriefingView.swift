@@ -65,11 +65,6 @@ struct AIBriefingView: View {
                         .foregroundStyle($0.sentiment.color(for: themeManager.selectedTheme))
                 },
                 content: {
-                    Text(String.aiGeneratedContentNotice)
-                        .font(.ico11)
-                        .foregroundStyle(.iCoNeutral)
-                        .lineSpacing(5)
-                    
                     Text($0.summary.byCharWrapping)
                 }
             )
