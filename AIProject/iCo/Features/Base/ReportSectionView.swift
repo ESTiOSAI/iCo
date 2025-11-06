@@ -65,7 +65,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             // Header
             HStack {
                 Image(systemName: data.icon)
@@ -91,6 +91,13 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                         data.onCancel()
                     }
                 case .success(let value):
+                    if !(Trailing.self == EmptyView.self) {
+                        Text(String.aiGeneratedContentNotice)
+                            .font(.ico11)
+                            .foregroundStyle(.iCoNeutral)
+                            .lineSpacing(5)
+                    }
+                    
                     content(value)
                         .font(.ico14)
                         .foregroundStyle(.iCoLabel)
@@ -102,6 +109,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                         TimestampWithRefreshButtonView(timestamp: ts) {
                             data.onRetry()
                         }
+                        .padding(.top, 2)
                     }
                 case .cancel(let error):
                     DefaultProgressView(status: .cancel, message: error.localizedDescription) {
