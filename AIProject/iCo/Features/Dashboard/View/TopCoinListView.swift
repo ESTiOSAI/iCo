@@ -49,7 +49,6 @@ struct TopCoinListView: View {
             RoundedRectangle(cornerRadius: 20)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
-        .padding(.horizontal, 16)
         .onAppear {
             Task {
                 await viewModel.fetchData()
