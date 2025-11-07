@@ -14,7 +14,6 @@ enum Prompt {
     case generateTodayNews(coinKName: String, today: String = Date().dateAndTime)
     case generateWeeklyTrends(coinKName: String, today: String = Date().dateAndTime)
     case extractCoinID(text: String)
-    case generateTodayInsight(today: String = Date().dateAndTime)
     case generateCommunityInsight(redditPost: String)
     case generateBookmarkBriefing(importance: String, bookmarks: String)
     
@@ -75,17 +74,6 @@ enum Prompt {
             """
             아래의 문자열에서 가상화폐를 찾아. 빈 배열에 모든 화폐의 심볼을 담고 “,” 로 구분해서 반환해. 응답에 다른 설명은 배제해.
             \(text)
-            """
-        case.generateTodayInsight(let today):
-            """
-            struct InsightDTO: Codable {
-                let todaysSentiment: String
-                let summary: String
-            }
-            
-            \(today) 기준 최근 2시간동안 한국 암호화폐 뉴스 분석 후 분위기(호재, 악재, 중립)와 그렇게 판단한 이유 200자로 요약
-            이유는 호재라면 긍정 요인, 악재라면 부정 요인만 요약, 중립이라면 긍정, 부정 요인을 자연스럽게 연결해 요약 
-            위 JSON 형식으로 작성 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case.generateCommunityInsight(let redditPost):
             """
