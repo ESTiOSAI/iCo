@@ -100,19 +100,8 @@ struct TopCoinListSection: View {
                             .foregroundColor(.iCoAccent)
                             .padding(.trailing, 16)
                         
-                        CachedAsyncImage(resource: .symbol(coin.coinSymbol)) {
-                            Text(String(coin.coinSymbol.prefix(1)))
-                                .font(.ico17Sb)
-                                .foregroundStyle(.iCoAccent)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(.iCoBackgroundAccent)
-                                .overlay(
-                                    Circle().strokeBorder(.defaultGradient, lineWidth: 0.5)
-                                )
-                        }
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                        .padding(.trailing, 8)
+                        CoinView(symbol: coin.coinSymbol, size: 40)
+                            .padding(.trailing, 8)
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text(viewModel.koreanName(for: coin.id))
