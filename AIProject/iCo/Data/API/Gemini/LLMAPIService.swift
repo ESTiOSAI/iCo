@@ -179,65 +179,6 @@ extension LLMAPIService {
         return try await fetchDTO(prompt: prompt, action: .coinReportGeneration)
     }
     
-    /// 2시간 단위 전체 시장 요약 데이터를 가져옵니다.
-    /// 캐시가 유효하면 캐시를 우선 사용하고, 없거나 만료되면 새로 요청 후 캐싱합니다.
-    ///
-    /// - Parameter ignoreCache: 캐시 여부
-    /// - Returns: 디코딩된 DTO
-    func fetchTodayInsight(ignoreCache: Bool = false) async throws -> Insight {
-        let now = Date.now
-        let interval: TimeInterval = 60 * 60
-        
-        if !ignoreCache {
-            if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefTodayTimestamp) as? String, let savedDate = Date.dateAndTimeFormatter.date(from: lastTimestamp) {
-                let cacheURL = URL(string: "https://cache.local/dashboard/today/\(lastTimestamp)")!
-                let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-                
-                if let cachedResponse = URLCache.shared.cachedResponse(for: request),
-                   now.timeIntervalSince(savedDate) < interval {
-                    do {
-                        let dto: InsightDTO = try JSONDecoder().decode(InsightDTO.self, from: cachedResponse.data)
-                        return dto.toDomain()
-                    } catch let decodingError as DecodingError {
-                        throw NetworkError.decodingError(decodingError)
-                    }
-                    
-                }
-            }
-        }
-        
-        let cacheURL = URL(string: "https://cache.local/dashboard/today/\(now.dateAndTime)")!
-        let request = URLRequest(url: cacheURL, cachePolicy: .returnCacheDataElseLoad)
-        
-        let prompt = Prompt.generateTodayInsight()
-        let dto: InsightDTO = try await fetchDTO(prompt: prompt, action: .dashboardBriefingGeneration)
-        
-        do {
-            let jsonData = try JSONEncoder().encode(dto)
-            
-            let response = URLResponse(
-                url: cacheURL,
-                mimeType: "application/json",
-                expectedContentLength: jsonData.count,
-                textEncodingName: "utf-8"
-            )
-            let cacheEntry = CachedURLResponse(response: response, data: jsonData)
-            URLCache.shared.storeCachedResponse(cacheEntry, for: request)
-        } catch {
-            throw NetworkError.encodingError
-        }
-        
-        if let lastTimestamp = UserDefaults.standard.value(forKey: AppStorageKey.cacheBriefTodayTimestamp) as? String {
-            let oldCacheURL = URL(string: "https://cache.local/dashboard/today/\(lastTimestamp)")!
-            let oldRequest = URLRequest(url: oldCacheURL, cachePolicy: .returnCacheDataElseLoad)
-            URLCache.shared.removeCachedResponse(for: oldRequest)
-        }
-        
-        UserDefaults.standard.set(now.dateAndTime, forKey: AppStorageKey.cacheBriefTodayTimestamp)
-        
-        return dto.toDomain()
-    }
-    
     /// 커뮤니티(예: Reddit) 게시글 요약을 기반으로 감정(`Sentiment`)과 요약을 생성합니다.
     /// 캐시가 유효하면 캐시를 우선 사용하고, 없거나 만료되면 새로 요청 후 캐싱합니다.
     ///

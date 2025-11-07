@@ -22,8 +22,6 @@ enum AppStorageKey {
     static let cacheCoinRecomURL = "cacheCoinRecomURL"
     /// AI 추천 코인 URL 캐시 시각 저장 키
     static let cacheCoinRecomTimestamp = "cacheCoinRecomTimestamp"
-    /// 오늘의 브리핑 캐시 시각 저장 키
-    static let cacheBriefTodayTimestamp = "cacheBriefTodayTimestamp"
     /// 커뮤니티 브리핑 캐시 시각 저장 키
     static let cacheBriefCommunityTimestamp = "cacheBriefCommunityTimestamp"
     /// 위젯에 북마크된 데이터 저장 키

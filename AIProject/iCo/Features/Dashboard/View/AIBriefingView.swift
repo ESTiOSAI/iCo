@@ -9,7 +9,7 @@ import SwiftUI
 
 /// 대시보드에서 AI 브리핑 섹션을 보여주는 뷰입니다.
 ///
-/// 오늘의 인사이트, 커뮤니티 반응, 공포 탐욕 지수으로 구성합니다.
+/// 오늘의 커뮤니티 반응, 공포 탐욕 지수, 거래대금/상승률 TOP5로 구성합니다.
 struct AIBriefingView: View {
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass

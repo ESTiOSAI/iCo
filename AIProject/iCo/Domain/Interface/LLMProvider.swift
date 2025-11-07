@@ -20,7 +20,6 @@ protocol LLMRecommendCoinFetching {
 protocol LLMProvider: LLMReportFetching, LLMRecommendCoinFetching {
     func postAnswer(content: String, action: LLMAction) async throws -> LLMResponseDTO
     func fetchRecommendCoins(preference: String, bookmarkCoins: String, ignoreCache: Bool) async throws -> [RecommendCoinDTO]
-    func fetchTodayInsight(ignoreCache: Bool) async throws -> Insight
     func fetchCommunityInsight(from post: String, now: Date, ignoreCache: Bool) async throws -> Insight
     func fetchBookmarkBriefing(for coins: [BookmarkEntity], character: RiskTolerance) async throws -> PortfolioBriefingDTO
 }
