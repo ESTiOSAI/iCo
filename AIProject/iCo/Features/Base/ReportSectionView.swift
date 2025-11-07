@@ -69,11 +69,11 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             // Header
             HStack {
                 Image(systemName: data.icon)
-                    .font(.ico14B)
+                    .font(.ico16B)
                     .foregroundStyle(.iCoAccent)
                 
                 Text(data.title)
-                    .font(.ico16B)
+                    .font(.ico18B)
                     .foregroundStyle(.iCoLabel)
                 
                 Spacer()
@@ -93,13 +93,13 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
                 case .success(let value):
                     if !(Trailing.self == EmptyView.self) {
                         Text(String.aiGeneratedContentNotice)
-                            .font(.ico11)
+                            .font(.ico13)
                             .foregroundStyle(.iCoNeutral)
                             .lineSpacing(5)
                     }
                     
                     content(value)
-                        .font(.ico14)
+                        .font(.ico15)
                         .foregroundStyle(.iCoLabel)
                         .lineSpacing(6)
                         .fixedSize(horizontal: false, vertical: true)
@@ -226,7 +226,7 @@ struct ReportSectionView<Value, Trailing: View, Content: View>: View {
             trailing: { value in
                 Button(action: { UIPasteboard.general.string = value }) {
                     Image(systemName: "doc.on.doc")
-                        .font(.ico14Sb)
+                        .font(.ico16Sb)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("내용 복사")

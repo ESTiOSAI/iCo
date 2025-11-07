@@ -40,7 +40,7 @@ struct SegmentedControlView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
-                        .foregroundColor(selection == idx ? .iCoBackgroundWhite : .iCoLabelSecondary)
+                        .foregroundColor(selection == idx ? .white : .iCoLabelSecondary)
                         .background(
                             ZStack {
                                 if selection == idx {

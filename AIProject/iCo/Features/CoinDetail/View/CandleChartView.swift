@@ -148,7 +148,7 @@ struct CandleChartView: View {
                     if date <= visibleRight {
                         AxisValueLabel {
                             Text(timeFormatter.string(from: date))
-                                .font(.ico11)
+                                .font(.ico13)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.75)
                                 .dynamicTypeSize(.xSmall ... .medium)

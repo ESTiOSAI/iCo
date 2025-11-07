@@ -63,7 +63,7 @@ struct FearGreedView: View {
     var headerSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             if hSizeClass == .compact {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
                     Group {
                         Text("지금 시장은")
                         
@@ -72,7 +72,7 @@ struct FearGreedView: View {
                             
                         + Text(" 상태예요")
                     }
-                    .font(.ico16B)
+                    .font(.ico18B)
                     .foregroundStyle(.iCoLabel)
                 }
             } else {
@@ -85,7 +85,7 @@ struct FearGreedView: View {
                         
                         + Text(" 상태예요")
                     }
-                    .font(.ico16B)
+                    .font(.ico18B)
                     .foregroundStyle(.iCoLabel)
                 }
             }
@@ -101,6 +101,7 @@ struct FearGreedView: View {
                 fearGreedDescription
             }
         }
+        .animation(.easeInOut, value: viewModel.classification)
     }
     
     var chartSection: some View {
@@ -115,14 +116,14 @@ struct FearGreedView: View {
                 Text("100")
                     .offset(y: 6)
             }
-            .font(.ico10M)
+            .font(.ico12M)
             .foregroundStyle(.secondary)
         }
     }
     
     var fearGreedDescription: some View {
         Text("ⓘ 공포 탐욕 지수는 투자 심리를 0~100 사이 수치로 나타낸 지표로, 0에 가까울수록 불안감으로 투자를 피하는 '공포', 100에 가까울수록 낙관적으로 적극 매수하는 '탐욕'을 의미합니다.".byCharWrapping)
-            .font(.ico11)
+            .font(.ico13)
             .padding(.top, 4)
             .foregroundStyle(.iCoNeutral)
             .lineSpacing(5)
@@ -145,7 +146,7 @@ extension FearGreedView {
         private static let gaugeTrim: CGFloat = 0.5
         private static let lineWidth: CGFloat = 10
         private static let rotationDegrees: Double = 180
-        @State private var guageValue: CGFloat = 0
+        @State private var guageValue: CGFloat
         
         let chartWidth: CGFloat
         let chartHeight: CGFloat
@@ -154,6 +155,7 @@ extension FearGreedView {
             self._viewModel = ObservedObject(wrappedValue: viewModel)
             self.chartWidth = chartWidth
             self.chartHeight = chartWidth / 2
+            self.guageValue = viewModel.indexValue
         }
         
         var body: some View {
@@ -191,10 +193,10 @@ extension FearGreedView {
                     .contentTransition(.numericText(countsDown: true))
             }
             .offset(y: chartHeight / 2)
-            .task {
+            .onChange(of: viewModel.indexValue) { _, newValue in
                 Task {
                     try await Task.sleep(for: .seconds(0.5))
-                    guageValue = viewModel.indexValue
+                    guageValue = newValue
                 }
             }
         }

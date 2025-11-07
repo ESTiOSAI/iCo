@@ -13,25 +13,25 @@ struct BriefingSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("분석 결과")
-                .font(.ico14Sb)
+                .font(.ico16Sb)
                 .foregroundColor(Color(.iCoAccent))
             
             briefing.briefing
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.ico14)
+                .font(.ico16)
                 .lineSpacing(6)
             
             Spacer(minLength: 20)
             
             Text("전략 제안")
-                .font(.ico14Sb)
+                .font(.ico16Sb)
                 .foregroundColor(Color(.iCoAccent))
             
             briefing.strategy
                 .byCharWrapping
                 .highlightTextForNumbersOperator()
-                .font(.ico14)
+                .font(.ico16)
                 .lineSpacing(6)
         }
     }

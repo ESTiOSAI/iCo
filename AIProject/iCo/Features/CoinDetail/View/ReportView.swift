@@ -18,12 +18,12 @@ struct ReportView: View {
         VStack(alignment: .leading, spacing: 16) {
             if hSizeClass == .regular {
                 Text("AI 리포트")
-                    .font(.ico18B)
+                    .font(.ico20B)
                     .foregroundStyle(.iCoLabel)
             }
             
             Text(String.aiGeneratedContentNotice)
-                .font(.ico11)
+                .font(.ico13)
                 .foregroundStyle(.iCoNeutral)
                 .lineSpacing(5)
             

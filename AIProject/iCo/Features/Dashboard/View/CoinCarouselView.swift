@@ -58,10 +58,7 @@ struct CoinCarouselView: View {
                     let coin = tempCoinArray[index]
                     
                     RecommendCardView(recommendCoin: coin)
-                        .frame(
-                            width: nil,
-                            height: CardConst.cardHeight
-                        )
+                        .frame(height: CardConst.cardHeight)
                         .onTapGesture {
                             selectedCoin = coin
                         }
@@ -79,7 +76,7 @@ struct CoinCarouselView: View {
                 }
             }
             .scrollTargetLayout()
-            .frame(height: CardConst.cardHeight, alignment: .top)
+//            .frame(height: CardConst.cardHeight, alignment: .top)
         }
         .contentMargins(.horizontal, CardConst.cardInnerPadding + .spacingXSmall) // 활성 카드의 양쪽에 2개의 카드 꽁지가 보이게하기
         .scrollTargetBehavior(.viewAligned)
@@ -142,29 +139,29 @@ struct CoinCarouselView: View {
             wrappedCoins.removeAll()
         }
         .sheet(item: $selectedCoin) { coin in
-            VStack(spacing: .spacing) {
+            VStack(spacing: 30) {
                 CoinInfoView(recommendCoin: coin) {
                     selectedCoin = nil
                 }
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
-                            .font(.ico14B)
+                            .font(.ico16B)
                             .foregroundStyle(.iCoAccent)
                         
                         Text("아이코가 추천하는 이유")
-                            .font(.ico16B)
+                            .font(.ico18B)
                             .foregroundStyle(.iCoLabel)
                     }
                     
                     Text(String.aiGeneratedContentNotice)
-                        .font(.ico11)
+                        .font(.ico13)
                         .foregroundStyle(.iCoNeutral)
-                        .lineSpacing(5)
+                        .lineSpacing(6)
                     
                     Text(coin.comment.byCharWrapping)
-                        .font(.ico14)
+                        .font(.ico16)
                         .lineSpacing(6)
                         .foregroundStyle(.iCoLabel)
                 }
@@ -292,13 +289,11 @@ extension CoinCarouselView {
             if !isSheetPresented {
                 isSheetPresented = true
                 viewModel.stopTimer()
-                print("‼️stop")
             }
         } else {
             if isSheetPresented {
                 isSheetPresented = false
                 viewModel.startTimer()
-                print("‼️start")
             }
         }
     }

@@ -17,7 +17,7 @@ struct ChatInputView: View {
         HStack {
             TextField("무엇이든 물어보세요.", text: $viewModel.searchText, axis: .vertical)
                 .lineLimit(1...3)
-                .font(.ico14)
+                .font(.ico16)
                 .foregroundStyle(.iCoLabel)
                 .focused($isFocused)
 

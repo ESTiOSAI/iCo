@@ -35,7 +35,7 @@ struct CommonPlaceholderView: View {
                 .padding(.bottom, 16)
             
             Text(text)
-                .font(.ico14)
+                .font(.ico15)
                 .foregroundStyle(.iCoLabelSecondary)
                 .lineSpacing(6)
         }

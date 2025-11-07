@@ -31,13 +31,13 @@ struct RoundedButton: View {
             HStack(spacing: 4) {
                 if let title {
                     Text(title)
-                        .font(.ico11)
+                        .font(.ico14)
                         .tint(foregroundColor ?? .iCoLabel)
                 }
                 
                 if let imageName {
                     Image(systemName: imageName)
-                        .font(.ico10)
+                        .font(.ico13)
                         .tint(foregroundColor ?? .iCoLabelSecondary)
                         .rotation3DEffect(
                             .degrees(isRotated ? 180 : 0),

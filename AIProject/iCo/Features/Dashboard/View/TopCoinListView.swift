@@ -18,10 +18,9 @@ struct TopCoinListView: View {
                     .foregroundStyle(.iCoAccent)
                 
                 Text("주목할 만한 코인 TOP5")
+                    .foregroundStyle(.iCoLabel)
             }
-            .font(.ico16B)
-            .padding(.horizontal, 22)
-            .padding(.top, 20)
+            .font(.ico18B)
 
             SegmentedControlView(
                 selection: Binding(
@@ -35,7 +34,8 @@ struct TopCoinListView: View {
                 tabTitles: TopCoinListViewModel.SegmentType.allCases.map { $0.rawValue },
                 width: .infinity
             )
-            .padding(.horizontal)
+            .padding(.horizontal, -4)
+            .padding(.bottom, 4)
             
             if viewModel.isLoading {
                 DefaultProgressView(status: .loading, message: "시세 불러오는중")
@@ -43,6 +43,7 @@ struct TopCoinListView: View {
                 TopCoinListSection(viewModel: viewModel)
             }
         }
+        .padding(22)
         .background(.iCoBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(
@@ -95,13 +96,13 @@ struct TopCoinListSection: View {
                 } label: {
                     HStack {
                         Text("\(index + 1)")
-                            .font(.ico14B)
+                            .font(.ico15B)
                             .foregroundColor(.iCoAccent)
                             .padding(.trailing, 16)
-
+                        
                         CachedAsyncImage(resource: .symbol(coin.coinSymbol)) {
                             Text(String(coin.coinSymbol.prefix(1)))
-                                .font(.ico15Sb)
+                                .font(.ico17Sb)
                                 .foregroundStyle(.iCoAccent)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .background(.iCoBackgroundAccent)
@@ -115,20 +116,23 @@ struct TopCoinListSection: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text(viewModel.koreanName(for: coin.id))
-                                .font(.ico15)
+                                .font(.ico16Sb)
+                                .lineLimit(1)
+                                .foregroundStyle(.iCoLabel)
                             if viewModel.selectedSegment == .volume {
                                 Text(coin.formatedVolume)
-                                    .font(.ico12)
+                                    .font(.ico14)
                                     .foregroundColor(.iCoLabelSecondary)
                             } else {
                                 Text(coin.formatedRate)
-                                    .font(.ico12)
+                                    .font(.ico14)
                                     .foregroundColor(
                                         coin.change == .rise ? .iCoPositive :
                                         (coin.change == .fall ? .iCoNegative : .iCoNeutral)
                                     )
                             }
                         }
+                        .padding(.trailing, 8)
 
                         Spacer()
 
@@ -137,21 +141,24 @@ struct TopCoinListSection: View {
                                 values: values,
                                 lineColor: coin.change == .fall ? .iCoNegative : .iCoPositive
                             )
-                            .frame(width: 100, height: 40)
+                            .frame(width: 80, height: 40)
                         } else {
                             ProgressView()
-                                .frame(width: 100, height: 40)
+                                .frame(width: 80, height: 40)
                         }
                     }
-                    .padding(.vertical, 16)
-                    .padding(.horizontal, 22)
+                    .padding(.bottom, index != viewModel.topCoins.count - 1 ? 14 : 0)
                 }
                 .buttonStyle(.plain)
             }
         }
+        .padding(.vertical, 4)
     }
 }
 
 #Preview {
     TopCoinListView()
+        .environmentObject(ThemeManager())
+        .environment(CoinStore(coinService: DefaultCoinService(network: NetworkClient())))
+        .padding()
 }

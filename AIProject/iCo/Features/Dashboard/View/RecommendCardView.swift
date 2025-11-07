@@ -14,11 +14,12 @@ struct RecommendCardView: View {
         VStack(alignment: .leading, spacing: 0) {
             CoinInfoView(recommendCoin: recommendCoin)
             
+            Spacer()
+            
             Text(recommendCoin.comment.byCharWrapping)
-                .font(.ico14)
+                .font(.ico15)
                 .lineSpacing(6)
                 .foregroundStyle(.iCoLabel)
-                .padding(.top, 30)
         }
         .padding(24)
         .background(

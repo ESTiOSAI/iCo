@@ -43,15 +43,15 @@ fileprivate struct CoinMetaView: View {
             CoinView(symbol: symbol, size: 30)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(name.highlighted(searchTerm, font: name.count < 8 ? .ico14B : .ico12B))
+                Text(name.highlighted(searchTerm, font: name.count < 7 ? .ico16B : .ico14B))
                     .lineLimit(1)
-                    .font(name.count < 8 ? .ico14B : .ico12B)
+                    .font(name.count < 7 ? .ico16B : .ico14B)
                 
                 Text(symbol.highlighted(searchTerm))
                     .foregroundStyle(.secondary)
             }
         }
-        .font(.ico11M)
+        .font(.ico13M)
         .foregroundStyle(.iCoLabel)
     }
 }
@@ -89,30 +89,30 @@ fileprivate struct CoinPriceView: View {
                 
                 Text(ticker.snapshot.formatedPrice)
                     .frame(minWidth: priceWidth, alignment: .trailing)
-                    .font(.ico15M)
+                    .font(.ico17M)
                     .blinkUnderlineOnChange(ticker.snapshot.price)
             }
             .frame(alignment: .trailing)
             
             HStack(spacing: 0) {
                 Text("거래")
-                    .font(.ico11M)
+                    .font(.ico13M)
                 Text(ticker.snapshot.formatedVolume)
                     .frame(minWidth: volumeWidth, alignment: .trailing)
             }
         }
-        .font(.ico12M)
+        .font(.ico14M)
         .foregroundStyle(.iCoLabel)
         .background {
             VStack {
                 ZStack {
                     Text(ticker.snapshot.formatedPrice)
-                        .font(.ico15M)
+                        .font(.ico17M)
                         .measureWidth { w in
                             priceWidth = w + pricePadding
                         }
                     Text(ticker.snapshot.formatedVolume)
-                        .font(.ico11M)
+                        .font(.ico13M)
                         .measureWidth { w in
                             volumeWidth = w + pricePadding
                         }

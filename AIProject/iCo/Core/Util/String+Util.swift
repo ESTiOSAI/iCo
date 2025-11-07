@@ -116,7 +116,7 @@ extension String {
     ///   - searchTerm: 검색어
     func highlighted(_ searchTerm: String,
                      color: Color = .iCoAccent,
-                     font: Font = Font.system(size: 14, weight: .bold)) -> AttributedString {
+                     font: Font = Font.system(size: 16, weight: .bold)) -> AttributedString {
         var attributed = AttributedString(self)
         let lowercasedText = self.lowercased()
         let lowercasedSearch = searchTerm.lowercased()
