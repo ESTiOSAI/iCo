@@ -289,13 +289,11 @@ extension CoinCarouselView {
             if !isSheetPresented {
                 isSheetPresented = true
                 viewModel.stopTimer()
-                print("‼️stop")
             }
         } else {
             if isSheetPresented {
                 isSheetPresented = false
                 viewModel.startTimer()
-                print("‼️start")
             }
         }
     }
