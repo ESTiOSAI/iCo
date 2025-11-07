@@ -60,7 +60,7 @@ final class TopCoinListViewModel: ObservableObject {
                 let targetIDs = Array(Set(topVolumeIDs + topRateIDs))
                 
                 guard !Task.isCancelled else { return }
-                
+                try? await Task.sleep(for: .seconds(2))
                 await withTaskGroup(of: Void.self) { group in
                     for id in targetIDs {
                         group.addTask {
