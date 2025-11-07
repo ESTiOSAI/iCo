@@ -85,7 +85,7 @@ enum Prompt {
                 let summary: String
             }
             
-            커뮤니티 분위기(호재, 악재, 중립)와 그렇게 평가한 이유를 한글로 200자 이상으로 요약해 위 JSON으로 제공 (답변은 한글, 마크다운 금지, 출처 제외)
+            커뮤니티 분위기(호재, 악재, 중립)와 그렇게 평가한 이유를 한글로 200자 이상으로 요약해 위 형식으로 작성해서 JSON으로 제공 (답변은 한글, 마크다운 금지, 출처 제외)
             """
         case .generateBookmarkBriefing(let importance, let bookmarks):
             """
