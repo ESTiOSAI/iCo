@@ -103,7 +103,7 @@ struct TopCoinListSection: View {
                         CoinView(symbol: coin.coinSymbol, size: 40)
                             .padding(.trailing, 8)
 
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(viewModel.koreanName(for: coin.id))
                                 .font(.ico16Sb)
                                 .lineLimit(1)
