@@ -29,7 +29,7 @@ struct AIBriefingView: View {
         SubheaderView(subheading: "시장 한눈에 보기")
             .padding(.bottom, 4)
         
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 16) {
             FearGreedView()
             
             VStack(spacing: 16) {
