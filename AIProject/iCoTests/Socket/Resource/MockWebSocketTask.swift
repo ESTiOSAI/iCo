@@ -1,9 +1,25 @@
+//
+//  MockWebSocketTask.swift
+//  iCo
+//
+//  Created by 강대훈 on 11/12/25.
+//
+
+import Foundation
+@testable import iCo
+
 final class MockWebSocketTask: WebSocketType {
     var delegate: URLSessionTaskDelegate?
+    
+    private var closed: Bool = false
     private var taskState: URLSessionTask.State = .completed
+    private var fakeSession: URLSession = URLSession(configuration: .ephemeral)
+    private var fakeTask: URLSessionWebSocketTask {
+        fakeSession.webSocketTask(with: URL(string: "wss://")!)
+    }
     
     var state: URLSessionTask.State {
-        taskState
+        return taskState
     }
     
     private var throwError: Bool
@@ -19,15 +35,32 @@ final class MockWebSocketTask: WebSocketType {
     }
     
     func resume() {
-        taskState = .suspended
         resumeCallCount += 1
-        taskState = .running
-        // Delegate 호출이 있어야 함.
+        
+        if let delegate = delegate as? URLSessionWebSocketDelegate {
+            delegate.urlSession?(fakeSession, webSocketTask: fakeTask, didOpenWithProtocol: nil)
+            taskState = .running
+        }
     }
     
     func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         cancelCallCount += 1
-        // Delegate 호출이 있어야 함.
+        taskState = .canceling
+        closed = true
+        
+        if let delegate = delegate as? URLSessionWebSocketDelegate {
+            delegate.urlSession?(fakeSession, webSocketTask: fakeTask, didCloseWith: closeCode, reason: nil)
+            delegate.urlSession?(fakeSession, task: fakeTask, didCompleteWithError: nil)
+        }
+    }
+    
+    func cancel() {
+        cancelCallCount += 1
+        taskState = .canceling
+        closed = true
+        
+        let error = URLError(.notConnectedToInternet)
+        delegate?.urlSession?(fakeSession, task: fakeTask, didCompleteWithError: error)
     }
     
     func send(_ message: URLSessionWebSocketTask.Message) async throws {
@@ -42,19 +75,21 @@ final class MockWebSocketTask: WebSocketType {
         sendCallCount += 1
     }
     
-    func cancel() {
-        cancelCallCount += 1
-        // Delegate 호출이 있어야 함.
-    }
-    
     func sendPing(pongReceiveHandler: @escaping ((any Error)?) -> Void) {
         sendPingCallCount += 1
         // 아직 모르겠음.
     }
     
     func receive() async throws -> URLSessionWebSocketTask.Message {
-        // 어떤 경우에 에러를 던지는지 생각해봐야 함.
+        if closed { // 작업이 종료되었을 때 에러 던져야 함.
+            throw NSError(
+                domain: NSURLErrorDomain,
+                code: URLError.cancelled.rawValue,
+                userInfo: nil
+            )
+        }
+        
         receiveCallCount += 1
-        return .string("데이터 잘 받음.")
+        return .string("데이터 잘 받았습니다.")
     }
 }
