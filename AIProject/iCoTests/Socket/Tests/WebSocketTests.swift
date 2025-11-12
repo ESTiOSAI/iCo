@@ -11,7 +11,7 @@ import XCTest
 final class WebSocketTests: XCTestCase {
     let url: URL = URL(string: "wss://")!
     var broadCaster: MockAsyncStreamBroadCaster<WebSocket.State>!
-    var sut: MockWebSocketClient!
+    var sut: WebSocketClient!
     var task: MockWebSocketTask!
     var urlSession: MockURLSession!
     
@@ -19,7 +19,7 @@ final class WebSocketTests: XCTestCase {
         task = MockWebSocketTask()
         broadCaster = MockAsyncStreamBroadCaster()
         urlSession = MockURLSession(task: task)
-        sut = MockWebSocketClient(url: url, session: urlSession, stateBroadCaster: broadCaster)
+        sut = WebSocketClient(url: url, session: urlSession, stateBroadCaster: broadCaster)
     }
     
     override func tearDown() async throws {
@@ -81,8 +81,8 @@ final class WebSocketTests: XCTestCase {
         
         // act
         await sut.connect()
-        await sut.disconnectWithCloseCode()
-        try? await Task.sleep(for: .seconds(3))
+        task.disconnect(with: .internalServerError)
+        try? await Task.sleep(for: .seconds(4))
         
         // assert
         XCTAssertEqual(expectedLog, broadCaster.log)
@@ -103,13 +103,98 @@ final class WebSocketTests: XCTestCase {
         ]
         
         await sut.connect()
-        await sut.disconnectWithoutCloseCode()
-        try? await Task.sleep(for: .seconds(3))
+        task.disconnect(with: .internalServerError)
+        try? await Task.sleep(for: .seconds(4))
         
         XCTAssertEqual(expectedLog, broadCaster.log)
         XCTAssertNotNil(sut.task)
         XCTAssertNotNil(sut.stateTask)
         XCTAssertNotNil(sut.receiveTask)
         XCTAssertNotNil(sut.healthCheck)
+    }
+    
+    func testSend_Failed_notConnected() async throws {
+        let value: ()? = try? await sut.send(text: "Hello")
+        XCTAssertNil(value)
+    }
+    
+    func testSend_Success() async throws {
+        let values = ["Hello", "Swift", "Test"]
+        
+        await sut.connect()
+        
+        try await sut.send(text: values[0])
+        try await sut.send(text: values[1])
+        try await sut.send(text: values[2])
+        
+        if case .string(let text) = task.messages[1] {
+            XCTAssertEqual(text, values[1])
+        } else {
+            XCTFail("not found")
+        }
+        
+        XCTAssertEqual(task.sendCallCount, 3)
+        XCTAssertEqual(task.messages.count, 3)
+    }
+    
+    func testSend_dataSucess() async throws {
+        await sut.connect()
+        
+        try await sut.send(data: Data("Hello".utf8))
+        
+        if case .data(let encoded) = task.messages[0] {
+            XCTAssertEqual("Hello", String(data: encoded, encoding: .utf8))
+        } else {
+            XCTFail("not found")
+        }
+        
+        XCTAssertEqual(task.sendCallCount, 1)
+    }
+    
+    func testPing_Failed_notConnected() async throws {
+        let exp = expectation(description: "Wait for request")
+        
+        makeSUTError()
+        task.sendPing { error in
+            XCTAssertNotNil(error)
+            exp.fulfill()
+        }
+        
+        await fulfillment(of: [exp], timeout: 0.3)
+    }
+    
+    func testPing_Failed_pingTimeout() async throws {
+        let exp = expectation(description: "Wait for request")
+        
+        makeSUTError()
+        await sut.connect()
+        task.sendPing { error in
+            XCTAssertNotNil(error)
+            exp.fulfill()
+        }
+        
+        await fulfillment(of: [exp], timeout: 0.3)
+    }
+    
+    func testPing_Success() async throws {
+        let exp = expectation(description: "Wait for request")
+        
+        await sut.connect()
+        
+        task.sendPing { error in
+            XCTAssertNil(error)
+            exp.fulfill()
+        }
+        
+        await fulfillment(of: [exp], timeout: 0.3)
+    }
+}
+
+extension WebSocketTests {
+    private func makeSUTError() {
+        task = MockWebSocketTask(throwError: true)
+        broadCaster = MockAsyncStreamBroadCaster()
+        urlSession = MockURLSession(task: task)
+        sut = WebSocketClient(url: url, session: urlSession, stateBroadCaster: broadCaster)
     }
 }

@@ -24,6 +24,8 @@ final class MockWebSocketTask: WebSocketType {
     
     private var throwError: Bool
     
+    var messages: [URLSessionWebSocketTask.Message] = []
+    
     var resumeCallCount: Int = 0
     var cancelCallCount: Int = 0
     var sendCallCount: Int = 0
@@ -72,12 +74,22 @@ final class MockWebSocketTask: WebSocketType {
             )
         }
         
+        messages.append(message)
         sendCallCount += 1
     }
     
     func sendPing(pongReceiveHandler: @escaping ((any Error)?) -> Void) {
-        sendPingCallCount += 1
-        // 아직 모르겠음.
+        if throwError || state != .running {
+            pongReceiveHandler(NSError(
+                domain: NSURLErrorDomain,
+                code: -1009,
+                userInfo: [NSLocalizedDescriptionKey: "The Internet connection appears to be offline."]
+            ))
+            return
+        } else {
+            pongReceiveHandler(nil)
+            sendPingCallCount += 1
+        }
     }
     
     func receive() async throws -> URLSessionWebSocketTask.Message {
@@ -91,5 +103,13 @@ final class MockWebSocketTask: WebSocketType {
         
         receiveCallCount += 1
         return .string("데이터 잘 받았습니다.")
+    }
+    
+    func disconnect(with code: URLSessionWebSocketTask.CloseCode?) {
+        if let code {
+            self.cancel(with: code, reason: nil)
+        } else {
+            self.cancel()
+        }
     }
 }

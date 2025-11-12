@@ -97,12 +97,14 @@ public class WebSocketClient: NSObject, WebSocketProvider {
 
     /// 텍스트 형태의 메시지를 WebSocket 서버로 전송합니다.
     public func send(text: String) async throws {
-        try await task?.send(.string(text))
+        guard let task else { throw NetworkError.networkError(URLError(.notConnectedToInternet)) }
+        try await task.send(.string(text))
     }
     
     /// 바이너리(Data) 형태의 메시지를 WebSocket 서버로 전송합니다.
     public func send(data: Data) async throws {
-        try await task?.send(.data(data))
+        guard let task else { throw NetworkError.networkError(URLError(.notConnectedToInternet)) }
+        try await task.send(.data(data))
     }
     
     deinit {
@@ -116,27 +118,11 @@ public class WebSocketClient: NSObject, WebSocketProvider {
 
 // MARK: - Private
 extension WebSocketClient {
-    /// 서버로 Ping 프레임을 전송하여 연결 상태를 확인합니다.
-    private func sendPing() async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            task?.sendPing { error in
-                Task {
-                    if let error {
-                        debugPrint("Ping Failed: \(error)")
-                        continuation.resume(throwing: error)
-                        return
-                    }
-                    
-                    continuation.resume()
-                }
-            }
-        }
-    }
     
     /// WebSocket의 상태 변화를 관찰하고 각 상태에 맞는 동작을 수행합니다.
     private func observeState() {
         stateTask = Task {
-            for await state in stateStream {
+            for await state in stateStream.removeDuplicates() {
                 switch state {
                 case .connecting:
                     debugPrint("Connecting")
@@ -174,13 +160,30 @@ extension WebSocketClient {
         healthCheck = Task {
             do {
                 while true {
-                    try await Task.sleep(until: .now + pingInterval)
                     try await performWithTimeout(sendPing, at: .seconds(10))
+                    try await Task.sleep(until: .now + pingInterval)
                 }
             } catch is CancellationError {
                 debugPrint("작업이 취소되었습니다.")
             } catch {
-                await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
+                await requestReconnect()
+            }
+        }
+    }
+    
+    /// 서버로 Ping 프레임을 전송하여 연결 상태를 확인합니다.
+    private func sendPing() async throws {
+        return try await withCheckedThrowingContinuation { continuation in
+            task?.sendPing { error in
+                Task {
+                    if let error {
+                        debugPrint("Ping Failed: \(error)")
+                        continuation.resume(throwing: error)
+                        return
+                    }
+                    
+                    continuation.resume()
+                }
             }
         }
     }
@@ -190,8 +193,12 @@ extension WebSocketClient {
         if userClose {
             await stateBroadCaster.send(.closed)
         } else {
-            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
+            await requestReconnect()
         }
+    }
+    
+    private func requestReconnect() async {
+        await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
     }
     
     /// WebSocket 재연결을 시도합니다.
@@ -199,7 +206,7 @@ extension WebSocketClient {
         guard task?.state != .running else {
             return
         }
-        
+  
         try? await Task.sleep(for: .seconds(2))
         await connect()
     }
@@ -230,7 +237,7 @@ extension WebSocketClient: URLSessionWebSocketDelegate {
     // 1. 네트워크 닫힘, 2. 에러로 종료, 3. 정상적으로 완료
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         if let _ = error {
-            Task { await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2))) }
+            Task { await requestReconnect() }
         }
     }
 }
