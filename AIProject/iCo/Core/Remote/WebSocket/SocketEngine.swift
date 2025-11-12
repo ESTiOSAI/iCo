@@ -51,6 +51,8 @@ extension WebSocket.State: Equatable {
             return true
         case (.connected, .connected):
             return true
+        case (.closed, .closed):
+            return true
         case (.reconnecting(let lhsDelay), .reconnecting(let rhsDelay)):
             return lhsDelay == rhsDelay
         default:
