@@ -20,29 +20,58 @@ public protocol WebSocketProvider {
     func send(data: Data) async throws
 }
 
-public final class WebSocketClient: NSObject, WebSocketProvider {
+public protocol URLSessionType {
+    func makeWebSocketTask(with url: URL) -> WebSocketType
+}
+
+public protocol WebSocketType {
+    var delegate: (any URLSessionTaskDelegate)? { get set }
+    var state: URLSessionTask.State { get }
+    
+    func resume()
+    func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?)
+    func send(_ message: URLSessionWebSocketTask.Message) async throws
+    func cancel()
+    func sendPing(pongReceiveHandler: @escaping ((any Error)?) -> Void)
+    func receive() async throws -> URLSessionWebSocketTask.Message
+}
+
+extension URLSession: URLSessionType {
+    public func makeWebSocketTask(with url: URL) -> any WebSocketType {
+        return webSocketTask(with: url)
+    }
+}
+
+extension URLSessionWebSocketTask: WebSocketType {}
+
+public class WebSocketClient: NSObject, WebSocketProvider {
     /// 소켓 상태 채널
     private var stateStream: AsyncStream<WebSocket.State>
     /// WebSocket의 상태 변화를 여러 Consumer에게 동시에 전달하는 브로드캐스터
-    public var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> = .init()
+    public var stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State>
     /// 메세지 채널
     public var incomingChannel: AsyncChannel<URLSessionWebSocketTask.Message>
     
-    private let url: URL
-    private let session: URLSession
-    private var task: URLSessionWebSocketTask?
+    private(set) var url: URL
+    private(set) var session: URLSessionType
+    private(set) var task: WebSocketType?
     
-    private var stateTask: Task<Void, Error>?
-    private var receiveTask: Task<Void, Error>?
+    private(set) var stateTask: Task<Void, Error>?
+    private(set) var receiveTask: Task<Void, Error>?
     
     /// 핑 전송 task
-    private var healthCheck: Task<Void, Error>?
+    private(set) var healthCheck: Task<Void, Error>?
     private var pingInterval: Duration = .seconds(30)
     private var pingTimeout: Duration = .seconds(10)
     
-    public init(url: URL, session: URLSession = .shared) {
+    public init(
+        url: URL,
+        session: URLSessionType = URLSession.shared,
+        stateBroadCaster: AsyncStreamBroadcaster<WebSocket.State> = .init()
+    ) {
         self.url = url
         self.session = session
+        self.stateBroadCaster = stateBroadCaster
         
         stateStream = stateBroadCaster.stream()
         incomingChannel = AsyncChannel<URLSessionWebSocketTask.Message>()
@@ -54,12 +83,9 @@ public final class WebSocketClient: NSObject, WebSocketProvider {
     /// 웹소켓 세션을 연결하고 작업을 생성합니다.
     public func connect() async {
         await stateBroadCaster.send(.connecting)
-        self.task = session.webSocketTask(with: url)
+        self.task = session.makeWebSocketTask(with: url)
         task?.delegate = self
         task?.resume()
-        
-        // 핑 응답은 연결 후에 오기 때문에 connected 시점을 캐치할 수 있음
-        try? await performWithTimeout(sendPing, at: pingTimeout)
     }
     
     /// 명시적으로 현재 WebSocket 연결을 정상적으로 종료합니다.
@@ -85,24 +111,6 @@ public final class WebSocketClient: NSObject, WebSocketProvider {
         task = nil
         stateBroadCaster.finish()
         incomingChannel.finish()
-    }
-}
-
-// MARK: - Test용 메소드
-// TODO: Deprecated 예정입니다.
-extension WebSocketClient {
-    public func sendState(with state: WebSocket.State) async {
-        await stateBroadCaster.send(state)
-    }
-    
-    public func cancel(with code: URLSessionWebSocketTask.CloseCode) {
-        task?.cancel(with: code, reason: nil)
-        task = nil
-    }
-    
-    public func cancel() {
-        task?.cancel()
-        task = nil
     }
 }
 
@@ -148,19 +156,13 @@ extension WebSocketClient {
         }
     }
     
-    // FIXME: 개선이 필요한지 한 번 더 생각해보기
     /// 서버로부터 WebSocket 메시지를 지속적으로 수신합니다.
     private func receive() {
-        receiveTask?.cancel()
-        
         receiveTask = Task {
-            do {
-                guard let task else { return }
+            while true {
+                guard let task else { throw NetworkError.taskCancelled }
                 let message = try await task.receive()
                 await incomingChannel.send(message)
-                receive()
-            } catch {
-                print("종료되어 더 이상 웹소켓 데이터를 받지 않습니다.")
             }
         }
     }
@@ -204,15 +206,11 @@ extension WebSocketClient {
     
     /// WebSocket 클라이언트의 모든 비동기 작업과 연결을 종료하고 리소스를 정리합니다.
     private func release() {
+
         receiveTask?.cancel()
         receiveTask = nil
         healthCheck?.cancel()
         healthCheck = nil
-        
-        if task?.state == .running {
-            task?.cancel(with: .goingAway, reason: nil)
-        }
-        
         task = nil
     }
 }
