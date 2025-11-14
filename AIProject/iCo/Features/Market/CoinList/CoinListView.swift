@@ -125,9 +125,9 @@ extension CoinListView {
         print(#function, phase)
         switch phase {
         case .background:
-            await store.disconnect()
-        case .inactive:
             break
+        case .inactive:
+            await store.disconnect()
         case .active:
             await store.connect()
         @unknown default:

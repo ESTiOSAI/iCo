@@ -9,12 +9,12 @@ import Foundation
 
 /// 업비트 실시간 코인 시세 웹소켓 서비스
 final class UpbitTickerService: RealTimeTickerProvider {
-    private let client: WebSocketClient
+    private let client: WebSocketProvider
     
     /// 소켓 상태 stream
     private var stateStreamTask: Task<Void, Never>?
     
-    init(client: WebSocketClient = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)) {
+    init(client: WebSocketProvider = WebSocketClient(url: URL(string: "wss://api.upbit.com/websocket/v1")!)) {
         self.client = client
     }
     
