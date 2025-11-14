@@ -32,7 +32,7 @@ public protocol WebSocketType {
     func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?)
     func send(_ message: URLSessionWebSocketTask.Message) async throws
     func cancel()
-    func sendPing(pongReceiveHandler: @escaping ((any Error)?) -> Void)
+    func sendPing(pongReceiveHandler: @escaping @Sendable((any Error)?) -> Void)
     func receive() async throws -> URLSessionWebSocketTask.Message
 }
 
