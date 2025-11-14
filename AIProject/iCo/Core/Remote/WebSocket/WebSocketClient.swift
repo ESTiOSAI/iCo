@@ -63,6 +63,7 @@ public class WebSocketClient: NSObject, WebSocketProvider {
     private(set) var healthCheck: Task<Void, Error>?
     private var pingInterval: Duration = .seconds(30)
     private var pingTimeout: Duration = .seconds(10)
+    private var attempts: Int = 0
     
     public init(
         url: URL,
@@ -221,10 +222,21 @@ extension WebSocketClient {
         }
     }
     
+    
+    /// WebSocket 재연결시에 백오프를 적용합니다.
+    /// - Returns: 백오프하는 시간을 Int 타입으로 반환합니다.
+    private func backoff() -> Int {
+        attempts += 1
+        let base = min(pow(2.0, Double(attempts)) * 100.0, 10000)
+        let jitter = Double.random(in: 0.5...1.0)
+        
+        return Int(base * jitter)
+    }
+    
     /// WebSocket 재연결을 시도합니다.
     private func reconnect() async {
-        if task?.state == .running { return }
-        try? await Task.sleep(for: .seconds(2))
+        if task?.state == .running || attempts > 10 { return }
+        try? await Task.sleep(for: .milliseconds(backoff()))
         await connect()
     }
     
