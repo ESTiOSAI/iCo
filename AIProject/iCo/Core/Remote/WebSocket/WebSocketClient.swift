@@ -107,14 +107,6 @@ public class WebSocketClient: NSObject, WebSocketProvider {
         guard let task else { throw NetworkError.networkError(URLError(.notConnectedToInternet)) }
         try await task.send(.data(data))
     }
-    
-    deinit {
-        debugPrint(String(describing: Self.self), #function)
-        task?.cancel()
-        task = nil
-        stateBroadCaster.finish()
-        incomingChannel.finish()
-    }
 }
 
 // MARK: - Private
