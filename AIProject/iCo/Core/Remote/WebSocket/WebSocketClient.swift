@@ -118,7 +118,6 @@ public class WebSocketClient: NSObject, WebSocketProvider {
 
 // MARK: - Private
 extension WebSocketClient {
-    
     /// WebSocket의 상태 변화를 관찰하고 각 상태에 맞는 동작을 수행합니다.
     private func observeState() {
         stateTask = Task {
@@ -155,19 +154,44 @@ extension WebSocketClient {
     
     /// 주기적으로 Ping을 전송하여 WebSocket 연결 상태를 점검합니다.
     private func checkingAlive() {
-        healthCheck?.cancel()
-        
         healthCheck = Task {
             do {
                 while true {
-                    try await performWithTimeout(sendPing, at: .seconds(10))
+                    try await performWithTimeout(sendPing, at: pingTimeout)
                     try await Task.sleep(until: .now + pingInterval)
                 }
             } catch is CancellationError {
                 debugPrint("작업이 취소되었습니다.")
             } catch {
-                await requestReconnect()
+                if handlePingError(error) {
+                    if task?.state == .running {
+                        task?.cancel()
+                    }
+                }
             }
+        }
+    }
+    
+    /// sendPing(:) 으로부터 받은 에러를 핸들링하는 메소드입니다.
+    /// - Parameter error: 에러를 전달받습니다.
+    /// - Returns: 재연결해야 한다면 true를 반환합니다.
+    private func handlePingError(_ error: Error) -> Bool {
+        if let urlError = error as? URLError {
+            switch urlError.code { // URLError (네트워크 단절)
+                case .notConnectedToInternet, .networkConnectionLost:
+                    return true
+                default:
+                    return false
+            }
+        } else if let posixError = error as? POSIXError {
+            switch posixError.code { // POSIXError (소켓이 죽음)
+                case .EPIPE, .ECONNRESET:
+                    return true
+                default:
+                    return false
+            }
+        } else { // 소켓이 정상상태가 아님.
+            return true
         }
     }
     
@@ -193,27 +217,19 @@ extension WebSocketClient {
         if userClose {
             await stateBroadCaster.send(.closed)
         } else {
-            await requestReconnect()
+            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
         }
-    }
-    
-    private func requestReconnect() async {
-        await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
     }
     
     /// WebSocket 재연결을 시도합니다.
     private func reconnect() async {
-        guard task?.state != .running else {
-            return
-        }
-  
+        if task?.state == .running { return }
         try? await Task.sleep(for: .seconds(2))
         await connect()
     }
     
     /// WebSocket 클라이언트의 모든 비동기 작업과 연결을 종료하고 리소스를 정리합니다.
     private func release() {
-
         receiveTask?.cancel()
         receiveTask = nil
         healthCheck?.cancel()
@@ -237,7 +253,7 @@ extension WebSocketClient: URLSessionWebSocketDelegate {
     // 1. 네트워크 닫힘, 2. 에러로 종료, 3. 정상적으로 완료
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         if let _ = error {
-            Task { await requestReconnect() }
+            Task { await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2))) }
         }
     }
 }
