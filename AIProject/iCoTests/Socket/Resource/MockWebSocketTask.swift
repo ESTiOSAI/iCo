@@ -40,26 +40,28 @@ final class MockWebSocketTask: WebSocketType {
         resumeCallCount += 1
         
         if let delegate = delegate as? URLSessionWebSocketDelegate {
-            delegate.urlSession?(fakeSession, webSocketTask: fakeTask, didOpenWithProtocol: nil)
             taskState = .running
+            delegate.urlSession?(fakeSession, webSocketTask: fakeTask, didOpenWithProtocol: nil)
         }
     }
     
     func cancel(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         cancelCallCount += 1
-        taskState = .canceling
         closed = true
+        taskState = .canceling
         
         if let delegate = delegate as? URLSessionWebSocketDelegate {
             delegate.urlSession?(fakeSession, webSocketTask: fakeTask, didCloseWith: closeCode, reason: nil)
             delegate.urlSession?(fakeSession, task: fakeTask, didCompleteWithError: nil)
         }
+        
+        taskState = .completed
     }
     
     func cancel() {
         cancelCallCount += 1
-        taskState = .canceling
         closed = true
+        taskState = .completed
         
         let error = URLError(.notConnectedToInternet)
         delegate?.urlSession?(fakeSession, task: fakeTask, didCompleteWithError: error)
@@ -67,10 +69,11 @@ final class MockWebSocketTask: WebSocketType {
     
     func send(_ message: URLSessionWebSocketTask.Message) async throws {
         if throwError {
+            taskState = .completed
             throw NSError(
                 domain: NSURLErrorDomain,
                 code: -1009,
-                userInfo: [NSLocalizedDescriptionKey: "The Internet connection appears to be offline."]
+                userInfo: [NSLocalizedDescriptionKey: "인터넷 에러 코드 -1009"]
             )
         }
         
@@ -83,9 +86,8 @@ final class MockWebSocketTask: WebSocketType {
             pongReceiveHandler(NSError(
                 domain: NSURLErrorDomain,
                 code: -1009,
-                userInfo: [NSLocalizedDescriptionKey: "The Internet connection appears to be offline."]
+                userInfo: [NSLocalizedDescriptionKey: "인터넷 에러 코드 -1009"]
             ))
-            return
         } else {
             pongReceiveHandler(nil)
             sendPingCallCount += 1
@@ -93,7 +95,7 @@ final class MockWebSocketTask: WebSocketType {
     }
     
     func receive() async throws -> URLSessionWebSocketTask.Message {
-        if closed { // 작업이 종료되었을 때 에러 던져야 함.
+        if closed {
             throw NSError(
                 domain: NSURLErrorDomain,
                 code: URLError.cancelled.rawValue,
@@ -105,7 +107,7 @@ final class MockWebSocketTask: WebSocketType {
         return .string("데이터 잘 받았습니다.")
     }
     
-    func disconnect(with code: URLSessionWebSocketTask.CloseCode?) {
+    func disconnect(with code: URLSessionWebSocketTask.CloseCode? = nil) {
         if let code {
             self.cancel(with: code, reason: nil)
         } else {

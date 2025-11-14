@@ -103,7 +103,7 @@ final class WebSocketTests: XCTestCase {
         ]
         
         await sut.connect()
-        task.disconnect(with: .internalServerError)
+        task.disconnect()
         try? await Task.sleep(for: .seconds(4))
         
         XCTAssertEqual(expectedLog, broadCaster.log)
