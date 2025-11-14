@@ -74,7 +74,7 @@ final class WebSocketTests: XCTestCase {
         let expectedLog: [WebSocket.State] = [
             .connecting,
             .connected,
-            .reconnecting(nextAttempsIn: .seconds(2)),
+            .reconnecting,
             .connecting,
             .connected
         ]
@@ -97,7 +97,7 @@ final class WebSocketTests: XCTestCase {
         let expectedLog: [WebSocket.State] = [
             .connecting,
             .connected,
-            .reconnecting(nextAttempsIn: .seconds(2)),
+            .reconnecting,
             .connecting,
             .connected
         ]

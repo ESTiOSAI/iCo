@@ -21,7 +21,7 @@ public enum WebSocket {
         case connecting, connected
         case failed
         case closed
-        case reconnecting(nextAttempsIn: Duration)
+        case reconnecting
     }
     
     public enum Failure: Error {
@@ -53,8 +53,8 @@ extension WebSocket.State: Equatable {
             return true
         case (.closed, .closed):
             return true
-        case (.reconnecting(let lhsDelay), .reconnecting(let rhsDelay)):
-            return lhsDelay == rhsDelay
+        case (.reconnecting, .reconnecting):
+            return true
         default:
             return false
         }

@@ -129,6 +129,7 @@ extension WebSocketClient {
                     continue
                 case .connected:
                     debugPrint("Connected")
+                    clearAttempts()
                     receive()
                     checkingAlive()
                 case .failed, .closed:
@@ -218,10 +219,13 @@ extension WebSocketClient {
         if userClose {
             await stateBroadCaster.send(.closed)
         } else {
-            await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2)))
+            await stateBroadCaster.send(.reconnecting)
         }
     }
     
+    private func clearAttempts() {
+        attempts = 0
+    }
     
     /// WebSocket 재연결시에 백오프를 적용합니다.
     /// - Returns: 백오프하는 시간을 Int 타입으로 반환합니다.
@@ -265,7 +269,7 @@ extension WebSocketClient: URLSessionWebSocketDelegate {
     // 1. 네트워크 닫힘, 2. 에러로 종료, 3. 정상적으로 완료
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         if let _ = error {
-            Task { await stateBroadCaster.send(.reconnecting(nextAttempsIn: .seconds(2))) }
+            Task { await stateBroadCaster.send(.reconnecting) }
         }
     }
 }
