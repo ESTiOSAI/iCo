@@ -184,6 +184,7 @@ struct CoinCarouselView: View {
                     }
                 )
             }
+            .scrollIndicators(.hidden)
             .presentationDetents([detent])
             
         }
