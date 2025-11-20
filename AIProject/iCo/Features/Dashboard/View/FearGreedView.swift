@@ -26,27 +26,43 @@ struct FearGreedView: View {
         case .xSmall, .small, .medium, .large:
             return baseWidth
         case .xLarge, .xxLarge, .xxxLarge:
-            return baseWidth * 0.9
+            return baseWidth * 1.2
         default:
-            return baseWidth * 0.7
+            return baseWidth * 1.4
         }
     }
     
     var body: some View {
         VStack {
-            HStack(alignment: .center, spacing: 0) {
-                headerSection
+            if typeSize >= .xLarge && hSizeClass == .compact {
+                VStack(alignment: .leading, spacing: 0) {
+                    headerSection
+                    
+                    if showFearGreedDescription {
+                        fearGreedDescription
+                            .opacity(!showFearGreedDescription ? 0 : 1)
+                            .animation(.snappy(duration: 0.3), value: showFearGreedDescription)
+                    }
+                    
+                    chartSection
+                        .padding(.top, 22)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack(alignment: .center, spacing: 0) {
+                    headerSection
+
+                    Spacer()
+
+                    chartSection
+                }
                 
-                Spacer()
-                
-                chartSection
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            
-            if showFearGreedDescription {
-                fearGreedDescription
-                    .opacity(!showFearGreedDescription ? 0 : 1)
-                    .animation(.snappy(duration: 0.3), value: showFearGreedDescription)
+                if showFearGreedDescription {
+                    fearGreedDescription
+                        .opacity(!showFearGreedDescription ? 0 : 1)
+                        .animation(.snappy(duration: 0.3), value: showFearGreedDescription)
+                }
             }
         }
         .padding(.horizontal, 22)
@@ -57,7 +73,6 @@ struct FearGreedView: View {
             RoundedRectangle(cornerRadius: Self.cornerRadius)
                 .strokeBorder(.defaultGradient, lineWidth: 0.5)
         )
-        .animation(.snappy(duration: 0.2), value: showFearGreedDescription)
     }
     
     var headerSection: some View {
@@ -119,6 +134,7 @@ struct FearGreedView: View {
             .font(.ico12M)
             .foregroundStyle(.secondary)
         }
+        .fixedSize(horizontal: true, vertical: false)
     }
     
     var fearGreedDescription: some View {
