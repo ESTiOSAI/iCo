@@ -139,50 +139,54 @@ struct CoinCarouselView: View {
             wrappedCoins.removeAll()
         }
         .sheet(item: $selectedCoin) { coin in
-            VStack(spacing: 30) {
-                CoinInfoView(recommendCoin: coin) {
-                    selectedCoin = nil
-                }
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "sparkles")
-                            .font(.ico16B)
-                            .foregroundStyle(.iCoAccent)
-                        
-                        Text("아이코가 추천하는 이유")
-                            .font(.ico18B)
-                            .foregroundStyle(.iCoLabel)
+            ScrollView {
+                VStack(spacing: 30) {
+                    CoinInfoView(recommendCoin: coin) {
+                        selectedCoin = nil
                     }
                     
-                    Text(String.aiGeneratedContentNotice)
-                        .font(.ico13)
-                        .foregroundStyle(.iCoNeutral)
-                        .lineSpacing(6)
-                    
-                    Text(coin.comment.byCharWrapping)
-                        .font(.ico16)
-                        .lineSpacing(6)
-                        .foregroundStyle(.iCoLabel)
-                }
-                .fixedSize(horizontal: false, vertical: true)
-                
-                RoundedRectangleFillButton(title: "더 자세히 보러가기", imageName: "info.circle", isHighlighted: .constant(true)) {
-                    selectedCoin = nil
-                    showDetailCoin = coin
-                }
-            }
-            .padding(20)
-            .background(.background)
-            .background(
-                GeometryReader { geo in
-                    Color.clear
-                        .onAppear {
-                            measuredHeight = geo.size.height
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .font(.ico16B)
+                                .foregroundStyle(.iCoAccent)
+                            
+                            Text("아이코가 추천하는 이유")
+                                .font(.ico18B)
+                                .foregroundStyle(.iCoLabel)
                         }
+                        
+                        Text(String.aiGeneratedContentNotice)
+                            .font(.ico13)
+                            .foregroundStyle(.iCoNeutral)
+                            .lineSpacing(6)
+                        
+                        Text(coin.comment.byCharWrapping)
+                            .font(.ico16)
+                            .lineSpacing(6)
+                            .foregroundStyle(.iCoLabel)
+                    }
+                    .fixedSize(horizontal: false, vertical: true)
+                    
+                    RoundedRectangleFillButton(title: "더 자세히 보러가기", imageName: "info.circle", isHighlighted: .constant(true)) {
+                        selectedCoin = nil
+                        showDetailCoin = coin
+                    }
                 }
-            )
+                .padding(20)
+                .background(.background)
+                .background(
+                    GeometryReader { geo in
+                        Color.clear
+                            .onAppear {
+                                measuredHeight = geo.size.height
+                            }
+                    }
+                )
+            }
+            .scrollIndicators(.hidden)
             .presentationDetents([detent])
+            
         }
         .onChange(of: selectedCoin) { _, newValue in
             updateTimerState()

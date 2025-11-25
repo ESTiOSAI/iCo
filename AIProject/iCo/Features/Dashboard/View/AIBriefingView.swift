@@ -34,7 +34,7 @@ struct AIBriefingView: View {
             
             VStack(spacing: 16) {
                 if isPadLayout {
-                    HStack(spacing: 16) {
+                    HStack(alignment: .top, spacing: 16) {
                         briefingView
                         TopCoinListView()
                     }
