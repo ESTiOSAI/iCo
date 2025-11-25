@@ -61,25 +61,28 @@ AICo는 **코인 입문자**를 위한 LLM 기반 큐레이션 서비스입니�
 <tr>
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Dashboard.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/9405bb7d-3f0c-4c84-a50e-ec3f87102255" />
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Market.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/5523289b-b0f8-4e8d-affd-f22efa669ae2" />
+
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Chatbot.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/30d067c4-a863-4b7b-a095-ac0e6f48d4ca" />
+
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Vision.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/734ac902-9fb6-43d8-b918-99dfda08b373" />
+
 
 </td>
 
@@ -145,25 +148,29 @@ LLM 필터링 기능
 <tr>
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Chart.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/54af360d-e801-4f4b-952f-62e13194e927" />
+
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/AIR.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/fda9383c-5d15-4f05-859f-c43535fa2b57" />
+
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Bookmark.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/0cc2d295-91b9-490e-bf54-16c8551c3bc6" />
+
 
 </td>
 
 <td align="center" width="250">
 
-<img width="200" alt="image" src="img/Widget.png" />
+<img width="230" alt="image" src="https://github.com/user-attachments/assets/24872bca-a606-45d3-9967-a27bfbe37932" />
+
 
 </td>
 
@@ -237,37 +244,6 @@ iCo
 └── └── Chart
 
 ```
-
-## 🎯 TroubleShooting
-
-<details> <summary>LLM 프롬프트 튜닝 및 파이프라인 설계</summary>
-  - LLM 응답의 일관성 부족 문제를 프롬프트 엔지니어링으로 해결 
-  - 비동기 API 호출 순서를 제어하여 중복 요청 방지 
-  - ![더보기](https://github.com/ESTiOSAI/AICo/edit/dev/README.md)
-
-</details> 
-
-<details> <summary>웹소켓 생명주기 관리</summary> - 백그라운드 전환 시 연결 해제 및 재연결 처리 - `Ping/Pong` 타임아웃 기반으로 안정적인 연결 유지 </details> 
-
-<details> <summary>AsyncStream / AsyncAlgorithm 활용</summary> - 코인 시세 스트리밍을 `AsyncStream`으로 구현 - `AsyncAlgorithms`를 활용해 debounce / throttle 적용 </details> 
-
-<details> <summary>캔들 차트 최적화</summary> - CoreGraphics 기반 성능 최적화 - 수천 개 데이터 처리 시 메모리 최적화 </details> 
-
-<details> <summary>챗봇 스크롤 UX 개선</summary> - 새 메시지 입력 시 자동 스크롤 문제 해결 - SwiftUI List의 offset 제어를 Custom ScrollView로 교체 </details>
-
-<details> <summary>무한 Carousel 구현</summary> - 무한 루프 성능 이슈 해결 (아이템 재사용 / 좌표 리셋) - 애니메이션 끊김 현상 개선 </details>
-
-<details> <summary>Vision, LLM 파이프라인 설계</summary> - 이미지 비식별화 속도 최적화 - 얼굴 탐지 False Positive 최소화 </details> 
-
-<details> <summary>위젯</summary> - `App Group` 기반 데이터 공유 - Background Refresh 시점 조정 </details> 
-
-<details> <summary>아이패드 대응 Navigation / SplitView </summary> - `NavigationSplitView` 사용 - 화면 크기에 따른 동적 레이아웃 분리 </details> 
-
-<details> <summary>네트워크 계층화 (Status Code 핸들링) </summary> - 공통 에러 핸들링 구조 설계 - `Status Code` 별 Retry / Fail 처리 </details> 
-
-<details> <summary>비동기 Task 제어 (cancel, retry, caching, TaskGroup, debounce)</summary> - `TaskGroup`으로 병렬/배치 처리 - cancel, retry, caching, debounce 전략 통합 </details> 
-
-<details> <summary>ImageLoader 최적화</summary> - GIF / JPEG 혼합 처리 시 메모리 최적화 - Prefetch + Cancel + Cache 전략 적용 </details>
 
 ## 📎 Attachments
 
